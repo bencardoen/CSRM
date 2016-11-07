@@ -53,12 +53,16 @@ def cosine(a):
 def absolute(a):
     return abs(a)
 
+def ln(a):
+    return log(a, math.e)
+
 
 # function : {prettyprint, arity, precedence, associativity}
 functionset = { plus:("+", 2, 2, 'L'), minus:("-", 2, 2, 'L'),
                 multiply:("*", 2, 3, 'L'), division:("/", 2, 3, 'L'),modulo:("%", 2, 3, 'L'),
-                power:("**", 2, 3, 'R'),
+                power:("**", 2, 3, 'R'), math.sqrt:("sqrt", 2,3,'R'),
                 logarithm:("log", 2, 4, 'F'), maximum:("max", 2, 4, 'F'), minimum:("min", 2, 4, 'F'),
+                ln:("ln", 1,4,'F'),
                 sine:("sin", 1, 4, 'F'), cosine:("cos", 1, 4, 'F'), absolute:("abs",1, 4, 'F')
                 }
 # todo complete
@@ -79,6 +83,7 @@ def tokenize(expression, variables=None):
     output = []
     i = 0
     expression = expression.replace(' ', '')
+    expression = expression.replace("**", "^")
     detect = ['(', ','] + [x for x in list(functionset.keys())]
     logger.debug("tokenize with args expr {} vars {}".format(expression, variables))
     while i < len(expression):
@@ -88,25 +93,12 @@ def tokenize(expression, variables=None):
             if i == 0 or (output and output[-1] in detect):
                 expression, i, output = handleUnaryMinus(expression, i, output, variables)
             else:
-                output += [tokens['-']]
+                output.append(tokens['-'])
         elif c == '^':
-            output += [tokens['**']]
-            logger.debug("Power at index {}".format(c, i))
-        elif c == '*':
-            if expression[i:i+2] == '**':
-                output += [tokens['**']]
-                logger.debug("Power at index {}".format(c, i))
-                i += 1
-            else:
-                logger.debug("Mult at index {}".format(c, i))
-                output += [tokens['*']]
+            output.append(tokens['**'])
         elif c in braces:
-            logger.debug("{} at index {}".format(c, i))
             output.append(c)
-        elif c in tokens:
-            output+= [tokens[c]]
         elif c in prefixes : # functions
-            logger.debug("f at index {}".format(c, i))
             expression, i, output = parseFunction(expression, i, output)
         else:
             f = tools.matchFloat(expression[i:])
@@ -211,6 +203,10 @@ def infixToPrefix(infix):
     return result
 
 def parseVariable(stream, variables, index):
+    """
+        Parse a variable from the stream if possible, create and return the object and offset
+        the index with the length of the token
+    """
     v = tools.matchVariable(stream)
     if v:
         index += len(v)-1
@@ -260,15 +256,16 @@ def parseFunction(expression, index, output):
     """
         Decode a function from the stream
     """
-    logger.debug("f at index {}".format(index))
-    for length in range(2, 5):
-        if index != len(expression)-length-1:
-            name = expression[index:index+length]
-            if name in tokens:
-                logger.debug("{} at index {}".format(name, index))
-                output += [tokens[name]]
-                index += length-1
-                break
+    logger.debug("f {} at index {}".format(expression[index],index))
+    candidate = None
+    for length in range(1, 5):
+        name = expression[index:index+length]
+        if name in tokens:
+            f = tokens[name]
+            logger.debug("{} at index {}".format(name, index))
+            output += [tokens[name]]
+            index += length-1
+            break
     else:
         raise ValueError("Invalid chars {}".format(name))
     return expression, index, output
