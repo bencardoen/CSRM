@@ -58,13 +58,13 @@ def ln(a):
 
 
 # function : {prettyprint, arity, precedence, associativity, class}
-functionset = { plus:("+", 2, 2, 'L', 'O'), minus:("-", 2, 2, 'L', 'O'),
-                multiply:("*", 2, 3, 'L', 'O'), division:("/", 2, 3, 'L'),modulo:("%", 2, 3, 'L', 'O'),
-                power:("**", 2, 3, 'R', 'O'), math.sqrt:("sqrt", 1,3,'R', 'O'),
+functionset = { plus:("+", 2, 2, 'L'), minus:("-", 2, 2, 'L'),
+                multiply:("*", 2, 3, 'L'), division:("/", 2, 3, 'L'),modulo:("%", 2, 3, 'L'),
+                power:("**", 2, 3, 'R'), math.sqrt:("sqrt", 1,3,'R'),
                 logarithm:("log", 2, 4, 'F'), maximum:("max", 2, 4, 'F'), minimum:("min", 2, 4, 'F'),
                 ln:("ln", 1,4,'R'),math.exp:("exp", 1,4,'R'),
-                sine:("sin", 1, 4, 'F'), cosine:("cos", 1, 4, 'F'), absolute:("abs",1, 4, 'F'),
-                math.tanh:("tanh", 1,4, 'F'), math.tan:("tan",1,4,'F')
+                sine:("sin", 1, 4, 'R'), cosine:("cos", 1, 4, 'R'), absolute:("abs",1, 4, 'F'),
+                math.tanh:("tanh", 1,4, 'R'), math.tan:("tan",1,4,'R')
                 }
 
 # Testfunctions from M.F. Korns' paper "A baseline symbolic regression algorithm"

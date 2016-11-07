@@ -421,7 +421,6 @@ class TreeTest(unittest.TestCase):
     def testPrecedence(self):
         datapoints = 2
         variables = [[ d for d in range(2,6)] for x in range(4)]
-        print(variables)
         expressions = ["5*x3**4*x2"]#,"-5*x2**(1/2)", "-5*sqrt(x2)"]
         expected = [[160, (-5*sqrt(2)*2),(-5*sqrt(2)*2)],[1215, (-5*sqrt(3)*3),(-5*sqrt(3)*3)]]
         trees = [None for d in range(len(expressions))]
