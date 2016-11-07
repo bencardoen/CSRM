@@ -410,7 +410,7 @@ class TreeTest(unittest.TestCase):
 
     def testUnaryExpressions(self):
         variables = [[ d for d in range(4)] for x in range(4)]
-        expressions = ["-(5+3)","2**-((-2)+(-3))", "max(-9 , -7) + 3**-4", "5.41 + -4.9*9", "-5.41 + -4.9*9", "-(x2 ** -x3)",]
+        expressions = ["-(5+3)","2**-((-2)+(-3))", "max(-9 , -7) + 3**-4", "5.41 + -4.9*9", "-5.41 + -4.9*9", "-(x2 ** -x3)"]
         expected = [-8.0,32.0,  -6.987654320987654, -38.69, -49.510000000000005, -1.0]
         i = 0
         for expr in expressions:

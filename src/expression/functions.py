@@ -12,6 +12,7 @@ import tree
 import re
 import logging
 import tools
+import math
 logger = logging.getLogger('global')
 
 
@@ -65,6 +66,8 @@ testfunctions = [ "1.57 + (24.3*x3)", "0.23+(14.2*((x3+x1)/(3.0*x4)))"
                 ]
 
 tokens = { value[0]: key for key, value in list(functionset.items())}
+braces = [',', '(',')']
+prefixes = { value[0][0]: (key, len(value[0])) for key, value in list(functionset.items())}
 
 def getRandomFunction():
     return choice(list(functionset.keys()))
@@ -83,35 +86,7 @@ def tokenize(expression, variables=None):
         logger.debug("Tokenizing {} at index {}".format(c, i))
         if c == '-':
             if i == 0 or (output and output[-1] in detect):
-                f = tools.matchFloat(expression[i:])
-                if f:
-                    i += len(f)-1  # -1 since we will increment i in any case
-                    output += [tree.Constant(float(f))]
-                else:
-                    v, newindex = parseVariable(expression[i+1:], variables, i)
-                    if v:
-                        i = newindex+1
-                        output += ['(',tree.Constant(-1.0), tokens['*'], v, ')']
-                    else:
-                        if i < (len(expression)-1) and expression[i+1] == '(': # case : -(5+3)
-                            lcount = 0
-                            j = i
-                            while j != len(expression):
-                                if expression[j] == '(':
-                                    lcount+=1
-                                elif expression[j] == ')':
-                                    lcount -= 1
-                                    if lcount == 0:
-                                        if j == len(expression)-1:
-                                            expression = expression[:] + ')'
-                                        else:
-                                            expression = expression[0:j] + ')' + expression[j+1:]
-                                        break
-                                j+=1
-                            output += ['(',tree.Constant(-1.0), tokens['*']]
-                        else:
-                            logging.error("Invalid pattern in string {} , full expr {}".format(expression[i:], expression))
-                            raise ValueError("Failed to decode number.")
+                expression, i, output = handleUnaryMinus(expression, i, output, variables)
             else:
                 output += [tokens['-']]
         elif c == '^':
@@ -125,29 +100,14 @@ def tokenize(expression, variables=None):
             else:
                 logger.debug("Mult at index {}".format(c, i))
                 output += [tokens['*']]
-        elif c == '(':
-            logger.debug("( at index {}".format(c, i))
-            output += ['(']
-        elif c == ')':
-            logger.debug(") at index {}".format(c, i))
-            output += [')']
-        # match min, max, abs, cos, sin, log
-        elif c in ['m', 'a', 'c', 's', 'l'] :
-            logger.debug("f at index {}".format(c, i))
-            if i != len(expression)-2:
-                name = expression[i:i+3]
-                if name in tokens:
-                    logger.debug("{} at index {}".format(name, i))
-                    output += [tokens[name]]
-                else:
-                    raise ValueError("Invalid chars {}".format(name))
-                i += 2
-            else:
-                raise ValueError("Invalid chars {}".format(name))
+        elif c in braces:
+            logger.debug("{} at index {}".format(c, i))
+            output.append(c)
         elif c in tokens:
-            output += [tokens[c]]
-        elif c == ',':
-            output += [',']
+            output+= [tokens[c]]
+        elif c in prefixes : # functions
+            logger.debug("f at index {}".format(c, i))
+            expression, i, output = parseFunction(expression, i, output)
         else:
             f = tools.matchFloat(expression[i:])
             if f:
@@ -262,3 +222,53 @@ def parseVariable(stream, variables, index):
         return (variable, index)
     else:
         return (None, index)
+
+def handleUnaryMinus(expression, index, output, variables):
+    f = tools.matchFloat(expression[index:])
+    if f:
+        index += len(f)-1  # -1 since we will increment i in any case
+        output += [tree.Constant(float(f))]
+    else:
+        v, newindex = parseVariable(expression[index+1:], variables, index)
+        if v:
+            index = newindex+1
+            output += ['(',tree.Constant(-1.0), tokens['*'], v, ')']
+        else:
+            if index < (len(expression)-1) and expression[index+1] == '(': # case : -(5+3) -> (-1*(5+3))
+                lcount = 0
+                j = index
+                while j != len(expression):
+                    if expression[j] == '(':
+                        lcount+=1
+                    elif expression[j] == ')':
+                        lcount -= 1
+                        if lcount == 0:
+                            if j == len(expression)-1:
+                                expression = expression[:] + ')'
+                            else:
+                                expression = expression[0:j] + ')' + expression[j+1:]
+                            break
+                    j+=1
+                output += ['(',tree.Constant(-1.0), tokens['*']]
+            else:
+                logging.error("Invalid pattern in string {} , full expr {}".format(expression[index:], expression))
+                raise ValueError("Failed to decode number.")
+    return expression, index, output
+
+
+def parseFunction(expression, index, output):
+    """
+        Decode a function from the stream
+    """
+    logger.debug("f at index {}".format(index))
+    for length in range(2, 5):
+        if index != len(expression)-length-1:
+            name = expression[index:index+length]
+            if name in tokens:
+                logger.debug("{} at index {}".format(name, index))
+                output += [tokens[name]]
+                index += length-1
+                break
+    else:
+        raise ValueError("Invalid chars {}".format(name))
+    return expression, index, output
