@@ -159,16 +159,9 @@ def tokenize(expression, variables=None):
                 i += len(f)-1  # -1 since we will increment i in any case
                 output += [tree.Constant(float(f))]
             else:
-                v = tools.matchVariable(expression[i:])
+                v, i = parseVariable(expression[i:], variables, i)
                 if v:
-                    i += len(v)-1
-                    index = int(''.join([x for x in v if x not in ['X', 'x', '_']]))
-                    vs = None
-                    if variables:
-                        vs = variables[index]
-                    variable = tree.Variable(vs, index)
-                    logging.debug("Appending Variable v={}".format(variable))
-                    output += [variable]
+                    output += [v]
                 else:
                     logging.error("Invalid pattern in string {} , full expr {}".format(expression[i:], expression))
                     raise ValueError("Failed to decode number.")
@@ -261,3 +254,16 @@ def infixToPrefix(infix):
     tmp = infixToPostfix(infix)
     result = [x for x in reversed(tmp)]
     return result
+
+def parseVariable(stream, variables, index):
+    v = tools.matchVariable(stream)
+    if v:
+        index += len(v)-1
+        vindex = int(''.join([x for x in v if x not in ['X', 'x', '_']]))
+        vs = None
+        vs = variables[vindex]
+        variable = tree.Variable(vs, vindex)
+        logging.debug("Parsed Variable v={}".format(variable))
+        return (variable, index)
+    else:
+        return (None, index)
