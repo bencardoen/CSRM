@@ -57,16 +57,28 @@ def ln(a):
     return log(a, math.e)
 
 
-# function : {prettyprint, arity, precedence, associativity}
-functionset = { plus:("+", 2, 2, 'L'), minus:("-", 2, 2, 'L'),
-                multiply:("*", 2, 3, 'L'), division:("/", 2, 3, 'L'),modulo:("%", 2, 3, 'L'),
-                power:("**", 2, 3, 'R'), math.sqrt:("sqrt", 2,3,'R'),
+# function : {prettyprint, arity, precedence, associativity, class}
+functionset = { plus:("+", 2, 2, 'L', 'O'), minus:("-", 2, 2, 'L', 'O'),
+                multiply:("*", 2, 3, 'L', 'O'), division:("/", 2, 3, 'L'),modulo:("%", 2, 3, 'L', 'O'),
+                power:("**", 2, 3, 'R', 'O'), math.sqrt:("sqrt", 1,3,'R', 'O'),
                 logarithm:("log", 2, 4, 'F'), maximum:("max", 2, 4, 'F'), minimum:("min", 2, 4, 'F'),
-                ln:("ln", 1,4,'F'),
-                sine:("sin", 1, 4, 'F'), cosine:("cos", 1, 4, 'F'), absolute:("abs",1, 4, 'F')
+                ln:("ln", 1,4,'R'),math.exp:("exp", 1,4,'R'),
+                sine:("sin", 1, 4, 'F'), cosine:("cos", 1, 4, 'F'), absolute:("abs",1, 4, 'F'),
+                math.tanh:("tanh", 1,4, 'F'), math.tan:("tan",1,4,'F')
                 }
-# todo complete
-testfunctions = [ "1.57 + (24.3*x3)", "0.23+(14.2*((x3+x1)/(3.0*x4)))"
+
+# Testfunctions from M.F. Korns' paper "A baseline symbolic regression algorithm"
+testfunctions = [
+                    "1.57 + (24.3*x3)", "0.23+(14.2*((x3+x1)/(3.0*x4)))",
+                    "-5.41 + (4.9*(((x3-x0)+(x1/x4))/(3*x4)))", "-2.3 + (0.13*sin(x2))",
+                    "3.0 + (2.13 * ln(x4))", "1.3 + (0.13*sqrt(x0))",
+                    "213.80940889 - (213.80940889*exp(-0.54723748542*x0))",
+                    "6.87+(11*sqrt(7.23*x0*x3*x4))","((sqrt(x0)/ln(x1))*exp(x2)/(x3 ** 2))",
+                    "0.81 + 24.3 * ( ( 2.0*x1+3.0*x2 **2) /(4.0*x3**3 + 5.0*x4**4) )",
+                    "6.87+ 11* cos(7.23*x0**3)", "2.0 - 2.1 * cos(9.8*x0) * sin(1.3*x4)",
+                    "32-3.0*( (tan(x0)/tan(x1) )*( tan(x2) / tan(x3) ))",
+                    "22 - 4.2*((cos(x0)-tan(x1))*(tanh(x2)/sin(x3)))",
+                    "12.0 - 6.0* tan(x0)/exp(x1) * (ln(x2)-tan(x3) ) "
                 ]
 
 tokens = { value[0]: key for key, value in list(functionset.items())}
@@ -111,7 +123,7 @@ def tokenize(expression, variables=None):
                     output += [v]
                 else:
                     logging.error("Invalid pattern in string {} , full expr {}".format(expression[i:], expression))
-                    raise ValueError("Failed to decode number.")
+                    raise ValueError("Failed to decode number, string is {}  in expr{}".format(expression[i:], expression))
         i += 1
     return output
 
@@ -258,7 +270,7 @@ def parseFunction(expression, index, output):
     """
     logger.debug("f {} at index {}".format(expression[index],index))
     candidate = None
-    for length in range(1, 5):
+    for length in reversed(range(1, 5)):
         name = expression[index:index+length]
         if name in tokens:
             f = tokens[name]

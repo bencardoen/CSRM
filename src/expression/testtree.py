@@ -409,18 +409,73 @@ class TreeTest(unittest.TestCase):
 
 
     def testUnaryExpressions(self):
-        variables = [[ d for d in range(4)] for x in range(4)]
+        variables = [[ d for d in range(4)] for x in range(2,7)]
         expressions = ["-(5+3)","2**-((-2)+(-3))", "max(-9 , -7) + 3**-4", "5.41 + -4.9*9", "-5.41 + -4.9*9", "-(x2 ** -x3)"]
         expected = [-8.0,32.0,  -6.987654320987654, -38.69, -49.510000000000005, -1.0]
-        i = 0
-        for expr in expressions:
+        for i, expr in enumerate(expressions):
             t = Tree.createTreeFromExpression(expr, variables)
             v = t.evaluateTree()
             t.printToDot("output/t27unary{}.dot".format(i))
             self.assertEqual(expected[i], v)
-            i+=1
 
+    def testPrecedence(self):
+        datapoints = 2
+        variables = [[ d for d in range(2,6)] for x in range(4)]
+        print(variables)
+        expressions = ["5*x3**4*x2"]#,"-5*x2**(1/2)", "-5*sqrt(x2)"]
+        expected = [[160, (-5*sqrt(2)*2),(-5*sqrt(2)*2)],[1215, (-5*sqrt(3)*3),(-5*sqrt(3)*3)]]
+        trees = [None for d in range(len(expressions))]
+        for d in range(datapoints):
+            for t in trees:
+                if t:
+                    t.updateIndex()
+            for i, expr in enumerate(expressions):
+                if not trees[i]:
+                    trees[i]=Tree.createTreeFromExpression(expr, variables)
+                t=trees[i]
+                v = t.evaluateTree()
+                t.printToDot("output/t28unary{}.dot".format(i))
+                self.assertEqual(expected[d][i], v)
 
+    def testVariableIndex(self):
+        expr = "x1 + x0"
+        variables = [[1,2],[2,3]]
+        t = Tree.createTreeFromExpression(expr, variables)
+        d = t.evaluateTree()
+        d = t.evaluateTree()
+        t.updateIndex()
+        e = t.evaluateTree()
+        self.assertNotEqual(d,e)
+
+    def testExp(self):
+        expr = "1 - 2*exp(-3*5)"
+        variables = [[1,2],[2,3]]
+        t = Tree.createTreeFromExpression(expr, variables)
+        e = t.evaluateTree()
+        t.printToDot("output/t30.dot")
+        self.assertAlmostEqual(e, 1-2*math.exp(-3*5))
+
+    def testBenchmarkFunctions(self):
+        funcs = len(testfunctions)
+        dcount = 2
+        vcount = 5
+        variables = tools.generateVariables(vcount, dcount, 0)
+        results = [[None for d in range(dcount)] for x in range(funcs)]
+        trees = [None for d in range(funcs)]
+        for j in range(dcount):
+            for t in trees:
+                if t:
+                    t.updateIndex()
+            for i, e in enumerate(testfunctions):
+                if not trees[i]:
+                    trees[i] = Tree.createTreeFromExpression(e, variables)
+                t = trees[i]
+                ev = t.evaluateTree()
+                results[i][j] = ev
+                t.printToDot("output/t29Benchmark{}{}.dot".format(i,j))
+        for index, res in enumerate(results):
+#            print("Comparing results of {} , {} !=? {}".format(testfunctions[index], res[0], res[1]))
+            self.assertNotAlmostEqual(res[0], res[1])
 
 if __name__=="__main__":
 #    logger.setLevel(logging.DEBUG)

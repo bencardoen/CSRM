@@ -48,6 +48,12 @@ class Node:
         else:
             return rv
 
+    def finalized(self):
+        """
+            Return true if this node can be evaluated (e.g. has enough children for its arity)
+        """
+        return ( len(self.getChildren()) == self.getArity())
+
     def getPosition(self):
         return self.pos
 
@@ -185,10 +191,11 @@ class Variable():
         self._current = i
 
     def getCurrentIndex(self):
-        return self_current
+        return self._current
 
     def getValue(self):
         if self._values:
+#            print("Index = {}, val = {}".format(self._current, self._values[self._current]))
             return self._values[self._current]
         else:
             logger.error("Variable value not set : returning 1")
@@ -218,7 +225,7 @@ class VariableNode(Node):
     def evaluate(self, args=None):
         con = self.getConstant()
         if con :
-            return self.variable * con.getValue()
+            return self.variable.getValue() * con.getValue()
         else:
             return self.variable.getValue()
 
@@ -288,8 +295,6 @@ class ConstantNode(Node):
         return not result
 
 
-
-
 class Tree:
     """
         Expression tree. A binary tree stored as an ordered list.
@@ -300,6 +305,8 @@ class Tree:
         self.nodes = []
         self.root = None
         self.variables = {}
+        self.evaluated = 0
+        self.modified = False
 
     def getNode(self, pos):
         self.testInvariant()
@@ -318,7 +325,7 @@ class Tree:
             raise ValueError("Mismatched lists")
         else:
             for n in left:
-                if n.getArity() != len(n.getChildren()):
+                if not n.finalized():
                     logger.error("Node {} has invalid set of children".format(n))
                     raise ValueError("Invalid tree state")
 
@@ -326,6 +333,7 @@ class Tree:
         """
             Add node to tree (without linking), insert variable if a terminal node.
         """
+        self.modified = True
         logger.debug("Adding {} at pos {}".format(node, pos))
         if pos == 0:
             self.root = node
@@ -434,7 +442,10 @@ class Tree:
         return output
 
     def evaluateTree(self):
-        return Tree._evalTree(self.nodes[0])
+        if self.modified:
+            self.evaluated = Tree._evalTree(self.nodes[0])
+            self.modified = False
+        return self.evaluated
 
     @staticmethod
     def _evalTree(node):
@@ -445,7 +456,8 @@ class Tree:
         if children:
             value = []
             for child in children:
-                value.append(Tree._evalTree(child))
+                v=Tree._evalTree(child)
+                value.append(v)
             try:
                 return node.evaluate(value)
             except (ValueError, ZeroDivisionError, OverflowError):
@@ -524,6 +536,7 @@ class Tree:
             Remove node from tree, replace with newnode.
             First stage in splicing a subtree, subtree with root node is unlinked, newnode is placed in.
         """
+        self.modified = True
         self.testInvariant()
         npos = node.getPosition()
         self.nodes[npos] = None
@@ -591,6 +604,7 @@ class Tree:
             Update the variables in the tree s.t. they point at the next datapoint
         """
         # Usually datapoints are present for all items.
+        self.modified = True
         for k, v in self.variables.items():
             variable = self.variables[k][0]
             index = variable.getCurrentIndex()
@@ -599,7 +613,7 @@ class Tree:
             else:
                 variable.setCurrentIndex(index + 1)
             self.variables[k][0] = variable
-            logger.debug("Updated v = {} index from {} to {}".format(self.variables[k], index, self.variables[k].getCurrentIndex()))
+            logger.debug("Updated v = {} index from {} to {}".format(variable, index, variable.getCurrentIndex()))
 
     @staticmethod
     def swapSubtrees(left, right):
@@ -625,8 +639,7 @@ class Tree:
         pfix = infixToPrefix(tokenize(expr, variables))
         logger.debug("Create Tree with args \n{} in prefix\n{}".format(expr , pfix))
         result = Tree()
-        rootf = pfix.pop(0)
-        lastnode = result.makeInternalNode(rootf, None, None) # Todo constants and Variable
+        lastnode = None
         for token in pfix:
             logger.debug("Converting token {} to node".format(token))
             if isFunction(token) or isOperator(token):
@@ -636,7 +649,7 @@ class Tree:
                     result.makeConstant(token, lastnode)
                 elif isinstance(token, Variable):
                     result.makeLeaf(token, lastnode)
-            while(len(lastnode.getChildren()) == lastnode.getArity()):
+            while lastnode.finalized():
                 parent = result.getParent(lastnode) # relies on position
                 if parent:
                     lastnode = parent
