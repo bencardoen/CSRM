@@ -88,15 +88,10 @@ def tokenize(expression, variables=None):
                     i += len(f)-1  # -1 since we will increment i in any case
                     output += [tree.Constant(float(f))]
                 else:
-                    v = tools.matchVariable(expression[i+1:])
+                    v, newindex = parseVariable(expression[i+1:], variables, i)
                     if v:
-                        i += len(v)
-                        index = int(''.join([x for x in v if x not in ['X', 'x', '_']]))
-                        vs = None
-                        if variables:
-                            vs = variables[index]
-                        variable = tree.Variable(vs, index)
-                        output += ['(',tree.Constant(-1.0), tokens['*'], variable, ')']
+                        i = newindex+1
+                        output += ['(',tree.Constant(-1.0), tokens['*'], v, ')']
                     else:
                         if i < (len(expression)-1) and expression[i+1] == '(': # case : -(5+3)
                             lcount = 0
