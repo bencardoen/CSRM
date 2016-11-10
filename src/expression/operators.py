@@ -34,9 +34,9 @@ class Crossover():
         Subtree crossover operator
     """
     @staticmethod
-    def subtreecrossover(left, right, seed = None):
+    def subtreecrossover(left, right, seed = None, depth = None):
         """
             Randomly select an expression from left, swap with random selection right.
         """
         # swap left and right, then update variables
-        Tree.swapSubtrees(left, right, seed)
+        Tree.swapSubtrees(left, right, seed=seed, depth=depth)

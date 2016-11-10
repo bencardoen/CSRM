@@ -516,7 +516,7 @@ class TreeTest(unittest.TestCase):
         varbs = None
         e = None
         for i in range(3):
-            t = Tree.makeRandomTree(variables, 6, seed=3)
+            t = Tree.makeRandomTree(variables, 4, seed=11)# todo look at case 6
             e2 = t.evaluateTree()
             if not varbs:
                 varbs = t.getVariables()
@@ -531,7 +531,7 @@ class TreeTest(unittest.TestCase):
             self.assertTrue(tools.compareLists(v2, vlist))
             self.assertEqual(v, varbs)
             self.assertEqual(e, e2)
-            self.assertEqual(t.getDepth(), 6)
+            self.assertEqual(t.getDepth(), 4)
 
     def testMutateOperator(self):
         variables = [[ d for d in range(2,6)] for x in range(4)]
@@ -552,9 +552,20 @@ class TreeTest(unittest.TestCase):
         left.printToDot("output/t34leftafter.dot")
         right.printToDot("output/t34rightafter.dot")
 
+    def testCrossoverOperatorDepthSensitive(self):
+        variables = [[ d for d in range(2,6)] for x in range(5)]
+        expression = "log(5, 4) + x3 ** 4 * x1 * x1"
+        expression = "min(5, 4) + x4 ** 4 * sin(x2)"
+        left = Tree.createTreeFromExpression(expression, variables)
+        left.printToDot("output/t35left.dot")
+        right = Tree.createTreeFromExpression(expression, variables)
+        right.printToDot("output/t35right.dot")
+        operators.Crossover.subtreecrossover(left, right, seed=42, depth=2)
+        left.printToDot("output/t35leftafter.dot")
+        right.printToDot("output/t35rightafter.dot")
 
 if __name__=="__main__":
-#    logger.setLevel(logging.DEBUG)
+ #   logger.setLevel(logging.DEBUG)
     if not os.path.isdir("output"):
         logger.error("Output directory does not exist : creating...")
         os.mkdir("output")

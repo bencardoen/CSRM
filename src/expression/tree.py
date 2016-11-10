@@ -14,6 +14,7 @@ from copy import deepcopy
 from node import Node, Constant, ConstantNode, Variable, VariableNode
 import logging
 import random
+import math
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('global')
@@ -261,7 +262,7 @@ class Tree:
             nodes = newnodes
         return t
 
-    def getRandomNode(self, seed = None):
+    def getRandomNode(self, seed = None, depth = None):
         """
             Return a randomly selected node from this tree
         """
@@ -269,11 +270,20 @@ class Tree:
         r = random.Random()
         if seed:
             r.seed(seed)
-        #node = None
-        #while node is None or node is self.getRoot():
-        #    node = r.choice(self.nodes)
-        #return node
-        return r.choice(self._positionalNodes()[1:])
+        if depth:
+            assert(depth < math.log(len(self.nodes)+1, 2))
+            lower = 2**depth-1
+            upper = min(2**(depth+1)-1, len(self.nodes))
+            depthnodes = self.nodes[lower:upper]
+            node = None
+            while node is None or node is self.getRoot():
+                node = r.choice(depthnodes)
+            return node
+        else:
+            node = None
+            while node is None or node is self.getRoot():
+                node = r.choice(self.nodes)
+            return node
 
     def setModified(self, v):
         self.modified = v
@@ -433,26 +443,27 @@ class Tree:
         return self.root
 
     @staticmethod
-    def swapSubtrees(left, right, seed = None):
+    def swapSubtrees(left, right, seed = None, depth = None):
         """
             Given two trees, pick random subtree roots and swap them between the trees.
         """
-        if seed:
-            sd = seed
-            sdp = seed+1
-        else:
-            sd = None
-            sdp = None
-        leftsubroot = left.getRandomNode(seed=sd)
+        leftsubroot = left.getRandomNode(seed=seed, depth=depth)
         leftv = leftsubroot.getVariables()
         logger.debug("Selected left node {}".format(leftsubroot))
-        rightsubroot = right.getRandomNode(seed=sdp)
+
+        rightseed = None
+        if seed:
+            rightseed = seed+42
+        rightsubroot = right.getRandomNode(seed=rightseed, depth=depth)
         rightv = rightsubroot.getVariables()
         logger.debug("Selected right node {}".format(rightsubroot))
+
         leftcopy = deepcopy(leftsubroot)
         rightcopy = deepcopy(rightsubroot)
+
         left.spliceSubTree(leftsubroot, rightcopy)
         left._updateVariables(rightv)
+
         right.spliceSubTree(rightsubroot, leftcopy)
         right._updateVariables(leftv)
 
