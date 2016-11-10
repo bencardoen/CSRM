@@ -1,4 +1,4 @@
-#This file is part of the CMSR project.
+#This file is part of the CSRM project.
 #Copyright 2016 - 2017 University of Antwerp
 #https://www.uantwerpen.be/en/
 #Licensed under the EUPL V.1.1
@@ -15,6 +15,7 @@ import re
 import tools
 import numpy
 import os
+import random
 
 logger = logging.getLogger('global')
 
@@ -475,6 +476,19 @@ class TreeTest(unittest.TestCase):
         for index, res in enumerate(results):
 #            print("Comparing results of {} , {} !=? {}".format(testfunctions[index], res[0], res[1]))
             self.assertNotAlmostEqual(res[0], res[1])
+
+    def testCaching(self):
+        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        t = Tree.makeRandomTree(variables, 3, seed=9)
+        s = Tree.makeRandomTree(variables, 2, seed=1)
+        t.printToDot("output/t30a.dot")
+        s.printToDot("output/t30b.dot")
+        e = t.evaluateTree()
+        cached_e = t.evaluateTree()
+        self.assertEqual(e, cached_e)
+        rng = random.Random()
+        rng.seed(0)
+        t.spliceSubTree(t.getRandomNode(rng), s.getNode(0))
 
 if __name__=="__main__":
 #    logger.setLevel(logging.DEBUG)

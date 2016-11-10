@@ -1,4 +1,4 @@
-#This file is part of the CMSR project.
+#This file is part of the CSRM project.
 #Copyright 2016 - 2017 University of Antwerp
 #https://www.uantwerpen.be/en/
 #Licensed under the EUPL V.1.1

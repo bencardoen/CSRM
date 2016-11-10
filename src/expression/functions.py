@@ -1,4 +1,4 @@
-#This file is part of the CMSR project.
+#This file is part of the CSRM project.
 #Copyright 2016 - 2017 University of Antwerp
 #https://www.uantwerpen.be/en/
 #Licensed under the EUPL V.1.1
@@ -83,9 +83,12 @@ testfunctions = [
 
 tokens = { value[0]: key for key, value in list(functionset.items())}
 braces = [',', '(',')']
+# A reverse map containing the first letter of each function object
 prefixes = { value[0][0]: (key, len(value[0])) for key, value in list(functionset.items())}
 
-def getRandomFunction():
+def getRandomFunction(rng = None):
+    if rng:
+        return rng.choice(list(functionset.keys()))
     return choice(list(functionset.keys()))
 
 def tokenize(expression, variables=None):
