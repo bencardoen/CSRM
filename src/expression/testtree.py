@@ -16,6 +16,7 @@ import tools
 import numpy
 import os
 import random
+import operators
 
 logger = logging.getLogger('global')
 
@@ -508,7 +509,7 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(3, t.getDepth())
 
     def testRandom(self):
-        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
         e = 1
         compnodes = None
         for i in range(100):
@@ -521,9 +522,28 @@ class TreeTest(unittest.TestCase):
                 e = e2
             self.assertEqual(str(compnodes), str(nodes))
             self.assertEqual(e, e2)
-            #cached_e = t.evaluateTree()
-            #self.assertEqual(e, cached_e)
-#            self.assertAlmostEqual(e, e2, 20)
+
+    def testCaching(self):
+        pass
+
+    def testVariables(self):
+        pass
+        #variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
+        #e = 1
+        #compnodes = None
+        #t = Tree.makeRandomTree(variables, 6, seed=11)
+        #e2 = t.evaluateTree()
+        #varbs = t.getVariables()
+        #retrieved = [v[0] for k, v in varbs.items()]
+        #vmod = variables[1:2] + variables[3:4]
+        #self.assertEqual(retrieved, vmod)
+
+    def testMutate(self):
+        pass
+        #variables = [[ d for d in range(2,6)] for x in range(4)]
+        #expression = "log(5, 4) + x3 ** 4 * x2"
+        #t = Tree.createTreeFromExpression(expression, variables)
+        #operators.Mutate.mutate(t, seed=2)
 
 
 if __name__=="__main__":

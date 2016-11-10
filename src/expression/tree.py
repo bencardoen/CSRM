@@ -220,7 +220,7 @@ class Tree:
         return d
 
     @staticmethod
-    def makeRandomTree(variables, depth, seed = 0):
+    def makeRandomTree(variables, depth, seed = None):
         """
             Generate a random expression tree with a random selection of variables
         """
@@ -246,16 +246,16 @@ class Tree:
             nodes = newnodes
         return t
 
-    def getRandomNode(self, rng = None):
+    def getRandomNode(self, seed = None):
         """
             Return a randomly selected node from this tree
         """
-        f = random.choice
-        if rng:
-            f = rng.choice
+        r = random.Random()
+        if seed:
+            r.seed(seed)
         node = None
         while node is None:
-            node = f(self.nodes)
+            node = r.choice(self.nodes)
         return node
 
     def setModified(self, v):
@@ -345,7 +345,27 @@ class Tree:
         return [ c.getConstant() for c in self.nodes]
 
     def getVariables(self):
+        """
+            Return an ordered list of all variables used in this tree
+        """
         return self.variables
+
+    def mergeVariables(self, otherset):
+        """
+            Otherset is a dict of refcounted variables
+        """
+        variables = self.getVariables()
+        logger.debug("Variables is now {}".format(variables))
+        for k, v in otherset.items():
+            logger.debug("Updating with {} {}".format(k, v))
+            if k in variables:
+                entry = variables[k]
+                entry[1] += v[1]
+                variables[k] = entry
+            else:
+                variables[k] = v
+        logger.debug("Variables is now {}".format(variables))
+        assert(variables == self.getVariables())
 
     def printNodes(self):
         for i, n in enumerate(self.nodes):
@@ -366,6 +386,11 @@ class Tree:
                 variable.setCurrentIndex(index + 1)
             self.variables[k][0] = variable
             logger.debug("Updated v = {} index from {} to {}".format(variable, index, variable.getCurrentIndex()))
+
+
+    def getRoot(self):
+        assert(self.root)
+        return self.root
 
     @staticmethod
     def swapSubtrees(left, right):

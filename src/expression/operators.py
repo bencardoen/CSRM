@@ -6,20 +6,25 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-from .tree import Tree
+from tree import Tree
 
 class Mutate():
     """
         Mutate a subexpression in the tree
     """
-    def mutate(tree, rng = None):
+    @staticmethod
+    def mutate(tr, seed = None, variables = None):
         """
             Replace a random node with a new generated subexpression.
+            If no variables are supplied, the existing set is reused.
         """
-        insertionpoint = tr.getRandomNode(rng)
-        # todo
-        # get depth of tree
-        subtree = Tree.makeRandomTree()
+        insertpoint = tr.getRandomNode(seed)
+        depth_at_i = insertpoint.getDepth()
+        variables = variables or tr.getVariables()
+        varlist = [v[0] for k,v in variables.items()]
+        subtree = Tree.makeRandomTree(varlist, depth_at_i, seed)
+        tr.spliceSubTree(insertpoint, subtree.getRoot())
+        tr.mergeVariables(subtree.getVariables())
 
 class Crossover():
     """
