@@ -507,6 +507,24 @@ class TreeTest(unittest.TestCase):
             self.assertEqual(v, n.getDepth())
         self.assertEqual(3, t.getDepth())
 
+    def testRandom(self):
+        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        e = 1
+        compnodes = None
+        for i in range(100):
+            t = Tree.makeRandomTree(variables, 5, seed=11)
+#            t.printToDot("output/t32a.dot")
+            e2 = t.evaluateTree()
+            nodes = t.getNodes()
+            if not compnodes:
+                compnodes = nodes
+                e = e2
+            self.assertEqual(str(compnodes), str(nodes))
+            self.assertEqual(e, e2)
+            #cached_e = t.evaluateTree()
+            #self.assertEqual(e, cached_e)
+#            self.assertAlmostEqual(e, e2, 20)
+
 
 if __name__=="__main__":
 #    logger.setLevel(logging.DEBUG)
