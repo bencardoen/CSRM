@@ -7,7 +7,7 @@
 #      Author: Ben Cardoen
 
 from math import log, sin, cos, sqrt
-from random import randint, choice
+import random
 import tree
 import re
 import logging
@@ -86,10 +86,11 @@ braces = [',', '(',')']
 # A reverse map containing the first letter of each function object
 prefixes = { value[0][0]: (key, len(value[0])) for key, value in list(functionset.items())}
 
-def getRandomFunction(rng = None):
-    if rng:
-        return rng.choice(list(functionset.keys()))
-    return choice(list(functionset.keys()))
+def getRandomFunction(seed = None):
+    rng = random.Random()
+    if seed:
+        rng.seed(seed)
+    return rng.choice(list(functionset.keys()))
 
 def tokenize(expression, variables=None):
     """

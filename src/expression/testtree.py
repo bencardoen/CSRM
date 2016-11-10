@@ -527,16 +527,15 @@ class TreeTest(unittest.TestCase):
         pass
 
     def testVariables(self):
-        pass
-        #variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
-        #e = 1
-        #compnodes = None
-        #t = Tree.makeRandomTree(variables, 6, seed=11)
-        #e2 = t.evaluateTree()
-        #varbs = t.getVariables()
-        #retrieved = [v[0] for k, v in varbs.items()]
-        #vmod = variables[1:2] + variables[3:4]
-        #self.assertEqual(retrieved, vmod)
+        variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
+        e = 1
+        compnodes = None
+        t = Tree.makeRandomTree(variables, 6, seed=11)
+        e2 = t.evaluateTree()
+        varbs = t.getVariables()
+        retrieved = [v[0] for k, v in varbs.items()]
+        vmod = variables[3:4]
+        self.assertEqual(retrieved, vmod)
 
     def testMutate(self):
         pass

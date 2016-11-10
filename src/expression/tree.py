@@ -224,24 +224,25 @@ class Tree:
         """
             Generate a random expression tree with a random selection of variables
         """
-        rngs = [random.Random() for d in range(4)]# functions, constant, variables, decisions
-        if seed:
-            for i in rngs:
-                i.seed(seed)
         t = Tree()
-        nodes = [t.makeInternalNode(getRandomFunction(rngs[0]), None, None)]
+        nodes = [t.makeInternalNode(getRandomFunction(seed), None, None)]
+        decisionrng = random.Random()
+        variablerng = random.Random()
+        if seed:
+            decisionrng.seed(seed)
+            variablerng.seed(seed)
         for i in range(depth):
             # for all generated nodes in last iteration
             newnodes=[]
             for node in nodes:
                 for j in range(node.getArity()):
                     if i >= depth-1:
-                        if (rngs[3].randrange(0, 2) & 1) and variables:
-                            child = t.makeLeaf(rngs[2].choice(variables), node)
+                        if (decisionrng.randrange(0, 2) & 1) and variables:
+                            child = t.makeLeaf(variablerng.choice(variables), node)
                         else:
-                            child = t.makeConstant(Constant.generateConstant(randomgenerator=rngs[1]), node)
+                            child = t.makeConstant(Constant.generateConstant(seed=seed), node)
                     else:
-                        child = t.makeInternalNode(getRandomFunction(rngs[0]), node, None)
+                        child = t.makeInternalNode(getRandomFunction(seed), node, None)
                         newnodes.append(child)
             nodes = newnodes
         return t
