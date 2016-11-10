@@ -177,14 +177,13 @@ class Tree:
         """
         if self.modified:
             oe = self.evaluated
-            self.evaluated = Tree._evalTree(self.nodes[0])
+            self.evaluated = self._evalTree(self.nodes[0])
             logger.info("Tree state modified, reevaluating from {} to {}".format(oe, self.evaluated))
             self.getDepth()
             self.modified = False
         return self.evaluated
 
-    @staticmethod
-    def _evalTree(node):
+    def _evalTree(self, node):
         """
             Recursively evaluate tree with node as root.
         """
@@ -192,15 +191,20 @@ class Tree:
         if children:
             value = []
             for child in children:
-                v=Tree._evalTree(child)
+                v=self._evalTree(child)
                 value.append(v)
             try:
-                return node.evaluate(value)
+                v = node.evaluate(value)
+                return v
             except (ValueError, ZeroDivisionError, OverflowError, TypeError):
                 logger.info("Node {} is invalid with given args {}".format(node, value))
+                # get current depth, seed, variables
+                # start with swapping children
+                # Exceptions is too expensive, find semantic correct children
                 return 1
         else:
             return node.evaluate()
+
 
     def printToDot(self, name = None):
         filename = name or "output.dot"
@@ -240,6 +244,7 @@ class Tree:
     def makeRandomTree(variables, depth, seed = None):
         """
             Generate a random expression tree with a random selection of variables
+            Topdown
         """
         t = Tree()
         nodes = [t.makeInternalNode(getRandomFunction(seed), None, None)]

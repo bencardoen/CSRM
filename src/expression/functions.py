@@ -54,7 +54,10 @@ def absolute(a):
     return abs(a)
 
 def ln(a):
-    return log(a, math.e)
+    return logarithm(a, math.e)
+
+def exponential(a):
+    return math.exp(a)
 
 
 def generateOrderedFunctionTable(fset):
@@ -67,7 +70,7 @@ functionset = { plus:("+", 2, 2, 'L'), minus:("-", 2, 2, 'L'),
                 multiply:("*", 2, 3, 'L'), division:("/", 2, 3, 'L'),modulo:("%", 2, 3, 'L'),
                 power:("**", 2, 3, 'R'), math.sqrt:("sqrt", 1,3,'R'),
                 logarithm:("log", 2, 4, 'F'), maximum:("max", 2, 4, 'F'), minimum:("min", 2, 4, 'F'),
-                ln:("ln", 1,4,'R'),math.exp:("exp", 1,4,'R'),
+                ln:("ln", 1,4,'R'),exponential:("exp", 1,4,'R'),
                 sine:("sin", 1, 4, 'R'), cosine:("cos", 1, 4, 'R'), absolute:("abs",1, 4, 'F'),
                 math.tanh:("tanh", 1,4, 'R'), math.tan:("tan",1,4,'R')
                 }
