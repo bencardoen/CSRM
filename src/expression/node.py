@@ -31,6 +31,7 @@ class Node:
             self.arity = 1
         self._modified = True
         self._cachedeval = 0
+        self._depth = Node.positionToDepth(pos)
 
     @staticmethod
     def positionToDepth(pos):
@@ -43,7 +44,7 @@ class Node:
         return i
 
     def getDepth(self):
-        return Node.positionToDepth(self.pos)
+        return self._depth
 
     def evaluate(self, args=None):
         """
@@ -72,6 +73,7 @@ class Node:
 
     def setPosition(self, newpos):
         self.pos = newpos
+        self._depth = Node.positionToDepth(self.pos)
 
     def addChild(self, node):
         if self.arity <= len(self.children):

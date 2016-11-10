@@ -206,6 +206,19 @@ class Tree:
         handle.write("}\n")
         handle.close()
 
+    def getDepth(self):
+        """
+            Return depth of this tree (max(node.getDepth) for n in self.nodes)
+        """
+        i = -1
+        n = self.nodes[i]
+        d = -1
+        while n is None:
+            i -= 1
+            n = self.nodes[i]
+        d = n.getDepth()
+        return d
+
     @staticmethod
     def makeRandomTree(variables, depth, seed = 0):
         """

@@ -505,6 +505,7 @@ class TreeTest(unittest.TestCase):
         for k, v in results.items():
             n = t.getNode(k)
             self.assertEqual(v, n.getDepth())
+        self.assertEqual(3, t.getDepth())
 
 
 if __name__=="__main__":
