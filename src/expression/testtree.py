@@ -219,31 +219,6 @@ class TreeTest(unittest.TestCase):
             self.assertEqual(tools.msb(k) , v)
 
 
-    def testMutateRoot(self):
-        """
-            Splice in a new subtree, this time at root
-        """
-        t = Tree()
-        root = t.makeInternalNode(plus, None, Constant(3.14))
-        l = t.makeInternalNode(multiply, root)
-        r = t.makeInternalNode(sine, root, Constant(0.2))
-        t.makeLeaf(Variable([3], 0), l)
-        t.makeLeaf(Variable([4], 0), l)
-        t.makeLeaf(Variable([6], 0), r)
-        self.assertEqual(root.getChildren(), [l, r])
-        self.assertEqual(t.evaluateTree(), 37.50452706713107)
-        t.printToDot("output/t11.dot")
-
-        tnew = Tree()
-        troot = tnew.makeInternalNode(plus, None, None)
-        tll = tnew.makeLeaf(Variable([3], 0), troot)
-        tnew.makeLeaf(Variable([4], 0), troot)
-        tnew.printToDot("output/t11candidate.dot")
-        t.spliceSubTree(t.getNode(0), troot)
-        t.printToDot("output/test11result.dot")
-        self.assertEqual(t.getNode(0), troot)
-        self.assertEqual(t.getNode(1), tll)
-
     def testCrossoverStatic(self):
         """
             Test an (old) failure case for crossover.
@@ -528,21 +503,23 @@ class TreeTest(unittest.TestCase):
 
     def testVariables(self):
         variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
-        e = 1
-        compnodes = None
-        t = Tree.makeRandomTree(variables, 6, seed=11)
-        e2 = t.evaluateTree()
-        varbs = t.getVariables()
-        retrieved = [v[0] for k, v in varbs.items()]
-        vmod = variables[3:4]
-        self.assertEqual(retrieved, vmod)
+        varbs = None
+        e = None
+        for i in range(100):
+            t = Tree.makeRandomTree(variables, 6, seed=11)
+            e2 = t.evaluateTree()
+            if not varbs:
+                varbs = t.getVariables()
+                e = t.evaluateTree()
+            v = t.getVariables()
+            self.assertEqual(v, varbs)
+            self.assertEqual(e, e2)
 
     def testMutate(self):
-        pass
-        #variables = [[ d for d in range(2,6)] for x in range(4)]
-        #expression = "log(5, 4) + x3 ** 4 * x2"
-        #t = Tree.createTreeFromExpression(expression, variables)
-        #operators.Mutate.mutate(t, seed=2)
+        variables = [[ d for d in range(2,6)] for x in range(4)]
+        expression = "log(5, 4) + x3 ** 4 * x2"
+        t = Tree.createTreeFromExpression(expression, variables)
+        operators.Mutate.mutate(t, seed=2)
 
 
 if __name__=="__main__":

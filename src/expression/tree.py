@@ -255,7 +255,7 @@ class Tree:
         if seed:
             r.seed(seed)
         node = None
-        while node is None:
+        while node is None or node is self.getRoot():
             node = r.choice(self.nodes)
         return node
 
@@ -326,6 +326,8 @@ class Tree:
         """
             Remove subtree with root node, replace it with subtree with root newnode
         """
+        logger.debug("Splicing newnode {} in node's {} position".format(newnode, node))
+        assert(node != self.getRoot())
         self.removeNode(node, newnode)
         newnode.updatePosition()
         nodes = newnode.getChildren()[:]

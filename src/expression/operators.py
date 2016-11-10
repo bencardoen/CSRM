@@ -7,6 +7,8 @@
 #      Author: Ben Cardoen
 
 from tree import Tree
+import logging
+logger = logging.getLogger('global')
 
 class Mutate():
     """
@@ -20,6 +22,7 @@ class Mutate():
         """
         insertpoint = tr.getRandomNode(seed)
         depth_at_i = insertpoint.getDepth()
+        logger.debug("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
         variables = variables or tr.getVariables()
         varlist = [v[0] for k,v in variables.items()]
         subtree = Tree.makeRandomTree(varlist, depth_at_i, seed)

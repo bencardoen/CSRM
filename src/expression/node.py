@@ -11,8 +11,6 @@ import logging
 import functions
 import random
 
-FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
-logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('global')
 
 class Node:
