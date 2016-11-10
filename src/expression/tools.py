@@ -78,3 +78,13 @@ def generateVariables(varcount, datacount, seed):
     rng.seed(seed)
     result = [ [rng.random() for d in range(datacount)] for x in range(varcount)]
     return result
+
+def msb(integer):
+    """
+        Return the leftmost significant bit of argument
+    """
+    cnt = 0
+    while integer:
+        integer >>= 1
+        cnt += 1
+    return cnt

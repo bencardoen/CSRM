@@ -212,6 +212,11 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(t.getNode(2), troot)
         self.assertEqual(t.getNode(5), tll)
 
+    def testMSB(self):
+        testvalues = {0:0, 1:1, 2:2, 3:2, 4:3, 5:3, 6:3, 7:3, 8:4}
+        for k, v in testvalues.items():
+            self.assertEqual(tools.msb(k) , v)
+
 
     def testMutateRoot(self):
         """
@@ -489,6 +494,18 @@ class TreeTest(unittest.TestCase):
         rng = random.Random()
         rng.seed(0)
         t.spliceSubTree(t.getRandomNode(rng), s.getNode(0))
+
+    def testDepth(self):
+        expr = "( ( ( min( 5.0, 6.0 ) ) ** ( log( 0.6, 0.3 ) ) ) + ( 1.0 * 9.23 ) )"
+        t = Tree.createTreeFromExpression(expr)
+        t.printToDot("output/t31.dot")
+        cycledexpr = t.toExpression()
+        self.assertEqual(cycledexpr, expr)
+        results = {0:0, 1:1, 2:1, 3:2, 4:2, 5:2, 6:2, 7:3, 8:3, 9:3, 10:3}
+        for k, v in results.items():
+            n = t.getNode(k)
+            self.assertEqual(v, n.getDepth())
+
 
 if __name__=="__main__":
 #    logger.setLevel(logging.DEBUG)

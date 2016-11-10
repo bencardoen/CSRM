@@ -32,6 +32,19 @@ class Node:
         self._modified = True
         self._cachedeval = 0
 
+    @staticmethod
+    def positionToDepth(pos):
+        i = 0
+        while pos:
+            if pos & 2:
+                pos -= 1
+            pos >>= 1
+            i+=1
+        return i
+
+    def getDepth(self):
+        return Node.positionToDepth(self.pos)
+
     def evaluate(self, args=None):
         """
         Evaluate this node using the function object, optionally multiplying with the constant.
