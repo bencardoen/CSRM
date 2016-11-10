@@ -39,7 +39,8 @@ class Tree:
     def testInvariant(self):
         left = self.getNodes()
         right = self.nodes
-        if not compareLists(left, right):
+        middle = self._positionalNodes()
+        if not (compareLists(left, right) and compareLists(left, middle)) :
             logger.error("Invariant failed")
             logger.error("getNodes() {}".format(left))
             logger.error("self.nodes {}".format(right))
@@ -103,6 +104,12 @@ class Tree:
         result = [self.root]
         result += self.root.getAllChildren()
         return result
+
+    def _positionalNodes(self):
+        """
+            Get all sorted nodes
+        """
+        return [d for d in self.nodes if d]
 
     def isLeaf(self, position):
         """
@@ -235,23 +242,21 @@ class Tree:
         """
         t = Tree()
         nodes = [t.makeInternalNode(getRandomFunction(seed), None, None)]
-        decisionrng = random.Random()
-        variablerng = random.Random()
+        rng = random.Random()
         if seed:
-            decisionrng.seed(seed)
-            variablerng.seed(seed)
+            rng.seed(seed)
         for i in range(depth):
             # for all generated nodes in last iteration
             newnodes=[]
             for node in nodes:
                 for j in range(node.getArity()):
                     if i >= depth-1:
-                        if (decisionrng.randrange(0, 2) & 1) and variables:
-                            child = t.makeLeaf(variablerng.choice(variables), node)
+                        if (rng.randrange(0, 2) & 1) and variables:
+                            child = t.makeLeaf(rng.choice(variables), node)
                         else:
                             child = t.makeConstant(Constant.generateConstant(seed=seed), node)
                     else:
-                        child = t.makeInternalNode(getRandomFunction(seed), node, None)
+                        child = t.makeInternalNode(getRandomFunction(seed=seed), node, None)
                         newnodes.append(child)
             nodes = newnodes
         return t
@@ -260,16 +265,21 @@ class Tree:
         """
             Return a randomly selected node from this tree
         """
+        logger.debug("Randomnode with seed {}".format(seed))
         r = random.Random()
         if seed:
             r.seed(seed)
-        node = None
-        while node is None or node is self.getRoot():
-            node = r.choice(self.nodes)
-        return node
+        #node = None
+        #while node is None or node is self.getRoot():
+        #    node = r.choice(self.nodes)
+        #return node
+        return r.choice(self._positionalNodes()[1:])
 
     def setModified(self, v):
         self.modified = v
+
+    def isModified(self):
+        return self.modified
 
     def getParent(self, node):
         """

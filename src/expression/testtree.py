@@ -499,14 +499,24 @@ class TreeTest(unittest.TestCase):
             self.assertEqual(e, e2)
 
     def testCaching(self):
-        expression = "13 + x2 - log(2, 8) ** sin(3)"
+        variables = [[ d for d in range(2,6)] for x in range(5)]
+        expression = "log(5, 4) + x3 ** 4 * x1 * x1"
+        t = Tree.createTreeFromExpression(expression, variables)
+        self.assertTrue(t.isModified())
+        e =t.evaluateTree()
+        self.assertFalse(t.isModified())
+        operators.Mutate.mutate(t, seed=2)
+        self.assertTrue(t.isModified())
+        t.getDepth()
+        t.evaluateTree()
+        self.assertFalse(t.isModified())
 
     def testVariables(self):
         variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
         varbs = None
         e = None
         for i in range(3):
-            t = Tree.makeRandomTree(variables, 6, seed=19)
+            t = Tree.makeRandomTree(variables, 6, seed=3)
             e2 = t.evaluateTree()
             if not varbs:
                 varbs = t.getVariables()
