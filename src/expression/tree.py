@@ -30,13 +30,11 @@ class Tree:
         self.variables = {}
         self.evaluated = 0
         self.modified = False
+        self.depth = None
 
     def getNode(self, pos):
         self.testInvariant()
         return self.nodes[pos]
-
-    def getDepth(self):
-        return msb(len(self.nodes))
 
     def testInvariant(self):
         left = self.getNodes()
@@ -169,6 +167,7 @@ class Tree:
             oe = self.evaluated
             self.evaluated = Tree._evalTree(self.nodes[0])
             logger.info("Tree state modified, reevaluating from {} to {}".format(oe, self.evaluated))
+            self.getDepth()
             self.modified = False
         return self.evaluated
 
@@ -185,7 +184,7 @@ class Tree:
                 value.append(v)
             try:
                 return node.evaluate(value)
-            except (ValueError, ZeroDivisionError, OverflowError):
+            except (ValueError, ZeroDivisionError, OverflowError, TypeError):
                 logger.warning("Node {} is invalid with given args {}".format(node, value))
                 return 1
         else:
@@ -210,6 +209,11 @@ class Tree:
         """
             Return depth of this tree (max(node.getDepth) for n in self.nodes)
         """
+        if self.modified:
+            self.depth = self.calculateDepth()
+        return self.depth
+
+    def calculateDepth(self):
         i = -1
         n = self.nodes[i]
         d = -1

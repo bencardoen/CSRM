@@ -499,7 +499,7 @@ class TreeTest(unittest.TestCase):
             self.assertEqual(e, e2)
 
     def testCaching(self):
-        pass
+        expression = "13 + x2 - log(2, 8) ** sin(3)"
 
     def testVariables(self):
         variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
@@ -514,6 +514,7 @@ class TreeTest(unittest.TestCase):
             v = t.getVariables()
             self.assertEqual(v, varbs)
             self.assertEqual(e, e2)
+            self.assertEqual(t.getDepth(), 6)
 
     def testMutate(self):
         variables = [[ d for d in range(2,6)] for x in range(4)]
