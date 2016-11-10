@@ -57,7 +57,12 @@ def ln(a):
     return log(a, math.e)
 
 
+def generateOrderedFunctionTable(fset):
+    return sorted(fset.keys(), key= lambda i : i.__name__)
+
+
 # function : {prettyprint, arity, precedence, associativity, class}
+# Default hash is location in memory, which changes, so for deterministic choice, use a one time sort.
 functionset = { plus:("+", 2, 2, 'L'), minus:("-", 2, 2, 'L'),
                 multiply:("*", 2, 3, 'L'), division:("/", 2, 3, 'L'),modulo:("%", 2, 3, 'L'),
                 power:("**", 2, 3, 'R'), math.sqrt:("sqrt", 1,3,'R'),
@@ -66,6 +71,7 @@ functionset = { plus:("+", 2, 2, 'L'), minus:("-", 2, 2, 'L'),
                 sine:("sin", 1, 4, 'R'), cosine:("cos", 1, 4, 'R'), absolute:("abs",1, 4, 'F'),
                 math.tanh:("tanh", 1,4, 'R'), math.tan:("tan",1,4,'R')
                 }
+functions = generateOrderedFunctionTable(functionset)
 
 # Testfunctions from M.F. Korns' paper "A baseline symbolic regression algorithm"
 testfunctions = [
@@ -90,7 +96,10 @@ def getRandomFunction(seed = None):
     rng = random.Random()
     if seed:
         rng.seed(seed)
-    return rng.choice(list(functionset.keys()))
+    chosen = rng.choice(functions)
+    logger.debug("Chosen f{}".format(chosen))
+    return chosen
+#    return rng.choice(list(functionset.keys()))
 
 def tokenize(expression, variables=None):
     """

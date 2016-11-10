@@ -13,7 +13,6 @@ from copy import deepcopy
 import logging
 import re
 import tools
-import numpy
 import os
 import random
 import operators
@@ -128,8 +127,12 @@ class TreeTest(unittest.TestCase):
             Test construction of a random tree. No assertions, but construction test of invariants.
         """
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        t = Tree.makeRandomTree(variables, 5)
-        t.printToDot("output/t6.dot")
+        for i in range(10):
+            t = Tree.makeRandomTree(variables, 10, 11)
+            e = t.evaluateTree()
+            self.assertEqual(e, 1.002032767907594)
+            if not i:
+                t.printToDot("output/t6.dot")
 
 
     def testCollectNodes(self):
@@ -355,11 +358,14 @@ class TreeTest(unittest.TestCase):
         """
         for i in range(100):
             variables = []
-            t = Tree.makeRandomTree(variables, 6)
+            t = Tree.makeRandomTree(variables, 6, seed=i)
             t.printToDot("output/t22randomtree.dot")
             expr = t.toExpression()
             tconverted = Tree.createTreeFromExpression(expr)
             sxpr = tconverted.toExpression()
+            ev = t.evaluateTree()
+            evt = tconverted.evaluateTree()
+            self.assertEqual(ev, evt)
             self.assertEqual(expr, sxpr)
             tconverted.printToDot("output/t22convertedtree.dot")
 
@@ -376,7 +382,7 @@ class TreeTest(unittest.TestCase):
         exprs = ["x1", "x3", "x_9", "x_09"]
         for e in exprs:
             m = tools.matchVariable(e)
-            self.assertNotEqual(e, None)
+            self.assertNotEqual(m, None)
 
     def testVariableExpressionTree(self):
         variables = tools.generateVariables(4, 4, 0)
@@ -557,12 +563,9 @@ class TreeTest(unittest.TestCase):
         expression = "log(5, 4) + x3 ** 4 * x1 * x1"
         expression = "min(5, 4) + x4 ** 4 * sin(x2)"
         left = Tree.createTreeFromExpression(expression, variables)
-        left.printToDot("output/t35left.dot")
         right = Tree.createTreeFromExpression(expression, variables)
-        right.printToDot("output/t35right.dot")
         operators.Crossover.subtreecrossover(left, right, seed=42, depth=2)
-        left.printToDot("output/t35leftafter.dot")
-        right.printToDot("output/t35rightafter.dot")
+
 
 if __name__=="__main__":
  #   logger.setLevel(logging.DEBUG)

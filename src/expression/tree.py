@@ -197,7 +197,7 @@ class Tree:
             try:
                 return node.evaluate(value)
             except (ValueError, ZeroDivisionError, OverflowError, TypeError):
-                logger.warning("Node {} is invalid with given args {}".format(node, value))
+                logger.info("Node {} is invalid with given args {}".format(node, value))
                 return 1
         else:
             return node.evaluate()
@@ -244,8 +244,7 @@ class Tree:
         t = Tree()
         nodes = [t.makeInternalNode(getRandomFunction(seed), None, None)]
         rng = random.Random()
-        if seed:
-            rng.seed(seed)
+        if seed: rng.seed(seed)
         for i in range(depth):
             # for all generated nodes in last iteration
             newnodes=[]
@@ -446,6 +445,7 @@ class Tree:
     def swapSubtrees(left, right, seed = None, depth = None):
         """
             Given two trees, pick random subtree roots and swap them between the trees.
+            Will swap out subtrees at equal depth.
         """
         leftsubroot = left.getRandomNode(seed=seed, depth=depth)
         leftv = leftsubroot.getVariables()
