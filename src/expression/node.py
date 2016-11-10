@@ -162,6 +162,15 @@ class Node:
     def getVariable(self):
         return None
 
+    def getVariables(self):
+        ac = self.getAllChildren()
+        vs = []
+        for c in ac:
+            v = c.getVariable()
+            if v:
+                vs.append(v)
+        return vs
+
 
 class Constant():
     def __init__(self, value):

@@ -27,15 +27,16 @@ class Mutate():
         varlist = [v[0] for k,v in variables.items()]
         subtree = Tree.makeRandomTree(varlist, depth_at_i, seed)
         tr.spliceSubTree(insertpoint, subtree.getRoot())
-        tr.mergeVariables(subtree.getVariables())
+        tr._mergeVariables(subtree.getVariables())
 
 class Crossover():
     """
         Subtree crossover operator
     """
     @staticmethod
-    def apply(left, right, rng = None):
+    def subtreecrossover(left, right, seed = None):
         """
             Randomly select an expression from left, swap with random selection right.
         """
-        pass
+        # swap left and right, then update variables
+        Tree.swapSubtrees(left, right, seed)

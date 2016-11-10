@@ -505,22 +505,42 @@ class TreeTest(unittest.TestCase):
         variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
         varbs = None
         e = None
-        for i in range(100):
-            t = Tree.makeRandomTree(variables, 6, seed=11)
+        for i in range(3):
+            t = Tree.makeRandomTree(variables, 6, seed=19)
             e2 = t.evaluateTree()
             if not varbs:
                 varbs = t.getVariables()
                 e = t.evaluateTree()
             v = t.getVariables()
+            vlist = []
+            for key ,value in v.items():
+                vlist.append(value[0])
+            r = t.getRoot()
+            v2 = r.getVariables()
+            v2 = list(set(v2))
+            self.assertTrue(tools.compareLists(v2, vlist))
             self.assertEqual(v, varbs)
             self.assertEqual(e, e2)
             self.assertEqual(t.getDepth(), 6)
 
-    def testMutate(self):
+    def testMutateOperator(self):
         variables = [[ d for d in range(2,6)] for x in range(4)]
         expression = "log(5, 4) + x3 ** 4 * x2"
         t = Tree.createTreeFromExpression(expression, variables)
         operators.Mutate.mutate(t, seed=2)
+        t.printToDot("output/t33.dot")
+
+    def testCrossoverOperator(self):
+        variables = [[ d for d in range(2,6)] for x in range(5)]
+        expression = "log(5, 4) + x3 ** 4 * x1 * x1"
+        expression = "min(5, 4) + x4 ** 4 * sin(x2)"
+        left = Tree.createTreeFromExpression(expression, variables)
+        left.printToDot("output/t34left.dot")
+        right = Tree.createTreeFromExpression(expression, variables)
+        right.printToDot("output/t34right.dot")
+        operators.Crossover.subtreecrossover(left, right, seed=42)
+        left.printToDot("output/t34leftafter.dot")
+        right.printToDot("output/t34rightafter.dot")
 
 
 if __name__=="__main__":

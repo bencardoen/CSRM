@@ -163,6 +163,10 @@ class Tree:
         return output
 
     def evaluateTree(self):
+        """
+            Evaluates tree if tree was modified, else returns a cached results.
+            Updates depth if needed.
+        """
         if self.modified:
             oe = self.evaluated
             self.evaluated = Tree._evalTree(self.nodes[0])
@@ -207,7 +211,8 @@ class Tree:
 
     def getDepth(self):
         """
-            Return depth of this tree (max(node.getDepth) for n in self.nodes)
+            Return depth of this tree.
+            Returns a cached version or calculates a new one if needed.
         """
         if self.modified:
             self.depth = self.calculateDepth()
@@ -357,9 +362,9 @@ class Tree:
         """
         return self.variables
 
-    def mergeVariables(self, otherset):
+    def _mergeVariables(self, otherset):
         """
-            Otherset is a dict of refcounted variables
+            When a new subtree is merged, update the variables
         """
         variables = self.getVariables()
         logger.debug("Variables is now {}".format(variables))
@@ -373,6 +378,24 @@ class Tree:
                 variables[k] = v
         logger.debug("Variables is now {}".format(variables))
         assert(variables == self.getVariables())
+
+    def _updateVariables(self, vlist):
+        """
+            When a set of variables from a different tree is merged, update the current set.
+        """
+        variables = self.getVariables()
+        logger.debug("Updating variables is now {}, adding {}".format(variables, vlist))
+        for v in vlist:
+            k = v.getIndex()
+            if k in variables:
+                entry = variables[k]
+                entry[1] += 1
+                variables[k] = entry
+            else:
+                variables[k] = [v, 1]
+        logger.debug("Variables is now {}".format(variables))
+
+
 
     def printNodes(self):
         for i, n in enumerate(self.nodes):
@@ -400,19 +423,28 @@ class Tree:
         return self.root
 
     @staticmethod
-    def swapSubtrees(left, right):
+    def swapSubtrees(left, right, seed = None):
         """
             Given two trees, pick random subtree roots and swap them between the trees.
         """
-        logger.debug("swapSubtree with left = {}, right = {}".format(left, right))
-        leftsubroot = left.getRandomNode()
+        if seed:
+            sd = seed
+            sdp = seed+1
+        else:
+            sd = None
+            sdp = None
+        leftsubroot = left.getRandomNode(seed=sd)
+        leftv = leftsubroot.getVariables()
         logger.debug("Selected left node {}".format(leftsubroot))
-        rightsubroot = right.getRandomNode()
+        rightsubroot = right.getRandomNode(seed=sdp)
+        rightv = rightsubroot.getVariables()
         logger.debug("Selected right node {}".format(rightsubroot))
         leftcopy = deepcopy(leftsubroot)
         rightcopy = deepcopy(rightsubroot)
         left.spliceSubTree(leftsubroot, rightcopy)
+        left._updateVariables(rightv)
         right.spliceSubTree(rightsubroot, leftcopy)
+        right._updateVariables(leftv)
 
     @staticmethod
     def createTreeFromExpression(expr, variables=None):
