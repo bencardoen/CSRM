@@ -15,6 +15,7 @@ import tools
 import math
 logger = logging.getLogger('global')
 
+size_limit = 200
 
 ## Functions defined by wrapper, allows easier future adaption.
 def plus(a, b):
@@ -27,15 +28,24 @@ def multiply(a, b):
     return a*b
 
 def power(a, b):
+    #if a < 0 or b > size_limit:
+    #    # todo : avoid complex results
+    #    pass
     return pow(a,b)
 
 def division(a, b):
+    #if b == 0:
+    #    # todo shield
+    #    pass
     return a/float(b)
 
 def modulo(a, b):
     return a % b
 
 def logarithm(a, b):
+    #if a <= 0 or b <= 0 or b == 1:
+    #    # todo shield
+    #    pass
     return log(a,b)
 
 def maximum(a, b):
@@ -57,8 +67,20 @@ def ln(a):
     return logarithm(a, math.e)
 
 def exponential(a):
-    return math.exp(a)
+    return power(math.e, a)
 
+def square_root(a):
+    #if a < 0:
+    #    pass
+    return math.sqrt(a)
+
+def tangent(a):
+    #if a == 0:
+    #    pass
+    return math.tan(a)
+
+def tangenth(a):
+    return math.tanh(a)
 
 def generateOrderedFunctionTable(fset):
     return sorted(fset.keys(), key= lambda i : i.__name__)
@@ -68,11 +90,11 @@ def generateOrderedFunctionTable(fset):
 # Default hash is location in memory, which changes, so for deterministic choice, use a one time sort.
 functionset = { plus:("+", 2, 2, 'L'), minus:("-", 2, 2, 'L'),
                 multiply:("*", 2, 3, 'L'), division:("/", 2, 3, 'L'),modulo:("%", 2, 3, 'L'),
-                power:("**", 2, 3, 'R'), math.sqrt:("sqrt", 1,3,'R'),
+                power:("**", 2, 3, 'R'), square_root:("sqrt", 1,3,'R'),
                 logarithm:("log", 2, 4, 'F'), maximum:("max", 2, 4, 'F'), minimum:("min", 2, 4, 'F'),
                 ln:("ln", 1,4,'R'),exponential:("exp", 1,4,'R'),
                 sine:("sin", 1, 4, 'R'), cosine:("cos", 1, 4, 'R'), absolute:("abs",1, 4, 'F'),
-                math.tanh:("tanh", 1,4, 'R'), math.tan:("tan",1,4,'R')
+                tangenth:("tanh", 1,4, 'R'), tangent:("tan",1,4,'R')
                 }
 functions = generateOrderedFunctionTable(functionset)
 

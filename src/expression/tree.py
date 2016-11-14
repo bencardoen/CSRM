@@ -197,7 +197,7 @@ class Tree:
                 v = node.evaluate(value)
                 return v
             except (ValueError, ZeroDivisionError, OverflowError, TypeError):
-                logger.info("Node {} is invalid with given args {}".format(node, value))
+                logger.error("Node {} is invalid with given args {}".format(node, value))
                 # get current depth, seed, variables
                 # start with swapping children
                 # Exceptions is too expensive, find semantic correct children
@@ -241,10 +241,10 @@ class Tree:
         return d
 
     @staticmethod
-    def makeRandomTree(variables, depth, seed = None, rng=None):
+    def makeRandomTree(variables, depth, seed = None, rng=None, tokenLeafs=False):
         """
             Generate a random expression tree with a random selection of variables
-            Topdown
+            Topdown construction, there is no guarantee that this construction renders a semantically valid tree
         """
         logger.debug("mkRandomTree with args {} depth {} seed {}".format(variables, depth, seed))
         t = Tree()
@@ -257,10 +257,13 @@ class Tree:
             for node in nodes:
                 for j in range(node.getArity()):
                     if i >= depth-1:
-                        if (_rng.randrange(0, 2) & 1) and variables:
-                            child = t.makeLeaf(_rng.choice(variables), node)
+                        if tokenLeafs:
+                            child = t.makeConstant(Constant(1.0), node)
                         else:
-                            child = t.makeConstant(Constant.generateConstant(rng=_rng), node)
+                            if (_rng.randrange(0, 2) & 1) and variables:
+                                child = t.makeLeaf(_rng.choice(variables), node)
+                            else:
+                                child = t.makeConstant(Constant.generateConstant(rng=_rng), node)
                     else:
                         child = t.makeInternalNode(getRandomFunction(rng=_rng), node, None)
                         newnodes.append(child)
@@ -270,7 +273,7 @@ class Tree:
     @staticmethod
     def constructFromSubtrees(left, right, seed=None, rng=None):
         logger.debug("cfSubtree with args left {} right {} seed {} rng {} ".format(left, right, seed, rng))
-        t = Tree.makeRandomTree(variables=None, depth=1, seed=seed, rng=rng)
+        t = Tree.makeRandomTree(variables=None, depth=1, seed=seed, rng=rng, tokenLeafs=True)
         if t.getRoot().getArity() == 2:
             t.spliceSubTree(t.getNode(1), left.getRoot())
             t.spliceSubTree(t.getNode(2), right.getRoot())
