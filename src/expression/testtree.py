@@ -566,6 +566,22 @@ class TreeTest(unittest.TestCase):
         right = Tree.createTreeFromExpression(expression, variables)
         operators.Crossover.subtreecrossover(left, right, seed=42, depth=2)
 
+    def testBottomUpConstruction(self):
+        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        left = Tree.makeRandomTree(variables, depth=1, seed=11)
+        right = Tree.makeRandomTree(variables, depth=1, seed=13)
+        newtree = Tree.constructFromSubtrees(left, right, seed=0)
+
+    def testRandomFunction(self):
+        rng = random.Random()
+        f = None
+        for i in range(10):
+            g = getRandomFunction(seed=0)
+            if i == 0:
+                f = g
+        self.assertEqual(f, g)
+
+
 
 if __name__=="__main__":
  #   logger.setLevel(logging.DEBUG)

@@ -246,25 +246,41 @@ class Tree:
             Generate a random expression tree with a random selection of variables
             Topdown
         """
+        logger.debug("mkRandomTree with args {} depth {} seed {}".format(variables, depth, seed))
         t = Tree()
-        rng = random.Random()
-        if seed: rng.seed(seed)
-        nodes = [t.makeInternalNode(getRandomFunction(rng=rng), None, None)]
+        _rng = random.Random()
+        if seed is not None: _rng.seed(seed)
+        nodes = [t.makeInternalNode(getRandomFunction(rng=_rng), None, None)]
         for i in range(depth):
             # for all generated nodes in last iteration
             newnodes=[]
             for node in nodes:
                 for j in range(node.getArity()):
                     if i >= depth-1:
-                        if (rng.randrange(0, 2) & 1) and variables:
-                            child = t.makeLeaf(rng.choice(variables), node)
+                        if (_rng.randrange(0, 2) & 1) and variables:
+                            child = t.makeLeaf(_rng.choice(variables), node)
                         else:
-                            child = t.makeConstant(Constant.generateConstant(rng=rng), node)
+                            child = t.makeConstant(Constant.generateConstant(rng=_rng), node)
                     else:
-                        child = t.makeInternalNode(getRandomFunction(rng=rng), node, None)
+                        child = t.makeInternalNode(getRandomFunction(rng=_rng), node, None)
                         newnodes.append(child)
             nodes = newnodes
         return t
+
+    @staticmethod
+    def constructFromSubtrees(left, right, seed=None):
+        logger.debug("cfSubtree with args left {} right {} seed {} ".format(left, right, seed))
+        t = Tree.makeRandomTree(variables=None, depth=1, seed=seed)
+        if t.getRoot().getArity() == 2:
+            t.spliceSubTree(t.getNode(1), left.getRoot())
+            t.spliceSubTree(t.getNode(2), right.getRoot())
+        else:
+            t.spliceSubTree(t.getNode(1), left.getRoot())
+        return t
+
+    @staticmethod
+    def growTree(depth=None, seed=None):
+        pass
 
     def getRandomNode(self, seed = None, depth = None):
         """
@@ -272,7 +288,7 @@ class Tree:
         """
         logger.debug("Randomnode with seed {}".format(seed))
         r = random.Random()
-        if seed:
+        if seed is not None:
             r.seed(seed)
         if depth:
             assert(depth < math.log(len(self.nodes)+1, 2))
@@ -457,7 +473,7 @@ class Tree:
         logger.debug("Selected left node {}".format(leftsubroot))
 
         rightseed = None
-        if seed:
+        if seed is not None:
             rightseed = seed+42
         rightsubroot = right.getRandomNode(seed=rightseed, depth=depth)
         rightv = rightsubroot.getVariables()

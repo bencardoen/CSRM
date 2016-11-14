@@ -194,7 +194,7 @@ class Constant():
             Generate a Constant object with value [lower, upper) by randomgenerator
         """
         _rng = rng or random.Random()
-        if seed: _rng.seed(seed)
+        if seed is not None: _rng.seed(seed)
         return Constant(lower + _rng.random()*(upper-lower))
 
 

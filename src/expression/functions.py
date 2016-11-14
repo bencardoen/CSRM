@@ -96,13 +96,13 @@ braces = [',', '(',')']
 prefixes = { value[0][0]: (key, len(value[0])) for key, value in list(functionset.items())}
 
 def getRandomFunction(seed = None, rng=None):
+    logger.info("getRandomFunction with seed {} and rng {}".format(seed, rng))
     _rng = rng or random.Random()
-    if seed:
+    if seed is not None:
         _rng.seed(seed)
     chosen = _rng.choice(functions)
     logger.debug("Chosen f{}".format(chosen))
     return chosen
-#    return rng.choice(list(functionset.keys()))
 
 def tokenize(expression, variables=None):
     """
