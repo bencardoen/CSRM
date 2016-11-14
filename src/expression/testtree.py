@@ -6,16 +6,16 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-from tree import Tree, Node, Constant, Variable, ConstantNode
-from functions import *
+from expression.tree import Tree, Node, Constant, Variable, ConstantNode
+from expression.functions import *
 import unittest
 from copy import deepcopy
 import logging
 import re
-import tools
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb
 import os
 import random
-import operators
+from expression.operators import Mutate, Crossover
 
 logger = logging.getLogger('global')
 
@@ -219,7 +219,7 @@ class TreeTest(unittest.TestCase):
     def testMSB(self):
         testvalues = {0:0, 1:1, 2:2, 3:2, 4:3, 5:3, 6:3, 7:3, 8:4}
         for k, v in testvalues.items():
-            self.assertEqual(tools.msb(k) , v)
+            self.assertEqual(msb(k) , v)
 
 
     def testCrossoverStatic(self):
@@ -299,7 +299,7 @@ class TreeTest(unittest.TestCase):
     def testMatchFloat(self):
         exprs = ["3.14 e-5","5.36" "-231.455132", "7.54503158691e-05"]
         for e in exprs:
-            self.assertNotEqual(tools.matchFloat(e), None)
+            self.assertNotEqual(matchFloat(e), None)
 
 
     def testInfixToPostfix(self):
@@ -381,11 +381,11 @@ class TreeTest(unittest.TestCase):
     def testMatchVariable(self):
         exprs = ["x1", "x3", "x_9", "x_09"]
         for e in exprs:
-            m = tools.matchVariable(e)
+            m = matchVariable(e)
             self.assertNotEqual(m, None)
 
     def testVariableExpressionTree(self):
-        variables = tools.generateVariables(4, 4, 0)
+        variables = generateVariables(4, 4, 0)
         expr = "1.57 + (24.3*x3)"
         t = Tree.createTreeFromExpression(expr, variables)
         t.printToDot("output/t25variables.dot")
@@ -446,7 +446,7 @@ class TreeTest(unittest.TestCase):
         funcs = len(testfunctions)
         dcount = 2
         vcount = 5
-        variables = tools.generateVariables(vcount, dcount, 0)
+        variables = generateVariables(vcount, dcount, 0)
         results = [[None for d in range(dcount)] for x in range(funcs)]
         trees = [None for d in range(funcs)]
         for j in range(dcount):
@@ -511,7 +511,7 @@ class TreeTest(unittest.TestCase):
         self.assertTrue(t.isModified())
         e =t.evaluateTree()
         self.assertFalse(t.isModified())
-        operators.Mutate.mutate(t, seed=2)
+        Mutate.mutate(t, seed=2)
         self.assertTrue(t.isModified())
         t.getDepth()
         t.evaluateTree()
@@ -534,7 +534,7 @@ class TreeTest(unittest.TestCase):
             r = t.getRoot()
             v2 = r.getVariables()
             v2 = list(set(v2))
-            self.assertTrue(tools.compareLists(v2, vlist))
+            self.assertTrue(compareLists(v2, vlist))
             self.assertEqual(v, varbs)
             self.assertEqual(e, e2)
             self.assertEqual(t.getDepth(), 4)
@@ -543,7 +543,7 @@ class TreeTest(unittest.TestCase):
         variables = [[ d for d in range(2,6)] for x in range(4)]
         expression = "log(5, 4) + x3 ** 4 * x2"
         t = Tree.createTreeFromExpression(expression, variables)
-        operators.Mutate.mutate(t, seed=2)
+        Mutate.mutate(t, seed=2)
         t.printToDot("output/t33.dot")
 
     def testCrossoverOperator(self):
@@ -554,7 +554,7 @@ class TreeTest(unittest.TestCase):
         left.printToDot("output/t34left.dot")
         right = Tree.createTreeFromExpression(expression, variables)
         right.printToDot("output/t34right.dot")
-        operators.Crossover.subtreecrossover(left, right, seed=42)
+        Crossover.subtreecrossover(left, right, seed=42)
         left.printToDot("output/t34leftafter.dot")
         right.printToDot("output/t34rightafter.dot")
 
@@ -564,7 +564,7 @@ class TreeTest(unittest.TestCase):
         expression = "min(5, 4) + x4 ** 4 * sin(x2)"
         left = Tree.createTreeFromExpression(expression, variables)
         right = Tree.createTreeFromExpression(expression, variables)
-        operators.Crossover.subtreecrossover(left, right, seed=42, depth=2)
+        Crossover.subtreecrossover(left, right, seed=42, depth=2)
 
     def testBottomUpConstruction(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]

@@ -8,8 +8,8 @@
 
 
 import logging
-import functions
 import random
+import expression.functions
 
 logger = logging.getLogger('global')
 
@@ -24,7 +24,7 @@ class Node:
         self.children = []
         self.constant = constant
         if self.function:
-            self.arity = functions.functionset[self.function][1]
+            self.arity = expression.functions.functionset[self.function][1]
         else:
             self.arity = 1
         self._modified = True
@@ -91,7 +91,7 @@ class Node:
         return self.function
 
     def __str__(self):
-        output = "{}".format(functions.functionset[self.function][0])
+        output = "{}".format(expression.functions.functionset[self.function][0])
         if self.constant:
             output += "*{}".format(self.constant.getValue())
         return output
@@ -130,8 +130,8 @@ class Node:
         arity = node.getArity()
         if children:
             left = Node.nodeToExpression(children[0])
-            frepr = functions.functionset[node.getFunction()][0]
-            isfunction = functions.functionset[node.getFunction()][3] == 'F'
+            frepr = expression.functions.functionset[node.getFunction()][0]
+            isfunction = expression.functions.functionset[node.getFunction()][3] == 'F'
             if arity == 2:
                 right = Node.nodeToExpression(children[1])
                 if isfunction:

@@ -6,7 +6,7 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-from tree import Tree
+from expression.tree import Tree
 import logging
 logger = logging.getLogger('global')
 

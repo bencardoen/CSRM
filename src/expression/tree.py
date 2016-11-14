@@ -7,11 +7,11 @@
 #      Author: Ben Cardoen
 
 
-from tools import msb, compareLists
-from functions import functionset, getRandomFunction, tokenize, infixToPostfix, isFunction, isOperator, infixToPrefix
+from expression.tools import msb, compareLists
+from expression.functions import functionset, getRandomFunction, tokenize, infixToPostfix, isFunction, isOperator, infixToPrefix
 from random import  choice, random
 from copy import deepcopy
-from node import Node, Constant, ConstantNode, Variable, VariableNode
+from .node import Node, Constant, ConstantNode, Variable, VariableNode
 import logging
 import random
 import math

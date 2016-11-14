@@ -7,11 +7,11 @@
 #      Author: Ben Cardoen
 
 from math import log, sin, cos, sqrt
+from expression.tools import matchFloat, matchVariable
+from expression.node import Constant, Variable
 import random
-import tree
 import re
 import logging
-import tools
 import math
 logger = logging.getLogger('global')
 
@@ -153,10 +153,10 @@ def tokenize(expression, variables=None):
         elif c in prefixes : # functions
             expression, i, output = parseFunction(expression, i, output)
         else:
-            f = tools.matchFloat(expression[i:])
+            f = matchFloat(expression[i:])
             if f:
                 i += len(f)-1  # -1 since we will increment i in any case
-                output += [tree.Constant(float(f))]
+                output += [Constant(float(f))]
             else:
                 v, i = parseVariable(expression[i:], variables, i)
                 if v:
@@ -204,10 +204,10 @@ def infixToPostfix(infix):
             if stack and isFunction(stack[-1]):
                 logger.debug("apppending f {}".format(stack[-1]))
                 result.append(stack.pop(-1))
-        elif isinstance(token, tree.Constant):
+        elif isinstance(token, Constant):
             result.append(token)
             logger.debug("apppending c {}".format(token))
-        elif isinstance(token, tree.Variable):
+        elif isinstance(token, Variable):
             result.append(token)
             logger.debug("appending v {}".format(token))
         elif token in functionset:
@@ -259,28 +259,28 @@ def parseVariable(stream, variables, index):
         Parse a variable from the stream if possible, create and return the object and offset
         the index with the length of the token
     """
-    v = tools.matchVariable(stream)
+    v = matchVariable(stream)
     if v:
         index += len(v)-1
         vindex = int(''.join([x for x in v if x not in ['X', 'x', '_']]))
         vs = None
         vs = variables[vindex]
-        variable = tree.Variable(vs, vindex)
+        variable = Variable(vs, vindex)
         logging.debug("Parsed Variable v={}".format(variable))
         return (variable, index)
     else:
         return (None, index)
 
 def handleUnaryMinus(expression, index, output, variables):
-    f = tools.matchFloat(expression[index:])
+    f = matchFloat(expression[index:])
     if f:
         index += len(f)-1  # -1 since we will increment i in any case
-        output += [tree.Constant(float(f))]
+        output += [Constant(float(f))]
     else:
         v, newindex = parseVariable(expression[index+1:], variables, index)
         if v:
             index = newindex+1
-            output += ['(',tree.Constant(-1.0), tokens['*'], v, ')']
+            output += ['(',Constant(-1.0), tokens['*'], v, ')']
         else:
             if index < (len(expression)-1) and expression[index+1] == '(': # case : -(5+3) -> (-1*(5+3))
                 lcount = 0
@@ -297,7 +297,7 @@ def handleUnaryMinus(expression, index, output, variables):
                                 expression = expression[0:j] + ')' + expression[j+1:]
                             break
                     j+=1
-                output += ['(',tree.Constant(-1.0), tokens['*']]
+                output += ['(',Constant(-1.0), tokens['*']]
             else:
                 logging.error("Invalid pattern in string {} , full expr {}".format(expression[index:], expression))
                 raise ValueError("Failed to decode number.")

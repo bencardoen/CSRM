@@ -8,7 +8,6 @@
 
 from collections import Counter
 from subprocess import call
-import tree
 import webbrowser
 import re
 import logging
