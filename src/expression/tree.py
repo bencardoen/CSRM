@@ -247,9 +247,9 @@ class Tree:
             Topdown
         """
         t = Tree()
-        nodes = [t.makeInternalNode(getRandomFunction(seed), None, None)]
         rng = random.Random()
         if seed: rng.seed(seed)
+        nodes = [t.makeInternalNode(getRandomFunction(rng=rng), None, None)]
         for i in range(depth):
             # for all generated nodes in last iteration
             newnodes=[]
@@ -259,9 +259,9 @@ class Tree:
                         if (rng.randrange(0, 2) & 1) and variables:
                             child = t.makeLeaf(rng.choice(variables), node)
                         else:
-                            child = t.makeConstant(Constant.generateConstant(seed=seed), node)
+                            child = t.makeConstant(Constant.generateConstant(rng=rng), node)
                     else:
-                        child = t.makeInternalNode(getRandomFunction(seed=seed), node, None)
+                        child = t.makeInternalNode(getRandomFunction(rng=rng), node, None)
                         newnodes.append(child)
             nodes = newnodes
         return t

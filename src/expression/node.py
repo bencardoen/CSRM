@@ -189,14 +189,13 @@ class Constant():
         return "Constant c = {}".format(self._value)
 
     @staticmethod
-    def generateConstant(lower=0, upper=1, seed=None):
+    def generateConstant(lower=0, upper=1, seed=None, rng = None):
         """
             Generate a Constant object with value [lower, upper) by randomgenerator
         """
-        rng = random.Random()
-        if seed:
-            rng.seed(seed)
-        return Constant(lower + rng.random()*(upper-lower))
+        _rng = rng or random.Random()
+        if seed: _rng.seed(seed)
+        return Constant(lower + _rng.random()*(upper-lower))
 
 
 class Variable():

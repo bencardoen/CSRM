@@ -95,11 +95,11 @@ braces = [',', '(',')']
 # A reverse map containing the first letter of each function object
 prefixes = { value[0][0]: (key, len(value[0])) for key, value in list(functionset.items())}
 
-def getRandomFunction(seed = None):
-    rng = random.Random()
+def getRandomFunction(seed = None, rng=None):
+    _rng = rng or random.Random()
     if seed:
-        rng.seed(seed)
-    chosen = rng.choice(functions)
+        _rng.seed(seed)
+    chosen = _rng.choice(functions)
     logger.debug("Chosen f{}".format(chosen))
     return chosen
 #    return rng.choice(list(functionset.keys()))

@@ -130,7 +130,7 @@ class TreeTest(unittest.TestCase):
         for i in range(10):
             t = Tree.makeRandomTree(variables, 10, 11)
             e = t.evaluateTree()
-            self.assertEqual(e, 1.002032767907594)
+            self.assertEqual(e, 0.966530248753001)
             if not i:
                 t.printToDot("output/t6.dot")
 
