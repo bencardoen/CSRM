@@ -7,7 +7,7 @@
 #      Author: Ben Cardoen
 
 from math import log, sin, cos, sqrt
-from expression.tools import matchFloat, matchVariable
+from expression.tools import matchFloat, matchVariable, almostEqual, approximateMultiple
 from expression.node import Constant, Variable
 import random
 import re
@@ -17,7 +17,9 @@ logger = logging.getLogger('global')
 
 size_limit = 80
 
-## Functions defined by wrapper, allows easier future adaption.
+
+# Function objects that can be used in an expression.
+# Most screen parameters to avoid expensive (frequent) exceptions.
 def plus(a, b):
     return a+b
 
@@ -77,7 +79,7 @@ def square_root(a):
     return math.sqrt(a)
 
 def tangent(a):
-    if a == 0:
+    if approximateMultiple(a, math.pi, epsilon=0.001):
         return None
     return math.tan(a)
 

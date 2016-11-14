@@ -12,6 +12,7 @@ import webbrowser
 import re
 import logging
 import random
+import inspect, itertools
 
 logger = logging.getLogger('global')
 
@@ -32,6 +33,24 @@ def compareLists(left, right):
     lefttrim = [x for x in left if x]
     righttrim = [y for y in right if y]
     return Counter(lefttrim) == Counter(righttrim)
+
+def approximateMultiple(a, b, epsilon):
+    """
+        let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True
+    """
+    logger.debug("{} {} {}".format(a,b,epsilon))
+    m = a / b
+    if not m: return False
+    return abs(m - round(m)) < epsilon
+
+
+def almostEqual(left, right, epsilon):
+    """
+        Absolute comparison
+    """
+    if abs(left - right) < epsilon:
+        return True
+    return False
 
 def generateSVG(dotfile):
     call(["dot", "-o {}.svg".format(dotfile[-4]), "{}".format(dotfile)])

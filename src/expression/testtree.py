@@ -581,6 +581,11 @@ class TreeTest(unittest.TestCase):
         e = t.evaluateTree()
         self.assertEqual(e, -1.383686947730111)
 
+    def testApproxMult(self):
+        b = math.pi
+        a = 6*math.pi + 0.0001
+        v = approximateMultiple(a, b, 0.001)
+        self.assertEqual(v, True)
 
 
 if __name__=="__main__":
