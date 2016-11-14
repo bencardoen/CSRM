@@ -15,7 +15,7 @@ import tools
 import math
 logger = logging.getLogger('global')
 
-size_limit = 200
+size_limit = 80
 
 ## Functions defined by wrapper, allows easier future adaption.
 def plus(a, b):
@@ -28,24 +28,26 @@ def multiply(a, b):
     return a*b
 
 def power(a, b):
-    #if a < 0 or b > size_limit:
-    #    # todo : avoid complex results
-    #    pass
+    if a < 0 or abs(b) > size_limit:
+        return None
+    if a == 0 and b<0:
+        return None
     return pow(a,b)
 
 def division(a, b):
-    #if b == 0:
-    #    # todo shield
-    #    pass
+    if b == 0:
+        return None
     return a/float(b)
 
 def modulo(a, b):
-    return a % b
+    b = int(b)
+    if b == 0:
+        return None
+    return int(a) % b
 
 def logarithm(a, b):
-    #if a <= 0 or b <= 0 or b == 1:
-    #    # todo shield
-    #    pass
+    if a <= 0 or b <= 0 or b == 1 or abs(b)>size_limit:
+        return None
     return log(a,b)
 
 def maximum(a, b):
@@ -70,13 +72,13 @@ def exponential(a):
     return power(math.e, a)
 
 def square_root(a):
-    #if a < 0:
-    #    pass
+    if a < 0:
+        return None
     return math.sqrt(a)
 
 def tangent(a):
-    #if a == 0:
-    #    pass
+    if a == 0:
+        return None
     return math.tan(a)
 
 def tangenth(a):

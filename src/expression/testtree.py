@@ -130,7 +130,7 @@ class TreeTest(unittest.TestCase):
         for i in range(10):
             t = Tree.makeRandomTree(variables, 10, 11)
             e = t.evaluateTree()
-            self.assertEqual(e, 0.966530248753001)
+            self.assertEqual(e, 2.700571199758967)
             if not i:
                 t.printToDot("output/t6.dot")
 
@@ -576,11 +576,10 @@ class TreeTest(unittest.TestCase):
 
     def testGrowTree(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        t = Tree.growTree(variables, depth=4, seed=1)
+        t = Tree.growTree(variables, depth=9, seed=1)
         t.printToDot("output/t35Grown.dot")
         e = t.evaluateTree()
-        t.printNodes()
-        self.assertEqual(e, -0.9763426942453582)
+        self.assertEqual(e, -1.383686947730111)
 
 
 

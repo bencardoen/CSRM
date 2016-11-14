@@ -186,22 +186,23 @@ class Tree:
     def _evalTree(self, node):
         """
             Recursively evaluate tree with node as root.
+            Returns None if evaluation is not valid
         """
         children = node.getChildren()
         if children:
             value = []
             for child in children:
                 v=self._evalTree(child)
+                if v is None:
+                    logger.info("Invalid evaluation of {}".format(child))
+                    return v
                 value.append(v)
-            try:
-                v = node.evaluate(value)
-                return v
-            except (ValueError, ZeroDivisionError, OverflowError, TypeError):
-                logger.error("Node {} is invalid with given args {}".format(node, value))
-                # get current depth, seed, variables
-                # start with swapping children
-                # Exceptions is too expensive, find semantic correct children
-                return 1
+            v = node.evaluate(value)
+
+            if v is None:
+                logger.info("Invalid evaluation of {}".format(child))
+            return v
+
         else:
             return node.evaluate()
 
@@ -250,36 +251,49 @@ class Tree:
         t = Tree()
         _rng = rng or random.Random()
         if seed is not None: _rng.seed(seed)
-        nodes = [t.makeInternalNode(getRandomFunction(rng=_rng), None, None)]
-        for i in range(depth):
-            # for all generated nodes in last iteration
-            newnodes=[]
-            for node in nodes:
-                for j in range(node.getArity()):
-                    if i >= depth-1:
-                        if tokenLeafs:
-                            child = t.makeConstant(Constant(1.0), node)
-                        else:
-                            if (_rng.randrange(0, 2) & 1) and variables:
-                                child = t.makeLeaf(_rng.choice(variables), node)
+        cnt = 0
+        while True:
+            t= Tree()
+            nodes = [t.makeInternalNode(getRandomFunction(rng=_rng), None, None)]
+            for i in range(depth):
+                # for all generated nodes in last iteration
+                newnodes=[]
+                for node in nodes:
+                    for j in range(node.getArity()):
+                        if i >= depth-1:
+                            if tokenLeafs:
+                                child = t.makeConstant(Constant(1.0), node)
                             else:
-                                child = t.makeConstant(Constant.generateConstant(rng=_rng), node)
-                    else:
-                        child = t.makeInternalNode(getRandomFunction(rng=_rng), node, None)
-                        newnodes.append(child)
-            nodes = newnodes
-        return t
+                                if (_rng.randrange(0, 2) & 1) and variables:
+                                    child = t.makeLeaf(_rng.choice(variables), node)
+                                else:
+                                    child = t.makeConstant(Constant.generateConstant(rng=_rng), node)
+                        else:
+                            child = t.makeInternalNode(getRandomFunction(rng=_rng), node, None)
+                            newnodes.append(child)
+                nodes = newnodes
+            e = t.evaluateTree()
+            if e is None:
+                logger.debug("Invalid result for generated random tree, retrying, attempt {}".format(cnt))
+                cnt += 1
+            else:
+                return t
 
     @staticmethod
     def constructFromSubtrees(left, right, seed=None, rng=None):
         logger.debug("cfSubtree with args left {} right {} seed {} rng {} ".format(left, right, seed, rng))
-        t = Tree.makeRandomTree(variables=None, depth=1, seed=seed, rng=rng, tokenLeafs=True)
-        if t.getRoot().getArity() == 2:
-            t.spliceSubTree(t.getNode(1), left.getRoot())
-            t.spliceSubTree(t.getNode(2), right.getRoot())
-        else:
-            t.spliceSubTree(t.getNode(1), left.getRoot())
-        return t
+        while True:
+            t = Tree.makeRandomTree(variables=None, depth=1, seed=seed, rng=rng, tokenLeafs=True)
+            if t.getRoot().getArity() == 2:
+                t.spliceSubTree(t.getNode(1), left.getRoot())
+                t.spliceSubTree(t.getNode(2), right.getRoot())
+            else:
+                t.spliceSubTree(t.getNode(1), left.getRoot())
+            e = t.evaluateTree()
+            if e is None:
+                logger.debug("Invalid evaluation of tree, retrying")
+            else:
+                return t
 
     @staticmethod
     def growTree(variables, depth, seed=None):
