@@ -241,14 +241,14 @@ class Tree:
         return d
 
     @staticmethod
-    def makeRandomTree(variables, depth, seed = None):
+    def makeRandomTree(variables, depth, seed = None, rng=None):
         """
             Generate a random expression tree with a random selection of variables
             Topdown
         """
         logger.debug("mkRandomTree with args {} depth {} seed {}".format(variables, depth, seed))
         t = Tree()
-        _rng = random.Random()
+        _rng = rng or random.Random()
         if seed is not None: _rng.seed(seed)
         nodes = [t.makeInternalNode(getRandomFunction(rng=_rng), None, None)]
         for i in range(depth):
@@ -268,9 +268,9 @@ class Tree:
         return t
 
     @staticmethod
-    def constructFromSubtrees(left, right, seed=None):
-        logger.debug("cfSubtree with args left {} right {} seed {} ".format(left, right, seed))
-        t = Tree.makeRandomTree(variables=None, depth=1, seed=seed)
+    def constructFromSubtrees(left, right, seed=None, rng=None):
+        logger.debug("cfSubtree with args left {} right {} seed {} rng {} ".format(left, right, seed, rng))
+        t = Tree.makeRandomTree(variables=None, depth=1, seed=seed, rng=rng)
         if t.getRoot().getArity() == 2:
             t.spliceSubTree(t.getNode(1), left.getRoot())
             t.spliceSubTree(t.getNode(2), right.getRoot())
@@ -279,8 +279,25 @@ class Tree:
         return t
 
     @staticmethod
-    def growTree(depth=None, seed=None):
-        pass
+    def growTree(variables, depth, seed=None):
+        rng = random.Random()
+        if seed is not None:
+            rng.seed(seed)
+        return Tree._growTree(variables, depth, rng=rng)
+
+    @staticmethod
+    def _growTree(variables, depth, rng=None):
+        if depth == 2:
+            left = Tree.makeRandomTree(variables, depth=1, seed=None, rng=rng)
+            right = Tree.makeRandomTree(variables, depth=1, seed=None, rng=rng)
+            root = Tree.constructFromSubtrees(left, right, seed=None, rng=rng)
+            return root
+        else:
+            left = Tree._growTree(variables, depth-1, rng=rng)
+            right = Tree._growTree(variables, depth-1, rng=rng)
+            root = Tree.constructFromSubtrees(left, right, seed=None, rng=rng)
+            return root
+
 
     def getRandomNode(self, seed = None, depth = None):
         """

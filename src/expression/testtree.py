@@ -571,15 +571,15 @@ class TreeTest(unittest.TestCase):
         left = Tree.makeRandomTree(variables, depth=1, seed=11)
         right = Tree.makeRandomTree(variables, depth=1, seed=13)
         newtree = Tree.constructFromSubtrees(left, right, seed=0)
+        e = newtree.evaluate()
+        self.assertEqual(e, 2)
 
-    def testRandomFunction(self):
-        rng = random.Random()
-        f = None
-        for i in range(10):
-            g = getRandomFunction(seed=0)
-            if i == 0:
-                f = g
-        self.assertEqual(f, g)
+    def testGrowTree(self):
+        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        t = Tree.growTree(variables, depth=4, seed=27)
+        e = t.evaluateTree()
+        self.assertEqual(e, 0.2382639434162021)
+        t.printToDot("output/t35Grown.dot")
 
 
 
