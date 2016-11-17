@@ -7,7 +7,7 @@
 #      Author: Ben Cardoen
 
 
-from expression.tools import msb, compareLists
+from expression.tools import msb, compareLists, traceFunction
 from expression.functions import functionset, getRandomFunction, tokenize, infixToPostfix, isFunction, isOperator, infixToPrefix
 from random import  choice, random
 from copy import deepcopy
@@ -295,8 +295,13 @@ class Tree:
             else:
                 return t
 
+
     @staticmethod
+    @traceFunction
     def growTree(variables, depth, seed=None):
+        """
+            Grow a tree up to depth, with optional seed for the rng.
+        """
         rng = random.Random()
         if seed is not None:
             rng.seed(seed)
@@ -304,23 +309,23 @@ class Tree:
 
     @staticmethod
     def _growTree(variables, depth, rng=None):
+        left = None
+        right = None
         if depth == 2:
             left = Tree.makeRandomTree(variables, depth=1, seed=None, rng=rng)
             right = Tree.makeRandomTree(variables, depth=1, seed=None, rng=rng)
-            root = Tree.constructFromSubtrees(left, right, seed=None, rng=rng)
-            return root
         else:
             left = Tree._growTree(variables, depth-1, rng=rng)
             right = Tree._growTree(variables, depth-1, rng=rng)
-            root = Tree.constructFromSubtrees(left, right, seed=None, rng=rng)
-            return root
+        root = Tree.constructFromSubtrees(left, right, seed=None, rng=rng)
+        return root
 
 
+    @traceFunction
     def getRandomNode(self, seed = None, depth = None):
         """
             Return a randomly selected node from this tree
         """
-        logger.debug("Randomnode with seed {}".format(seed))
         r = random.Random()
         if seed is not None:
             r.seed(seed)
@@ -363,6 +368,7 @@ class Tree:
     def logState(self):
         logger.debug("Current state = rnodes {}\n lnodes = {}".format(self.getNodes(), self.nodes))
 
+    @traceFunction
     def removeNode(self, node, newnode):
         """
             Remove node from tree, replace with newnode.
@@ -403,6 +409,17 @@ class Tree:
                         logger.debug("Decrementing refcount var {} to {}".format(var, v[1]-1))
                         self.variables[index] = [v[0], v[1]-1]
 
+    def _unreferenceVariable(self, varv):
+        logger.debug("Removing var {} from {}".format(var, self.variables))
+        index = var.getIndex()
+        if index in self.variables:
+            v = self.variables[index]
+            if v[1] == 1:
+                logger.debug("Removing var {}".format(var))
+                del self.variables[index]
+            else:
+                logger.debug("Decrementing refcount var {} to {}".format(var, v[1]-1))
+                self.variables[index] = [v[0], v[1]-1]
 
 
     def spliceSubTree(self, node, newnode):

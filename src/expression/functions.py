@@ -7,7 +7,7 @@
 #      Author: Ben Cardoen
 
 from math import log, sin, cos, sqrt
-from expression.tools import matchFloat, matchVariable, almostEqual, approximateMultiple
+from expression.tools import matchFloat, matchVariable, almostEqual, approximateMultiple, traceFunction
 from expression.node import Constant, Variable
 import random
 import re
@@ -20,6 +20,9 @@ size_limit = 80
 
 # Function objects that can be used in an expression.
 # Most screen parameters to avoid expensive (frequent) exceptions.
+# For example : div(a/0) is not legal, but catching often generated expression
+# is to expensive
+
 def plus(a, b):
     return a+b
 
@@ -121,15 +124,15 @@ braces = [',', '(',')']
 # A reverse map containing the first letter of each function object
 prefixes = { value[0][0]: (key, len(value[0])) for key, value in list(functionset.items())}
 
+
 def getRandomFunction(seed = None, rng=None):
-    logger.info("getRandomFunction with seed {} and rng {}".format(seed, rng))
     _rng = rng or random.Random()
     if seed is not None:
         _rng.seed(seed)
     chosen = _rng.choice(functions)
-    logger.debug("Chosen f{}".format(chosen))
     return chosen
 
+@traceFunction
 def tokenize(expression, variables=None):
     """
         Split expression into tokens, returned as a list.
@@ -139,10 +142,8 @@ def tokenize(expression, variables=None):
     expression = expression.replace(' ', '')
     expression = expression.replace("**", "^")
     detect = ['(', ','] + [x for x in list(functionset.keys())]
-    logger.debug("tokenize with args expr {} vars {}".format(expression, variables))
     while i < len(expression):
         c = expression[i]
-        logger.debug("Tokenizing {} at index {}".format(c, i))
         if c == '-':
             if i == 0 or (output and output[-1] in detect):
                 expression, i, output = handleUnaryMinus(expression, i, output, variables)
@@ -169,21 +170,22 @@ def tokenize(expression, variables=None):
         i += 1
     return output
 
+
 def isFunction(token):
     decision = False
     if token in functionset:
         if functionset[token][3] == 'F':
             decision = True
-    logger.debug("Token {} = function ? {}".format(token, decision))
     return decision
+
 
 def isOperator(token):
     decision = False
     if token in functionset:
         if functionset[token][3] != 'F':
             decision = True
-    logger.debug("Token {} = operator ? {}".format(token, decision))
     return decision
+
 
 def infixToPostfix(infix):
     """
@@ -191,7 +193,6 @@ def infixToPostfix(infix):
     """
     result = []
     stack = []
-    logger.debug("infix to postfix with args \n{}".format(infix))
     for token in infix:
         if token == ',':
             while stack[-1] != '(':
@@ -268,7 +269,6 @@ def parseVariable(stream, variables, index):
         vs = None
         vs = variables[vindex]
         variable = Variable(vs, vindex)
-        logging.debug("Parsed Variable v={}".format(variable))
         return (variable, index)
     else:
         return (None, index)
@@ -310,7 +310,6 @@ def parseFunction(expression, index, output):
     """
         Decode a function from the stream
     """
-    logger.debug("f {} at index {}".format(expression[index],index))
     candidate = None
     for length in reversed(range(1, 5)):
         name = expression[index:index+length]

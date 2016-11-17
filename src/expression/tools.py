@@ -13,6 +13,7 @@ import re
 import logging
 import random
 import inspect, itertools
+import functools
 
 logger = logging.getLogger('global')
 
@@ -69,10 +70,10 @@ def matchFloat(expr):
     m = p.match(expr)
     if m:
         v = m.group()
-        logger.debug("Found variable {} in {}".format(v, expr))
         return v
     else:
         return None
+
 
 def matchVariable(expr):
     """
@@ -82,7 +83,6 @@ def matchVariable(expr):
     m = pattern.match(expr)
     if m:
         v = m.group()
-        logger.debug("Found variable {} in {}".format(v, expr))
         return v
     else:
         return None
@@ -106,3 +106,32 @@ def msb(integer):
         integer >>= 1
         cnt += 1
     return cnt
+
+
+def traceFunction(fn=None, logcall=None):
+    """
+        Decorator to log a function with an optional logger.
+        Logs arguments and return value of the function object at debug level if no logger is given,
+        else uses the logcall object.
+        Example usage :
+                @traceFunction(logcall=logging.getLogger('global').error) or @traceFunction
+                def myfunc(...):
+        Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
+    """
+    if not logcall:
+        logcall = logging.getLogger('global').debug
+
+    # This is the wrapping decorator, without kargs
+    def _decorate(function):
+        @functools.wraps(function)# don't need this, but it is helpful to avoid __name__ overwriting
+        # This is the actual decorator, pass arguments and log.
+        def inner(*args, **kwargs):
+            logcall("Function {} called with pargs {} and kargs {}".format(function, args, kwargs))
+            rv = function(*args, **kwargs)
+            logcall("Function {} returns {}".format(function, rv))
+            return rv
+        return inner
+
+    if fn:
+        return _decorate(fn)
+    return _decorate

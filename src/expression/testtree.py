@@ -12,12 +12,20 @@ import unittest
 from copy import deepcopy
 import logging
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction
 import os
 import random
 from expression.operators import Mutate, Crossover
 
 logger = logging.getLogger('global')
+
+@traceFunction
+def testFunction(a, b, operator=None):
+    return a+b
+
+@traceFunction(logcall=logger.info)
+def testFunctionE(a, b, operator=None):
+    return a+b
 
 class TreeTest(unittest.TestCase):
 
@@ -305,14 +313,11 @@ class TreeTest(unittest.TestCase):
     def testInfixToPostfix(self):
         expr = "( ( min( 5, 6 ) ) ** ( log( 0.6, 0.3 ) ) ) + 1 * 9.23"
         tokenized = tokenize(expr)
-        logger.debug("Tokenized this is\n {}\n".format(tokenized))
         pfix = infixToPostfix(tokenized)
-        logger.debug("Postfix ? \n{}".format(pfix))
         self.assertEqual(len(pfix), 11)
         expr2 = "1/2**3-4"
         tokenized = tokenize(expr2)
         self.assertEqual(len(tokenized), 7)
-        logger.debug("Tokenized this is\n {}\n".format(tokenized))
         p2fix = infixToPostfix(tokenized)
         self.assertEqual(len(p2fix), 7)
 
@@ -322,10 +327,8 @@ class TreeTest(unittest.TestCase):
         expr = "1/2**3-4"
         expr = "(1 + 2) * (3 + 4)"
         tokenized = tokenize(expr)
-        logger.debug("Tokenized this is\n {}\n".format(tokenized))
         postfix = infixToPostfix(tokenized)
         prefix = infixToPrefix(tokenized)
-        logger.debug("Prefix ? \n{}".format(prefix))
         self.assertEqual(len(prefix), 7)
 
 
@@ -586,6 +589,13 @@ class TreeTest(unittest.TestCase):
         a = 6*math.pi + 0.0001
         v = approximateMultiple(a, b, 0.001)
         self.assertEqual(v, True)
+
+    def testTracing(self):
+        """
+            Test logging decorator
+        """
+        testFunction(1,2)
+        testFunctionE(1, 2, sum)
 
 
 if __name__=="__main__":
