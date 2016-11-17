@@ -10,5 +10,5 @@
 
 # Simple script converts all .dot files in cwd to svg
 DIR="output"
-cd $DIR
+#cd $DIR
 for f in *.dot; do dot -Tsvg -o ${f%.dot}.svg $f; done

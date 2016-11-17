@@ -19,6 +19,8 @@ from expression.operators import Mutate, Crossover
 
 logger = logging.getLogger('global')
 
+outputfolder = "../output/"
+
 #Test functions
 @traceFunction
 def testFunction(a, b, operator=None):
@@ -45,7 +47,7 @@ class TreeTest(unittest.TestCase):
         t.makeConstant(Constant(6), r)
         self.assertEqual(root.getChildren(), [l, r])
         self.assertEqual(t.evaluateTree(), 11)
-        t.printToDot("output/t1.dot")
+        t.printToDot(outputfolder+"t1.dot")
 
     def testIsLeaf(self):
         t = Tree()
@@ -63,7 +65,7 @@ class TreeTest(unittest.TestCase):
             self.assertTrue(t.isLeaf(n.getPosition()))
         for n in [root, l, r, rl]:
             self.assertTrue(not t.isLeaf(n.getPosition()))
-        t.printToDot("output/t1.dot")
+        t.printToDot(outputfolder+"t1.dot")
 
 
 
@@ -80,7 +82,7 @@ class TreeTest(unittest.TestCase):
         t.makeConstant(Constant(6), r)
         self.assertEqual(root.getChildren(), [l, r])
         self.assertEqual(t.evaluateTree(), 11.720584501801074)
-        t.printToDot("output/t2.dot")
+        t.printToDot(outputfolder+"t2.dot")
 
 
     def testVariableExpression(self):
@@ -96,7 +98,7 @@ class TreeTest(unittest.TestCase):
         t.makeLeaf(Variable([6], 0), r)
         self.assertEqual(root.getChildren(), [l, r])
         self.assertEqual(t.evaluateTree(), 11.720584501801074)
-        t.printToDot("output/t3.dot")
+        t.printToDot(outputfolder+"t3.dot")
 
 
     def testVariableConstantExpression(self):
@@ -112,7 +114,7 @@ class TreeTest(unittest.TestCase):
         t.makeLeaf(Variable([6], 0), r)
         self.assertEqual(root.getChildren(), [l, r])
         self.assertEqual(t.evaluateTree(), 37.50452706713107)
-        t.printToDot("output/t4.dot")
+        t.printToDot(outputfolder+"t4.dot")
 
 
     def testOutput(self):
@@ -128,7 +130,7 @@ class TreeTest(unittest.TestCase):
         t.makeConstant(Constant(6), r)
         self.assertEqual(root.getChildren(), [l, r])
         self.assertEqual(t.evaluateTree(), 11.720584501801074)
-        t.printToDot("output/t5.dot")
+        t.printToDot(outputfolder+"t5.dot")
 
 
     def testRandomTree(self):
@@ -141,7 +143,7 @@ class TreeTest(unittest.TestCase):
             e = t.evaluateTree()
             self.assertEqual(e, 2.700571199758967)
             if not i:
-                t.printToDot("output/t6.dot")
+                t.printToDot(outputfolder+"t6.dot")
 
 
     def testCollectNodes(self):
@@ -192,12 +194,12 @@ class TreeTest(unittest.TestCase):
         t.makeConstant(Constant(3), l)
         t.makeConstant(Constant(4), l)
         rr = t.makeConstant(Constant(6), r)
-        t.printToDot("output/t9before.dot")
+        t.printToDot(outputfolder+"t9before.dot")
 
         self.assertEqual(t.getNode(0), root)
         c = ConstantNode(rr.getPosition(), Constant(42)) # todo remove placeholder
         t._removeNode(rr,c)
-        t.printToDot("output/t9after.dot")
+        t.printToDot(outputfolder+"t9after.dot")
         self.assertNotEqual(t.getNode(5),rr)
         self.assertEqual(c, t.getNode(5))
         t.testInvariant()
@@ -215,14 +217,14 @@ class TreeTest(unittest.TestCase):
         t.makeLeaf(Variable([6], 0), r)
         self.assertEqual(root.getChildren(), [l, r])
         self.assertEqual(t.evaluateTree(), 37.50452706713107)
-        t.printToDot("output/t10.dot")
+        t.printToDot(outputfolder+"t10.dot")
         tnew = Tree()
         troot = tnew.makeInternalNode(plus, None, None)
         tll = tnew.makeLeaf(Variable([3], 0), troot)
         tnew.makeLeaf(Variable([4], 0), troot)
-        tnew.printToDot("output/t10candidate.dot")
+        tnew.printToDot(outputfolder+"t10candidate.dot")
         t.spliceSubTree(t.getNode(2), troot)
-        t.printToDot("output/t10result.dot")
+        t.printToDot(outputfolder+"t10result.dot")
         self.assertEqual(t.getNode(2), troot)
         self.assertEqual(t.getNode(5), tll)
 
@@ -242,7 +244,7 @@ class TreeTest(unittest.TestCase):
         t.makeLeaf(Variable([3], 0), l)
         lr = t.makeLeaf(Variable([4], 0), l)
         self.assertEqual(root.getChildren(), [l])
-        t.printToDot("output/test12left.dot")
+        t.printToDot(outputfolder+"test12left.dot")
 
         tnew = Tree()
         troot = tnew.makeInternalNode(power, None, None)
@@ -252,16 +254,16 @@ class TreeTest(unittest.TestCase):
         tnew.makeLeaf(Variable([6], 0), tl)
         tnew.makeConstant(Constant(0.6), tr)
         tnew.makeConstant(Constant(0.3), tr)
-        tnew.printToDot("output/test12right.dot")
+        tnew.printToDot(outputfolder+"test12right.dot")
 
         rightin = deepcopy(tl)
         t.spliceSubTree(lr, rightin)
-        t.printToDot("output/t12leftafter.dot")
-        tnew.printToDot("output/t12rightinvariant.dot")
+        t.printToDot(outputfolder+"t12leftafter.dot")
+        tnew.printToDot(outputfolder+"t12rightinvariant.dot")
 
         leftin = deepcopy(lr)
         tnew.spliceSubTree(tl, leftin)
-        tnew.printToDot("output/t12rightafter.dot")
+        tnew.printToDot(outputfolder+"t12rightafter.dot")
 
 
     def testCrossover(self):
@@ -270,14 +272,14 @@ class TreeTest(unittest.TestCase):
         """
         variables = [Variable([10, 11],0),Variable([3, 12],0),Variable([9, 12],0),Variable([8, 9],0)]
         left = Tree.makeRandomTree(variables, 6)
-        left.printToDot("output/t13LeftBefore.dot")
+        left.printToDot(outputfolder+"t13LeftBefore.dot")
 
         right = Tree.makeRandomTree(variables, 6)
-        right.printToDot("output/t13RightBefore.dot")
+        right.printToDot(outputfolder+"t13RightBefore.dot")
 
         Tree.swapSubtrees(left, right)
-        left.printToDot("output/t13LeftSwapped.dot")
-        right.printToDot("output/t13RightSwapped.dot")
+        left.printToDot(outputfolder+"t13LeftSwapped.dot")
+        right.printToDot(outputfolder+"t13RightSwapped.dot")
 
 
     def testTreeToExpression(self):
@@ -340,7 +342,7 @@ class TreeTest(unittest.TestCase):
         """
         expr = "( ( 1.0 + 2.0 ) * ( 3.0 + 4.0 ) )"
         tree = Tree.createTreeFromExpression(expr)
-        tree.printToDot("output/t20createdFromExpressionBasic.dot")
+        tree.printToDot(outputfolder+"t20createdFromExpressionBasic.dot")
         cycled = tree.toExpression()
         self.assertEqual(expr, cycled)
 
@@ -351,7 +353,7 @@ class TreeTest(unittest.TestCase):
         """
         expr = "( ( ( min( 5.0, 6.0 ) ) ** ( log( 0.6, 0.3 ) ) ) + ( 1.0 * 9.23 ) )"
         t = Tree.createTreeFromExpression(expr)
-        t.printToDot("output/t21createdFromExpressionFunctions.dot")
+        t.printToDot(outputfolder+"t21createdFromExpressionFunctions.dot")
         cycledexpr = t.toExpression()
         self.assertEqual(cycledexpr, expr)
 
@@ -364,7 +366,7 @@ class TreeTest(unittest.TestCase):
         for i in range(100):
             variables = []
             t = Tree.makeRandomTree(variables, 6, seed=i)
-            t.printToDot("output/t22randomtree.dot")
+            t.printToDot(outputfolder+"t22randomtree.dot")
             expr = t.toExpression()
             tconverted = Tree.createTreeFromExpression(expr)
             sxpr = tconverted.toExpression()
@@ -372,14 +374,14 @@ class TreeTest(unittest.TestCase):
             evt = tconverted.evaluateTree()
             self.assertEqual(ev, evt)
             self.assertEqual(expr, sxpr)
-            tconverted.printToDot("output/t22convertedtree.dot")
+            tconverted.printToDot(outputfolder+"t22convertedtree.dot")
 
     def testExpressions(self):
         """
             Verify an old bug
         """
         t = Tree.createTreeFromExpression("1+2+3%5")
-        t.printToDot("output/t23convertedtree.dot")
+        t.printToDot(outputfolder+"t23convertedtree.dot")
         e = t.evaluateTree()
         self.assertEqual(e, 6)
 
@@ -393,7 +395,7 @@ class TreeTest(unittest.TestCase):
         variables = generateVariables(4, 4, 0)
         expr = "1.57 + (24.3*x3)"
         t = Tree.createTreeFromExpression(expr, variables)
-        t.printToDot("output/t25variables.dot")
+        t.printToDot(outputfolder+"t25variables.dot")
         t.testInvariant()
         v = t.evaluateTree()
         expected = 1.57 + 24.3*variables[3][0]
@@ -408,7 +410,7 @@ class TreeTest(unittest.TestCase):
         for i, expr in enumerate(expressions):
             t = Tree.createTreeFromExpression(expr, variables)
             v = t.evaluateTree()
-            t.printToDot("output/t27unary{}.dot".format(i))
+            t.printToDot(outputfolder+"t27unary{}.dot".format(i))
             self.assertEqual(expected[i], v)
 
     def testPrecedence(self):
@@ -426,7 +428,7 @@ class TreeTest(unittest.TestCase):
                     trees[i]=Tree.createTreeFromExpression(expr, variables)
                 t=trees[i]
                 v = t.evaluateTree()
-                t.printToDot("output/t28unary{}.dot".format(i))
+                t.printToDot(outputfolder+"t28unary{}.dot".format(i))
                 self.assertEqual(expected[d][i], v)
 
     def testVariableIndex(self):
@@ -444,7 +446,7 @@ class TreeTest(unittest.TestCase):
         variables = [[1,2],[2,3]]
         t = Tree.createTreeFromExpression(expr, variables)
         e = t.evaluateTree()
-        t.printToDot("output/t30.dot")
+        t.printToDot(outputfolder+"t30.dot")
         self.assertAlmostEqual(e, 1-2*math.exp(-3*5))
 
     def testBenchmarkFunctions(self):
@@ -464,7 +466,7 @@ class TreeTest(unittest.TestCase):
                 t = trees[i]
                 ev = t.evaluateTree()
                 results[i][j] = ev
-                t.printToDot("output/t29Benchmark{}{}.dot".format(i,j))
+                t.printToDot(outputfolder+"t29Benchmark{}{}.dot".format(i,j))
         for index, res in enumerate(results):
 #            print("Comparing results of {} , {} !=? {}".format(testfunctions[index], res[0], res[1]))
             self.assertNotAlmostEqual(res[0], res[1])
@@ -473,8 +475,8 @@ class TreeTest(unittest.TestCase):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         t = Tree.makeRandomTree(variables, 3, seed=9)
         s = Tree.makeRandomTree(variables, 2, seed=1)
-        t.printToDot("output/t30a.dot")
-        s.printToDot("output/t30b.dot")
+        t.printToDot(outputfolder+"t30a.dot")
+        s.printToDot(outputfolder+"t30b.dot")
         e = t.evaluateTree()
         cached_e = t.evaluateTree()
         self.assertEqual(e, cached_e)
@@ -485,7 +487,7 @@ class TreeTest(unittest.TestCase):
     def testDepth(self):
         expr = "( ( ( min( 5.0, 6.0 ) ) ** ( log( 0.6, 0.3 ) ) ) + ( 1.0 * 9.23 ) )"
         t = Tree.createTreeFromExpression(expr)
-        t.printToDot("output/t31.dot")
+        t.printToDot(outputfolder+"t31.dot")
         cycledexpr = t.toExpression()
         self.assertEqual(cycledexpr, expr)
         results = {0:0, 1:1, 2:1, 3:2, 4:2, 5:2, 6:2, 7:3, 8:3, 9:3, 10:3}
@@ -500,7 +502,7 @@ class TreeTest(unittest.TestCase):
         compnodes = None
         for i in range(100):
             t = Tree.makeRandomTree(variables, 5, seed=11)
-#            t.printToDot("output/t32a.dot")
+#            t.printToDot(outputfolder+"t32a.dot")
             e2 = t.evaluateTree()
             nodes = t.getNodes()
             if not compnodes:
@@ -549,19 +551,19 @@ class TreeTest(unittest.TestCase):
         expression = "log(5, 4) + x3 ** 4 * x2"
         t = Tree.createTreeFromExpression(expression, variables)
         Mutate.mutate(t, seed=2)
-        t.printToDot("output/t33.dot")
+        t.printToDot(outputfolder+"t33.dot")
 
     def testCrossoverOperator(self):
         variables = [[ d for d in range(2,6)] for x in range(5)]
         expression = "log(5, 4) + x3 ** 4 * x1 * x1"
         expression = "min(5, 4) + x4 ** 4 * sin(x2)"
         left = Tree.createTreeFromExpression(expression, variables)
-        left.printToDot("output/t34left.dot")
+        left.printToDot(outputfolder+"t34left.dot")
         right = Tree.createTreeFromExpression(expression, variables)
-        right.printToDot("output/t34right.dot")
+        right.printToDot(outputfolder+"t34right.dot")
         Crossover.subtreecrossover(left, right, seed=42)
-        left.printToDot("output/t34leftafter.dot")
-        right.printToDot("output/t34rightafter.dot")
+        left.printToDot(outputfolder+"t34leftafter.dot")
+        right.printToDot(outputfolder+"t34rightafter.dot")
 
     def testCrossoverOperatorDepthSensitive(self):
         variables = [[ d for d in range(2,6)] for x in range(5)]
@@ -582,7 +584,7 @@ class TreeTest(unittest.TestCase):
     def testGrowTree(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         t = Tree.growTree(variables, depth=9, seed=1)
-        t.printToDot("output/t35Grown.dot")
+        t.printToDot(outputfolder+"t35Grown.dot")
         e = t.evaluateTree()
         self.assertEqual(e, -1.383686947730111)
 
@@ -602,8 +604,8 @@ class TreeTest(unittest.TestCase):
 
 if __name__=="__main__":
 #    logger.setLevel(logging.DEBUG)
-    if not os.path.isdir("output"):
+    if not os.path.isdir(outputfolder):
         logger.error("Output directory does not exist : creating...")
-        os.mkdir("output")
+        os.mkdir(outputfolder)
     print("Running")
     unittest.main()
