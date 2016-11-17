@@ -15,6 +15,9 @@ from .node import Node, Constant, ConstantNode, Variable, VariableNode
 import logging
 import random
 import math
+from itertools import islice
+
+# Configure the log subsystem
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('global')
@@ -26,18 +29,22 @@ class Tree:
         Each node has an optional constant.
     """
     def __init__(self):
+        # List of nodes in order of generation
         self.nodes = []
         self.root = None
         self.variables = {}
+        # Cached evaluation
         self.evaluated = 0
         self.modified = False
         self.depth = None
 
     def getNode(self, pos):
-        self.testInvariant()
         return self.nodes[pos]
 
     def testInvariant(self):
+        """
+            Ensure the tree is still correct in structure
+        """
         left = self.getNodes()
         right = self.nodes
         middle = self._positionalNodes()
@@ -52,29 +59,27 @@ class Tree:
                     logger.error("Node {} has invalid set of children".format(n))
                     raise ValueError("Invalid tree state")
 
+    @traceFunction
     def _addNode(self, node, pos):
         """
             Add node to tree (without linking), insert variable if a terminal node.
         """
         self.modified = True
-        logger.debug("Adding {} at pos {}".format(node, pos))
         if pos == 0:
             self.root = node
         curlen = len(self.nodes)
-        if pos >= len(self.nodes):
+        if pos >= curlen:
             self.nodes.extend([None] * (pos-curlen + 1))
-            logger.info("Extending list from {} to {}".format(curlen, len(self.nodes)))
         if self.nodes[pos]:
             raise ValueError("Node exists at {}".format(pos))
         else:
             self.nodes[pos] = node
+        # Update variable if needed
         variable = node.getVariable()
         if variable:
             index = variable.getIndex()
-            logger.debug("Adding var {} from node {} to variables".format(variable, node))
             if index in self.variables:
                 v = self.variables[index]
-                logger.debug("Updating refcount for {} from {} to {}".format(variable, v[1], v[1]+1))
                 self.variables[index] = [v[0], v[1]+1]
             else:
                 self.variables[index] = [variable, 1]
@@ -84,14 +89,11 @@ class Tree:
             Add an internal node to the tree
         """
         position = 0
-        if parent is not None:
-            children = parent.getChildren()
-            if children:
-                position = children[-1].getPosition()+1
-            else:
-                position = parent.getPosition()*2 + 1
         n = Node(function, position, constant)
         if parent is not None:
+            children = parent.getChildren()
+            position = children[-1].getPosition()+1 if children else parent.getPosition()*2 + 1
+            n.setPosition(position)
             parent.addChild(n)
         else:
             self.root = n
@@ -102,9 +104,7 @@ class Tree:
         """
             Recursively retrieve all nodes
         """
-        result = [self.root]
-        result += self.root.getAllChildren()
-        return result
+        return [self.root] + self.root.getAllChildren()
 
     def _positionalNodes(self):
         """
@@ -193,18 +193,11 @@ class Tree:
             value = []
             for child in children:
                 v=self._evalTree(child)
-                if v is None:
-                    logger.info("Invalid evaluation of {}".format(child))
-                    return v
+                if v is None: return v
                 value.append(v)
-            v = node.evaluate(value)
-
-            if v is None:
-                logger.info("Invalid evaluation of {}".format(child))
-            return v
-
+            return node.evaluate(value) # function or operator
         else:
-            return node.evaluate()
+            return node.evaluate() # leaf
 
 
     def printToDot(self, name = None):
@@ -232,14 +225,9 @@ class Tree:
         return self.depth
 
     def calculateDepth(self):
-        i = -1
-        n = self.nodes[i]
-        d = -1
-        while n is None:
-            i -= 1
-            n = self.nodes[i]
-        d = n.getDepth()
-        return d
+        for n in reversed(self.nodes):
+            if n : return n.getDepth()
+        raise ValueError("No Nodes in tree")
 
     @staticmethod
     def makeRandomTree(variables, depth, seed = None, rng=None, tokenLeafs=False):
@@ -332,18 +320,20 @@ class Tree:
         if seed is not None:
             r.seed(seed)
         if depth:
+            # We know our repr is a binary try, with depth slices equal in length to 2^k where k is depth
             assert(depth < math.log(len(self.nodes)+1, 2))
             lower = 2**depth-1
             upper = min(2**(depth+1)-1, len(self.nodes))
-            depthnodes = self.nodes[lower:upper]
             node = None
-            while node is None or node is self.getRoot():
-                node = r.choice(depthnodes)
+            while node is None:
+                i = r.randrange(max(lower,1), upper)
+                node = self.getNode(i)
             return node
         else:
             node = None
-            while node is None or node is self.getRoot():
-                node = r.choice(self.nodes)
+            while node is None:
+                i = r.randrange(1, len(self.nodes))
+                node = self.getNode(i)
             return node
 
     def setModified(self, v):
@@ -352,26 +342,23 @@ class Tree:
     def isModified(self):
         return self.modified
 
+    @traceFunction
     def getParent(self, node):
         """
             Get parent of node
         """
+        # todo fix invariant
         pos = node.getPosition()
         parentindex = 0
         if pos == 0:
             return None
-        if pos & 1:
-            parentindex = pos//2
-        else:
-            parentindex = pos//2 -1
-        parent = self.nodes[parentindex]
-        return parent
+        return self.getNode(pos//2) if pos & 1 else self.getNode(pos//2 -1)
 
     def logState(self):
         logger.debug("Current state = rnodes {}\n lnodes = {}".format(self.getNodes(), self.nodes))
 
     @traceFunction
-    def removeNode(self, node, newnode):
+    def _removeNode(self, node, newnode):
         """
             Remove node from tree, replace with newnode.
             First stage in splicing a subtree, subtree with root node is unlinked, newnode is placed in.
@@ -423,7 +410,7 @@ class Tree:
         """
         logger.debug("Splicing newnode {} in node's {} position".format(newnode, node))
         assert(node != self.getRoot())
-        self.removeNode(node, newnode)
+        self._removeNode(node, newnode)
         # newnode is in place, make sure its subtree is updated and children linked in
         newnode.updatePosition()
         nodes = newnode.getChildren()[:]
@@ -503,8 +490,6 @@ class Tree:
                 variable.setCurrentIndex(i)
             else:
                 variable.setCurrentIndex(index + 1)
-            self.variables[k][0] = variable
-            logger.debug("Updated v = {} index from {} to {}".format(variable, index, variable.getCurrentIndex()))
 
 
     def getRoot(self):
@@ -521,13 +506,11 @@ class Tree:
         leftv = leftsubroot.getVariables()
         logger.debug("Selected left node {}".format(leftsubroot))
 
-        rightseed = None
-        if seed is not None:
-            rightseed = seed+42
-        rightsubroot = right.getRandomNode(seed=rightseed, depth=depth)
+        rightsubroot = right.getRandomNode(seed=(seed + 1 if seed else seed), depth=depth)
         rightv = rightsubroot.getVariables()
         logger.debug("Selected right node {}".format(rightsubroot))
 
+        # We don't want aliasing effects, note that variable set is still aliased
         leftcopy = deepcopy(leftsubroot)
         rightcopy = deepcopy(rightsubroot)
 
@@ -545,7 +528,6 @@ class Tree:
             create a corresponding expression tree.
         """
         pfix = infixToPrefix(tokenize(expr, variables))
-        logger.debug("Create Tree with args \n{} in prefix\n{}".format(expr , pfix))
         result = Tree()
         lastnode = None
         for token in pfix:
@@ -557,6 +539,7 @@ class Tree:
                     result.makeConstant(token, lastnode)
                 elif isinstance(token, Variable):
                     result.makeLeaf(token, lastnode)
+            # If the current node has all children slots filled, move up to parent (until root), else keep completing
             while lastnode.finalized():
                 parent = result.getParent(lastnode) # relies on position
                 if parent:

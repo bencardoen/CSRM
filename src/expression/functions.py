@@ -129,8 +129,7 @@ def getRandomFunction(seed = None, rng=None):
     _rng = rng or random.Random()
     if seed is not None:
         _rng.seed(seed)
-    chosen = _rng.choice(functions)
-    return chosen
+    return _rng.choice(functions)
 
 @traceFunction
 def tokenize(expression, variables=None):
@@ -139,9 +138,10 @@ def tokenize(expression, variables=None):
     """
     output = []
     i = 0
+    # Prepare input
     expression = expression.replace(' ', '')
     expression = expression.replace("**", "^")
-    detect = ['(', ','] + [x for x in list(functionset.keys())]
+    detect = ['(', ','] + [x for x in list(functionset.keys())] # list of tokens following a unary minus
     while i < len(expression):
         c = expression[i]
         if c == '-':
@@ -172,19 +172,11 @@ def tokenize(expression, variables=None):
 
 
 def isFunction(token):
-    decision = False
-    if token in functionset:
-        if functionset[token][3] == 'F':
-            decision = True
-    return decision
+    return token in functionset and functionset[token][3] == 'F'
 
 
 def isOperator(token):
-    decision = False
-    if token in functionset:
-        if functionset[token][3] != 'F':
-            decision = True
-    return decision
+    return token in functionset and functionset[token][3] != 'F'
 
 
 def infixToPostfix(infix):
@@ -266,10 +258,7 @@ def parseVariable(stream, variables, index):
     if v:
         index += len(v)-1
         vindex = int(''.join([x for x in v if x not in ['X', 'x', '_']]))
-        vs = None
-        vs = variables[vindex]
-        variable = Variable(vs, vindex)
-        return (variable, index)
+        return ( Variable(variables[vindex], vindex) , index)
     else:
         return (None, index)
 
@@ -311,6 +300,7 @@ def parseFunction(expression, index, output):
         Decode a function from the stream
     """
     candidate = None
+    # reversed since we want a greedy match, e.g. tanh is preferred over tan|h
     for length in reversed(range(1, 5)):
         name = expression[index:index+length]
         if name in tokens:

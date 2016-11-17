@@ -196,10 +196,11 @@ class TreeTest(unittest.TestCase):
 
         self.assertEqual(t.getNode(0), root)
         c = ConstantNode(rr.getPosition(), Constant(42)) # todo remove placeholder
-        t.removeNode(rr,c)
+        t._removeNode(rr,c)
         t.printToDot("output/t9after.dot")
         self.assertNotEqual(t.getNode(5),rr)
         self.assertEqual(c, t.getNode(5))
+        t.testInvariant()
 
     def testMutate(self):
         """
