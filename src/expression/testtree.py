@@ -19,6 +19,7 @@ from expression.operators import Mutate, Crossover
 
 logger = logging.getLogger('global')
 
+#Test functions
 @traceFunction
 def testFunction(a, b, operator=None):
     return a+b
@@ -132,7 +133,7 @@ class TreeTest(unittest.TestCase):
 
     def testRandomTree(self):
         """
-            Test construction of a random tree. No assertions, but construction test of invariants.
+            Construction test
         """
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         for i in range(10):
@@ -599,7 +600,7 @@ class TreeTest(unittest.TestCase):
 
 
 if __name__=="__main__":
- #   logger.setLevel(logging.DEBUG)
+#    logger.setLevel(logging.DEBUG)
     if not os.path.isdir("output"):
         logger.error("Output directory does not exist : creating...")
         os.mkdir("output")

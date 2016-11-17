@@ -10,6 +10,7 @@
 import logging
 import random
 import expression.functions
+from expression.tools import traceFunction
 
 logger = logging.getLogger('global')
 
@@ -44,6 +45,7 @@ class Node:
     def getDepth(self):
         return self._depth
 
+    @traceFunction
     def evaluate(self, args=None):
         """
         Evaluate this node using the function object, optionally multiplying with the constant.
@@ -102,8 +104,8 @@ class Node:
             fname = self.function.__name__
         return " f={} arity={} constant={}".format(fname, self.arity, self.constant or 1)
 
+    @traceFunction
     def updatePosition(self):
-        logger.debug("Updating position for {}".format(self))
         pos = self.getPosition()
         i = 1
         for c in self.getChildren():
@@ -112,8 +114,8 @@ class Node:
             i+=1
             c.updatePosition()
 
+    @traceFunction
     def getAllChildren(self):
-        logger.debug(("getAllchildren for {} with children {}".format(self, self.children)))
         children = self.getChildren()[:]
         collected = children[:]
         if children :
@@ -125,6 +127,7 @@ class Node:
             return []
 
     @staticmethod
+    @traceFunction
     def nodeToExpression(node):
         children = node.getChildren()
         arity = node.getArity()

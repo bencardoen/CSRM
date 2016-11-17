@@ -7,6 +7,7 @@
 #      Author: Ben Cardoen
 
 from expression.tree import Tree
+from expression.tools import traceFunction
 import logging
 logger = logging.getLogger('global')
 
@@ -15,6 +16,7 @@ class Mutate():
         Mutate a subexpression in the tree
     """
     @staticmethod
+    @traceFunction
     def mutate(tr, seed = None, variables = None):
         """
             Replace a random node with a new generated subexpression.
@@ -34,5 +36,6 @@ class Crossover():
         Subtree crossover operator
     """
     @staticmethod
+    @traceFunction
     def subtreecrossover(left, right, seed = None, depth = None):
         Tree.swapSubtrees(left, right, seed=seed, depth=depth)

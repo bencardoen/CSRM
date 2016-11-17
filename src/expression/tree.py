@@ -325,6 +325,8 @@ class Tree:
     def getRandomNode(self, seed = None, depth = None):
         """
             Return a randomly selected node from this tree
+            If parameter depth is set, select only nodes at that depth
+            The returned node is never root.
         """
         r = random.Random()
         if seed is not None:
@@ -376,10 +378,12 @@ class Tree:
         """
         self.setModified(True)
         self.testInvariant()
+        # Unlink the current node
         npos = node.getPosition()
         self.nodes[npos] = None
         parent = self.getParent(node)
         newnode.setPosition(npos)
+        # Replace current node with new node
         if parent:
             if npos & 1:
                 logger.debug("Setting newnode as first child of {}".format(parent))
@@ -397,31 +401,22 @@ class Tree:
             self.nodes[c.getPosition()]=None
             var = c.getVariable()
             if var:
-                logger.debug("Removing var {} from {}".format(var, self.variables))
-                logging.debug("Removing var {}".format(var))
-                index = var.getIndex()
-                if index in self.variables:
-                    v = self.variables[index]
-                    if v[1] == 1:
-                        logger.debug("Removing var {}".format(var))
-                        del self.variables[index]
-                    else:
-                        logger.debug("Decrementing refcount var {} to {}".format(var, v[1]-1))
-                        self.variables[index] = [v[0], v[1]-1]
+                self._unreferenceVariable(var)
 
+    @traceFunction
     def _unreferenceVariable(self, varv):
-        logger.debug("Removing var {} from {}".format(var, self.variables))
-        index = var.getIndex()
+        index = varv.getIndex()
         if index in self.variables:
             v = self.variables[index]
             if v[1] == 1:
-                logger.debug("Removing var {}".format(var))
+                logger.debug("Removing var {}".format(varv))
                 del self.variables[index]
             else:
-                logger.debug("Decrementing refcount var {} to {}".format(var, v[1]-1))
+                logger.debug("Decrementing refcount var {} to {}".format(varv, v[1]-1))
                 self.variables[index] = [v[0], v[1]-1]
 
 
+    @traceFunction
     def spliceSubTree(self, node, newnode):
         """
             Remove subtree with root node, replace it with subtree with root newnode
@@ -429,6 +424,7 @@ class Tree:
         logger.debug("Splicing newnode {} in node's {} position".format(newnode, node))
         assert(node != self.getRoot())
         self.removeNode(node, newnode)
+        # newnode is in place, make sure its subtree is updated and children linked in
         newnode.updatePosition()
         nodes = newnode.getChildren()[:]
         while len(nodes) != 0:
@@ -445,7 +441,7 @@ class Tree:
             Return an ordered array of constants for all nodes.
             Non initialized constants will have a value of None
         """
-        return [ c.getConstant() for c in self.nodes]
+        return [ c.getConstant() for c in self.nodes if c]
 
     def getVariables(self):
         """
@@ -470,18 +466,16 @@ class Tree:
         logger.debug("Variables is now {}".format(variables))
         assert(variables == self.getVariables())
 
+    @traceFunction
     def _updateVariables(self, vlist):
         """
             When a set of variables from a different tree is merged, update the current set.
         """
         variables = self.getVariables()
-        logger.debug("Updating variables is now {}, adding {}".format(variables, vlist))
         for v in vlist:
             k = v.getIndex()
             if k in variables:
-                entry = variables[k]
-                entry[1] += 1
-                variables[k] = entry
+                variables[k][1]+=1
             else:
                 variables[k] = [v, 1]
         logger.debug("Variables is now {}".format(variables))
@@ -489,9 +483,13 @@ class Tree:
 
 
     def printNodes(self):
+        """
+            Print nodes to stdout in binary order (root, ... , ith generation, ....)
+        """
         for i, n in enumerate(self.nodes):
             print("Node {} at {}".format(n, i))
 
+    @traceFunction
     def updateIndex(self,i=-1):
         """
             Update the variables in the tree s.t. they point at the next datapoint
@@ -540,6 +538,7 @@ class Tree:
         right._updateVariables(leftv)
 
     @staticmethod
+    @traceFunction
     def createTreeFromExpression(expr, variables=None):
         """
             Given an infix expression containing floats, operators, function defined in functions.functionset,
@@ -568,6 +567,7 @@ class Tree:
         return result
 
 
+    @traceFunction
     def toExpression(self):
         """
             Print the tree to an infix expression.
