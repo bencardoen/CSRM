@@ -1,0 +1,22 @@
+src.gp package
+==============
+
+Submodules
+----------
+
+src.gp.algorithm module
+-----------------------
+
+.. automodule:: src.gp.algorithm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: src.gp
+    :members:
+    :undoc-members:
+    :show-inheritance:
