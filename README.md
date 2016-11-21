@@ -19,3 +19,5 @@ A small script is present in this folder that call graphviz to render the trees 
 ```Shell
    $./dotify.sh
 ```
+
+Documentation is present in the folder 'doc/html/index/html'
