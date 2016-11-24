@@ -1,15 +1,20 @@
 
 from expression.tree import Tree
 from expression.node import Variable
+import random
 
 
 class GPAlgorithm():
     def __init__(self, X, Y, popsize, maxdepth, seed = None):
         # Needs to be indexed, ordered by fitness, deterministically ordered, variable length?
+        # A collection of (key, tree) values in a sorted collection
         self.population = []
         self.maxdepth = maxdepth
         self.popsize=popsize
         self.seed = seed
+        self._rng = random.Random()
+        if seed:
+            self._rng.seed(seed)
         self.X = X
         self.Y = Y
         self._initialize()
@@ -22,6 +27,13 @@ class GPAlgorithm():
             vlist.append(Variable(x, i))
         self.variables = vlist
 
+
+    def addTree(self, t):
+        pass
+
+    def getBestTree(self):
+        pass
+
     def _initializePopulation(self):
         for i in range(self.popsize):
             self.population.append(Tree.growTree(self.variables, self.maxdepth, self.seed))
@@ -29,6 +41,6 @@ class GPAlgorithm():
     def getVariables(self):
         return self.variables
 
-    def printForest(self):
-        for t in self.population:
-            t.printNodes()
+    def printForest(self, prefix):
+        for i,t in enumerate(self.population):
+            t.printToDot(prefix+str(i)+".dot")

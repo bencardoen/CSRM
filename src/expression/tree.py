@@ -37,9 +37,31 @@ class Tree:
         self.evaluated = 0
         self.modified = False
         self.depth = None
+        self.fitness = 0
+        self.fitnessfunction = None
 
     def getNode(self, pos):
         return self.nodes[pos]
+
+    def getFitness(self):
+        return self.fitness
+
+    def setFitness(self, fscore):
+        self.fitness = fscore
+
+    @traceFunction()
+    def updateFitness(self):
+        """
+            Re-evaluate self to obtain a fitness score.
+        """
+        if self.fitnessfunction:
+            self.fitness = self.fitnessfunction(self)
+        else:
+            logger.warning("No fitness function set!")
+
+    @traceFunction()
+    def setFitnessFunction(self, fcall):
+        self.fitnessfunction = fcall
 
     def testInvariant(self):
         """
@@ -178,7 +200,7 @@ class Tree:
         if self.modified:
             oe = self.evaluated
             self.evaluated = self._evalTree(self.nodes[0])
-            logger.info("Tree state modified, reevaluating from {} to {}".format(oe, self.evaluated))
+            logger.debug("Tree state modified, reevaluating from {} to {}".format(oe, self.evaluated))
             self.getDepth()
             self.modified = False
         return self.evaluated
@@ -268,6 +290,7 @@ class Tree:
                 return t
 
     @staticmethod
+    @traceFunction
     def constructFromSubtrees(left, right, seed=None, rng=None):
         logger.debug("cfSubtree with args left {} right {} seed {} rng {} ".format(left, right, seed, rng))
         while True:
@@ -468,7 +491,6 @@ class Tree:
         logger.debug("Variables is now {}".format(variables))
 
 
-
     def printNodes(self):
         """
             Print nodes to stdout in binary order (root, ... , ith generation, ....)
@@ -490,7 +512,6 @@ class Tree:
                 variable.setCurrentIndex(i)
             else:
                 variable.setCurrentIndex(index + 1)
-
 
     def getRoot(self):
         assert(self.root)

@@ -26,7 +26,7 @@ outputfolder = "../output/"
 def testFunction(a, b, operator=None):
     return a+b
 
-@traceFunction(logcall=logger.info)
+@traceFunction(logcall=logger.debug)
 def testFunctionE(a, b, operator=None):
     return a+b
 
@@ -601,9 +601,25 @@ class TreeTest(unittest.TestCase):
         testFunction(1,2)
         testFunctionE(1, 2, sum)
 
+    def testFitness(self):
+        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        left = Tree.makeRandomTree(variables, depth=1, seed=11)
+        right = Tree.makeRandomTree(variables, depth=1, seed=13)
+        def myf(tree):
+            return tree.getDepth()
+        left.setFitnessFunction(myf)
+        left.updateFitness()
+        self.assertEqual(left.getDepth(), left.getFitness())
+        def wrap(tree):
+            return tree.getDepth()
+        right.setFitnessFunction(wrap)
+        right.updateFitness()
+        self.assertEqual(right.getDepth(), right.getFitness())
+
+
 
 if __name__=="__main__":
-#    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     if not os.path.isdir(outputfolder):
         logger.error("Output directory does not exist : creating...")
         os.mkdir(outputfolder)
