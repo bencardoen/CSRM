@@ -1,7 +1,7 @@
-src
-===
+gp
+==
 
 .. toctree::
    :maxdepth: 4
 
-   src
+   gp

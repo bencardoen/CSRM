@@ -63,7 +63,7 @@
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">msb</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+<div class="viewcode-block" id="msb"><a class="viewcode-back" href="../../expression.html#expression.tools.msb">[docs]</a><span class="k">def</span> <span class="nf">msb</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return most significant bit (max(i) s.t. b[i]==1)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -71,9 +71,9 @@
     <span class="k">while</span> <span class="n">b</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">b</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
         <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="n">i</span></div>
 
-<div class="viewcode-block" id="compareLists"><a class="viewcode-back" href="../../expression.html#expression.tools.compareLists">[docs]</a><span class="k">def</span> <span class="nf">compareLists</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+<div class="viewcode-block" id="compareLists"><a class="viewcode-back" href="../../expression.html#expression.tools.compareLists">[docs]</a><span class="k">def</span> <span class="nf">compareLists</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return true if left and right contain the same elements, disregarding order and None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -99,16 +99,16 @@
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="generateSVG"><a class="viewcode-back" href="../../expression.html#expression.tools.generateSVG">[docs]</a><span class="k">def</span> <span class="nf">generateSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">):</span>
+<div class="viewcode-block" id="generateSVG"><a class="viewcode-back" href="../../expression.html#expression.tools.generateSVG">[docs]</a><span class="k">def</span> <span class="nf">generateSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">call</span><span class="p">([</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span> <span class="s2">&quot;-o </span><span class="si">{}</span><span class="s2">.svg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dotfile</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">]),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dotfile</span><span class="p">)])</span></div>
 
-<div class="viewcode-block" id="showSVG"><a class="viewcode-back" href="../../expression.html#expression.tools.showSVG">[docs]</a><span class="k">def</span> <span class="nf">showSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">):</span>
+<div class="viewcode-block" id="showSVG"><a class="viewcode-back" href="../../expression.html#expression.tools.showSVG">[docs]</a><span class="k">def</span> <span class="nf">showSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">outfile</span> <span class="o">=</span> <span class="n">dotfile</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.svg&quot;</span>
     <span class="n">generateSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">)</span>
     <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="matchFloat"><a class="viewcode-back" href="../../expression.html#expression.tools.matchFloat">[docs]</a><span class="k">def</span> <span class="nf">matchFloat</span><span class="p">(</span><span class="n">expr</span><span class="p">):</span>
+<div class="viewcode-block" id="matchFloat"><a class="viewcode-back" href="../../expression.html#expression.tools.matchFloat">[docs]</a><span class="k">def</span> <span class="nf">matchFloat</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Try to parse a floating point expression at begin of expr, return string representation if found or None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -121,7 +121,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="matchVariable"><a class="viewcode-back" href="../../expression.html#expression.tools.matchVariable">[docs]</a><span class="k">def</span> <span class="nf">matchVariable</span><span class="p">(</span><span class="n">expr</span><span class="p">):</span>
+<div class="viewcode-block" id="matchVariable"><a class="viewcode-back" href="../../expression.html#expression.tools.matchVariable">[docs]</a><span class="k">def</span> <span class="nf">matchVariable</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Try to match a variable at begin of expr, return string representation if found</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -133,32 +133,26 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="generateVariables"><a class="viewcode-back" href="../../expression.html#expression.tools.generateVariables">[docs]</a><span class="k">def</span> <span class="nf">generateVariables</span><span class="p">(</span><span class="n">varcount</span><span class="p">,</span> <span class="n">datacount</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+<div class="viewcode-block" id="generateVariables"><a class="viewcode-back" href="../../expression.html#expression.tools.generateVariables">[docs]</a><span class="k">def</span> <span class="nf">generateVariables</span><span class="p">(</span><span class="n">varcount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">datacount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate a list of varcount list, each datacount large.</span>
-<span class="sd">    This represent a feature set [X] with |X| = varcount, and |X[i]| = datacount</span>
+<span class="sd">    Generate a list of datapoints.</span>
+
+<span class="sd">    :param int varcount: number of features</span>
+<span class="sd">    :param int datacount: number of datapoints per feature</span>
+<span class="sd">    :param int seed: Seed for the rng</span>
+<span class="sd">    :returns: a list of varcount lists each datacount sized.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
     <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">datacount</span><span class="p">)]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">varcount</span><span class="p">)]</span>
     <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="msb"><a class="viewcode-back" href="../../expression.html#expression.tools.msb">[docs]</a><span class="k">def</span> <span class="nf">msb</span><span class="p">(</span><span class="n">integer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return the leftmost significant bit of argument</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">while</span> <span class="n">integer</span><span class="p">:</span>
-        <span class="n">integer</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
-        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">cnt</span></div>
-
-
 <div class="viewcode-block" id="traceFunction"><a class="viewcode-back" href="../../expression.html#expression.tools.traceFunction">[docs]</a><span class="k">def</span> <span class="nf">traceFunction</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logcall</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator to log a function with an optional logger.</span>
 <span class="sd">    Logs arguments and return value of the function object at debug level if no logger is given,</span>
 <span class="sd">    else uses the logcall object.</span>
+
 <span class="sd">    :param function fn: function object, implicit</span>
 <span class="sd">    :param function logcall: logging callable, e.g. logcall=logger.getLogger(&#39;global&#39;).debug</span>
 <span class="sd">    Example usage :</span>
@@ -216,7 +210,7 @@
       &copy;2016, Ben Cardoen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
     </div>

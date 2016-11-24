@@ -134,7 +134,8 @@ def getRandomFunction(seed = None, rng=None):
 @traceFunction
 def tokenize(expression, variables=None):
     """
-    Split expression into tokens, returned as a list.
+
+    :returns: expression parsed as a list of tokens
     """
     output = []
     i = 0
@@ -251,8 +252,8 @@ def infixToPrefix(infix):
 
 def parseVariable(stream, variables, index):
     """
-    Parse a variable from the stream if possible, create and return the object and offset
-    the index with the length of the token
+
+    :returns: Variable or None , newindex
     """
     v = matchVariable(stream)
     if v:
@@ -295,9 +296,11 @@ def handleUnaryMinus(expression, index, output, variables):
     return expression, index, output
 
 
-def parseFunction(expression, index, output):
+def parseFunction(expression: str, index: int, output: list):
     """
     Decode a function from the stream
+
+    :returns: expression, newindex, newoutput
     """
     # reversed since we want a greedy match, e.g. tanh is preferred over tan|h
     for length in reversed(range(1, 5)):

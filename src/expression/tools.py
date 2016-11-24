@@ -27,7 +27,7 @@ def msb(b):
         i += 1
     return i
 
-def compareLists(left, right):
+def compareLists(left: list, right: list):
     """
     Return true if left and right contain the same elements, disregarding order and None
     """
@@ -53,16 +53,16 @@ def almostEqual(left, right, epsilon):
         return True
     return False
 
-def generateSVG(dotfile):
+def generateSVG(dotfile: str):
     call(["dot", "-o {}.svg".format(dotfile[-4]), "{}".format(dotfile)])
 
-def showSVG(dotfile):
+def showSVG(dotfile: str):
     outfile = dotfile[:-4] + ".svg"
     generateSVG(dotfile)
     webbrowser.open(outfile)
 
 
-def matchFloat(expr):
+def matchFloat(expr: str):
     """
     Try to parse a floating point expression at begin of expr, return string representation if found or None.
     """
@@ -75,7 +75,7 @@ def matchFloat(expr):
         return None
 
 
-def matchVariable(expr):
+def matchVariable(expr: str):
     """
     Try to match a variable at begin of expr, return string representation if found
     """
@@ -87,32 +87,26 @@ def matchVariable(expr):
     else:
         return None
 
-def generateVariables(varcount, datacount, seed):
+def generateVariables(varcount: int, datacount: int, seed: int):
     """
-    Generate a list of varcount list, each datacount large.
-    This represent a feature set [X] with |X| = varcount, and |X[i]| = datacount
+    Generate a list of datapoints.
+
+    :param int varcount: number of features
+    :param int datacount: number of datapoints per feature
+    :param int seed: Seed for the rng
+    :returns: a list of varcount lists each datacount sized.
     """
     rng = random.Random()
     rng.seed(seed)
     result = [ [rng.random() for d in range(datacount)] for x in range(varcount)]
     return result
 
-def msb(integer):
-    """
-    Return the leftmost significant bit of argument
-    """
-    cnt = 0
-    while integer:
-        integer >>= 1
-        cnt += 1
-    return cnt
-
-
 def traceFunction(fn=None, logcall=None):
     """
     Decorator to log a function with an optional logger.
     Logs arguments and return value of the function object at debug level if no logger is given,
     else uses the logcall object.
+
     :param function fn: function object, implicit
     :param function logcall: logging callable, e.g. logcall=logger.getLogger('global').debug
     Example usage :

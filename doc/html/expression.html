@@ -76,7 +76,7 @@
 
 <dl class="function">
 <dt id="expression.functions.getRandomFunction">
-<code class="descclassname">expression.functions.</code><code class="descname">getRandomFunction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/functions.html#getRandomFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.functions.getRandomFunction" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.functions.</code><code class="descname">getRandomFunction</code><span class="sig-paren">(</span><em>seed=None</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/functions.html#getRandomFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.functions.getRandomFunction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -143,15 +143,29 @@
 
 <dl class="function">
 <dt id="expression.functions.parseFunction">
-<code class="descclassname">expression.functions.</code><code class="descname">parseFunction</code><span class="sig-paren">(</span><em>expression</em>, <em>index</em>, <em>output</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/functions.html#parseFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.functions.parseFunction" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.functions.</code><code class="descname">parseFunction</code><span class="sig-paren">(</span><em>expression: str</em>, <em>index: int</em>, <em>output: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/functions.html#parseFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.functions.parseFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decode a function from the stream</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">expression, newindex, newoutput</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="expression.functions.parseVariable">
 <code class="descclassname">expression.functions.</code><code class="descname">parseVariable</code><span class="sig-paren">(</span><em>stream</em>, <em>variables</em>, <em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/functions.html#parseVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.functions.parseVariable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse a variable from the stream if possible, create and return the object and offset
-the index with the length of the token</p>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Variable or None , newindex</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -186,8 +200,15 @@ the index with the length of the token</p>
 
 <dl class="function">
 <dt id="expression.functions.tokenize">
-<code class="descclassname">expression.functions.</code><code class="descname">tokenize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/functions.html#tokenize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.functions.tokenize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Split expression into tokens, returned as a list.</p>
+<code class="descclassname">expression.functions.</code><code class="descname">tokenize</code><span class="sig-paren">(</span><em>expression</em>, <em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/functions.html#tokenize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.functions.tokenize" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">expression parsed as a list of tokens</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -196,7 +217,13 @@ the index with the length of the token</p>
 <dl class="class">
 <dt id="expression.node.Constant">
 <em class="property">class </em><code class="descclassname">expression.node.</code><code class="descname">Constant</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Constant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Constant" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="staticmethod">
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="expression.node.Constant.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Constant.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Constant.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
 <dt id="expression.node.Constant.generateConstant">
 <em class="property">static </em><code class="descname">generateConstant</code><span class="sig-paren">(</span><em>lower=0</em>, <em>upper=1</em>, <em>seed=None</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Constant.generateConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Constant.generateConstant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a Constant object with value [lower, upper) by randomgenerator</p>
@@ -220,6 +247,11 @@ the index with the length of the token</p>
 <dd><p>Bases: <a class="reference internal" href="#expression.node.Node" title="expression.node.Node"><code class="xref py py-class docutils literal"><span class="pre">expression.node.Node</span></code></a></p>
 <p>Represents a leaf or terminal node in the expression, holding a constant</p>
 <dl class="method">
+<dt id="expression.node.ConstantNode.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>pos</em>, <em>constant</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#ConstantNode.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.ConstantNode.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.node.ConstantNode.evaluate">
 <code class="descname">evaluate</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#ConstantNode.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.ConstantNode.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -234,14 +266,22 @@ the index with the length of the token</p>
 <dl class="class">
 <dt id="expression.node.Node">
 <em class="property">class </em><code class="descclassname">expression.node.</code><code class="descname">Node</code><span class="sig-paren">(</span><em>fun</em>, <em>pos</em>, <em>constant=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="expression.node.Node.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>fun</em>, <em>pos</em>, <em>constant=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a node composed of a function object, position in (binary) tree and an optional
+constant multiplier. Arity of the function is assumed to be 1.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="expression.node.Node.addChild">
 <code class="descname">addChild</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.addChild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.addChild" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="expression.node.Node.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate this node using the function object, optionally multiplying with the constant.</p>
 </dd></dl>
 
@@ -253,7 +293,7 @@ the index with the length of the token</p>
 
 <dl class="method">
 <dt id="expression.node.Node.getAllChildren">
-<code class="descname">getAllChildren</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.getAllChildren"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.getAllChildren" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getAllChildren</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.getAllChildren"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.getAllChildren" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -298,7 +338,7 @@ the index with the length of the token</p>
 
 <dl class="staticmethod">
 <dt id="expression.node.Node.nodeToExpression">
-<em class="property">static </em><code class="descname">nodeToExpression</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.nodeToExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.nodeToExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">nodeToExpression</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.nodeToExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.nodeToExpression" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="staticmethod">
@@ -313,7 +353,7 @@ the index with the length of the token</p>
 
 <dl class="method">
 <dt id="expression.node.Node.updatePosition">
-<code class="descname">updatePosition</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.updatePosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.updatePosition" title="Permalink to this definition">¶</a></dt>
+<code class="descname">updatePosition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.updatePosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.updatePosition" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -321,7 +361,15 @@ the index with the length of the token</p>
 <dl class="class">
 <dt id="expression.node.Variable">
 <em class="property">class </em><code class="descclassname">expression.node.</code><code class="descname">Variable</code><span class="sig-paren">(</span><em>values</em>, <em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="expression.node.Variable.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>values</em>, <em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Values is a list of datapoints this feature has
+Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index = 9</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="expression.node.Variable.getCurrentIndex">
 <code class="descname">getCurrentIndex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.getCurrentIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.getCurrentIndex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -360,6 +408,11 @@ the index with the length of the token</p>
 <dd><p>Bases: <a class="reference internal" href="#expression.node.Node" title="expression.node.Node"><code class="xref py py-class docutils literal"><span class="pre">expression.node.Node</span></code></a></p>
 <p>Represents a leaf or terminal node in the expression, holding a reference to a variable (x_i)</p>
 <dl class="method">
+<dt id="expression.node.VariableNode.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>pos</em>, <em>variable</em>, <em>constant=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#VariableNode.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.VariableNode.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.node.VariableNode.evaluate">
 <code class="descname">evaluate</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#VariableNode.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.VariableNode.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -382,10 +435,11 @@ the index with the length of the token</p>
 <dl class="class">
 <dt id="expression.operators.Crossover">
 <em class="property">class </em><code class="descclassname">expression.operators.</code><code class="descname">Crossover</code><a class="reference internal" href="_modules/expression/operators.html#Crossover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.operators.Crossover" title="Permalink to this definition">¶</a></dt>
-<dd><p>Subtree crossover operator</p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Subtree crossover operator</p>
 <dl class="staticmethod">
 <dt id="expression.operators.Crossover.subtreecrossover">
-<em class="property">static </em><code class="descname">subtreecrossover</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/operators.html#Crossover.subtreecrossover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.operators.Crossover.subtreecrossover" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">subtreecrossover</code><span class="sig-paren">(</span><em>left</em>, <em>right</em>, <em>seed=None</em>, <em>depth=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/operators.html#Crossover.subtreecrossover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.operators.Crossover.subtreecrossover" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -393,10 +447,11 @@ the index with the length of the token</p>
 <dl class="class">
 <dt id="expression.operators.Mutate">
 <em class="property">class </em><code class="descclassname">expression.operators.</code><code class="descname">Mutate</code><a class="reference internal" href="_modules/expression/operators.html#Mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.operators.Mutate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mutate a subexpression in the tree</p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Mutate a subexpression in the tree</p>
 <dl class="staticmethod">
 <dt id="expression.operators.Mutate.mutate">
-<em class="property">static </em><code class="descname">mutate</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/operators.html#Mutate.mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.operators.Mutate.mutate" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">mutate</code><span class="sig-paren">(</span><em>tr</em>, <em>seed=None</em>, <em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/operators.html#Mutate.mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.operators.Mutate.mutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace a random node with a new generated subexpression.
 If no variables are supplied, the existing set is reused.</p>
 </dd></dl>
@@ -644,12 +699,12 @@ Fuzz tests all conversion functions.</p>
 
 <dl class="function">
 <dt id="expression.testtree.testFunction">
-<code class="descclassname">expression.testtree.</code><code class="descname">testFunction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#testFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.testFunction" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.testtree.</code><code class="descname">testFunction</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>operator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#testFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.testFunction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="expression.testtree.testFunctionE">
-<code class="descclassname">expression.testtree.</code><code class="descname">testFunctionE</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#testFunctionE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.testFunctionE" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.testtree.</code><code class="descname">testFunctionE</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>operator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#testFunctionE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.testFunctionE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -669,43 +724,58 @@ Fuzz tests all conversion functions.</p>
 
 <dl class="function">
 <dt id="expression.tools.compareLists">
-<code class="descclassname">expression.tools.</code><code class="descname">compareLists</code><span class="sig-paren">(</span><em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#compareLists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.compareLists" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.tools.</code><code class="descname">compareLists</code><span class="sig-paren">(</span><em>left: list</em>, <em>right: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#compareLists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.compareLists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return true if left and right contain the same elements, disregarding order and None</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.generateSVG">
-<code class="descclassname">expression.tools.</code><code class="descname">generateSVG</code><span class="sig-paren">(</span><em>dotfile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#generateSVG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.generateSVG" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.tools.</code><code class="descname">generateSVG</code><span class="sig-paren">(</span><em>dotfile: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#generateSVG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.generateSVG" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.generateVariables">
-<code class="descclassname">expression.tools.</code><code class="descname">generateVariables</code><span class="sig-paren">(</span><em>varcount</em>, <em>datacount</em>, <em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#generateVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.generateVariables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a list of varcount list, each datacount large.
-This represent a feature set [X] with <a href="#id1"><span class="problematic" id="id2">|X|</span></a> = varcount, and <a href="#id3"><span class="problematic" id="id4">|X[i]|</span></a> = datacount</p>
+<code class="descclassname">expression.tools.</code><code class="descname">generateVariables</code><span class="sig-paren">(</span><em>varcount: int</em>, <em>datacount: int</em>, <em>seed: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#generateVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.generateVariables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a list of datapoints.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>varcount</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of features</li>
+<li><strong>datacount</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of datapoints per feature</li>
+<li><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Seed for the rng</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of varcount lists each datacount sized.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.matchFloat">
-<code class="descclassname">expression.tools.</code><code class="descname">matchFloat</code><span class="sig-paren">(</span><em>expr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#matchFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.matchFloat" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.tools.</code><code class="descname">matchFloat</code><span class="sig-paren">(</span><em>expr: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#matchFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.matchFloat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to parse a floating point expression at begin of expr, return string representation if found or None.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.matchVariable">
-<code class="descclassname">expression.tools.</code><code class="descname">matchVariable</code><span class="sig-paren">(</span><em>expr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#matchVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.matchVariable" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.tools.</code><code class="descname">matchVariable</code><span class="sig-paren">(</span><em>expr: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#matchVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.matchVariable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to match a variable at begin of expr, return string representation if found</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.msb">
-<code class="descclassname">expression.tools.</code><code class="descname">msb</code><span class="sig-paren">(</span><em>integer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#msb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.msb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the leftmost significant bit of argument</p>
+<code class="descclassname">expression.tools.</code><code class="descname">msb</code><span class="sig-paren">(</span><em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#msb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.msb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return most significant bit (max(i) s.t. b[i]==1)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.showSVG">
-<code class="descclassname">expression.tools.</code><code class="descname">showSVG</code><span class="sig-paren">(</span><em>dotfile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#showSVG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.showSVG" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.tools.</code><code class="descname">showSVG</code><span class="sig-paren">(</span><em>dotfile: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#showSVG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.showSVG" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -713,13 +783,24 @@ This represent a feature set [X] with <a href="#id1"><span class="problematic" i
 <code class="descclassname">expression.tools.</code><code class="descname">traceFunction</code><span class="sig-paren">(</span><em>fn=None</em>, <em>logcall=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#traceFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.traceFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorator to log a function with an optional logger.
 Logs arguments and return value of the function object at debug level if no logger is given,
-else uses the logcall object.
-:param function fn: function object, implicit
-:param function logcall: logging callable, e.g. logcall=logger.getLogger(&#8216;global&#8217;).debug
-Example usage :</p>
-<blockquote>
-<div>&#64;traceFunction(logcall=logging.getLogger(&#8216;global&#8217;).error) or &#64;traceFunction
-def myfunc(...):</div></blockquote>
+else uses the logcall object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fn</strong> (<em>function</em>) &#8211; function object, implicit</li>
+<li><strong>logcall</strong> (<em>function</em>) &#8211; logging callable, e.g. logcall=logger.getLogger(&#8216;global&#8217;).debug</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Example usage :</dt>
+<dd>&#64;traceFunction(logcall=logging.getLogger(&#8216;global&#8217;).error) or &#64;traceFunction
+def myfunc(...):</dd>
+</dl>
 <p>Based on : <a class="reference external" href="https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments">https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments</a></p>
 </dd></dl>
 
@@ -729,9 +810,15 @@ def myfunc(...):</div></blockquote>
 <dl class="class">
 <dt id="expression.tree.Tree">
 <em class="property">class </em><code class="descclassname">expression.tree.</code><code class="descname">Tree</code><a class="reference internal" href="_modules/expression/tree.html#Tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Expression tree. A binary tree stored as an ordered list.
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Expression tree. A binary tree stored as an ordered list.
 Internal nodes hold operators, terminal nodes either Variables or Constants.
-Each node has an optional constant.</p>
+Each node has an optional constant weight</p>
+<dl class="method">
+<dt id="expression.tree.Tree.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="expression.tree.Tree.calculateDepth">
 <code class="descname">calculateDepth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.calculateDepth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.calculateDepth" title="Permalink to this definition">¶</a></dt>
@@ -739,12 +826,12 @@ Each node has an optional constant.</p>
 
 <dl class="staticmethod">
 <dt id="expression.tree.Tree.constructFromSubtrees">
-<em class="property">static </em><code class="descname">constructFromSubtrees</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.constructFromSubtrees"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.constructFromSubtrees" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">constructFromSubtrees</code><span class="sig-paren">(</span><em>left</em>, <em>right</em>, <em>seed=None</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.constructFromSubtrees"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.constructFromSubtrees" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="staticmethod">
 <dt id="expression.tree.Tree.createTreeFromExpression">
-<em class="property">static </em><code class="descname">createTreeFromExpression</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.createTreeFromExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.createTreeFromExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">createTreeFromExpression</code><span class="sig-paren">(</span><em>expr: str</em>, <em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.createTreeFromExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.createTreeFromExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given an infix expression containing floats, operators, function defined in functions.functionset,
 create a corresponding expression tree.</p>
 </dd></dl>
@@ -777,7 +864,7 @@ Returns a cached version or calculates a new one if needed.</p>
 
 <dl class="method">
 <dt id="expression.tree.Tree.getNode">
-<code class="descname">getNode</code><span class="sig-paren">(</span><em>pos</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getNode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getNode</code><span class="sig-paren">(</span><em>pos: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getNode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -788,13 +875,13 @@ Returns a cached version or calculates a new one if needed.</p>
 
 <dl class="method">
 <dt id="expression.tree.Tree.getParent">
-<code class="descname">getParent</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getParent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getParent" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getParent</code><span class="sig-paren">(</span><em>node: expression.node.Node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getParent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getParent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parent of node</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="expression.tree.Tree.getRandomNode">
-<code class="descname">getRandomNode</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getRandomNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getRandomNode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getRandomNode</code><span class="sig-paren">(</span><em>seed=None</em>, <em>depth=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getRandomNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getRandomNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a randomly selected node from this tree
 If parameter depth is set, select only nodes at that depth
 The returned node is never root.</p>
@@ -813,13 +900,13 @@ The returned node is never root.</p>
 
 <dl class="staticmethod">
 <dt id="expression.tree.Tree.growTree">
-<em class="property">static </em><code class="descname">growTree</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.growTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.growTree" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">growTree</code><span class="sig-paren">(</span><em>variables</em>, <em>depth: int</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.growTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.growTree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grow a tree up to depth, with optional seed for the rng.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="expression.tree.Tree.isLeaf">
-<code class="descname">isLeaf</code><span class="sig-paren">(</span><em>position</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.isLeaf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.isLeaf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">isLeaf</code><span class="sig-paren">(</span><em>position: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.isLeaf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.isLeaf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return true if node at position is a terminal/leaf node.</p>
 </dd></dl>
 
@@ -835,7 +922,7 @@ The returned node is never root.</p>
 
 <dl class="method">
 <dt id="expression.tree.Tree.makeConstant">
-<code class="descname">makeConstant</code><span class="sig-paren">(</span><em>constant</em>, <em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.makeConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.makeConstant" title="Permalink to this definition">¶</a></dt>
+<code class="descname">makeConstant</code><span class="sig-paren">(</span><em>constant</em>, <em>parent: expression.node.Node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.makeConstant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.makeConstant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a leaf node holding a constant</p>
 </dd></dl>
 
@@ -847,13 +934,13 @@ The returned node is never root.</p>
 
 <dl class="method">
 <dt id="expression.tree.Tree.makeLeaf">
-<code class="descname">makeLeaf</code><span class="sig-paren">(</span><em>variable</em>, <em>parent</em>, <em>constant=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.makeLeaf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.makeLeaf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">makeLeaf</code><span class="sig-paren">(</span><em>variable</em>, <em>parent: expression.node.Node</em>, <em>constant=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.makeLeaf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.makeLeaf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a leaf node holding a reference to a variable.</p>
 </dd></dl>
 
 <dl class="staticmethod">
 <dt id="expression.tree.Tree.makeRandomTree">
-<em class="property">static </em><code class="descname">makeRandomTree</code><span class="sig-paren">(</span><em>variables</em>, <em>depth</em>, <em>seed=None</em>, <em>rng=None</em>, <em>tokenLeafs=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.makeRandomTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.makeRandomTree" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">makeRandomTree</code><span class="sig-paren">(</span><em>variables</em>, <em>depth: int</em>, <em>seed=None</em>, <em>rng=None</em>, <em>tokenLeafs=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.makeRandomTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.makeRandomTree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a random expression tree with a random selection of variables
 Topdown construction, there is no guarantee that this construction renders a semantically valid tree</p>
 </dd></dl>
@@ -876,7 +963,7 @@ Topdown construction, there is no guarantee that this construction renders a sem
 
 <dl class="method">
 <dt id="expression.tree.Tree.setFitnessFunction">
-<code class="descname">setFitnessFunction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.setFitnessFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.setFitnessFunction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setFitnessFunction</code><span class="sig-paren">(</span><em>fcall</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.setFitnessFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.setFitnessFunction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -886,7 +973,7 @@ Topdown construction, there is no guarantee that this construction renders a sem
 
 <dl class="method">
 <dt id="expression.tree.Tree.spliceSubTree">
-<code class="descname">spliceSubTree</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.spliceSubTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.spliceSubTree" title="Permalink to this definition">¶</a></dt>
+<code class="descname">spliceSubTree</code><span class="sig-paren">(</span><em>node: expression.node.Node</em>, <em>newnode: expression.node.Node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.spliceSubTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.spliceSubTree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove subtree with root node, replace it with subtree with root newnode</p>
 </dd></dl>
 
@@ -905,19 +992,19 @@ Will swap out subtrees at equal depth.</p>
 
 <dl class="method">
 <dt id="expression.tree.Tree.toExpression">
-<code class="descname">toExpression</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.toExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.toExpression" title="Permalink to this definition">¶</a></dt>
+<code class="descname">toExpression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.toExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.toExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print the tree to an infix expression.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="expression.tree.Tree.updateFitness">
-<code class="descname">updateFitness</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.updateFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.updateFitness" title="Permalink to this definition">¶</a></dt>
+<code class="descname">updateFitness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.updateFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.updateFitness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Re-evaluate self to obtain a fitness score.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="expression.tree.Tree.updateIndex">
-<code class="descname">updateIndex</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.updateIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.updateIndex" title="Permalink to this definition">¶</a></dt>
+<code class="descname">updateIndex</code><span class="sig-paren">(</span><em>i=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.updateIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.updateIndex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the variables in the tree s.t. they point at the next datapoint</p>
 </dd></dl>
 
@@ -981,7 +1068,7 @@ Will swap out subtrees at equal depth.</p>
       &copy;2016, Ben Cardoen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |

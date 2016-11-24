@@ -180,7 +180,8 @@
 <span class="nd">@traceFunction</span>
 <div class="viewcode-block" id="tokenize"><a class="viewcode-back" href="../../expression.html#expression.functions.tokenize">[docs]</a><span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Split expression into tokens, returned as a list.</span>
+
+<span class="sd">    :returns: expression parsed as a list of tokens</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
@@ -297,8 +298,8 @@
 
 <div class="viewcode-block" id="parseVariable"><a class="viewcode-back" href="../../expression.html#expression.functions.parseVariable">[docs]</a><span class="k">def</span> <span class="nf">parseVariable</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parse a variable from the stream if possible, create and return the object and offset</span>
-<span class="sd">    the index with the length of the token</span>
+
+<span class="sd">    :returns: Variable or None , newindex</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">matchVariable</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
@@ -341,9 +342,11 @@
     <span class="k">return</span> <span class="n">expression</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">output</span></div>
 
 
-<div class="viewcode-block" id="parseFunction"><a class="viewcode-back" href="../../expression.html#expression.functions.parseFunction">[docs]</a><span class="k">def</span> <span class="nf">parseFunction</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+<div class="viewcode-block" id="parseFunction"><a class="viewcode-back" href="../../expression.html#expression.functions.parseFunction">[docs]</a><span class="k">def</span> <span class="nf">parseFunction</span><span class="p">(</span><span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decode a function from the stream</span>
+
+<span class="sd">    :returns: expression, newindex, newoutput</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># reversed since we want a greedy match, e.g. tanh is preferred over tan|h</span>
     <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)):</span>
@@ -389,7 +392,7 @@
       &copy;2016, Ben Cardoen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
     </div>

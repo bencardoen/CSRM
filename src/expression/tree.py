@@ -26,7 +26,7 @@ class Tree:
     """
         Expression tree. A binary tree stored as an ordered list.
         Internal nodes hold operators, terminal nodes either Variables or Constants.
-        Each node has an optional constant.
+        Each node has an optional constant weight
     """
     def __init__(self):
         # List of nodes in order of generation

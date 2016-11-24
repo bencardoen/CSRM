@@ -7,6 +7,16 @@ import random
 
 class GPAlgorithm():
     def __init__(self, X, Y, popsize, maxdepth, seed = None):
+        """
+        Initializes a forest of trees randomly constructed.
+
+        :param list X: a list of feature values, per feature an equal length sublist
+        :param list Y: a list of response values
+        :param int popsize: maximum population size
+        :param int maxdepth: the maximum depth a tree is initialized to
+        :param int seed: seed value for the rng used in tree construction
+        """
+        # Sorted set of trees by fitness value
         self._population = SetPopulation(key=lambda _tree : 0-_tree.getFitness())
         self._maxdepth = maxdepth
         self._popsize=popsize
@@ -17,6 +27,7 @@ class GPAlgorithm():
         self._X = X
         self._Y = Y
         self._initialize()
+        self._archive = SetPopulation(key=lambda _tree : 0-_tree.getFitness())
 
     def _initialize(self):
         vlist = []
