@@ -40,7 +40,7 @@ class Tree:
         self.fitness = 0
         self.fitnessfunction = None
 
-    def getNode(self, pos):
+    def getNode(self, pos: int):
         return self.nodes[pos]
 
     def getFitness(self):
@@ -82,7 +82,7 @@ class Tree:
                     raise ValueError("Invalid tree state")
 
     @traceFunction
-    def _addNode(self, node, pos):
+    def _addNode(self, node: Node, pos: int):
         """
         Add node to tree (without linking), insert variable if a terminal node.
         """
@@ -134,7 +134,7 @@ class Tree:
         """
         return [d for d in self.nodes if d]
 
-    def isLeaf(self, position):
+    def isLeaf(self, position: int):
         """
         Return true if node at position is a terminal/leaf node.
         """
@@ -147,7 +147,7 @@ class Tree:
         else:
             return True
 
-    def makeLeaf(self, variable, parent, constant = None):
+    def makeLeaf(self, variable, parent: Node, constant = None):
         """
         Make a leaf node holding a reference to a variable.
         """
@@ -163,7 +163,7 @@ class Tree:
         self._addNode(n, position)
         return n
 
-    def makeConstant(self, constant, parent):
+    def makeConstant(self, constant, parent: Node):
         """
         Make a leaf node holding a constant
         """
@@ -204,7 +204,7 @@ class Tree:
             self.modified = False
         return self.evaluated
 
-    def _evalTree(self, node):
+    def _evalTree(self, node: Node):
         """
         Recursively evaluate tree with node as root.
         Returns None if evaluation is not valid
@@ -251,7 +251,7 @@ class Tree:
         raise ValueError("No Nodes in tree")
 
     @staticmethod
-    def makeRandomTree(variables, depth, seed = None, rng=None, tokenLeafs=False):
+    def makeRandomTree(variables, depth: int, seed = None, rng=None, tokenLeafs=False):
         """
         Generate a random expression tree with a random selection of variables
         Topdown construction, there is no guarantee that this construction renders a semantically valid tree
@@ -308,7 +308,7 @@ class Tree:
 
     @staticmethod
     @traceFunction
-    def growTree(variables, depth, seed=None):
+    def growTree(variables, depth: int, seed=None):
         """
         Grow a tree up to depth, with optional seed for the rng.
         """
@@ -318,7 +318,7 @@ class Tree:
         return Tree._growTree(variables, depth, rng=rng)
 
     @staticmethod
-    def _growTree(variables, depth, rng=None):
+    def _growTree(variables, depth: int, rng=None):
         left = None
         right = None
         if depth == 2:
@@ -365,7 +365,7 @@ class Tree:
         return self.modified
 
     @traceFunction
-    def getParent(self, node):
+    def getParent(self, node: Node):
         """
         Get parent of node
         """
@@ -380,7 +380,7 @@ class Tree:
         logger.debug("Current state = rnodes {}\n lnodes = {}".format(self.getNodes(), self.nodes))
 
     @traceFunction
-    def _removeNode(self, node, newnode):
+    def _removeNode(self, node: Node, newnode: Node):
         """
         Remove node from tree, replace with newnode.
         First stage in splicing a subtree, subtree with root node is unlinked, newnode is placed in.
@@ -413,7 +413,7 @@ class Tree:
                 self._unreferenceVariable(var)
 
     @traceFunction
-    def _unreferenceVariable(self, varv):
+    def _unreferenceVariable(self, varv: Variable):
         index = varv.getIndex()
         if index in self.variables:
             v = self.variables[index]
@@ -426,7 +426,7 @@ class Tree:
 
 
     @traceFunction
-    def spliceSubTree(self, node, newnode):
+    def spliceSubTree(self, node: Node, newnode: Node):
         """
         Remove subtree with root node, replace it with subtree with root newnode
         """
@@ -458,7 +458,7 @@ class Tree:
         """
         return self.variables
 
-    def _mergeVariables(self, otherset):
+    def _mergeVariables(self, otherset: dict):
         """
         When a new subtree is merged, update the variables
         """
@@ -476,19 +476,12 @@ class Tree:
         assert(variables == self.getVariables())
 
     @traceFunction
-    def _updateVariables(self, vlist):
+    def _updateVariables(self, vlist: list):
         """
         When a set of variables from a different tree is merged, update the current set.
         """
-        variables = self.getVariables()
-        for v in vlist:
-            k = v.getIndex()
-            if k in variables:
-                variables[k][1]+=1
-            else:
-                variables[k] = [v, 1]
-        logger.debug("Variables is now {}".format(variables))
-
+        d = {v.getIndex():[v, 0] for v in vlist}
+        self._mergeVariables(d)
 
     def printNodes(self):
         """
@@ -542,7 +535,7 @@ class Tree:
 
     @staticmethod
     @traceFunction
-    def createTreeFromExpression(expr, variables=None):
+    def createTreeFromExpression(expr: str, variables=None):
         """
         Given an infix expression containing floats, operators, function defined in functions.functionset,
         create a corresponding expression tree.
