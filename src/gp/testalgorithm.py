@@ -41,11 +41,13 @@ class GPTest(unittest.TestCase):
         g.printForest(outputfolder + "forest")
 
     def testPopulation(self):
-        forest = generateForest(fsize=5, depth=5, seed=11)
+        fs=10
+        forest = generateForest(fsize=fs, depth=5, seed=11)
         p = SetPopulation(key=lambda _tree : 0-_tree.getFitness())
         for t in forest:
             p.add(t)
         for t in forest:
+            self.assertTrue(t in p)
             p.remove(t)
         self.assertTrue(len(p) == 0)
         for i, t in enumerate(forest):
@@ -55,6 +57,16 @@ class GPTest(unittest.TestCase):
             t = p.top()
             t2 = p.pop()
             self.assertEqual(t, t2)
+        for i,t in enumerate(forest):
+            t.setFitness(10-i)
+            p.add(t)
+        slicesize=4
+        kn = p.getN(slicesize)
+        self.assertEqual(len(kn), slicesize)
+        self.assertEqual(len(p), fs)
+        kn = p.removeN(slicesize)
+        self.assertEqual(len(kn), slicesize)
+        self.assertEqual(len(p), fs-slicesize)
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)

@@ -11,34 +11,55 @@ import logging
 logger = logging.getLogger('global')
 
 class Population():
+    """
+        Interface to a population structure, aimed to keep a set of trees in sorted order.
+    """
     def __init__(self, iterable=None, key=None):
         self._pop = []
 
     def __iter__(self):
         return iter(self._pop)
 
+    def __reversed__(self):
+        return reversed(self._pop)
+
     def __len__(self):
         return len(self._pop)
 
+    def __contains(self, b):
+        raise NotImplementedError
+
     def __getitem__(self, key):
-        return self._pop[key]
+        raise NotImplementedError
 
     def __setitem__(self,key, item):
-        self._pop[key]=item
+        raise NotImplementedError
 
     def top(self):
-        pass
+        raise NotImplementedError
 
     def pop(self):
-        pass
+        raise NotImplementedError
 
     def add(self,item):
-        pass
+        raise NotImplementedError
 
     def remove(self, item):
-        pass
+        raise NotImplementedError
+
+    def update(self, item):
+        raise NotImplementedError
+
+    def getN(self, n):
+        """
+            Return and remove the first n elements
+        """
+        raise NotImplementedError
 
 class SLWKPopulation(Population):
+    """
+        Sorted List population.
+    """
     def __init__(self, iterable=None, key=None):
         self._pop = SortedListWithKey(iterable=iterable, key=key)
 
@@ -52,8 +73,11 @@ class SLWKPopulation(Population):
         return t
 
 
-
 class OrderedPopulation(Population):
+    """
+        Prototype code for an ordered dict.
+        @deprecated as it implies [item]=item
+    """
     def __init__(self, iterable=None, key=None):
         if not key:
             key = id
@@ -62,9 +86,17 @@ class OrderedPopulation(Population):
             iterable = []
         self._pop = SortedDict(key, 1000, iterable)
 
+    def __getitem__(self, key):
+        return self._pop[key]
+
+    def __setitem__(self,key, item):
+        self._pop[key]=item
 
 
 class SetPopulation(Population):
+    """
+        An ordered population structure, a wrapper around an ordered set with highest fitness first.
+    """
     def __init__(self, iterable=None, key=None):
         if not key:
             key = id
@@ -86,3 +118,20 @@ class SetPopulation(Population):
         t = self.top()
         self._pop.pop()
         return t
+
+    def __contains__(self, b):
+        return b in self._pop
+
+    def update(self, item):
+        self.remove(item)
+        self.add(item)
+
+    def getN(self, n):
+        i = self._pop.islice(start=0, stop=n, reverse=False)
+        return [d for d in i]
+
+    def removeN(self, n):
+        kn = self.getN(n)
+        for i in kn:
+            self.remove(i)
+        return kn

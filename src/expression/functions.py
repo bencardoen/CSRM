@@ -6,22 +6,22 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-from math import log, sin, cos, sqrt
-from expression.tools import matchFloat, matchVariable, almostEqual, approximateMultiple, traceFunction
+from math import log, sin, cos
+from expression.tools import matchFloat, matchVariable, approximateMultiple, traceFunction
 from expression.node import Constant, Variable
 import random
-import re
 import logging
 import math
 logger = logging.getLogger('global')
 
+# Defines a limit for exponents. (ie a^b && b<size_limit)
 size_limit = 80
 
 
 # Function objects that can be used in an expression.
 # Most screen parameters to avoid expensive (frequent) exceptions.
 # For example : div(a/0) is not legal, but catching often generated expression
-# is to expensive
+# is too expensive
 
 def plus(a, b):
     return a+b

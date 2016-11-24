@@ -8,6 +8,7 @@
 
 from expression.tree import Tree, Node, Constant, Variable, ConstantNode
 from expression.functions import *
+from math import sqrt
 import unittest
 from copy import deepcopy
 import logging
