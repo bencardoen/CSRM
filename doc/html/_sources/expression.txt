@@ -12,18 +12,18 @@ expression.functions module
     :undoc-members:
     :show-inheritance:
 
-expression.operators module
----------------------------
+expression.node module
+----------------------
 
-.. automodule:: expression.operators
+.. automodule:: expression.node
     :members:
     :undoc-members:
     :show-inheritance:
 
-expression.prototypes module
-----------------------------
+expression.operators module
+---------------------------
 
-.. automodule:: expression.prototypes
+.. automodule:: expression.operators
     :members:
     :undoc-members:
     :show-inheritance:

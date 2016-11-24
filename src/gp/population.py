@@ -12,7 +12,7 @@ logger = logging.getLogger('global')
 
 class Population():
     """
-        Interface to a population structure, aimed to keep a set of trees in sorted order.
+    Interface to a population structure, aimed to keep a set of trees in sorted order.
     """
     def __init__(self, iterable=None, key=None):
         self._pop = []
@@ -36,9 +36,15 @@ class Population():
         raise NotImplementedError
 
     def top(self):
+        """
+        Return first sorted element (least)
+        """
         raise NotImplementedError
 
     def pop(self):
+        """
+        Return and remove first sorted element
+        """
         raise NotImplementedError
 
     def add(self,item):
@@ -48,17 +54,20 @@ class Population():
         raise NotImplementedError
 
     def update(self, item):
+        """
+        Update the set with the modified instance item
+        """
         raise NotImplementedError
 
     def getN(self, n):
         """
-            Return and remove the first n elements
+        Return and remove the first n elements
         """
         raise NotImplementedError
 
 class SLWKPopulation(Population):
     """
-        Sorted List population.
+    Sorted List population.
     """
     def __init__(self, iterable=None, key=None):
         self._pop = SortedListWithKey(iterable=iterable, key=key)
@@ -75,8 +84,8 @@ class SLWKPopulation(Population):
 
 class OrderedPopulation(Population):
     """
-        Prototype code for an ordered dict.
-        @deprecated as it implies [item]=item
+    Prototype code for an ordered dict.
+    @deprecated as it implies [item]=item
     """
     def __init__(self, iterable=None, key=None):
         if not key:
@@ -95,7 +104,7 @@ class OrderedPopulation(Population):
 
 class SetPopulation(Population):
     """
-        An ordered population structure, a wrapper around an ordered set with highest fitness first.
+    An ordered population structure, a wrapper around an ordered set with highest fitness first.
     """
     def __init__(self, iterable=None, key=None):
         if not key:

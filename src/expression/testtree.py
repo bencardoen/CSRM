@@ -135,9 +135,6 @@ class TreeTest(unittest.TestCase):
 
 
     def testRandomTree(self):
-        """
-            Construction test
-        """
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         for i in range(10):
             t = Tree.makeRandomTree(variables, 10, 11)
@@ -149,7 +146,7 @@ class TreeTest(unittest.TestCase):
 
     def testCollectNodes(self):
         """
-            Test if a Node can collect its entire hierarchy
+        Test if a Node can collect its entire hierarchy
         """
         t = Tree()
         root = t.makeInternalNode(plus, None, None)
@@ -166,7 +163,7 @@ class TreeTest(unittest.TestCase):
 
     def testGetChildren(self):
         """
-            Make sure a tree can collect all nodes from root (evading the use of the list)
+        Make sure a tree can collect all nodes from root (evading the use of the list)
         """
         t = Tree()
         root = t.makeInternalNode(plus, None, None)
@@ -185,9 +182,6 @@ class TreeTest(unittest.TestCase):
 
 
     def testRemove(self):
-        """
-            Simple removal test : remove and replace a subtree
-        """
         t = Tree()
         root = t.makeInternalNode(plus, None, None)
         l = t.makeInternalNode(multiply, root)
@@ -206,9 +200,6 @@ class TreeTest(unittest.TestCase):
         t.testInvariant()
 
     def testMutate(self):
-        """
-            Splice in a new subtree
-        """
         t = Tree()
         root = t.makeInternalNode(plus, None, Constant(3.14))
         l = t.makeInternalNode(multiply, root)
@@ -237,7 +228,7 @@ class TreeTest(unittest.TestCase):
 
     def testCrossoverStatic(self):
         """
-            Test an (old) failure case for crossover.
+        Test an (old) failure case for crossover.
         """
         t = Tree()
         root = t.makeInternalNode(sine, None, None)
@@ -269,7 +260,7 @@ class TreeTest(unittest.TestCase):
 
     def testCrossover(self):
         """
-            Test subtree crossover operation with random trees.
+        Test subtree crossover operation with random trees.
         """
         variables = [Variable([10, 11],0),Variable([3, 12],0),Variable([9, 12],0),Variable([8, 9],0)]
         left = Tree.makeRandomTree(variables, 6)
@@ -339,7 +330,7 @@ class TreeTest(unittest.TestCase):
 
     def testConversionToTreeBasic(self):
         """
-            Convert basic expression to tree
+        Convert basic expression to tree
         """
         expr = "( ( 1.0 + 2.0 ) * ( 3.0 + 4.0 ) )"
         tree = Tree.createTreeFromExpression(expr)
@@ -350,7 +341,7 @@ class TreeTest(unittest.TestCase):
 
     def testConversionToTreeFunctions(self):
         """
-            Convert complex expression to expression tree
+        Convert complex expression to expression tree
         """
         expr = "( ( ( min( 5.0, 6.0 ) ) ** ( log( 0.6, 0.3 ) ) ) + ( 1.0 * 9.23 ) )"
         t = Tree.createTreeFromExpression(expr)
@@ -361,8 +352,8 @@ class TreeTest(unittest.TestCase):
 
     def testFuzzCyclicConvert(self):
         """
-            Generate a random tree x times, convert to expression, to tree and back and compare results.
-            Fuzz tests all conversion functions.
+        Generate a random tree x times, convert to expression, to tree and back and compare results.
+        Fuzz tests all conversion functions.
         """
         for i in range(100):
             variables = []
@@ -379,7 +370,7 @@ class TreeTest(unittest.TestCase):
 
     def testExpressions(self):
         """
-            Verify an old bug
+        Verify an old bug
         """
         t = Tree.createTreeFromExpression("1+2+3%5")
         t.printToDot(outputfolder+"t23convertedtree.dot")
@@ -597,7 +588,7 @@ class TreeTest(unittest.TestCase):
 
     def testTracing(self):
         """
-            Test logging decorator
+        Test logging decorator
         """
         testFunction(1,2)
         testFunctionE(1, 2, sum)

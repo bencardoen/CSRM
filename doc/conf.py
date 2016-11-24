@@ -20,6 +20,7 @@ import os
 import sys
 #sys.path.insert(9, "/home/bcardoen/univ/master/project/src")
 sys.path.insert(0, os.path.abspath('../src/'))
+#sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
 

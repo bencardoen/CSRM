@@ -52,22 +52,22 @@
 <span class="c1">#https://joinup.ec.europa.eu/community/eupl/og_page/eupl</span>
 <span class="c1">#      Author: Ben Cardoen</span>
 
-<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sqrt</span>
-<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">matchFloat</span><span class="p">,</span> <span class="n">matchVariable</span><span class="p">,</span> <span class="n">almostEqual</span><span class="p">,</span> <span class="n">approximateMultiple</span><span class="p">,</span> <span class="n">traceFunction</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">matchFloat</span><span class="p">,</span> <span class="n">matchVariable</span><span class="p">,</span> <span class="n">approximateMultiple</span><span class="p">,</span> <span class="n">traceFunction</span>
 <span class="kn">from</span> <span class="nn">expression.node</span> <span class="k">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
 <span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
 
+<span class="c1"># Defines a limit for exponents. (ie a^b &amp;&amp; b&lt;size_limit)</span>
 <span class="n">size_limit</span> <span class="o">=</span> <span class="mi">80</span>
 
 
 <span class="c1"># Function objects that can be used in an expression.</span>
 <span class="c1"># Most screen parameters to avoid expensive (frequent) exceptions.</span>
 <span class="c1"># For example : div(a/0) is not legal, but catching often generated expression</span>
-<span class="c1"># is to expensive</span>
+<span class="c1"># is too expensive</span>
 
 <div class="viewcode-block" id="plus"><a class="viewcode-back" href="../../expression.html#expression.functions.plus">[docs]</a><span class="k">def</span> <span class="nf">plus</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span></div>
@@ -170,7 +170,7 @@
 <span class="c1"># A reverse map containing the first letter of each function object</span>
 <span class="n">prefixes</span> <span class="o">=</span> <span class="p">{</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">functionset</span><span class="o">.</span><span class="n">items</span><span class="p">())}</span>
 
-
+<span class="nd">@traceFunction</span>
 <div class="viewcode-block" id="getRandomFunction"><a class="viewcode-back" href="../../expression.html#expression.functions.getRandomFunction">[docs]</a><span class="k">def</span> <span class="nf">getRandomFunction</span><span class="p">(</span><span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -180,7 +180,7 @@
 <span class="nd">@traceFunction</span>
 <div class="viewcode-block" id="tokenize"><a class="viewcode-back" href="../../expression.html#expression.functions.tokenize">[docs]</a><span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Split expression into tokens, returned as a list.</span>
+<span class="sd">    Split expression into tokens, returned as a list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
@@ -227,7 +227,7 @@
 
 <div class="viewcode-block" id="infixToPostfix"><a class="viewcode-back" href="../../expression.html#expression.functions.infixToPostfix">[docs]</a><span class="k">def</span> <span class="nf">infixToPostfix</span><span class="p">(</span><span class="n">infix</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Dijkstra&#39;s shunting yard algorithm to convert an infix expression to postfix</span>
+<span class="sd">    Dijkstra&#39;s shunting yard algorithm to convert an infix expression to postfix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
@@ -281,7 +281,7 @@
 
 <div class="viewcode-block" id="infixToPrefix"><a class="viewcode-back" href="../../expression.html#expression.functions.infixToPrefix">[docs]</a><span class="k">def</span> <span class="nf">infixToPrefix</span><span class="p">(</span><span class="n">infix</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert infix to prefix by way of postfix conversion.</span>
+<span class="sd">    Convert infix to prefix by way of postfix conversion.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Algorithm is mirror of i to p, roles of () are reversed.</span>
     <span class="c1"># Reverse input, swap (), i to p, reverse result</span>
@@ -297,8 +297,8 @@
 
 <div class="viewcode-block" id="parseVariable"><a class="viewcode-back" href="../../expression.html#expression.functions.parseVariable">[docs]</a><span class="k">def</span> <span class="nf">parseVariable</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parse a variable from the stream if possible, create and return the object and offset</span>
-<span class="sd">        the index with the length of the token</span>
+<span class="sd">    Parse a variable from the stream if possible, create and return the object and offset</span>
+<span class="sd">    the index with the length of the token</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">matchVariable</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
@@ -343,14 +343,12 @@
 
 <div class="viewcode-block" id="parseFunction"><a class="viewcode-back" href="../../expression.html#expression.functions.parseFunction">[docs]</a><span class="k">def</span> <span class="nf">parseFunction</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Decode a function from the stream</span>
+<span class="sd">    Decode a function from the stream</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">candidate</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># reversed since we want a greedy match, e.g. tanh is preferred over tan|h</span>
     <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)):</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">expression</span><span class="p">[</span><span class="n">index</span><span class="p">:</span><span class="n">index</span><span class="o">+</span><span class="n">length</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> at index </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
             <span class="n">output</span> <span class="o">+=</span> <span class="p">[</span><span class="n">tokens</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span>
             <span class="n">index</span> <span class="o">+=</span> <span class="n">length</span><span class="o">-</span><span class="mi">1</span>

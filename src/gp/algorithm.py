@@ -32,13 +32,13 @@ class GPAlgorithm():
 
     def getBestTree(self):
         """
-            Get Tree with best (highest) fitness score
+        Get Tree with best (highest) fitness score
         """
         return self._population.top()
 
     def getBestN(self, n, remove=False):
         """
-            Get the n fittest trees. Without remove, a view.
+        Get the n fittest trees. Without remove, a view.
         """
         return self._population.getN(n) if not remove else self._population.removeN(n)
 

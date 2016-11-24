@@ -134,7 +134,7 @@ def getRandomFunction(seed = None, rng=None):
 @traceFunction
 def tokenize(expression, variables=None):
     """
-        Split expression into tokens, returned as a list.
+    Split expression into tokens, returned as a list.
     """
     output = []
     i = 0
@@ -181,7 +181,7 @@ def isOperator(token):
 
 def infixToPostfix(infix):
     """
-        Dijkstra's shunting yard algorithm to convert an infix expression to postfix
+    Dijkstra's shunting yard algorithm to convert an infix expression to postfix
     """
     result = []
     stack = []
@@ -235,7 +235,7 @@ def infixToPostfix(infix):
 
 def infixToPrefix(infix):
     """
-        Convert infix to prefix by way of postfix conversion.
+    Convert infix to prefix by way of postfix conversion.
     """
     # Algorithm is mirror of i to p, roles of () are reversed.
     # Reverse input, swap (), i to p, reverse result
@@ -251,8 +251,8 @@ def infixToPrefix(infix):
 
 def parseVariable(stream, variables, index):
     """
-        Parse a variable from the stream if possible, create and return the object and offset
-        the index with the length of the token
+    Parse a variable from the stream if possible, create and return the object and offset
+    the index with the length of the token
     """
     v = matchVariable(stream)
     if v:
@@ -297,14 +297,12 @@ def handleUnaryMinus(expression, index, output, variables):
 
 def parseFunction(expression, index, output):
     """
-        Decode a function from the stream
+    Decode a function from the stream
     """
-    candidate = None
     # reversed since we want a greedy match, e.g. tanh is preferred over tan|h
     for length in reversed(range(1, 5)):
         name = expression[index:index+length]
         if name in tokens:
-            f = tokens[name]
             logger.debug("{} at index {}".format(name, index))
             output += [tokens[name]]
             index += length-1

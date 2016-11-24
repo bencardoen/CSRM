@@ -49,23 +49,23 @@ class Tree:
     def setFitness(self, fscore):
         self.fitness = fscore
 
-    @traceFunction()
+    @traceFunction
     def updateFitness(self):
         """
-            Re-evaluate self to obtain a fitness score.
+        Re-evaluate self to obtain a fitness score.
         """
         if self.fitnessfunction:
             self.fitness = self.fitnessfunction(self)
         else:
             logger.warning("No fitness function set!")
 
-    @traceFunction()
+    @traceFunction
     def setFitnessFunction(self, fcall):
         self.fitnessfunction = fcall
 
     def testInvariant(self):
         """
-            Ensure the tree is still correct in structure
+        Ensure the tree is still correct in structure
         """
         left = self.getNodes()
         right = self.nodes
@@ -84,7 +84,7 @@ class Tree:
     @traceFunction
     def _addNode(self, node, pos):
         """
-            Add node to tree (without linking), insert variable if a terminal node.
+        Add node to tree (without linking), insert variable if a terminal node.
         """
         self.modified = True
         if pos == 0:
@@ -108,7 +108,7 @@ class Tree:
 
     def makeInternalNode(self, function, parent=None, constant=None):
         """
-            Add an internal node to the tree
+        Add an internal node to the tree
         """
         position = 0
         n = Node(function, position, constant)
@@ -124,19 +124,19 @@ class Tree:
 
     def getNodes(self):
         """
-            Recursively retrieve all nodes
+        Recursively retrieve all nodes
         """
         return [self.root] + self.root.getAllChildren()
 
     def _positionalNodes(self):
         """
-            Get all sorted nodes
+        Get all sorted nodes
         """
         return [d for d in self.nodes if d]
 
     def isLeaf(self, position):
         """
-            Return true if node at position is a terminal/leaf node.
+        Return true if node at position is a terminal/leaf node.
         """
         l = 2*position + 1
         r = 2*position + 2
@@ -149,7 +149,7 @@ class Tree:
 
     def makeLeaf(self, variable, parent, constant = None):
         """
-            Make a leaf node holding a reference to a variable.
+        Make a leaf node holding a reference to a variable.
         """
         logger.debug("Makeleaf with args = v={}, parent={}, cte={}".format(variable, parent, constant))
         children = parent.getChildren()
@@ -165,9 +165,8 @@ class Tree:
 
     def makeConstant(self, constant, parent):
         """
-            Make a leaf node holding a constant
+        Make a leaf node holding a constant
         """
-#        print("Makeleaf with args = v={}, parent={}, cte={}".format(variable, parent, constant))
         children = parent.getChildren()
         position = 0
         if children:
@@ -194,8 +193,8 @@ class Tree:
 
     def evaluateTree(self):
         """
-            Evaluates tree if tree was modified, else returns a cached results.
-            Updates depth if needed.
+        Evaluates tree if tree was modified, else returns a cached results.
+        Updates depth if needed.
         """
         if self.modified:
             oe = self.evaluated
@@ -207,8 +206,8 @@ class Tree:
 
     def _evalTree(self, node):
         """
-            Recursively evaluate tree with node as root.
-            Returns None if evaluation is not valid
+        Recursively evaluate tree with node as root.
+        Returns None if evaluation is not valid
         """
         children = node.getChildren()
         if children:
@@ -239,8 +238,8 @@ class Tree:
 
     def getDepth(self):
         """
-            Return depth of this tree.
-            Returns a cached version or calculates a new one if needed.
+        Return depth of this tree.
+        Returns a cached version or calculates a new one if needed.
         """
         if self.modified:
             self.depth = self.calculateDepth()
@@ -254,8 +253,8 @@ class Tree:
     @staticmethod
     def makeRandomTree(variables, depth, seed = None, rng=None, tokenLeafs=False):
         """
-            Generate a random expression tree with a random selection of variables
-            Topdown construction, there is no guarantee that this construction renders a semantically valid tree
+        Generate a random expression tree with a random selection of variables
+        Topdown construction, there is no guarantee that this construction renders a semantically valid tree
         """
         logger.debug("mkRandomTree with args {} depth {} seed {}".format(variables, depth, seed))
         t = Tree()
@@ -311,7 +310,7 @@ class Tree:
     @traceFunction
     def growTree(variables, depth, seed=None):
         """
-            Grow a tree up to depth, with optional seed for the rng.
+        Grow a tree up to depth, with optional seed for the rng.
         """
         rng = random.Random()
         if seed is not None:
@@ -335,9 +334,9 @@ class Tree:
     @traceFunction
     def getRandomNode(self, seed = None, depth = None):
         """
-            Return a randomly selected node from this tree
-            If parameter depth is set, select only nodes at that depth
-            The returned node is never root.
+        Return a randomly selected node from this tree
+        If parameter depth is set, select only nodes at that depth
+        The returned node is never root.
         """
         r = random.Random()
         if seed is not None:
@@ -368,7 +367,7 @@ class Tree:
     @traceFunction
     def getParent(self, node):
         """
-            Get parent of node
+        Get parent of node
         """
         # todo fix invariant
         pos = node.getPosition()
@@ -383,8 +382,8 @@ class Tree:
     @traceFunction
     def _removeNode(self, node, newnode):
         """
-            Remove node from tree, replace with newnode.
-            First stage in splicing a subtree, subtree with root node is unlinked, newnode is placed in.
+        Remove node from tree, replace with newnode.
+        First stage in splicing a subtree, subtree with root node is unlinked, newnode is placed in.
         """
         self.setModified(True)
         self.testInvariant()
@@ -429,7 +428,7 @@ class Tree:
     @traceFunction
     def spliceSubTree(self, node, newnode):
         """
-            Remove subtree with root node, replace it with subtree with root newnode
+        Remove subtree with root node, replace it with subtree with root newnode
         """
         logger.debug("Splicing newnode {} in node's {} position".format(newnode, node))
         assert(node != self.getRoot())
@@ -448,20 +447,20 @@ class Tree:
 
     def getConstants(self):
         """
-            Return an ordered array of constants for all nodes.
-            Non initialized constants will have a value of None
+        Return an ordered array of constants for all nodes.
+        Non initialized constants will have a value of None
         """
         return [ c.getConstant() for c in self.nodes if c]
 
     def getVariables(self):
         """
-            Return an ordered list of all variables used in this tree
+        Return an ordered list of all variables used in this tree
         """
         return self.variables
 
     def _mergeVariables(self, otherset):
         """
-            When a new subtree is merged, update the variables
+        When a new subtree is merged, update the variables
         """
         variables = self.getVariables()
         logger.debug("Variables is now {}".format(variables))
@@ -479,7 +478,7 @@ class Tree:
     @traceFunction
     def _updateVariables(self, vlist):
         """
-            When a set of variables from a different tree is merged, update the current set.
+        When a set of variables from a different tree is merged, update the current set.
         """
         variables = self.getVariables()
         for v in vlist:
@@ -493,7 +492,7 @@ class Tree:
 
     def printNodes(self):
         """
-            Print nodes to stdout in binary order (root, ... , ith generation, ....)
+        Print nodes to stdout in binary order (root, ... , ith generation, ....)
         """
         for i, n in enumerate(self.nodes):
             print("Node {} at {}".format(n, i))
@@ -501,7 +500,7 @@ class Tree:
     @traceFunction
     def updateIndex(self,i=-1):
         """
-            Update the variables in the tree s.t. they point at the next datapoint
+        Update the variables in the tree s.t. they point at the next datapoint
         """
         # Usually datapoints are present for all items.
         self.setModified(True)
@@ -520,8 +519,8 @@ class Tree:
     @staticmethod
     def swapSubtrees(left, right, seed = None, depth = None):
         """
-            Given two trees, pick random subtree roots and swap them between the trees.
-            Will swap out subtrees at equal depth.
+        Given two trees, pick random subtree roots and swap them between the trees.
+        Will swap out subtrees at equal depth.
         """
         leftsubroot = left.getRandomNode(seed=seed, depth=depth)
         leftv = leftsubroot.getVariables()
@@ -545,8 +544,8 @@ class Tree:
     @traceFunction
     def createTreeFromExpression(expr, variables=None):
         """
-            Given an infix expression containing floats, operators, function defined in functions.functionset,
-            create a corresponding expression tree.
+        Given an infix expression containing floats, operators, function defined in functions.functionset,
+        create a corresponding expression tree.
         """
         pfix = infixToPrefix(tokenize(expr, variables))
         result = Tree()
@@ -574,6 +573,6 @@ class Tree:
     @traceFunction
     def toExpression(self):
         """
-            Print the tree to an infix expression.
+        Print the tree to an infix expression.
         """
         return Node.nodeToExpression(self.root)

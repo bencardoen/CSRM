@@ -19,7 +19,7 @@ logger = logging.getLogger('global')
 
 def msb(b):
     """
-        Return most significant bit (max(i) s.t. b[i]==1)
+    Return most significant bit (max(i) s.t. b[i]==1)
     """
     i = 0
     while b != 0:
@@ -29,7 +29,7 @@ def msb(b):
 
 def compareLists(left, right):
     """
-        Return true if left and right contain the same elements, disregarding order and None
+    Return true if left and right contain the same elements, disregarding order and None
     """
     lefttrim = [x for x in left if x]
     righttrim = [y for y in right if y]
@@ -37,7 +37,7 @@ def compareLists(left, right):
 
 def approximateMultiple(a, b, epsilon):
     """
-        let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True
+    let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True
     """
     logger.debug("{} {} {}".format(a,b,epsilon))
     m = a / b
@@ -47,7 +47,7 @@ def approximateMultiple(a, b, epsilon):
 
 def almostEqual(left, right, epsilon):
     """
-        Absolute comparison
+    Absolute comparison
     """
     if abs(left - right) < epsilon:
         return True
@@ -64,7 +64,7 @@ def showSVG(dotfile):
 
 def matchFloat(expr):
     """
-        Try to parse a floating point expression at begin of expr, return string representation if found or None.
+    Try to parse a floating point expression at begin of expr, return string representation if found or None.
     """
     p = re.compile("[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?")
     m = p.match(expr)
@@ -77,7 +77,7 @@ def matchFloat(expr):
 
 def matchVariable(expr):
     """
-        Try to match a variable at begin of expr, return string representation if found
+    Try to match a variable at begin of expr, return string representation if found
     """
     pattern = re.compile("[xX][_]?\d+")
     m = pattern.match(expr)
@@ -89,8 +89,8 @@ def matchVariable(expr):
 
 def generateVariables(varcount, datacount, seed):
     """
-        Generate a list of varcount list, each datacount large.
-        This represent a feature set [X] with |X| = varcount, and |X[i]| = datacount
+    Generate a list of varcount list, each datacount large.
+    This represent a feature set [X] with |X| = varcount, and |X[i]| = datacount
     """
     rng = random.Random()
     rng.seed(seed)
@@ -99,7 +99,7 @@ def generateVariables(varcount, datacount, seed):
 
 def msb(integer):
     """
-        Return the leftmost significant bit of argument
+    Return the leftmost significant bit of argument
     """
     cnt = 0
     while integer:
@@ -110,13 +110,15 @@ def msb(integer):
 
 def traceFunction(fn=None, logcall=None):
     """
-        Decorator to log a function with an optional logger.
-        Logs arguments and return value of the function object at debug level if no logger is given,
-        else uses the logcall object.
-        Example usage :
-                @traceFunction(logcall=logging.getLogger('global').error) or @traceFunction
-                def myfunc(...):
-        Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
+    Decorator to log a function with an optional logger.
+    Logs arguments and return value of the function object at debug level if no logger is given,
+    else uses the logcall object.
+    :param function fn: function object, implicit
+    :param function logcall: logging callable, e.g. logcall=logger.getLogger('global').debug
+    Example usage :
+            @traceFunction(logcall=logging.getLogger('global').error) or @traceFunction
+            def myfunc(...):
+    Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
     """
     if not logcall:
         logcall = logging.getLogger('global').debug

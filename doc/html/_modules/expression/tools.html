@@ -65,7 +65,7 @@
 
 <span class="k">def</span> <span class="nf">msb</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return most significant bit (max(i) s.t. b[i]==1)</span>
+<span class="sd">    Return most significant bit (max(i) s.t. b[i]==1)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">b</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -75,7 +75,7 @@
 
 <div class="viewcode-block" id="compareLists"><a class="viewcode-back" href="../../expression.html#expression.tools.compareLists">[docs]</a><span class="k">def</span> <span class="nf">compareLists</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return true if left and right contain the same elements, disregarding order and None</span>
+<span class="sd">    Return true if left and right contain the same elements, disregarding order and None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lefttrim</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">left</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
     <span class="n">righttrim</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">right</span> <span class="k">if</span> <span class="n">y</span><span class="p">]</span>
@@ -83,7 +83,7 @@
 
 <div class="viewcode-block" id="approximateMultiple"><a class="viewcode-back" href="../../expression.html#expression.tools.approximateMultiple">[docs]</a><span class="k">def</span> <span class="nf">approximateMultiple</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True</span>
+<span class="sd">    let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">epsilon</span><span class="p">))</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span>
@@ -93,7 +93,7 @@
 
 <div class="viewcode-block" id="almostEqual"><a class="viewcode-back" href="../../expression.html#expression.tools.almostEqual">[docs]</a><span class="k">def</span> <span class="nf">almostEqual</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Absolute comparison</span>
+<span class="sd">    Absolute comparison</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">left</span> <span class="o">-</span> <span class="n">right</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -110,7 +110,7 @@
 
 <div class="viewcode-block" id="matchFloat"><a class="viewcode-back" href="../../expression.html#expression.tools.matchFloat">[docs]</a><span class="k">def</span> <span class="nf">matchFloat</span><span class="p">(</span><span class="n">expr</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Try to parse a floating point expression at begin of expr, return string representation if found or None.</span>
+<span class="sd">    Try to parse a floating point expression at begin of expr, return string representation if found or None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?&quot;</span><span class="p">)</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
@@ -123,7 +123,7 @@
 
 <div class="viewcode-block" id="matchVariable"><a class="viewcode-back" href="../../expression.html#expression.tools.matchVariable">[docs]</a><span class="k">def</span> <span class="nf">matchVariable</span><span class="p">(</span><span class="n">expr</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Try to match a variable at begin of expr, return string representation if found</span>
+<span class="sd">    Try to match a variable at begin of expr, return string representation if found</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[xX][_]?\d+&quot;</span><span class="p">)</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
@@ -135,8 +135,8 @@
 
 <div class="viewcode-block" id="generateVariables"><a class="viewcode-back" href="../../expression.html#expression.tools.generateVariables">[docs]</a><span class="k">def</span> <span class="nf">generateVariables</span><span class="p">(</span><span class="n">varcount</span><span class="p">,</span> <span class="n">datacount</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a list of varcount list, each datacount large.</span>
-<span class="sd">        This represent a feature set [X] with |X| = varcount, and |X[i]| = datacount</span>
+<span class="sd">    Generate a list of varcount list, each datacount large.</span>
+<span class="sd">    This represent a feature set [X] with |X| = varcount, and |X[i]| = datacount</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
     <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
@@ -145,7 +145,7 @@
 
 <div class="viewcode-block" id="msb"><a class="viewcode-back" href="../../expression.html#expression.tools.msb">[docs]</a><span class="k">def</span> <span class="nf">msb</span><span class="p">(</span><span class="n">integer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the leftmost significant bit of argument</span>
+<span class="sd">    Return the leftmost significant bit of argument</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">integer</span><span class="p">:</span>
@@ -156,13 +156,15 @@
 
 <div class="viewcode-block" id="traceFunction"><a class="viewcode-back" href="../../expression.html#expression.tools.traceFunction">[docs]</a><span class="k">def</span> <span class="nf">traceFunction</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logcall</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Decorator to log a function with an optional logger.</span>
-<span class="sd">        Logs arguments and return value of the function object at debug level if no logger is given,</span>
-<span class="sd">        else uses the logcall object.</span>
-<span class="sd">        Example usage :</span>
-<span class="sd">                @traceFunction(logcall=logging.getLogger(&#39;global&#39;).error) or @traceFunction</span>
-<span class="sd">                def myfunc(...):</span>
-<span class="sd">        Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments</span>
+<span class="sd">    Decorator to log a function with an optional logger.</span>
+<span class="sd">    Logs arguments and return value of the function object at debug level if no logger is given,</span>
+<span class="sd">    else uses the logcall object.</span>
+<span class="sd">    :param function fn: function object, implicit</span>
+<span class="sd">    :param function logcall: logging callable, e.g. logcall=logger.getLogger(&#39;global&#39;).debug</span>
+<span class="sd">    Example usage :</span>
+<span class="sd">            @traceFunction(logcall=logging.getLogger(&#39;global&#39;).error) or @traceFunction</span>
+<span class="sd">            def myfunc(...):</span>
+<span class="sd">    Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">logcall</span><span class="p">:</span>
         <span class="n">logcall</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span>
