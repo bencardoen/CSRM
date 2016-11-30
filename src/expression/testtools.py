@@ -6,7 +6,7 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-from expression.tools import rootmeansquare, pearson, rootmeansquarenormalized, traceFunction, approximateMultiple
+from expression.tools import rootmeansquare, pearson, rootmeansquarenormalized, traceFunction, approximateMultiple, randomizedConsume, permutate
 import unittest
 import logging
 import math
@@ -45,6 +45,18 @@ class ToolTest(unittest.TestCase):
         """
         testFunction(1,2)
         testFunctionE(1, 2, sum)
+
+    def testGenerator(self):
+        l = [1,2,3, 4]
+        for k in randomizedConsume(l):
+            assert(k not in l)
+        assert(len(l) == 0)
+
+        l = [1,2,3,4]
+        lold = l[:]
+        for k in permutate(l):
+            assert(k in l)
+        assert(l != lold)
 
 
 if __name__=="__main__":
