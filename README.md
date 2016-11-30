@@ -3,11 +3,12 @@
 ### Dependencies ###
 * Python3
 * Sortedcontainers : 
-    ```Shell
-	pip3 install sortedcontainers
+
+    ```
+	$pip3 install sortedcontainers
     ```
 * Numpy :
-    ```Shell
+    ```
        pip3 install numpy
     ```
 * Optional : graphviz
