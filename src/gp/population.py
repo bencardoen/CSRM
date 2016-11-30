@@ -61,7 +61,13 @@ class Population():
 
     def getN(self, n):
         """
-        Return and remove the first n elements
+        Return the first n elements
+        """
+        raise NotImplementedError
+
+    def removeN(self, n):
+        """
+        Get and remove the first n elements
         """
         raise NotImplementedError
 

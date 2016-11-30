@@ -6,6 +6,10 @@
     ```Shell
 	pip3 install sortedcontainers
     ```
+* Numpy :
+    ```Shell
+       pip3 install numpy
+    ```
 * Optional : graphviz
 
 The project in its current state has code in the subpackage expression holding the datastructures for the GP algorithm. Tree repesentation, expression parsing from/to trees, mutation/crossover operators, random tree initialization, constant/feature management, base functions (functions.py) and several auxillary functions (tools.py).
