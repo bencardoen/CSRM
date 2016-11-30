@@ -47,6 +47,12 @@ class Population():
         """
         raise NotImplementedError
 
+    def last(self):
+        raise NotImplementedError
+
+    def drop(self):
+        raise NotImplementedError
+
     def add(self,item):
         raise NotImplementedError
 
@@ -70,6 +76,12 @@ class Population():
         Get and remove the first n elements
         """
         raise NotImplementedError
+
+    def getAll(self):
+        return self.getN(len(self))
+
+    def removeAll(self):
+        return self.removeN(len(self))
 
 class SLWKPopulation(Population):
     """
@@ -133,6 +145,14 @@ class SetPopulation(Population):
         t = self.top()
         self._pop.pop()
         return t
+
+    def last(self):
+        return self._pop[len(self)-1]
+
+    def bottom(self):
+        l = self.last()
+        self.remove(l)
+        return l
 
     def __contains__(self, b):
         return b in self._pop

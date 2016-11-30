@@ -13,7 +13,7 @@ import re
 import os
 import random
 from expression.operators import Mutate, Crossover
-from gp.algorithm import GPAlgorithm
+from gp.algorithm import GPAlgorithm, BruteElitist
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
 from expression.tree import Tree
 from expression.node import Variable
@@ -71,11 +71,17 @@ class GPTest(unittest.TestCase):
         kn = p.removeN(slicesize)
         self.assertEqual(len(kn), slicesize)
         self.assertEqual(len(p), fs-slicesize)
+        rem = p.getAll()
+        self.assertEqual(len(rem) , len(p))
+        self.assertEqual(len(rem), len(p.removeAll()))
 
     def testVirtualBase(self):
         X = []
         Y = []
-        g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit)
+        # Test if tracing works across virtual functions
+        g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
+        g.run()
+        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
 
 if __name__=="__main__":
