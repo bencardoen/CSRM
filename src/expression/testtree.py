@@ -14,7 +14,7 @@ import unittest
 from copy import deepcopy
 import logging
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized
 import os
 import random
 from expression.operators import Mutate, Crossover
@@ -571,22 +571,6 @@ class TreeTest(unittest.TestCase):
         t.printToDot(outputfolder+"t35Grown.dot")
         e = t.evaluateTree()
         self.assertEqual(e, -1.383686947730111)
-
-    def testFitness(self):
-        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        left = Tree.makeRandomTree(variables, depth=1, seed=11)
-        right = Tree.makeRandomTree(variables, depth=1, seed=13)
-        def myf(tree):
-            return tree.getDepth()
-        left.setFitnessFunction(myf)
-        left.updateFitness()
-        self.assertEqual(left.getDepth(), left.getFitness())
-        def wrap(tree):
-            return tree.getDepth()
-        right.setFitnessFunction(wrap)
-        right.updateFitness()
-        self.assertEqual(right.getDepth(), right.getFitness())
-        
         
     def testEvaluation(self):
 #        def generateVariables(varcount: int, datacount: int, seed: int):
@@ -601,11 +585,6 @@ class TreeTest(unittest.TestCase):
         #variables = [[d,0] for d in variables]
         #variables = [Variable([10,11],0),Variable([3,4],0),Variable([9,6],0),Variable([8,9],0)]
         t= Tree.makeRandomTree(variables, depth=4, seed=0)
-        def myf(tree):
-            return tree.getDepth()
-        t.setFitnessFunction(myf)
-        t.updateFitness()
-        self.assertEqual(t.getDepth(), t.getFitness())
         self.assertEqual(t._getDatapointCount() , dpoint)
         actual = t.evaluateAll()
         self.assertEqual(len(actual), dpoint)
@@ -613,16 +592,20 @@ class TreeTest(unittest.TestCase):
     def testBenchmarks(self):
         dpoint = 5
         vcount = 5
+        def myconstraint(fitness, tree):
+            return fitness + tree.getDepth()
         vs = generateVariables(vcount, dpoint, seed=0)
         forest = []
-        
+        rng = random.Random()
+        rng.seed(0)
+        e = [ rng.random() for i in range(dpoint)]
         for testf in testfunctions:
             t = Tree.createTreeFromExpression(testf, vs)
-            v = t.evaluateAll()
-            e = [1 * len(v)]
-            #t.scoreTree(actual=v, expected=e, distancefunction=tools.)
+            norm = t.scoreTree(expected=e, distancefunction=rootmeansquare)
+            norme = t.scoreTree(expected=e, distancefunction=rootmeansquare, constraintfunction=myconstraint)
+            self.assertNotEqual(norm, norme)
             
-        
+                          
 
 
 if __name__=="__main__":

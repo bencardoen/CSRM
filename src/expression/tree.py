@@ -49,20 +49,6 @@ class Tree:
     def setFitness(self, fscore):
         self.fitness = fscore
 
-    @traceFunction
-    def updateFitness(self):
-        """
-        Re-evaluate self to obtain a fitness score.
-        """
-        if self.fitnessfunction:
-            self.fitness = self.fitnessfunction(self)
-        else:
-            logger.warning("No fitness function set!")
-
-    @traceFunction
-    def setFitnessFunction(self, fcall):
-        self.fitnessfunction = fcall
-
     def testInvariant(self):
         """
         Ensure the tree is still correct in structure
@@ -225,9 +211,20 @@ class Tree:
             values.append(v)
         return values
         
-    def scoreTree(self, expected, distancefunction):
+    def scoreTree(self, expected, distancefunction, constraintfunction=None):
+        """
+            Evaluate a tree w.r.t a distancefucntion.
+            
+            :param expected: list A set of expected output values for each datapoint.
+            :param distancefunction: Calculates a measure between the calculated and expected values
+            :param constraintfunction: Modifies the fitness score using the tree object itself, optional. Signature : f ( oldfitness, treeobject) --> newfitness
+        """
         actual = self.evaluateAll()
-        return distancefunction(actual, expected)
+        f = distancefunction(actual, expected)
+        if constraintfunction:
+            f = constraintfunction(fitness=f, tree=self)
+        self.setFitness(f)
+        return self.getFitness()
 
     def _evalTree(self, node: Node):
         """
@@ -421,10 +418,11 @@ class Tree:
         if parent:
             if npos & 1:
                 logger.debug("Setting newnode as first child of {}".format(parent))
-                parent.getChildren()[0] = newnode
+                assert(parent.getChildren())
+                parent.getChildren()[0] = newnode #trace
             else:
                 logger.debug("Setting newnode as second child of {}".format(parent))
-                parent.getChildren()[1] = newnode
+                parent.getChildren()[1] = newnode  #trace
         self.nodes[npos] = newnode
         if npos == 0:
             self.root=newnode

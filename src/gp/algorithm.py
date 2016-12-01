@@ -28,7 +28,7 @@ class GPAlgorithm():
         self._popsize=popsize
         self._seed = seed
         self._rng = random.Random()
-        if seed:
+        if seed is not None:
             self._rng.seed(seed)
         self._X = X
         self._Y = Y
@@ -38,9 +38,10 @@ class GPAlgorithm():
         self._archivesize = archivesize or self._popsize
 
     def getSeed(self):
-        s = self._seed or None
-        if s:
-            self._seed += 1
+        s = self._seed
+        if s is None:
+            return None
+        self._seed += 1
         return s
 
     def _initialize(self):
@@ -70,9 +71,8 @@ class GPAlgorithm():
 
     def _initializePopulation(self):
         for i in range(self._popsize):
-            t = Tree.growTree(self._variables, self._maxdepth, self._seed+i if self._seed else None)
-            t.setFitnessFunction(lambda o : o.getDepth())
-            t.updateFitness()
+            t = Tree.growTree(self._variables, self._maxdepth, self.getSeed())
+            t.setFitness(0)
             self.addTree(t)
 
     def getVariables(self):
@@ -138,18 +138,25 @@ class GPAlgorithm():
 
 class BruteElitist(GPAlgorithm):
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed)
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed)
 
     def select(self):
         s = self._population.removeAll()
         assert(len(self._population)==0)
         return s
 
+    @traceFunction
     def evolve(self, selection):
         for i,t in enumerate(selection):
+            logging.info("Evolving {}".format(t))
             Mutate.mutate(t, seed=self.getSeed())
+            logging.info("Mutation results in {}".format(t))
             left = t
             right = selection[self._rng.randint(0, len(selection)-1)]
+            while right == left:
+                    right = selection[self._rng.randint(0, len(selection)-1)]
+            assert(left != right)
+            logging.info("Right selected for crossover {}".format(right))
             Crossover.subtreecrossover(left, right, seed=self.getSeed()) # TODO depth
         return selection
 

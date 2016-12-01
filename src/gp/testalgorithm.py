@@ -13,6 +13,7 @@ import re
 import os
 import random
 from expression.operators import Mutate, Crossover
+from expression.tools import generateVariables
 from gp.algorithm import GPAlgorithm, BruteElitist
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
 from expression.tree import Tree
@@ -28,8 +29,6 @@ def generateForest(fsize=10, depth=4, seed=None):
         seed = 0
     for i in range(fsize):
         forest.append(Tree.makeRandomTree(variables, depth=depth, seed=seed+i))
-        forest[i].setFitnessFunction(lambda o : o.getDepth())
-        forest[i].updateFitness()
     return forest
 
 def _fit(_tree):
@@ -81,6 +80,13 @@ class GPTest(unittest.TestCase):
         # Test if tracing works across virtual functions
         g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
+        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
+        g.run()
+        
+    def testRun(self):
+        X = generateVariables(5,5, seed=0)
+        Y = [1 * len(X[0])]
+        # Test if tracing works across virtual functions
         g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
 

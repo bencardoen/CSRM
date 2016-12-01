@@ -179,6 +179,7 @@ def randomizedConsume(lst, seed=None):
         lst[pos] = lst[-1]
         del lst[-1]
         yield item
+        
 
 def permutate(lst, seed=None):
     """
