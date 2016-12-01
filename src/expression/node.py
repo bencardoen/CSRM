@@ -202,6 +202,14 @@ class Constant():
 
 
 class Variable():
+    @staticmethod
+    def toVariables(lst:list):
+        """
+            Converts a twodimensional array where each row is a set of data points to a list of Variables.
+        """
+        return [Variable(row, i) for i,entry in enumerate(lst)] 
+        
+    
     def __init__(self, values, index):
         """
             Values is a list of datapoints this feature has
@@ -213,11 +221,15 @@ class Variable():
 
     def getValues(self):
         return self._values
+        
+    def __len__(self):
+        return len(self._values)
 
     def setValues(self,vals):
         self._values = vals
 
     def setCurrentIndex(self,i):
+        assert(i < len(self._values))
         self._current = i
 
     def getCurrentIndex(self):

@@ -8,6 +8,7 @@
 
 from expression.tree import Tree, Node, Constant, Variable, ConstantNode
 from expression.functions import *
+from expression.functions import testfunctions
 from math import sqrt
 import unittest
 from copy import deepcopy
@@ -607,6 +608,40 @@ class TreeTest(unittest.TestCase):
         right.setFitnessFunction(wrap)
         right.updateFitness()
         self.assertEqual(right.getDepth(), right.getFitness())
+        
+        
+    def testEvaluation(self):
+#        def generateVariables(varcount: int, datacount: int, seed: int):
+        dpoint = 5
+        vcount = 5
+        data = generateVariables(vcount, dpoint, seed=0)
+        variables = []
+        for i,entry in enumerate(data):
+            v = Variable(entry, i)
+            assert(len(entry)==dpoint)
+            variables.append(v)
+        #variables = [[d,0] for d in variables]
+        #variables = [Variable([10,11],0),Variable([3,4],0),Variable([9,6],0),Variable([8,9],0)]
+        t= Tree.makeRandomTree(variables, depth=4, seed=0)
+        def myf(tree):
+            return tree.getDepth()
+        t.setFitnessFunction(myf)
+        t.updateFitness()
+        self.assertEqual(t.getDepth(), t.getFitness())
+        self.assertEqual(t._getDatapointCount() , dpoint)
+        actual = t.evaluateAll()
+        self.assertEqual(len(actual), dpoint)
+        
+    def testBenchmarks(self):
+        dpoint = 5
+        vcount = 5
+        vs = generateVariables(vcount, dpoint, seed=0)
+        forest = []
+        for testf in testfunctions:
+            t = Tree.createTreeFromExpression(testf, vs)
+            v = t.evaluateAll()
+            
+        
 
 
 

@@ -121,6 +121,10 @@ class Tree:
             self.root = n
         self._addNode(n, position)
         return n
+        
+    def _getDatapointCount(self):
+        assert(len(self.variables))
+        return len(self.variables[next(self.variables.__iter__())][0])
 
     def getNodes(self):
         """
@@ -203,6 +207,24 @@ class Tree:
             self.getDepth()
             self.modified = False
         return self.evaluated
+        
+    def evaluateAll(self):
+        """
+            For each data point, evaluate this tree object.
+            :returns list : list of evaluations
+        """
+        v = self.getVariables()
+        dcount = self._getDatapointCount()
+        values = []
+        for i in range(dcount):
+            v = self.evaluateTree()
+            if i == dcount-1:
+                self.updateIndex(0)
+            else:
+                self.updateIndex()
+            values.append(v)
+        return values
+        
 
     def _evalTree(self, node: Node):
         """
@@ -495,7 +517,6 @@ class Tree:
         """
         Update the variables in the tree s.t. they point at the next datapoint
         """
-        # Usually datapoints are present for all items.
         self.setModified(True)
         for k, v in self.variables.items():
             variable = self.variables[k][0]
@@ -504,7 +525,7 @@ class Tree:
                 variable.setCurrentIndex(i)
             else:
                 variable.setCurrentIndex(index + 1)
-
+                
     def getRoot(self):
         assert(self.root)
         return self.root

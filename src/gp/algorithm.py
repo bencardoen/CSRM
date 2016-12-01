@@ -36,6 +36,7 @@ class GPAlgorithm():
             vlist.append(Variable(x, i))
         self._variables = vlist
         self._initializePopulation()
+    
 
     def addTree(self, t):
         assert(t not in self._population)
