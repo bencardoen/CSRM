@@ -211,18 +211,15 @@ class Tree:
             values.append(v)
         return values
         
-    def scoreTree(self, expected, distancefunction, constraintfunction=None):
+    def scoreTree(self, expected, distancefunction):
         """
             Evaluate a tree w.r.t a distancefucntion.
             
             :param expected: list A set of expected output values for each datapoint.
-            :param distancefunction: Calculates a measure between the calculated and expected values
-            :param constraintfunction: Modifies the fitness score using the tree object itself, optional. Signature : f ( oldfitness, treeobject) --> newfitness
+            :param distancefunction: Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)
         """
         actual = self.evaluateAll()
-        f = distancefunction(actual, expected)
-        if constraintfunction:
-            f = constraintfunction(fitness=f, tree=self)
+        f = distancefunction(actual, expected, tree=self)
         self.setFitness(f)
         return self.getFitness()
 

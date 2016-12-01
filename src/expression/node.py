@@ -237,7 +237,6 @@ class Variable():
 
     def getValue(self):
         if self._values:
-#            print("Index = {}, val = {}".format(self._current, self._values[self._current]))
             return self._values[self._current]
         else:
             logger.error("Variable value not set : returning 1")

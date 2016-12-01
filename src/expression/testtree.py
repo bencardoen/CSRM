@@ -573,7 +573,6 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(e, -1.383686947730111)
         
     def testEvaluation(self):
-#        def generateVariables(varcount: int, datacount: int, seed: int):
         dpoint = 5
         vcount = 5
         data = generateVariables(vcount, dpoint, seed=0)
@@ -582,8 +581,6 @@ class TreeTest(unittest.TestCase):
             v = Variable(entry, i)
             assert(len(entry)==dpoint)
             variables.append(v)
-        #variables = [[d,0] for d in variables]
-        #variables = [Variable([10,11],0),Variable([3,4],0),Variable([9,6],0),Variable([8,9],0)]
         t= Tree.makeRandomTree(variables, depth=4, seed=0)
         self.assertEqual(t._getDatapointCount() , dpoint)
         actual = t.evaluateAll()
@@ -592,8 +589,10 @@ class TreeTest(unittest.TestCase):
     def testBenchmarks(self):
         dpoint = 5
         vcount = 5
-        def myconstraint(fitness, tree):
-            return fitness + tree.getDepth()
+        def myconstraint(actual, expected, tree):
+            return rootmeansquare(actual, expected) + tree.getDepth()
+        def passconstraint(actual, expected, tree):
+            return rootmeansquare(actual, expected)
         vs = generateVariables(vcount, dpoint, seed=0)
         forest = []
         rng = random.Random()
@@ -601,8 +600,8 @@ class TreeTest(unittest.TestCase):
         e = [ rng.random() for i in range(dpoint)]
         for testf in testfunctions:
             t = Tree.createTreeFromExpression(testf, vs)
-            norm = t.scoreTree(expected=e, distancefunction=rootmeansquare)
-            norme = t.scoreTree(expected=e, distancefunction=rootmeansquare, constraintfunction=myconstraint)
+            norm = t.scoreTree(expected=e, distancefunction=myconstraint)
+            norme = t.scoreTree(expected=e, distancefunction=passconstraint)
             self.assertNotEqual(norm, norme)
             
                           

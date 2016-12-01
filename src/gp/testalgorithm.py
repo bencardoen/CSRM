@@ -90,6 +90,9 @@ class GPTest(unittest.TestCase):
         g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
 
+
+
+
 if __name__=="__main__":
     logger.setLevel(logging.INFO)
     print("Running")
