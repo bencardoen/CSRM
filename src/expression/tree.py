@@ -225,6 +225,9 @@ class Tree:
             values.append(v)
         return values
         
+    def scoreTree(self, expected, distancefunction):
+        actual = self.evaluateAll()
+        return distancefunction(actual, expected)
 
     def _evalTree(self, node: Node):
         """

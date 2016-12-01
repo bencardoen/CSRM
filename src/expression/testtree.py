@@ -637,9 +637,12 @@ class TreeTest(unittest.TestCase):
         vcount = 5
         vs = generateVariables(vcount, dpoint, seed=0)
         forest = []
+        
         for testf in testfunctions:
             t = Tree.createTreeFromExpression(testf, vs)
             v = t.evaluateAll()
+            e = [1 * len(v)]
+            #t.scoreTree(actual=v, expected=e, distancefunction=tools.)
             
         
 
