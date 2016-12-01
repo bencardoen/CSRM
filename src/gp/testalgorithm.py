@@ -13,7 +13,7 @@ import re
 import os
 import random
 from expression.operators import Mutate, Crossover
-from expression.tools import generateVariables
+from expression.tools import generateVariables, rootmeansquare
 from gp.algorithm import GPAlgorithm, BruteElitist
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
 from expression.tree import Tree
@@ -31,16 +31,17 @@ def generateForest(fsize=10, depth=4, seed=None):
         forest.append(Tree.makeRandomTree(variables, depth=depth, seed=seed+i))
     return forest
 
-def _fit(_tree):
-    return neg(_tree.getFitness())
+def _fit(actual, expected, tree):
+    return tree.getDepth()
+#    return rootmeansquare(actual, expected)
 
 class GPTest(unittest.TestCase):
 
 
     def testInitialization(self):
-        X = []
+        X = generateVariables(3,3,seed=0)
         Y = []
-        g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit)
+        g = GPAlgorithm(X, Y, popsize=2, maxdepth=4, fitnessfunction=_fit)
         g.printForest(outputfolder + "forest")
 
     def testPopulation(self):
@@ -75,8 +76,8 @@ class GPTest(unittest.TestCase):
         self.assertEqual(len(rem), len(p.removeAll()))
 
     def testVirtualBase(self):
-        X = []
-        Y = []
+        X = generateVariables(3,3,seed=0)
+        Y = [ 0 for d in range(3)]
         # Test if tracing works across virtual functions
         g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
@@ -85,7 +86,7 @@ class GPTest(unittest.TestCase):
         
     def testRun(self):
         X = generateVariables(5,5, seed=0)
-        Y = [1 * len(X[0])]
+        Y = [1 for i in range( len(X[0]))]
         # Test if tracing works across virtual functions
         g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()

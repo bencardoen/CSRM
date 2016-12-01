@@ -23,17 +23,20 @@ class GPAlgorithm():
         :param int seed: seed value for the rng used in tree construction
         """
         # Sorted set of trees by fitness value
-        self._population = SetPopulation(key=lambda _tree : fitnessfunction(_tree))
+        self._population = SetPopulation(key=lambda _tree : _tree.getFitness())
+        self._datapointcount = len(X[0])
+        self._fitnessfunction = fitnessfunction
         self._maxdepth = maxdepth
         self._popsize=popsize
         self._seed = seed
         self._rng = random.Random()
         if seed is not None:
             self._rng.seed(seed)
+        logging.error("X {}".format(X))
         self._X = X
         self._Y = Y
         self._initialize()
-        self._archive = SetPopulation(key=lambda _tree : fitnessfunction(_tree))
+        self._archive = SetPopulation(key=lambda _tree : _tree.getFitness)
         self._generations = generations
         self._archivesize = archivesize or self._popsize
 
@@ -46,10 +49,11 @@ class GPAlgorithm():
 
     def _initialize(self):
         vlist = []
+        assert(len(self._X))
         for i, x in enumerate(self._X):
             assert(isinstance(x, list))
             vlist.append(Variable(x, i))
-        self._variables = vlist
+        self._variables = vlist[:]
         self._initializePopulation()
     
 
@@ -70,10 +74,16 @@ class GPAlgorithm():
         return self._population.getN(n) if not remove else self._population.removeN(n)
 
     def _initializePopulation(self):
+        assert(len(self._variables))
         for i in range(self._popsize):
+            logging.error("Growing {}".format(i))
             t = Tree.growTree(self._variables, self._maxdepth, self.getSeed())
             t.setFitness(0)
+            assert(len(t.getVariables()))
             self.addTree(t)
+        for t in self._population:
+            assert(len(t.getVariables()))
+            
 
     def getVariables(self):
         return self._variables
@@ -143,11 +153,16 @@ class BruteElitist(GPAlgorithm):
     def select(self):
         s = self._population.removeAll()
         assert(len(self._population)==0)
+        for t in s:
+            assert(len(t.getVariables()))
         return s
 
     @traceFunction
     def evolve(self, selection):
+        
         for i,t in enumerate(selection):
+            print(t)
+            assert(len(t.getVariables()))
             logging.info("Evolving {}".format(t))
             Mutate.mutate(t, seed=self.getSeed())
             logging.info("Mutation results in {}".format(t))
@@ -158,12 +173,15 @@ class BruteElitist(GPAlgorithm):
             assert(left != right)
             logging.info("Right selected for crossover {}".format(right))
             Crossover.subtreecrossover(left, right, seed=self.getSeed()) # TODO depth
+        for i in selection:
+            assert(len(i.getVariables()))
         return selection
 
     def update(self, modified):
         # update fitness value here or in evolve ?
-        for i in modified:
-            self.addTree(i)
+        for t in modified:
+            t.scoreTree(self._Y, self._fitnessfunction)
+            self.addTree(t)
 
     def archive(self, modified):
         t = self.getBestTree()

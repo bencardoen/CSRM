@@ -194,17 +194,16 @@ class Tree:
             self.modified = False
         return self.evaluated
         
-    def evaluateAll(self):
+    def evaluateAll(self, datapointcount):
         """
             For each data point, evaluate this tree object.
             :returns list : list of evaluations
         """
         v = self.getVariables()
-        dcount = self._getDatapointCount()
         values = []
-        for i in range(dcount):
+        for i in range(datapointcount):
             v = self.evaluateTree()
-            if i == dcount-1:
+            if i == datapointcount-1:
                 self.updateIndex(0)
             else:
                 self.updateIndex()
@@ -219,6 +218,10 @@ class Tree:
             :param distancefunction: Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)
         """
         actual = self.evaluateAll()
+        assert(actual)
+        assert(expected)
+        print(actual)
+        print(expected)
         f = distancefunction(actual, expected, tree=self)
         self.setFitness(f)
         return self.getFitness()
