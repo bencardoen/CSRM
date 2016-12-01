@@ -400,6 +400,12 @@ Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index
 <code class="descname">setValues</code><span class="sig-paren">(</span><em>vals</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.setValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.setValues" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="staticmethod">
+<dt id="expression.node.Variable.toVariables">
+<em class="property">static </em><code class="descname">toVariables</code><span class="sig-paren">(</span><em>lst: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.toVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.toVariables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a twodimensional array where each row is a set of data points to a list of Variables.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -466,11 +472,6 @@ If no variables are supplied, the existing set is reused.</p>
 <em class="property">class </em><code class="descclassname">expression.testtree.</code><code class="descname">TreeTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
 <dl class="method">
-<dt id="expression.testtree.TreeTest.testApproxMult">
-<code class="descname">testApproxMult</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testApproxMult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testApproxMult" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="expression.testtree.TreeTest.testBasicFullExpression">
 <code class="descname">testBasicFullExpression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testBasicFullExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testBasicFullExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test construction and evaluation of a full binary tree with basic operators.</p>
@@ -485,6 +486,11 @@ If no variables are supplied, the existing set is reused.</p>
 <dl class="method">
 <dt id="expression.testtree.TreeTest.testBenchmarkFunctions">
 <code class="descname">testBenchmarkFunctions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testBenchmarkFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testBenchmarkFunctions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="expression.testtree.TreeTest.testBenchmarks">
+<code class="descname">testBenchmarks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testBenchmarks" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -543,6 +549,11 @@ If no variables are supplied, the existing set is reused.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="expression.testtree.TreeTest.testEvaluation">
+<code class="descname">testEvaluation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testEvaluation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testEvaluation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.testtree.TreeTest.testExp">
 <code class="descname">testExp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testExp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testExp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -552,11 +563,6 @@ If no variables are supplied, the existing set is reused.</p>
 <code class="descname">testExpressions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testExpressions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testExpressions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verify an old bug</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="expression.testtree.TreeTest.testFitness">
-<code class="descname">testFitness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testFitness" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="expression.testtree.TreeTest.testFuzzCyclicConvert">
@@ -653,12 +659,6 @@ Fuzz tests all conversion functions.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="expression.testtree.TreeTest.testTracing">
-<code class="descname">testTracing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testTracing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testTracing" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test logging decorator</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="expression.testtree.TreeTest.testTreeToExpression">
 <code class="descname">testTreeToExpression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testTreeToExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testTreeToExpression" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -696,16 +696,6 @@ Fuzz tests all conversion functions.</p>
 <dd></dd></dl>
 
 </dd></dl>
-
-<dl class="function">
-<dt id="expression.testtree.testFunction">
-<code class="descclassname">expression.testtree.</code><code class="descname">testFunction</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>operator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#testFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.testFunction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="expression.testtree.testFunctionE">
-<code class="descclassname">expression.testtree.</code><code class="descname">testFunctionE</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>operator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#testFunctionE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.testFunctionE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 <div class="section" id="module-expression.tools">
@@ -774,6 +764,38 @@ Fuzz tests all conversion functions.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="expression.tools.pearson">
+<code class="descclassname">expression.tools.</code><code class="descname">pearson</code><span class="sig-paren">(</span><em>actual</em>, <em>expected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#pearson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.pearson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return Pearson correlation coefficient.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="expression.tools.permutate">
+<code class="descclassname">expression.tools.</code><code class="descname">permutate</code><span class="sig-paren">(</span><em>lst</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#permutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.permutate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a generator to a random element in the list without repeating.
+When the generator halts, the list a random permumation (in place).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="expression.tools.randomizedConsume">
+<code class="descclassname">expression.tools.</code><code class="descname">randomizedConsume</code><span class="sig-paren">(</span><em>lst</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#randomizedConsume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.randomizedConsume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a generator to a random element in the list without repeating.
+:lst list : modified in place, at the last call the list is empty.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="expression.tools.rootmeansquare">
+<code class="descclassname">expression.tools.</code><code class="descname">rootmeansquare</code><span class="sig-paren">(</span><em>actual</em>, <em>expected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#rootmeansquare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.rootmeansquare" title="Permalink to this definition">¶</a></dt>
+<dd><p>RMSE</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="expression.tools.rootmeansquarenormalized">
+<code class="descclassname">expression.tools.</code><code class="descname">rootmeansquarenormalized</code><span class="sig-paren">(</span><em>actual</em>, <em>expected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#rootmeansquarenormalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.rootmeansquarenormalized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized RMSE with mean of actual.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="expression.tools.showSVG">
 <code class="descclassname">expression.tools.</code><code class="descname">showSVG</code><span class="sig-paren">(</span><em>dotfile: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#showSVG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.showSVG" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -834,6 +856,13 @@ Each node has an optional constant weight</p>
 <em class="property">static </em><code class="descname">createTreeFromExpression</code><span class="sig-paren">(</span><em>expr: str</em>, <em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.createTreeFromExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.createTreeFromExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given an infix expression containing floats, operators, function defined in functions.functionset,
 create a corresponding expression tree.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="expression.tree.Tree.evaluateAll">
+<code class="descname">evaluateAll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.evaluateAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.evaluateAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each data point, evaluate this tree object.
+:returns list : list of evaluations</p>
 </dd></dl>
 
 <dl class="method">
@@ -957,13 +986,26 @@ Topdown construction, there is no guarantee that this construction renders a sem
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="expression.tree.Tree.setFitness">
-<code class="descname">setFitness</code><span class="sig-paren">(</span><em>fscore</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.setFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.setFitness" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="expression.tree.Tree.scoreTree">
+<code class="descname">scoreTree</code><span class="sig-paren">(</span><em>expected</em>, <em>distancefunction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.scoreTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.scoreTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate a tree w.r.t a distancefucntion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expected</strong> &#8211; list A set of expected output values for each datapoint.</li>
+<li><strong>distancefunction</strong> &#8211; Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
-<dt id="expression.tree.Tree.setFitnessFunction">
-<code class="descname">setFitnessFunction</code><span class="sig-paren">(</span><em>fcall</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.setFitnessFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.setFitnessFunction" title="Permalink to this definition">¶</a></dt>
+<dt id="expression.tree.Tree.setFitness">
+<code class="descname">setFitness</code><span class="sig-paren">(</span><em>fscore</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.setFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.setFitness" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -994,12 +1036,6 @@ Will swap out subtrees at equal depth.</p>
 <dt id="expression.tree.Tree.toExpression">
 <code class="descname">toExpression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.toExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.toExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print the tree to an infix expression.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="expression.tree.Tree.updateFitness">
-<code class="descname">updateFitness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.updateFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.updateFitness" title="Permalink to this definition">¶</a></dt>
-<dd><p>Re-evaluate self to obtain a fitness score.</p>
 </dd></dl>
 
 <dl class="method">

@@ -111,8 +111,8 @@ class GPAlgorithm():
     def evolve(self, selection):
         """
         Evolve a selected set of the population, applying a set of operators.
-        :param selection : a subset of the population selected
-        :return modified : a subset of modified specimens
+        :param list selection: a subset of the population selected
+        :return list modified: a subset of modified specimens
         """
         return selection
 

@@ -48,15 +48,27 @@ class Population():
         raise NotImplementedError
 
     def last(self):
+        """
+        Return the last sorted element
+        """
         raise NotImplementedError
 
     def drop(self):
+        """
+        Return and remove the last element
+        """
         raise NotImplementedError
 
     def add(self,item):
+        """
+        Add item to the population
+        """
         raise NotImplementedError
 
     def remove(self, item):
+        """
+        Remove item from the population
+        """
         raise NotImplementedError
 
     def update(self, item):

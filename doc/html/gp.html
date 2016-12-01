@@ -50,12 +50,43 @@
 <div class="section" id="module-gp.algorithm">
 <span id="gp-algorithm-module"></span><h2>gp.algorithm module<a class="headerlink" href="#module-gp.algorithm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="gp.algorithm.BruteElitist">
+<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">BruteElitist</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gp.algorithm.GPAlgorithm" title="gp.algorithm.GPAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">gp.algorithm.GPAlgorithm</span></code></a></p>
+<dl class="method">
+<dt id="gp.algorithm.BruteElitist.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.BruteElitist.archive">
+<code class="descname">archive</code><span class="sig-paren">(</span><em>modified</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist.archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist.archive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.BruteElitist.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist.evolve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.BruteElitist.select">
+<code class="descname">select</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist.select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist.select" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.BruteElitist.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>modified</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="gp.algorithm.GPAlgorithm">
-<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">GPAlgorithm</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">GPAlgorithm</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a forest of trees randomly constructed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -66,6 +97,7 @@
 <li><strong>Y</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; a list of response values</li>
 <li><strong>popsize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; maximum population size</li>
 <li><strong>maxdepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; the maximum depth a tree is initialized to</li>
+<li><strong>generations</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; generations to iterate</li>
 <li><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; seed value for the rng used in tree construction</li>
 </ul>
 </td>
@@ -75,9 +107,28 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.addToArchive">
+<code class="descname">addToArchive</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.addToArchive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.addToArchive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.addTree">
 <code class="descname">addTree</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.addTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.addTree" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.archive">
+<code class="descname">archive</code><span class="sig-paren">(</span><em>modified</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Using the new and previous generation, determine the best specimens and store them.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evolve a selected set of the population, applying a set of operators.
+:param list selection: a subset of the population selected
+:return list modified: a subset of modified specimens</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.getBestN">
@@ -92,6 +143,11 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.getSeed">
+<code class="descname">getSeed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.getSeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.getSeed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.getVariables">
 <code class="descname">getVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.getVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.getVariables" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -100,6 +156,30 @@
 <dt id="gp.algorithm.GPAlgorithm.printForest">
 <code class="descname">printForest</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.printForest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.printForest" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main algorithm loop. Evolve population through generations.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.select">
+<code class="descname">select</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a subset of the current population to operate on.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.stopCondition">
+<code class="descname">stopCondition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.stopCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.stopCondition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Halt algorithm if internal state satisfies some condition</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>modified</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process the new generation.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -132,12 +212,30 @@
 <dl class="method">
 <dt id="gp.population.Population.add">
 <code class="descname">add</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#Population.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.Population.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add item to the population</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.population.Population.drop">
+<code class="descname">drop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#Population.drop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.Population.drop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return and remove the last element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.population.Population.getAll">
+<code class="descname">getAll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#Population.getAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.Population.getAll" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="gp.population.Population.getN">
 <code class="descname">getN</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#Population.getN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.Population.getN" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return and remove the first n elements</p>
+<dd><p>Return the first n elements</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.population.Population.last">
+<code class="descname">last</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#Population.last"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.Population.last" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the last sorted element</p>
 </dd></dl>
 
 <dl class="method">
@@ -149,7 +247,19 @@
 <dl class="method">
 <dt id="gp.population.Population.remove">
 <code class="descname">remove</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#Population.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.Population.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove item from the population</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.population.Population.removeAll">
+<code class="descname">removeAll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#Population.removeAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.Population.removeAll" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.population.Population.removeN">
+<code class="descname">removeN</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#Population.removeN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.Population.removeN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get and remove the first n elements</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="gp.population.Population.top">
@@ -203,8 +313,18 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="gp.population.SetPopulation.bottom">
+<code class="descname">bottom</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#SetPopulation.bottom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.SetPopulation.bottom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="gp.population.SetPopulation.getN">
 <code class="descname">getN</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#SetPopulation.getN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.SetPopulation.getN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.population.SetPopulation.last">
+<code class="descname">last</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#SetPopulation.last"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.SetPopulation.last" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -249,6 +369,16 @@
 <dl class="method">
 <dt id="gp.testalgorithm.GPTest.testPopulation">
 <code class="descname">testPopulation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testPopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testPopulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.testalgorithm.GPTest.testRun">
+<code class="descname">testRun</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testRun" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.testalgorithm.GPTest.testVirtualBase">
+<code class="descname">testVirtualBase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testVirtualBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testVirtualBase" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

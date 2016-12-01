@@ -54,12 +54,13 @@
 
 <span class="kn">from</span> <span class="nn">expression.tree</span> <span class="k">import</span> <span class="n">Tree</span><span class="p">,</span> <span class="n">Node</span><span class="p">,</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">ConstantNode</span>
 <span class="kn">from</span> <span class="nn">expression.functions</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">expression.functions</span> <span class="k">import</span> <span class="n">testfunctions</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sqrt</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">compareLists</span><span class="p">,</span> <span class="n">matchFloat</span><span class="p">,</span> <span class="n">matchVariable</span><span class="p">,</span> <span class="n">generateVariables</span><span class="p">,</span> <span class="n">msb</span><span class="p">,</span> <span class="n">traceFunction</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">compareLists</span><span class="p">,</span> <span class="n">matchFloat</span><span class="p">,</span> <span class="n">matchVariable</span><span class="p">,</span> <span class="n">generateVariables</span><span class="p">,</span> <span class="n">msb</span><span class="p">,</span> <span class="n">traceFunction</span><span class="p">,</span> <span class="n">rootmeansquare</span><span class="p">,</span> <span class="n">rootmeansquarenormalized</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">expression.operators</span> <span class="k">import</span> <span class="n">Mutate</span><span class="p">,</span> <span class="n">Crossover</span>
@@ -67,15 +68,6 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
 
 <span class="n">outputfolder</span> <span class="o">=</span> <span class="s2">&quot;../output/&quot;</span>
-
-<span class="c1">#Test functions</span>
-<span class="nd">@traceFunction</span>
-<div class="viewcode-block" id="testFunction"><a class="viewcode-back" href="../../expression.html#expression.testtree.testFunction">[docs]</a><span class="k">def</span> <span class="nf">testFunction</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span></div>
-
-<span class="nd">@traceFunction</span><span class="p">(</span><span class="n">logcall</span><span class="o">=</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
-<div class="viewcode-block" id="testFunctionE"><a class="viewcode-back" href="../../expression.html#expression.testtree.testFunctionE">[docs]</a><span class="k">def</span> <span class="nf">testFunctionE</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span></div>
 
 <div class="viewcode-block" id="TreeTest"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest">[docs]</a><span class="k">class</span> <span class="nc">TreeTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 
@@ -625,35 +617,40 @@
         <span class="n">t</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;t35Grown.dot&quot;</span><span class="p">)</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateTree</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.383686947730111</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="TreeTest.testApproxMult"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testApproxMult">[docs]</a>    <span class="k">def</span> <span class="nf">testApproxMult</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="mi">6</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="mf">0.0001</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">approximateMultiple</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="TreeTest.testTracing"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testTracing">[docs]</a>    <span class="k">def</span> <span class="nf">testTracing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Test logging decorator</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">testFunction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">testFunctionE</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">sum</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="TreeTest.testFitness"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testFitness">[docs]</a>    <span class="k">def</span> <span class="nf">testFitness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">([</span><span class="mi">10</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">3</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">9</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span><span class="p">)]</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">myf</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">tree</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
-        <span class="n">left</span><span class="o">.</span><span class="n">setFitnessFunction</span><span class="p">(</span><span class="n">myf</span><span class="p">)</span>
-        <span class="n">left</span><span class="o">.</span><span class="n">updateFitness</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">left</span><span class="o">.</span><span class="n">getDepth</span><span class="p">(),</span> <span class="n">left</span><span class="o">.</span><span class="n">getFitness</span><span class="p">())</span>
-        <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">tree</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
-        <span class="n">right</span><span class="o">.</span><span class="n">setFitnessFunction</span><span class="p">(</span><span class="n">wrap</span><span class="p">)</span>
-        <span class="n">right</span><span class="o">.</span><span class="n">updateFitness</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">right</span><span class="o">.</span><span class="n">getDepth</span><span class="p">(),</span> <span class="n">right</span><span class="o">.</span><span class="n">getFitness</span><span class="p">())</span></div></div>
-
+        
+<div class="viewcode-block" id="TreeTest.testEvaluation"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testEvaluation">[docs]</a>    <span class="k">def</span> <span class="nf">testEvaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">vcount</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vcount</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span><span class="o">==</span><span class="n">dpoint</span><span class="p">)</span>
+            <span class="n">variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">_getDatapointCount</span><span class="p">()</span> <span class="p">,</span> <span class="n">dpoint</span><span class="p">)</span>
+        <span class="n">actual</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">),</span> <span class="n">dpoint</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TreeTest.testBenchmarks"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testBenchmarks">[docs]</a>    <span class="k">def</span> <span class="nf">testBenchmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">vcount</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">def</span> <span class="nf">myconstraint</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">rootmeansquare</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span> <span class="o">+</span> <span class="n">tree</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
+        <span class="k">def</span> <span class="nf">passconstraint</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">rootmeansquare</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+        <span class="n">vs</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vcount</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">forest</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="p">[</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dpoint</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">testf</span> <span class="ow">in</span> <span class="n">testfunctions</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">testf</span><span class="p">,</span> <span class="n">vs</span><span class="p">)</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="n">expected</span><span class="o">=</span><span class="n">e</span><span class="p">,</span> <span class="n">distancefunction</span><span class="o">=</span><span class="n">myconstraint</span><span class="p">)</span>
+            <span class="n">norme</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="n">expected</span><span class="o">=</span><span class="n">e</span><span class="p">,</span> <span class="n">distancefunction</span><span class="o">=</span><span class="n">passconstraint</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">norme</span><span class="p">)</span></div></div>
+            
+                          
 
 
 <span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>

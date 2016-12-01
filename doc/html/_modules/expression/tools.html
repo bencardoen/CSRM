@@ -60,6 +60,7 @@
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
 
@@ -177,6 +178,71 @@
     <span class="k">if</span> <span class="n">fn</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_decorate</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_decorate</span></div>
+
+
+<div class="viewcode-block" id="rootmeansquare"><a class="viewcode-back" href="../../expression.html#expression.tools.rootmeansquare">[docs]</a><span class="k">def</span> <span class="nf">rootmeansquare</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RMSE</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected</span><span class="p">))</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="rootmeansquarenormalized"><a class="viewcode-back" href="../../expression.html#expression.tools.rootmeansquarenormalized">[docs]</a><span class="k">def</span> <span class="nf">rootmeansquarenormalized</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalized RMSE with mean of actual.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rootmeansquare</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span><span class="o">/</span><span class="n">a</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="pearson"><a class="viewcode-back" href="../../expression.html#expression.tools.pearson">[docs]</a><span class="k">def</span> <span class="nf">pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return Pearson correlation coefficient.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">assaray</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+    <span class="n">meana</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">meanb</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">va</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">meana</span>
+    <span class="n">vb</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">meanb</span>
+    <span class="n">nom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">va</span><span class="o">*</span><span class="n">vb</span>  <span class="p">)</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">va</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span> <span class="n">vb</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span></div>
+
+
+<div class="viewcode-block" id="randomizedConsume"><a class="viewcode-back" href="../../expression.html#expression.tools.randomizedConsume">[docs]</a><span class="k">def</span> <span class="nf">randomizedConsume</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a generator to a random element in the list without repeating.</span>
+<span class="sd">        :lst list : modified in place, at the last call the list is empty.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">lsize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lsize</span><span class="p">):</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">yield</span> <span class="n">item</span></div>
+        
+
+<div class="viewcode-block" id="permutate"><a class="viewcode-back" href="../../expression.html#expression.tools.permutate">[docs]</a><span class="k">def</span> <span class="nf">permutate</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a generator to a random element in the list without repeating.</span>
+<span class="sd">        When the generator halts, the list a random permumation (in place).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">lsize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="n">limit</span> <span class="o">=</span> <span class="n">lsize</span><span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lsize</span><span class="p">):</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">limit</span><span class="p">]</span>
+        <span class="n">lst</span><span class="p">[</span><span class="n">limit</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="n">limit</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">yield</span> <span class="n">item</span></div>
 </pre></div>
 
           </div>
