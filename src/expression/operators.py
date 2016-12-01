@@ -38,4 +38,4 @@ class Crossover():
     @staticmethod
     @traceFunction
     def subtreecrossover(left, right, seed = None, depth = None):
-        Tree.swapSubtrees(left, right, seed=seed, depth=depth)
+        Tree.swapSubtrees(left, right, seed=seed, depth=depth)# TODO test more

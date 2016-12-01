@@ -13,10 +13,11 @@ import re
 import os
 import random
 from expression.operators import Mutate, Crossover
-from gp.algorithm import GPAlgorithm
+from gp.algorithm import GPAlgorithm, BruteElitist
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
 from expression.tree import Tree
 from expression.node import Variable
+from operator import neg
 logger = logging.getLogger('global')
 outputfolder = "../output/"
 
@@ -31,13 +32,16 @@ def generateForest(fsize=10, depth=4, seed=None):
         forest[i].updateFitness()
     return forest
 
+def _fit(_tree):
+    return neg(_tree.getFitness())
+
 class GPTest(unittest.TestCase):
 
 
     def testInitialization(self):
         X = []
         Y = []
-        g = GPAlgorithm(X, Y, popsize=10, maxdepth=4)
+        g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit)
         g.printForest(outputfolder + "forest")
 
     def testPopulation(self):
@@ -67,6 +71,18 @@ class GPTest(unittest.TestCase):
         kn = p.removeN(slicesize)
         self.assertEqual(len(kn), slicesize)
         self.assertEqual(len(p), fs-slicesize)
+        rem = p.getAll()
+        self.assertEqual(len(rem) , len(p))
+        self.assertEqual(len(rem), len(p.removeAll()))
+
+    def testVirtualBase(self):
+        X = []
+        Y = []
+        # Test if tracing works across virtual functions
+        g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
+        g.run()
+        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
+        g.run()
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)

@@ -14,6 +14,7 @@ import logging
 import random
 import inspect, itertools
 import functools
+import numpy
 
 logger = logging.getLogger('global')
 
@@ -131,3 +132,67 @@ def traceFunction(fn=None, logcall=None):
     if fn:
         return _decorate(fn)
     return _decorate
+
+
+def rootmeansquare(actual, expected):
+    """
+    RMSE
+    """
+    assert(len(actual) == len(expected))
+    a = numpy.asarray(actual)
+    b = numpy.asarray(expected)
+    return numpy.sqrt(numpy.sum(numpy.square(a-b))/len(actual))
+
+def rootmeansquarenormalized(actual, expected):
+    """
+    Normalized RMSE with mean of actual.
+    """
+    a = numpy.asarray(actual)
+    return rootmeansquare(actual, expected)/a.mean()
+
+def pearson(actual, expected):
+    """
+    Return Pearson correlation coefficient.
+    """
+    a = numpy.asarray(actual)
+    b = numpy.assaray(expected)
+    meana = a.mean()
+    meanb = b.mean()
+    va = a - meana
+    vb = a - meanb
+    nom = numpy.sum( va*vb  )
+    denom = numpy.sqrt( numpy.sum( numpy.square(va) ) * numpy.sum( numpy.square( vb ) ) )
+    return nom/denom
+
+
+def randomizedConsume(lst, seed=None):
+    """
+        Return a generator to a random element in the list without repeating.
+        :lst list : modified in place, at the last call the list is empty.
+    """
+    rng = random.Random()
+    rng.seed(seed)
+    lsize = len(lst)
+    for i in range(lsize):
+        pos = rng.randint(0, len(lst)-1)
+        item = lst[pos]
+        lst[pos] = lst[-1]
+        del lst[-1]
+        yield item
+
+def permutate(lst, seed=None):
+    """
+        Return a generator to a random element in the list without repeating.
+        When the generator halts, the list a random permumation (in place).
+    """
+    rng = random.Random()
+    rng.seed(seed)
+    lsize = len(lst)
+    limit = lsize-1
+    for i in range(lsize):
+        pos = rng.randint(0, limit)
+        item = lst[pos]
+        lst[pos] = lst[limit]
+        lst[limit] = item
+        limit -= 1
+        yield item

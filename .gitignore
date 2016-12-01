@@ -2,3 +2,6 @@
 *.dot
 *.pyc
 *.bak
+*.aux
+*.log
+*.synctex.gz

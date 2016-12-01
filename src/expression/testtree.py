@@ -23,15 +23,6 @@ logger = logging.getLogger('global')
 
 outputfolder = "../output/"
 
-#Test functions
-@traceFunction
-def testFunction(a, b, operator=None):
-    return a+b
-
-@traceFunction(logcall=logger.debug)
-def testFunctionE(a, b, operator=None):
-    return a+b
-
 class TreeTest(unittest.TestCase):
 
 
@@ -581,19 +572,6 @@ class TreeTest(unittest.TestCase):
         e = t.evaluateTree()
         self.assertEqual(e, -1.383686947730111)
 
-    def testApproxMult(self):
-        b = math.pi
-        a = 6*math.pi + 0.0001
-        v = approximateMultiple(a, b, 0.001)
-        self.assertEqual(v, True)
-
-    def testTracing(self):
-        """
-        Test logging decorator
-        """
-        testFunction(1,2)
-        testFunctionE(1, 2, sum)
-
     def testFitness(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         left = Tree.makeRandomTree(variables, depth=1, seed=11)
@@ -645,7 +623,6 @@ class TreeTest(unittest.TestCase):
             #t.scoreTree(actual=v, expected=e, distancefunction=tools.)
             
         
-
 
 
 if __name__=="__main__":
