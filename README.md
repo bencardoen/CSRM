@@ -7,6 +7,7 @@
     ```
 	$pip3 install sortedcontainers
     ```
+
 * Numpy :
     ```
        pip3 install numpy
