@@ -352,12 +352,12 @@ class Tree:
         left = None
         right = None
         if depth == 2:
-            left = Tree.makeRandomTree(variables, depth=1, seed=seed, rng=rng)
-            right = Tree.makeRandomTree(variables, depth=1, seed=seed, rng=rng)
+            left = Tree.makeRandomTree(variables, depth=1, seed=None, rng=rng)
+            right = Tree.makeRandomTree(variables, depth=1, seed=None, rng=rng)
         else:
-            left = Tree._growTree(variables, depth-1, rng=rng, seed=seed)
-            right = Tree._growTree(variables, depth-1, rng=rng, seed=seed)
-        root = Tree.constructFromSubtrees(left, right, seed=seed, rng=rng)
+            left = Tree._growTree(variables, depth-1, rng=rng, seed=None)
+            right = Tree._growTree(variables, depth-1, rng=rng, seed=None)
+        root = Tree.constructFromSubtrees(left, right, seed=None, rng=rng)
         return root
 
 

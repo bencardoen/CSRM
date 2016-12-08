@@ -196,8 +196,6 @@ class BruteElitist(GPAlgorithm):
     def select(self):
         s = self._population.removeAll()
         assert(len(self._population)==0)
-        for t in s:
-            assert(len(t.getVariables()))
         return s
 
     @traceFunction
