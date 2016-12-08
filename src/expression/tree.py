@@ -281,6 +281,8 @@ class Tree:
         """
         Generate a random expression tree with a random selection of variables
         Topdown construction, there is no guarantee that this construction renders a semantically valid tree
+        :param tokenLeafs : if set, only use constants
+        :param limit : raises Exception if no valid tree can be found
         """
         dpoint = 0
         if variables:
@@ -313,6 +315,9 @@ class Tree:
             e = t.evaluateTree()
             if e is None:
                 cnt += 1
+                if limit is not None:
+                    if cnt >= limit:
+                        raise ValueError("Invalid iteration count")
             else:
                 t.setDataPointCount(dpoint)
                 return t

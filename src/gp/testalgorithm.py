@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #This file is part of the CSRM project.
 #Copyright 2016 - 2017 University of Antwerp
 #https://www.uantwerpen.be/en/
@@ -102,7 +103,7 @@ class GPTest(unittest.TestCase):
         g.run()
         #g.printForest()
         logger.info("Starting BE algorithm")
-        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0, generations=2)
+        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0, generations=3)
         g.run()
         #g.printForestToDot("prefix")
         #g.printForest()
@@ -118,6 +119,7 @@ class GPTest(unittest.TestCase):
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)
+    logging.disable(logging.DEBUG)
     print("Running")
     if not os.path.isdir(outputfolder):
         logger.error("Output directory does not exist : creating...")

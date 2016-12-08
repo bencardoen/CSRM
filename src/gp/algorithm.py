@@ -46,12 +46,12 @@ class GPAlgorithm():
         self._archivesize = archivesize or self._popsize
 
     def getSeed(self):
-        logger.info("Retrieving seed {}".format(self._seed))
+        logger.debug("Retrieving seed {}".format(self._seed))
         s = self._seed
         if s is None:
             return None
-        self._seed = self._rng.random()
-        logger.info("Seed is  {}".format(self._seed))
+        self._seed = self._rng.randint(0, 0xffffffff)
+        logger.debug("Seed is  {}".format(self._seed))
         return s
 
     def _initialize(self):
@@ -90,14 +90,15 @@ class GPAlgorithm():
             self.addRandomTree()
             
     def addRandomTree(self):
-        logger.info("Adding random tree")
+        logger.debug("Adding random tree")
         t = Tree.growTree(self._variables, self._maxdepth, self.getSeed())
-        logger.info("Tree generated")
+        logger.debug("Tree generated")
         t.scoreTree(self._Y, self._fitnessfunction)
-        logger.info("Scoring tree")
+        logger.debug("Scoring tree")
         self.addTree(t)
 
-        
+    def testInvariant(self):
+        assert(len(self._population) == self._popsize)
 
     def getVariables(self):
         return self._variables
@@ -114,18 +115,19 @@ class GPAlgorithm():
         """
         Main algorithm loop. Evolve population through generations.
         """
-        for _ in range(self._generations):
-            print("Generation")
+        for i in range(self._generations):
+            logger.info("Generation {}".format(i))
             selected = self.select()
-            print("Selection")
+            logger.info("Selection")
             modified = self.evolve(selected)
-            print("Evolution")
+            logger.info("Evolution")
             self.update(modified)
-            print("Update")
+            logger.info("Update")
             self.archive(modified)
-            print("Archival")
+            logger.info("Archival")
             if self.stopCondition():
                 break
+            self.testInvariant()
 
     def stopCondition(self):
         """
@@ -202,19 +204,19 @@ class BruteElitist(GPAlgorithm):
     def evolve(self, selection):
         if len(selection) < 2:
             return selection
-        logger.info("Evolving ")
+        logger.debug("Evolving ")
 
         for i,t in enumerate(selection):
 #            logger.info("Evolving {}".format(t.toExpression()))
-            logger.info("Evolving {}".format(i))
+            logger.debug("Evolving {}".format(i))
             Mutate.mutate(t, seed=self.getSeed())
-            logger.info("Mutation results in {}".format(t.toExpression()))
+            logger.debug("Mutation results in {}".format(t.toExpression()))
             left = t
             right = selection[self._rng.randint(0, len(selection)-1)]
             while right == left:
                 right = selection[self._rng.randint(0, len(selection)-1)]
             assert(left != right)
-            logger.info("Right selected for crossover {}".format(right.toExpression()))
+            logger.debug("Right selected for crossover {}".format(right.toExpression()))
             Crossover.subtreecrossover(left, right, seed=self.getSeed()) # TODO depth
         return selection
 
