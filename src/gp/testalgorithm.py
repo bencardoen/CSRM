@@ -37,19 +37,19 @@ def _fit(actual, expected, tree):
     """
     if not tree.getVariables():
         logger.warning("Tree instance is a constant expression : invalid")
-        return Constants.MAXFITNESS
+        return Constants.MINFITNESS
     if not actual:
         logger.warning("Tree instance has no datapoints : invalid")
-        return Constants.MAXFITNESS
+        return Constants.MINFITNESS
     if len(actual) != len(expected):
         logger.warning("Tree instance has no matching datapoints : invalid")
-        return Constants.MAXFITNESS
+        return Constants.MINFITNESS
         
     d = tree.getDepth()
-    for i in actual:
+    for j, i in enumerate(actual):
         if i is None:
-            logger.warning("Tree instance is a constant expression : invalid")
-            return Constants.MAXFITNESS
+            logger.warning("Tree instance has an invalid expression for a given datapoint : invalid")
+            return Constants.MINFITNESS
     rms = rootmeansquare(actual, expected)
     return rms * d
 
@@ -96,8 +96,10 @@ class GPTest(unittest.TestCase):
     def testVirtualBase(self):
         X = generateVariables(3,3,seed=0)
         Y = [ 0 for d in range(3)]
-        g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
+        logger.info("Y {} X {}".format(Y, X)) 
+        g = GPAlgorithm(X, Y, popsize=1, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
+        logger.info("Starting BE algorithm")
         g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
         

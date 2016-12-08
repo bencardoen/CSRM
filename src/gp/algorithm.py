@@ -2,6 +2,7 @@
 from expression.tree import Tree
 from expression.operators import Mutate, Crossover
 from expression.tools import traceFunction
+from expression.functions import Constants
 from gp.population import Population, SetPopulation
 from expression.node import Variable
 from copy import deepcopy
@@ -10,13 +11,6 @@ import random
 import logging
 logger = logging.getLogger('global')
 
-class Constants():
-    def __init__(self):
-        pass
-    
-    MAXFITNESS = float('inf')
-    MINFITNESS = 0
- 
 
 class GPAlgorithm():
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None):
@@ -40,7 +34,7 @@ class GPAlgorithm():
         self._rng = random.Random()
         if seed is not None:
             self._rng.seed(seed)
-        logging.error("X {}".format(X))
+        logging.info(" Data points for X {}".format(X))
         self._X = X
         self._Y = Y
         self._initialize()
@@ -86,7 +80,6 @@ class GPAlgorithm():
         for i in range(self._popsize):
             logging.error("Growing {}".format(i))
             t = Tree.growTree(self._variables, self._maxdepth, self.getSeed())
-            t.setFitness(0)
             assert(len(t.getVariables()))
             self.addTree(t)
         for t in self._population:
@@ -158,6 +151,7 @@ class BruteElitist(GPAlgorithm):
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed)
 
+    @traceFunction(logcall=logger.info)
     def select(self):
         s = self._population.removeAll()
         assert(len(self._population)==0)
@@ -165,9 +159,10 @@ class BruteElitist(GPAlgorithm):
             assert(len(t.getVariables()))
         return s
 
-    @traceFunction
+    @traceFunction(logcall=logger.info)
     def evolve(self, selection):
-        
+        if len(selection) < 2:
+            return selection
         for i,t in enumerate(selection):
             logging.info("Evolving {}".format(t))
             Mutate.mutate(t, seed=self.getSeed())
@@ -181,12 +176,18 @@ class BruteElitist(GPAlgorithm):
             Crossover.subtreecrossover(left, right, seed=self.getSeed()) # TODO depth
         return selection
 
+    @traceFunction(logcall=logger.info)
     def update(self, modified):
         # update fitness value here or in evolve ?
         for t in modified:
+            oldfit = t.getFitness()
+            logger.info("Updating {}".format(t, t.getFitness()))
             t.scoreTree(self._Y, self._fitnessfunction)
+            newfit = t.getFitness()
+            logger.info("Updating {} with oldfit {} to newfit {}".format(t, oldfit, newfit))
             self.addTree(t)
 
+    @traceFunction(logcall=logger.info)
     def archive(self, modified):
         t = self.getBestTree()
         t = deepcopy(t)

@@ -8,7 +8,7 @@
 
 
 from expression.tools import msb, compareLists, traceFunction
-from expression.functions import functionset, getRandomFunction, tokenize, infixToPostfix, isFunction, isOperator, infixToPrefix
+from expression.functions import functionset, getRandomFunction, tokenize, infixToPostfix, isFunction, isOperator, infixToPrefix, Constants
 from random import  choice, random
 from copy import deepcopy
 from .node import Node, Constant, ConstantNode, Variable, VariableNode
@@ -37,10 +37,11 @@ class Tree:
         self.evaluated = 0
         self.modified = False
         self.depth = None
-        self.fitness = 0
+        self.fitness = Constants.MINFITNESS
         self.fitnessfunction = None
         
     def setDataPointCount(self, v:int):
+        logger.info("Setting dpoint to {}".format(v))
         self._datapointcount = v
         
     def getDataPointCount(self):
@@ -323,6 +324,8 @@ class Tree:
         logger.debug("cfSubtree with args left {} right {} seed {} rng {} ".format(left, right, seed, rng))
         while True:
             t = Tree.makeRandomTree(variables=None, depth=1, seed=seed, rng=rng, tokenLeafs=True)
+            dl = left.getDataPointCount()
+            dr = right.getDataPointCount()
             if t.getRoot().getArity() == 2:
                 t.spliceSubTree(t.getNode(1), left.getRoot())
                 t.spliceSubTree(t.getNode(2), right.getRoot())
@@ -332,6 +335,7 @@ class Tree:
             if e is None:
                 logger.debug("Invalid evaluation of tree, retrying")
             else:
+                t.setDataPointCount(min(dl, dr))
                 return t
 
 

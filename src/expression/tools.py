@@ -123,9 +123,9 @@ def traceFunction(fn=None, logcall=None):
         @functools.wraps(function)# don't need this, but it is helpful to avoid __name__ overwriting
         # This is the actual decorator, pass arguments and log.
         def inner(*args, **kwargs):
-            logcall("Function {} called with pargs {} and kargs {}".format(function, args, kwargs))
+            logcall("Function {} called with pargs\n{} and kargs\n{}".format(function, args, kwargs))
             rv = function(*args, **kwargs)
-            logcall("Function {} returns {}".format(function, rv))
+            logcall("Function {} returns \n{}".format(function, rv))
             return rv
         return inner
 

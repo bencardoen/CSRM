@@ -14,9 +14,16 @@ import logging
 import math
 logger = logging.getLogger('global')
 
-# Defines a limit for exponents. (ie a^b && b<size_limit)
-size_limit = 80
 
+
+class Constants():
+    def __init__(self):
+        pass
+    #Fitness function (lower is better)
+    MINFITNESS = float('inf')
+    MAXFITNESS = 0
+    # Size limit for exponents
+    SIZE_LIMIT = 80
 
 # Function objects that can be used in an expression.
 # Most screen parameters to avoid expensive (frequent) exceptions.
@@ -33,7 +40,7 @@ def multiply(a, b):
     return a*b
 
 def power(a, b):
-    if a < 0 or abs(b) > size_limit:
+    if a < 0 or abs(b) > Constants.SIZE_LIMIT:
         return None
     if a == 0 and b<0:
         return None
@@ -51,7 +58,7 @@ def modulo(a, b):
     return int(a) % b
 
 def logarithm(a, b):
-    if a <= 0 or b <= 0 or b == 1 or abs(b)>size_limit:
+    if a <= 0 or b <= 0 or b == 1 or abs(b)>Constants.SIZE_LIMIT:
         return None
     return log(a,b)
 
