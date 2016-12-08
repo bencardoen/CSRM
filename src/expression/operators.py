@@ -26,11 +26,10 @@ class Mutate():
         rng = random.Random()
         rng.seed(seed)
         insertpoint = tr.getRandomNode(seed)
-        # TODO : while fail, restart
         d = tr.getDepth()
         depth_at_i = insertpoint.getDepth()
         targetdepth = d - depth_at_i
-        logger.info("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
+        logger.debug("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
         assert(targetdepth >= 0)
         variables = variables or tr.getVariables()
         varlist = [v[0] for k,v in variables.items()]

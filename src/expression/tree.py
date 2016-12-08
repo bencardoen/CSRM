@@ -295,16 +295,11 @@ class Tree:
         :param tokenLeafs : if set, only use constants
         :param limit : raises Exception if no valid tree can be found
         """
-        dpoint = 0
-        if variables:
-            dpoint = len(variables[0])
-        #logger.info("mkRandomTree with args {} depth {} seed {}".format(variables, depth, seed))
-        t = Tree()
+        dpoint = 0 if not variables else len(variables[0])
         _rng = rng
         if rng is None:
             _rng = random.Random()
         if depth == 0:
-            print("Depth == 0")
             t = Tree()
             if (_rng.randrange(0, 2) & 1) and variables:
                 child = t.makeLeaf(_rng.choice(variables), None)
@@ -317,7 +312,6 @@ class Tree:
             t= Tree()
             nodes = [t.makeInternalNode(getRandomFunction(rng=_rng), None, None)]
             for i in range(depth):
-                # for all generated nodes in last iteration
                 newnodes=[]
                 for node in nodes:
                     for j in range(node.getArity()):
@@ -325,7 +319,7 @@ class Tree:
                             if tokenLeafs:
                                 child = t.makeConstant(Constant(1.0), node)
                             else:
-                                if (_rng.randrange(0, 2) & 1) and variables:
+                                if (_rng.randrange(0, 2) & 1) and variables:# todo bias features
                                     child = t.makeLeaf(_rng.choice(variables), node)
                                 else:
                                     child = t.makeConstant(Constant.generateConstant(rng=_rng), node)

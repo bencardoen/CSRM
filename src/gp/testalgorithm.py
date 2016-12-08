@@ -47,7 +47,7 @@ def _fit(actual, expected, tree):
     if len(actual) != len(expected):
         logger.debug("Tree instance has no matching datapoints : invalid")
         return Constants.MINFITNESS
-        
+
     d = tree.getDepth()
     for j, i in enumerate(actual):
         if i is None:
@@ -99,17 +99,17 @@ class GPTest(unittest.TestCase):
     def testVirtualBase(self):
         X = generateVariables(3,3,seed=0)
         Y = [ 0 for d in range(3)]
-        logger.debug("Y {} X {}".format(Y, X)) 
+        logger.debug("Y {} X {}".format(Y, X))
         g = GPAlgorithm(X, Y, popsize=2, maxdepth=4, fitnessfunction=_fit, seed=0)
         #g.printForest()
         g.run()
         #g.printForest()
         logger.info("Starting BE algorithm")
-        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0, generations=3)
+        g = BruteElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=5)
         g.run()
         #g.printForestToDot("prefix")
         #g.printForest()
-        
+
     def testRun(self):
         X = generateVariables(5,5, seed=0)
         Y = [1 for i in range( len(X[0]))]

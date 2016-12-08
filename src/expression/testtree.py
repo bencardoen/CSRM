@@ -637,12 +637,10 @@ class TreeTest(unittest.TestCase):
     def testMutateGrow(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         t = Tree.growTree(variables, depth=0, seed=1)
-        print(t)
-        #rng = random.Random()
-        #rng.seed(0)
-        #t = Tree.makeRandomTree(variables, depth=1, rng=rng)
-        #print(t)
-        #Mutate.mutate(t, seed=0)
+        rng = random.Random()
+        rng.seed(0)
+        t = Tree.makeRandomTree(variables, depth=1, rng=rng)
+        Mutate.mutate(t, seed=0)
 
 
 
