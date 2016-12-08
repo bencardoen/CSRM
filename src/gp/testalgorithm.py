@@ -36,19 +36,19 @@ def _fit(actual, expected, tree):
         Discard trees with constant expressions, restrict depth and invalid results.
     """
     if not tree.getVariables():
-        logger.warning("Tree instance is a constant expression : invalid")
+        logger.debug("Tree instance is a constant expression : invalid")
         return Constants.MINFITNESS
     if not actual:
-        logger.warning("Tree instance has no datapoints : invalid")
+        logger.debug("Tree instance has no datapoints : invalid")
         return Constants.MINFITNESS
     if len(actual) != len(expected):
-        logger.warning("Tree instance has no matching datapoints : invalid")
+        logger.debug("Tree instance has no matching datapoints : invalid")
         return Constants.MINFITNESS
         
     d = tree.getDepth()
     for j, i in enumerate(actual):
         if i is None:
-            logger.warning("Tree instance has an invalid expression for a given datapoint : invalid")
+            logger.debug("Tree instance has an invalid expression for a datapoint {}".format(j))
             return Constants.MINFITNESS
     rms = rootmeansquare(actual, expected)
     return rms * d
@@ -59,8 +59,8 @@ class GPTest(unittest.TestCase):
     def testInitialization(self):
         X = generateVariables(3,3,seed=0)
         Y = []
-        g = GPAlgorithm(X, Y, popsize=2, maxdepth=4, fitnessfunction=_fit)
-        g.printForest(outputfolder + "forest")
+        g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
+        g.printForestToDot(outputfolder + "forest")
 
     def testPopulation(self):
         fs=10
@@ -96,17 +96,21 @@ class GPTest(unittest.TestCase):
     def testVirtualBase(self):
         X = generateVariables(3,3,seed=0)
         Y = [ 0 for d in range(3)]
-        logger.info("Y {} X {}".format(Y, X)) 
-        g = GPAlgorithm(X, Y, popsize=1, maxdepth=4, fitnessfunction=_fit, seed=0)
+        logger.debug("Y {} X {}".format(Y, X)) 
+        g = GPAlgorithm(X, Y, popsize=2, maxdepth=4, fitnessfunction=_fit, seed=0)
+        #g.printForest()
         g.run()
+        #g.printForest()
         logger.info("Starting BE algorithm")
-        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
+        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0, generations=2)
         g.run()
+        #g.printForestToDot("prefix")
+        #g.printForest()
         
     def testRun(self):
         X = generateVariables(5,5, seed=0)
         Y = [1 for i in range( len(X[0]))]
-        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
+        g = BruteElitist(X, Y, popsize=5, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
 
 

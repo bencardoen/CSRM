@@ -176,12 +176,13 @@ class Tree:
 
     def __str__(self):
         root = self.nodes[0]
-        output = str(root) + "\n"
+        output = "Fitness {}\n".format(self.getFitness())
+        output += str(root) + "\n"
         children = root.getChildren()[:]
         while len(children) != 0:
             gchildren = []
             for c in children:
-                output += str(c) + " "
+                output += str(c) + "\t"
                 gchildren += c.getChildren()[:]
             children = gchildren
             output += "\n"
@@ -276,7 +277,7 @@ class Tree:
         raise ValueError("No Nodes in tree")
 
     @staticmethod
-    def makeRandomTree(variables, depth: int, seed = None, rng=None, tokenLeafs=False):
+    def makeRandomTree(variables, depth: int, seed = None, rng=None, tokenLeafs=False, limit=None):
         """
         Generate a random expression tree with a random selection of variables
         Topdown construction, there is no guarantee that this construction renders a semantically valid tree
@@ -284,7 +285,7 @@ class Tree:
         dpoint = 0
         if variables:
             dpoint = len(variables[0])
-        logger.debug("mkRandomTree with args {} depth {} seed {}".format(variables, depth, seed))
+        #logger.info("mkRandomTree with args {} depth {} seed {}".format(variables, depth, seed))
         t = Tree()
         _rng = rng or random.Random()
         if seed is not None: _rng.seed(seed)
@@ -311,14 +312,12 @@ class Tree:
                 nodes = newnodes
             e = t.evaluateTree()
             if e is None:
-                logger.warning("Invalid result for generated random tree, retrying, attempt {}".format(cnt))
                 cnt += 1
             else:
                 t.setDataPointCount(dpoint)
                 return t
 
     @staticmethod
-    @traceFunction
     def constructFromSubtrees(left, right, seed=None, rng=None):
         logger.debug("cfSubtree with args left {} right {} seed {} rng {} ".format(left, right, seed, rng))
         while True:
@@ -339,7 +338,6 @@ class Tree:
 
 
     @staticmethod
-    @traceFunction
     def growTree(variables, depth: int, seed=None):
         """
         Grow a tree up to depth, with optional seed for the rng.
@@ -347,19 +345,19 @@ class Tree:
         rng = random.Random()
         if seed is not None:
             rng.seed(seed)
-        return Tree._growTree(variables, depth, rng=rng)
+        return Tree._growTree(variables, depth, rng=rng, seed=seed)
 
     @staticmethod
-    def _growTree(variables, depth: int, rng=None):
+    def _growTree(variables, depth: int, rng=None, seed=None):
         left = None
         right = None
         if depth == 2:
-            left = Tree.makeRandomTree(variables, depth=1, seed=None, rng=rng)
-            right = Tree.makeRandomTree(variables, depth=1, seed=None, rng=rng)
+            left = Tree.makeRandomTree(variables, depth=1, seed=seed, rng=rng)
+            right = Tree.makeRandomTree(variables, depth=1, seed=seed, rng=rng)
         else:
-            left = Tree._growTree(variables, depth-1, rng=rng)
-            right = Tree._growTree(variables, depth-1, rng=rng)
-        root = Tree.constructFromSubtrees(left, right, seed=None, rng=rng)
+            left = Tree._growTree(variables, depth-1, rng=rng, seed=seed)
+            right = Tree._growTree(variables, depth-1, rng=rng, seed=seed)
+        root = Tree.constructFromSubtrees(left, right, seed=seed, rng=rng)
         return root
 
 

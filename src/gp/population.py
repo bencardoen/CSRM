@@ -94,6 +94,7 @@ class Population():
 
     def removeAll(self):
         return self.removeN(len(self))
+        
 
 class SLWKPopulation(Population):
     """
@@ -147,9 +148,6 @@ class SetPopulation(Population):
     def add(self, item):
         self._pop.add(item)
 
-    def remove(self, item):
-        self._pop.remove(item)
-
     def top(self):
         return self._pop[0]
 
@@ -165,6 +163,9 @@ class SetPopulation(Population):
         l = self.last()
         self.remove(l)
         return l
+        
+    def remove(self, item):
+        self._pop.remove(item)
 
     def __contains__(self, b):
         return b in self._pop
@@ -178,7 +179,14 @@ class SetPopulation(Population):
         return [d for d in i]
 
     def removeN(self, n):
+        oldlen = len(self)
+        logger.debug("Removing {} from {}".format(n, str(self)))
         kn = self.getN(n)
         for i in kn:
-            self.remove(i)
+            logger.debug("Removing {} from selection {} and pop {}".format(repr(i), kn, self._pop))
+            self.pop()
+        assert(len(self) == oldlen - n)
         return kn
+        
+    def __str__(self):
+        return "".join(str(d) for d in self._pop)
