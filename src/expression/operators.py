@@ -18,7 +18,7 @@ class Mutate():
     """
     @staticmethod
     @traceFunction
-    def mutate(tr, seed = None, variables = None):
+    def mutate(tr, seed = None, variables = None, equaldepth=False):
         """
             Replace a random node with a new generated subexpression.
             If no variables are supplied, the existing set is reused.
@@ -27,11 +27,15 @@ class Mutate():
         rng.seed(seed)
         insertpoint = tr.getRandomNode(seed)
         # TODO : while fail, restart
+        d = tr.getDepth()
         depth_at_i = insertpoint.getDepth()
-        logger.debug("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
+        targetdepth = d - depth_at_i
+        logger.info("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
+
         variables = variables or tr.getVariables()
         varlist = [v[0] for k,v in variables.items()]
-        subtree = Tree.makeRandomTree(variables=varlist, depth=depth_at_i, rng=rng)
+        subtree = Tree.growTree(variables=varlist, depth=targetdepth, seed=seed)
+        #subtree = Tree.makeRandomTree(variables=varlist, depth=targetdepth, rng=rng)
         tr.spliceSubTree(insertpoint, subtree.getRoot())
         tr._mergeVariables(subtree.getVariables())
 

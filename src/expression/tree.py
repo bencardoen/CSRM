@@ -39,10 +39,10 @@ class Tree:
         self.depth = None
         self.fitness = Constants.MINFITNESS
         self.fitnessfunction = None
-        
+
     def setDataPointCount(self, v:int):
         self._datapointcount = v
-        
+
     def getDataPointCount(self):
         return self._datapointcount
 
@@ -113,7 +113,7 @@ class Tree:
             self.root = n
         self._addNode(n, position)
         return n
-        
+
     def _getDatapointCount(self):
         assert(len(self.variables))
         return len(self.variables[next(self.variables.__iter__())][0])
@@ -148,31 +148,42 @@ class Tree:
         Make a leaf node holding a reference to a variable.
         """
         logger.debug("Makeleaf with args = v={}, parent={}, cte={}".format(variable, parent, constant))
-        children = parent.getChildren()
-        position = 0
-        if children:
-            position = children[-1].getPosition()+1
+        if parent is None:
+            n = VariableNode( 0, variable, constant)
+            self.root = n
+            self._addNode(n, 0)
+            return n
         else:
-            position = parent.getPosition()*2+1
-        n = VariableNode( position, variable, constant)
-        parent.addChild(n)
-        self._addNode(n, position)
-        return n
+            children = parent.getChildren()
+            position = 0
+            if children:
+                position = children[-1].getPosition()+1
+            else:
+                position = parent.getPosition()*2+1
+            n = VariableNode( position, variable, constant)
+            parent.addChild(n)
+            self._addNode(n, position)
+            return n
 
     def makeConstant(self, constant, parent: Node):
         """
         Make a leaf node holding a constant
         """
-        children = parent.getChildren()
-        position = 0
-        if children:
-            position = children[-1].getPosition()+1
+        if parent is None:
+            n = ConstantNode( 0, constant)
+            self._addNode(n, 0)
+            return n
         else:
-            position = parent.getPosition()*2+1
-        n = ConstantNode( position, constant)
-        parent.addChild(n)
-        self._addNode(n, position)
-        return n
+            children = parent.getChildren()
+            position = 0
+            if children:
+                position = children[-1].getPosition()+1
+            else:
+                position = parent.getPosition()*2+1
+            n = ConstantNode( position, constant)
+            parent.addChild(n)
+            self._addNode(n, position)
+            return n
 
     def __str__(self):
         root = self.nodes[0]
@@ -187,7 +198,7 @@ class Tree:
             children = gchildren
             output += "\n"
         return output
-            
+
     def evaluateTree(self):
         """
         Evaluates tree if tree was modified, else returns a cached results.
@@ -200,7 +211,7 @@ class Tree:
             self.getDepth()
             self.modified = False
         return self.evaluated
-        
+
     def evaluateAll(self):
         """
             For each data point, evaluate this tree object.
@@ -217,11 +228,11 @@ class Tree:
                 self.updateIndex()
             values.append(value)
         return values
-        
+
     def scoreTree(self, expected, distancefunction):
         """
             Evaluate a tree w.r.t a distancefucntion.
-            
+
             :param expected: list A set of expected output values for each datapoint.
             :param distancefunction: Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)
         """
@@ -292,8 +303,14 @@ class Tree:
         _rng = rng
         if rng is None:
             _rng = random.Random()
-#        _rng = rng or random.Random()
-#        if seed is not None: _rng.seed(seed)
+        if depth == 0:
+            print("Depth == 0")
+            t = Tree()
+            if (_rng.randrange(0, 2) & 1) and variables:
+                child = t.makeLeaf(_rng.choice(variables), None)
+            else:
+                child = t.makeConstant(Constant.generateConstant(rng=_rng), None)
+            return t
         cnt = 0
         while True:
             #logger.info("making tree {}".format(cnt))
@@ -361,6 +378,8 @@ class Tree:
             rng = random.Random()
         if seed is not None:
             rng.seed(seed)
+        if depth <= 1:
+            return Tree.makeRandomTree(variables=variables, depth=depth, rng=rng)
         return Tree._growTree(variables=variables, depth=depth, rng=rng)
 
     @staticmethod
@@ -550,7 +569,7 @@ class Tree:
                 variable.setCurrentIndex(i)
             else:
                 variable.setCurrentIndex(index + 1)
-                
+
     def getRoot(self):
         assert(self.root)
         return self.root
