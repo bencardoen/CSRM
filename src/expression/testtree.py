@@ -594,7 +594,6 @@ class TreeTest(unittest.TestCase):
         def passconstraint(actual, expected, tree):
             return rootmeansquare(actual, expected)
         vs = generateVariables(vcount, dpoint, seed=0)
-        forest = []
         rng = random.Random()
         rng.seed(0)
         e = [ rng.random() for i in range(dpoint)]

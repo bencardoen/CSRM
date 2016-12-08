@@ -39,6 +39,12 @@ class Tree:
         self.depth = None
         self.fitness = 0
         self.fitnessfunction = None
+        
+    def setDataPointCount(self, v:int):
+        self._datapointcount = v
+        
+    def getDataPointCount(self):
+        return self._datapointcount
 
     def getNode(self, pos: int):
         return self.nodes[pos]
@@ -194,20 +200,21 @@ class Tree:
             self.modified = False
         return self.evaluated
         
-    def evaluateAll(self, datapointcount):
+    def evaluateAll(self):
         """
             For each data point, evaluate this tree object.
             :returns list : list of evaluations
         """
         v = self.getVariables()
         values = []
-        for i in range(datapointcount):
-            v = self.evaluateTree()
-            if i == datapointcount-1:
+        dpoint = self.getDataPointCount()
+        for i in range(dpoint):
+            value = self.evaluateTree()
+            if i == dpoint-1:
                 self.updateIndex(0)
             else:
                 self.updateIndex()
-            values.append(v)
+            values.append(value)
         return values
         
     def scoreTree(self, expected, distancefunction):
@@ -218,10 +225,6 @@ class Tree:
             :param distancefunction: Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)
         """
         actual = self.evaluateAll()
-        assert(actual)
-        assert(expected)
-        print(actual)
-        print(expected)
         f = distancefunction(actual, expected, tree=self)
         self.setFitness(f)
         return self.getFitness()
@@ -278,6 +281,9 @@ class Tree:
         Generate a random expression tree with a random selection of variables
         Topdown construction, there is no guarantee that this construction renders a semantically valid tree
         """
+        dpoint = 0
+        if variables:
+            dpoint = len(variables[0])
         logger.debug("mkRandomTree with args {} depth {} seed {}".format(variables, depth, seed))
         t = Tree()
         _rng = rng or random.Random()
@@ -308,6 +314,7 @@ class Tree:
                 logger.debug("Invalid result for generated random tree, retrying, attempt {}".format(cnt))
                 cnt += 1
             else:
+                t.setDataPointCount(dpoint)
                 return t
 
     @staticmethod
@@ -562,6 +569,9 @@ class Tree:
         Given an infix expression containing floats, operators, function defined in functions.functionset,
         create a corresponding expression tree.
         """
+        dpoint = 0
+        if variables:
+            dpoint = len(variables[0])
         pfix = infixToPrefix(tokenize(expr, variables))
         result = Tree()
         lastnode = None
@@ -582,6 +592,7 @@ class Tree:
                 else:
                     break
         result.testInvariant()
+        result.setDataPointCount(dpoint)
         return result
 
 

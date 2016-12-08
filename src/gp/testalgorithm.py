@@ -14,7 +14,7 @@ import os
 import random
 from expression.operators import Mutate, Crossover
 from expression.tools import generateVariables, rootmeansquare
-from gp.algorithm import GPAlgorithm, BruteElitist
+from gp.algorithm import GPAlgorithm, BruteElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
 from expression.tree import Tree
 from expression.node import Variable
@@ -32,8 +32,26 @@ def generateForest(fsize=10, depth=4, seed=None):
     return forest
 
 def _fit(actual, expected, tree):
-    return tree.getDepth()
-#    return rootmeansquare(actual, expected)
+    """
+        Discard trees with constant expressions, restrict depth and invalid results.
+    """
+    if not tree.getVariables():
+        logger.warning("Tree instance is a constant expression : invalid")
+        return Constants.MAXFITNESS
+    if not actual:
+        logger.warning("Tree instance has no datapoints : invalid")
+        return Constants.MAXFITNESS
+    if len(actual) != len(expected):
+        logger.warning("Tree instance has no matching datapoints : invalid")
+        return Constants.MAXFITNESS
+        
+    d = tree.getDepth()
+    for i in actual:
+        if i is None:
+            logger.warning("Tree instance is a constant expression : invalid")
+            return Constants.MAXFITNESS
+    rms = rootmeansquare(actual, expected)
+    return rms * d
 
 class GPTest(unittest.TestCase):
 
@@ -78,7 +96,6 @@ class GPTest(unittest.TestCase):
     def testVirtualBase(self):
         X = generateVariables(3,3,seed=0)
         Y = [ 0 for d in range(3)]
-        # Test if tracing works across virtual functions
         g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
         g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
@@ -87,7 +104,6 @@ class GPTest(unittest.TestCase):
     def testRun(self):
         X = generateVariables(5,5, seed=0)
         Y = [1 for i in range( len(X[0]))]
-        # Test if tracing works across virtual functions
         g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.run()
 

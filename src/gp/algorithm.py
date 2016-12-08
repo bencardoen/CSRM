@@ -10,6 +10,14 @@ import random
 import logging
 logger = logging.getLogger('global')
 
+class Constants():
+    def __init__(self):
+        pass
+    
+    MAXFITNESS = float('inf')
+    MINFITNESS = 0
+ 
+
 class GPAlgorithm():
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None):
         """
@@ -161,20 +169,16 @@ class BruteElitist(GPAlgorithm):
     def evolve(self, selection):
         
         for i,t in enumerate(selection):
-            print(t)
-            assert(len(t.getVariables()))
             logging.info("Evolving {}".format(t))
             Mutate.mutate(t, seed=self.getSeed())
             logging.info("Mutation results in {}".format(t))
             left = t
             right = selection[self._rng.randint(0, len(selection)-1)]
             while right == left:
-                    right = selection[self._rng.randint(0, len(selection)-1)]
+                right = selection[self._rng.randint(0, len(selection)-1)]
             assert(left != right)
             logging.info("Right selected for crossover {}".format(right))
             Crossover.subtreecrossover(left, right, seed=self.getSeed()) # TODO depth
-        for i in selection:
-            assert(len(i.getVariables()))
         return selection
 
     def update(self, modified):
