@@ -28,8 +28,10 @@ def generateForest(fsize=10, depth=4, seed=None):
     forest = []
     if seed is None:
         seed = 0
+    rng = random.Random()
+    rng.seed(seed)
     for i in range(fsize):
-        forest.append(Tree.makeRandomTree(variables, depth=depth, seed=seed+i))
+        forest.append(Tree.makeRandomTree(variables, depth=depth, rng=rng))
     return forest
 
 def _fit(actual, expected, tree):

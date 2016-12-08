@@ -204,12 +204,12 @@ class BruteElitist(GPAlgorithm):
     def evolve(self, selection):
         if len(selection) < 2:
             return selection
-        logger.debug("Evolving ")
+        logger.info("Evolving ")
 
         for i,t in enumerate(selection):
 #            logger.info("Evolving {}".format(t.toExpression()))
             logger.debug("Evolving {}".format(i))
-            Mutate.mutate(t, seed=self.getSeed())
+            #Mutate.mutate(t, seed=self.getSeed())
             logger.debug("Mutation results in {}".format(t.toExpression()))
             left = t
             right = selection[self._rng.randint(0, len(selection)-1)]

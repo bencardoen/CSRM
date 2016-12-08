@@ -9,6 +9,7 @@
 from expression.tree import Tree
 from expression.tools import traceFunction
 import logging
+import random
 logger = logging.getLogger('global')
 
 class Mutate():
@@ -22,12 +23,15 @@ class Mutate():
             Replace a random node with a new generated subexpression.
             If no variables are supplied, the existing set is reused.
         """
+        rng = random.Random()
+        rng.seed(seed)
         insertpoint = tr.getRandomNode(seed)
+        # TODO : while fail, restart
         depth_at_i = insertpoint.getDepth()
         logger.debug("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
         variables = variables or tr.getVariables()
         varlist = [v[0] for k,v in variables.items()]
-        subtree = Tree.makeRandomTree(varlist, depth_at_i, seed)
+        subtree = Tree.makeRandomTree(variables=varlist, depth=depth_at_i, rng=rng)
         tr.spliceSubTree(insertpoint, subtree.getRoot())
         tr._mergeVariables(subtree.getVariables())
 

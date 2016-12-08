@@ -129,9 +129,11 @@ class TreeTest(unittest.TestCase):
     def testRandomTree(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         for i in range(10):
-            t = Tree.makeRandomTree(variables, 10, 11)
+            rng = random.Random()
+            rng.seed(0)
+            t = Tree.makeRandomTree(variables, depth=10, rng=rng)
             e = t.evaluateTree()
-            self.assertEqual(e, 2.700571199758967)
+            self.assertEqual(e,  2.746542827737955)
             if not i:
                 t.printToDot(outputfolder+"t6.dot")
 
@@ -349,7 +351,9 @@ class TreeTest(unittest.TestCase):
         """
         for i in range(100):
             variables = []
-            t = Tree.makeRandomTree(variables, 6, seed=i)
+            rng = random.Random()
+            rng.seed(0)
+            t = Tree.makeRandomTree(variables, depth=6, rng=rng)
             t.printToDot(outputfolder+"t22randomtree.dot")
             expr = t.toExpression()
             tconverted = Tree.createTreeFromExpression(expr)
@@ -484,8 +488,10 @@ class TreeTest(unittest.TestCase):
         variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
         e = 1
         compnodes = None
+        rng = random.Random()
         for i in range(100):
-            t = Tree.makeRandomTree(variables, 5, seed=11)
+            rng.seed(0)
+            t = Tree.makeRandomTree(variables, 5, rng=rng)
 #            t.printToDot(outputfolder+"t32a.dot")
             e2 = t.evaluateTree()
             nodes = t.getNodes()
@@ -512,8 +518,11 @@ class TreeTest(unittest.TestCase):
         variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
         varbs = None
         e = None
+        rng = random.Random()
+        rng.seed(0)
         for i in range(3):
-            t = Tree.makeRandomTree(variables, 4, seed=11)# todo look at case 6
+            rng.seed(0)
+            t = Tree.makeRandomTree(variables, 4, rng=rng)# todo look at case 6
             e2 = t.evaluateTree()
             if not varbs:
                 varbs = t.getVariables()
@@ -559,18 +568,27 @@ class TreeTest(unittest.TestCase):
 
     def testBottomUpConstruction(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        left = Tree.makeRandomTree(variables, depth=1, seed=11)
-        right = Tree.makeRandomTree(variables, depth=1, seed=13)
-        newtree = Tree.constructFromSubtrees(left, right, seed=0)
+        rng = random.Random()
+        rng.seed(19)
+        left = Tree.makeRandomTree(variables, depth=1, rng=rng)
+        right = Tree.makeRandomTree(variables, depth=1, rng=rng)
+        newtree = Tree.constructFromSubtrees(left, right, rng=rng)
         e = newtree.evaluateTree()
-        self.assertEqual(e,  11.319369231885034 )
+        self.assertEqual(e, 0.7656269169069502 )
 
-    def testGrowTree(self):
+    def testGrowTreeDeep(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         t = Tree.growTree(variables, depth=9, seed=1)
         t.printToDot(outputfolder+"t35Grown.dot")
         e = t.evaluateTree()
-        self.assertEqual(e, -1.383686947730111)
+        self.assertEqual(e, 30.90267074966982)
+        
+    def testGrowTree(self):
+        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        t = Tree.growTree(variables, depth=3, seed=0)
+        t.printToDot(outputfolder+"t36Grown.dot")
+        e = t.evaluateTree()
+        self.assertNotEqual(e, None)
         
     def testEvaluation(self):
         dpoint = 5
@@ -581,7 +599,9 @@ class TreeTest(unittest.TestCase):
             v = Variable(entry, i)
             assert(len(entry)==dpoint)
             variables.append(v)
-        t= Tree.makeRandomTree(variables, depth=4, seed=0)
+        rng = random.Random()
+        rng.seed(0)
+        t= Tree.makeRandomTree(variables, depth=4, rng=rng)
         self.assertEqual(t._getDatapointCount() , dpoint)
         actual = t.evaluateAll()
         self.assertEqual(len(actual), dpoint)
