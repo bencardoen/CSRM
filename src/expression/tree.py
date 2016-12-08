@@ -41,7 +41,6 @@ class Tree:
         self.fitnessfunction = None
         
     def setDataPointCount(self, v:int):
-        logger.info("Setting dpoint to {}".format(v))
         self._datapointcount = v
         
     def getDataPointCount(self):
@@ -187,7 +186,7 @@ class Tree:
             children = gchildren
             output += "\n"
         return output
-
+            
     def evaluateTree(self):
         """
         Evaluates tree if tree was modified, else returns a cached results.
@@ -312,7 +311,7 @@ class Tree:
                 nodes = newnodes
             e = t.evaluateTree()
             if e is None:
-                logger.debug("Invalid result for generated random tree, retrying, attempt {}".format(cnt))
+                logger.warning("Invalid result for generated random tree, retrying, attempt {}".format(cnt))
                 cnt += 1
             else:
                 t.setDataPointCount(dpoint)

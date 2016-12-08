@@ -164,15 +164,15 @@ class BruteElitist(GPAlgorithm):
         if len(selection) < 2:
             return selection
         for i,t in enumerate(selection):
-            logging.info("Evolving {}".format(t))
+            logging.info("Evolving {}".format(t.toExpression()))
             Mutate.mutate(t, seed=self.getSeed())
-            logging.info("Mutation results in {}".format(t))
+            logging.info("Mutation results in {}".format(t.toExpression()))
             left = t
             right = selection[self._rng.randint(0, len(selection)-1)]
             while right == left:
                 right = selection[self._rng.randint(0, len(selection)-1)]
             assert(left != right)
-            logging.info("Right selected for crossover {}".format(right))
+            logging.info("Right selected for crossover {}".format(right.toExpression()))
             Crossover.subtreecrossover(left, right, seed=self.getSeed()) # TODO depth
         return selection
 
@@ -181,10 +181,9 @@ class BruteElitist(GPAlgorithm):
         # update fitness value here or in evolve ?
         for t in modified:
             oldfit = t.getFitness()
-            logger.info("Updating {}".format(t, t.getFitness()))
             t.scoreTree(self._Y, self._fitnessfunction)
             newfit = t.getFitness()
-            logger.info("Updating {} with oldfit {} to newfit {}".format(t, oldfit, newfit))
+            logger.info("Updating \n{}n with fitness {} ---> {}".format(t.toExpression().replace(" ",""), oldfit, newfit))
             self.addTree(t)
 
     @traceFunction(logcall=logger.info)
