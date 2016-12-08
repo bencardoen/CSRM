@@ -62,12 +62,12 @@ class GPAlgorithm():
             vlist.append(Variable(x, i))
         self._variables = vlist[:]
         self._initializePopulation()
-    
+
 
     def addTree(self, t):
         assert(t not in self._population)
         self._population.add(t)
-    
+
 
     def getBestTree(self):
         """
@@ -88,7 +88,7 @@ class GPAlgorithm():
         assert(len(self._variables))
         for i in range(self._popsize):
             self.addRandomTree()
-            
+
     def addRandomTree(self):
         logger.debug("Adding random tree")
         t = Tree.growTree(self._variables, self._maxdepth, self.getSeed())
@@ -106,7 +106,7 @@ class GPAlgorithm():
     def printForestToDot(self, prefix):
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
-            
+
 
     def printForest(self):
         print(str(self._population))
@@ -144,7 +144,7 @@ class GPAlgorithm():
         sel = self._population.removeAll()
         assert(len(self._population)==0)
         return sel
-        
+
     def evaluate(self, sel=None):
         """
             Recalculate the fitness of the population if sel == None, else the selection.
@@ -209,7 +209,7 @@ class BruteElitist(GPAlgorithm):
         for i,t in enumerate(selection):
 #            logger.info("Evolving {}".format(t.toExpression()))
             logger.debug("Evolving {}".format(i))
-            #Mutate.mutate(t, seed=self.getSeed())
+            Mutate.mutate(t, seed=self.getSeed())
             logger.debug("Mutation results in {}".format(t.toExpression()))
             left = t
             right = selection[self._rng.randint(0, len(selection)-1)]

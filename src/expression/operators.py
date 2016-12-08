@@ -31,11 +31,10 @@ class Mutate():
         depth_at_i = insertpoint.getDepth()
         targetdepth = d - depth_at_i
         logger.info("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
-
+        assert(targetdepth >= 0)
         variables = variables or tr.getVariables()
         varlist = [v[0] for k,v in variables.items()]
         subtree = Tree.growTree(variables=varlist, depth=targetdepth, seed=seed)
-        #subtree = Tree.makeRandomTree(variables=varlist, depth=targetdepth, rng=rng)
         tr.spliceSubTree(insertpoint, subtree.getRoot())
         tr._mergeVariables(subtree.getVariables())
 
