@@ -10,6 +10,7 @@ from operator import neg
 import random
 import logging
 import math
+import numpy
 logger = logging.getLogger('global')
 
 
@@ -31,12 +32,11 @@ class GPAlgorithm():
         self._fitnessfunction = fitnessfunction
         self._maxdepth = maxdepth
         self._popsize=popsize
-        logger.info("Seed is {}".format(seed))
         self._seed = seed
         self._rng = random.Random()
         if seed is not None:
-            logger.info("Setting RNG {}".format(self._seed))
             self._rng.seed(seed)
+        self._trace = False
         logging.info(" Data points for X {}".format(X))
         self._X = X
         self._Y = Y
@@ -51,7 +51,6 @@ class GPAlgorithm():
         if s is None:
             return None
         self._seed = self._rng.randint(0, 0xffffffff)
-        logger.debug("Seed is  {}".format(self._seed))
         return s
 
     def _initialize(self):
@@ -90,11 +89,14 @@ class GPAlgorithm():
             self.addRandomTree()
 
     def addRandomTree(self):
-        logger.debug("Adding random tree")
         t = Tree.growTree(self._variables, self._maxdepth, self.getSeed())
-        logger.debug("Tree generated")
         t.scoreTree(self._Y, self._fitnessfunction)
-        logger.debug("Scoring tree")
+        i = 0
+        while t.getFitness() == Constants.MINFITNESS:
+            print("Attempt {}".format(i))
+            t = Tree.growTree(self._variables, self._maxdepth, self.getSeed())
+            t.scoreTree(self._Y, self._fitnessfunction)
+            i += 1
         self.addTree(t)
 
     def testInvariant(self):
@@ -107,9 +109,38 @@ class GPAlgorithm():
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
+    def summarizeGeneration(self):
+        """
+            Compute fitness statistics for the current generation
+        """
+        fit = [d.getFitness() for d in self._population]
+        mean = numpy.mean(fit)
+        sd = numpy.std(fit)
+        v = numpy.var(fit)
+        sfit =  "".join('{:.2f}, '.format(d) for d in fit)
+        logger.info("Fitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {}".format(sfit, mean, sd, v))
+        return fit
+
+    def setTrace(self, v, prefix):
+        self._trace = v
+        self._prefix = prefix
 
     def printForest(self):
         print(str(self._population))
+
+    def reseed(self):
+        """
+            After a run of x generations, reseed the population based on the archive
+        """
+        archived = self._archive.getAll()
+        for a in archived:
+            self.addTree(deepcopy(a))
+        # Retrim the current population by removing the least fit samples
+        while len(self._population) > self._popsize:
+            self._population.bottom()
+        while len(self._population) < self._popsize:
+            self.addRandomTree()
+        logger.info("Reseeding using archive {}".format(archived))
 
     def run(self):
         """
@@ -117,17 +148,22 @@ class GPAlgorithm():
         """
         for i in range(self._generations):
             logger.info("Generation {}".format(i))
+            logger.info("\nSelection\n")
             selected = self.select()
-            logger.info("Selection")
+            logger.info("\nEvolution\n")
             modified = self.evolve(selected)
-            logger.info("Evolution")
+            logger.info("\nUpdate\n")
             self.update(modified)
-            logger.info("Update")
-            self.archive(modified)
-            logger.info("Archival")
+            self.summarizeGeneration()
             if self.stopCondition():
                 break
             self.testInvariant()
+            if self._trace:
+                self.printForestToDot(self._prefix + "generation_{}_".format(i))
+        logger.info("\nArchival\n")
+        self.archive(modified)
+        self.reseed()
+
 
     def stopCondition(self):
         """
@@ -185,13 +221,14 @@ class GPAlgorithm():
         """
         return
 
+
     def addToArchive(self, t):
         self._archive.add(t)
         if len(self._archive) > self._archivesize:
             self._archive.popLast()
 
 class BruteElitist(GPAlgorithm):
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed)
 
     @traceFunction
@@ -204,18 +241,14 @@ class BruteElitist(GPAlgorithm):
     def evolve(self, selection):
         if len(selection) < 2:
             return selection
-        logger.info("Evolving ")
-
         for i,t in enumerate(selection):
-#            logger.info("Evolving {}".format(t.toExpression()))
             logger.debug("Evolving {}".format(i))
-            Mutate.mutate(t, seed=self.getSeed())
+            Mutate.mutate(t, variables=self._variables, seed=self.getSeed())
             logger.debug("Mutation results in {}".format(t.toExpression()))
             left = t
             right = selection[self._rng.randint(0, len(selection)-1)]
             while right == left:
                 right = selection[self._rng.randint(0, len(selection)-1)]
-            assert(left != right)
             logger.debug("Right selected for crossover {}".format(right.toExpression()))
             Crossover.subtreecrossover(left, right, seed=self.getSeed()) # TODO depth
         return selection
@@ -228,8 +261,10 @@ class BruteElitist(GPAlgorithm):
             newfit = t.getFitness()
             logger.debug("Updating \n{}n with fitness {} ---> {}".format(t.toExpression().replace(" ",""), oldfit, newfit))
             if newfit != Constants.MINFITNESS:
+                assert(t.getFitness() != Constants.MINFITNESS)
                 self.addTree(t)
         remcount = self._popsize - len(self._population)
+        logger.info("Adding {} new random trees".format(remcount))
         for _ in range(remcount):
             self.addRandomTree()
 

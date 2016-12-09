@@ -1,0 +1,8 @@
+    """
+    Generate a list of datapoints.
+
+    :param int varcount: number of features
+    :param int datacount: number of datapoints per feature
+    :param int seed: Seed for the rng
+    :returns: a list of varcount lists each datacount sized.
+    """

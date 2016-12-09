@@ -59,19 +59,20 @@ class Tree:
         """
         Ensure the tree is still correct in structure
         """
-        left = self.getNodes()
-        right = self.nodes
-        middle = self._positionalNodes()
-        if not (compareLists(left, right) and compareLists(left, middle)) :
-            logger.error("Invariant failed")
-            logger.error("getNodes() {}".format(left))
-            logger.error("self.nodes {}".format(right))
-            raise ValueError("Mismatched lists")
-        else:
-            for n in left:
-                if not n.finalized():
-                    logger.error("Node {} has invalid set of children".format(n))
-                    raise ValueError("Invalid tree state")
+        pass
+        #left = self.getNodes()
+        #right = self.nodes
+        #middle = self._positionalNodes()
+        #if not (compareLists(left, right) and compareLists(left, middle)) :
+        #    logger.error("Invariant failed")
+        #    logger.error("getNodes() {}".format(left))
+        #    logger.error("self.nodes {}".format(right))
+        #    raise ValueError("Mismatched lists")
+        #else:
+        #    for n in left:
+        #        if not n.finalized():
+        #            logger.error("Node {} has invalid set of children".format(n))
+        #            raise ValueError("Invalid tree state")
 
     @traceFunction
     def _addNode(self, node: Node, pos: int):
@@ -308,11 +309,11 @@ class Tree:
             return t
         cnt = 0
         while True:
-            #logger.info("making tree {}".format(cnt))
             t= Tree()
             nodes = [t.makeInternalNode(getRandomFunction(rng=_rng), None, None)]
             for i in range(depth):
                 newnodes=[]
+                addnode = newnodes.append
                 for node in nodes:
                     for j in range(node.getArity()):
                         if i >= depth-1:
@@ -325,7 +326,7 @@ class Tree:
                                     child = t.makeConstant(Constant.generateConstant(rng=_rng), node)
                         else:
                             child = t.makeInternalNode(getRandomFunction(rng=_rng), node, None)
-                            newnodes.append(child)
+                            addnode(child)
                 nodes = newnodes
             e = t.evaluateTree()
             if e is None:
@@ -345,6 +346,7 @@ class Tree:
         logger.debug("cfSubtree with args left {} right {} rng {} ".format(left, right, rng))
         if rng is None:
             rng = random.Random()
+        i = 0
         while True:
             seed = rng.randint(0, 0xffffffff)
             t = Tree.makeRandomTree(variables=None, depth=1, rng=rng, tokenLeafs=True)
