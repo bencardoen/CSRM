@@ -1,7 +1,7 @@
 
 from expression.tree import Tree
 from expression.operators import Mutate, Crossover
-from expression.tools import traceFunction
+from expression.tools import traceFunction, randomizedConsume
 from expression.functions import Constants
 from gp.population import Population, SetPopulation
 from expression.node import Variable
@@ -243,18 +243,68 @@ class BruteElitist(GPAlgorithm):
     def evolve(self, selection):
         if len(selection) < 2:
             return selection
-        for i,t in enumerate(selection):
-            # TODO replace only when fitter
-            logger.debug("Evolving {}".format(i))
-            Mutate.mutate(t, variables=self._variables, seed=self.getSeed())
-            logger.debug("Mutation results in {}".format(t.toExpression()))
-            left = t
-            right = selection[self._rng.randint(0, len(selection)-1)]
-            while right == left:
-                right = selection[self._rng.randint(0, len(selection)-1)]
-            logger.debug("Right selected for crossover {}".format(right.toExpression()))
-            Crossover.subtreecrossover(left, right, seed=self.getSeed())
-        return selection
+
+        # Mutation
+        selcount = len(selection)
+        for i in range(selcount):
+            t = selection[i]
+            # Mutation
+            candidate = deepcopy(t)
+            Mutate.mutate(candidate, variables=self._variables, seed=self.getSeed())
+            candidate.scoreTree(self._Y, self._fitnessfunction)
+
+            if candidate.getFitness() < t.getFitness():
+                logger.info("Mutation resulted in improved fitness, replacing")
+                selection[i] = candidate
+
+        # Subtree Crossover
+        # Select 2 random trees, crossover, if better than parent, replace
+            newgen = []
+            selector = randomizedConsume(selection)
+            while selection:
+                left = next(selector)
+                right = next(selector)
+                assert(left != right)
+                lc = deepcopy(left)
+                rc = deepcopy(right)
+                Crossover.subtreecrossover(lc, rc, seed=self.getSeed())
+                lc.scoreTree(self._Y, self._fitnessfunction)
+                rc.scoreTree(self._Y, self._fitnessfunction)
+                if lc.getFitness() < left.getFitness():
+                    logger.info("Crossover resulted in improved fitness, replacing")
+                    newgen.append(lc)
+                else:
+                    newgen.append(left)
+                if rc.getFitness() < left.getFitness():
+                    logger.info("Crossover resulted in improved fitness, replacing")
+                    newgen.append(rc)
+                else:
+                    newgen.append(right)
+            return newgen
+
+#            # Subtree crossover
+#            left = t
+#            leftcandidate = deepcopy(t)
+#
+#            right = selection[self._rng.randint(0, len(selection)-1)]
+#            while right == left:
+#                right = selection[self._rng.randint(0, len(selection)-1)]
+#            rightcandidate = deepcopy(right)
+#
+#            logger.debug("Right selected for crossover {}".format(right.toExpression()))
+#            Crossover.subtreecrossover(leftcandidate, rightcandidate, seed=self.getSeed())
+#
+#            rightcandidate.scoreTree(self._Y, self._fitnessfunction)
+#            leftcandidate.scoreTree(self._Y, self._fitnessfunction)
+#            if leftcandidate.getFitness() < left.getFitness():
+#                left = leftcandidate
+#            if rightcandidate.getFitness() < right.getFitness():
+#                right = rightcandidate
+#
+#            newgen.append(left)
+#            newgen.append(right)
+
+
 
     @traceFunction
     def update(self, modified):
