@@ -54,7 +54,7 @@
 
 
 <span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">msb</span><span class="p">,</span> <span class="n">compareLists</span><span class="p">,</span> <span class="n">traceFunction</span>
-<span class="kn">from</span> <span class="nn">expression.functions</span> <span class="k">import</span> <span class="n">functionset</span><span class="p">,</span> <span class="n">getRandomFunction</span><span class="p">,</span> <span class="n">tokenize</span><span class="p">,</span> <span class="n">infixToPostfix</span><span class="p">,</span> <span class="n">isFunction</span><span class="p">,</span> <span class="n">isOperator</span><span class="p">,</span> <span class="n">infixToPrefix</span>
+<span class="kn">from</span> <span class="nn">expression.functions</span> <span class="k">import</span> <span class="n">functionset</span><span class="p">,</span> <span class="n">getRandomFunction</span><span class="p">,</span> <span class="n">tokenize</span><span class="p">,</span> <span class="n">infixToPostfix</span><span class="p">,</span> <span class="n">isFunction</span><span class="p">,</span> <span class="n">isOperator</span><span class="p">,</span> <span class="n">infixToPrefix</span><span class="p">,</span> <span class="n">Constants</span>
 <span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span>  <span class="n">choice</span><span class="p">,</span> <span class="n">random</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">.node</span> <span class="k">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">ConstantNode</span><span class="p">,</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">VariableNode</span>
@@ -83,8 +83,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">MINFITNESS</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fitnessfunction</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Tree.setDataPointCount"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.setDataPointCount">[docs]</a>    <span class="k">def</span> <span class="nf">setDataPointCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_datapointcount</span> <span class="o">=</span> <span class="n">v</span></div>
+
+<div class="viewcode-block" id="Tree.getDataPointCount"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getDataPointCount">[docs]</a>    <span class="k">def</span> <span class="nf">getDataPointCount</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datapointcount</span></div>
 
 <div class="viewcode-block" id="Tree.getNode"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getNode">[docs]</a>    <span class="k">def</span> <span class="nf">getNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span></div>
@@ -99,19 +105,20 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensure the tree is still correct in structure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNodes</span><span class="p">()</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span>
-        <span class="n">middle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_positionalNodes</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">compareLists</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span> <span class="ow">and</span> <span class="n">compareLists</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">middle</span><span class="p">))</span> <span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invariant failed&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;getNodes() </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">left</span><span class="p">))</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;self.nodes </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">right</span><span class="p">))</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mismatched lists&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">left</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="o">.</span><span class="n">finalized</span><span class="p">():</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Node </span><span class="si">{}</span><span class="s2"> has invalid set of children&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid tree state&quot;</span><span class="p">)</span></div>
+        <span class="k">pass</span></div>
+        <span class="c1">#left = self.getNodes()</span>
+        <span class="c1">#right = self.nodes</span>
+        <span class="c1">#middle = self._positionalNodes()</span>
+        <span class="c1">#if not (compareLists(left, right) and compareLists(left, middle)) :</span>
+        <span class="c1">#    logger.error(&quot;Invariant failed&quot;)</span>
+        <span class="c1">#    logger.error(&quot;getNodes() {}&quot;.format(left))</span>
+        <span class="c1">#    logger.error(&quot;self.nodes {}&quot;.format(right))</span>
+        <span class="c1">#    raise ValueError(&quot;Mismatched lists&quot;)</span>
+        <span class="c1">#else:</span>
+        <span class="c1">#    for n in left:</span>
+        <span class="c1">#        if not n.finalized():</span>
+        <span class="c1">#            logger.error(&quot;Node {} has invalid set of children&quot;.format(n))</span>
+        <span class="c1">#            raise ValueError(&quot;Invalid tree state&quot;)</span>
 
     <span class="nd">@traceFunction</span>
     <span class="k">def</span> <span class="nf">_addNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -153,7 +160,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">n</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_addNode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">n</span></div>
-        
+
     <span class="k">def</span> <span class="nf">_getDatapointCount</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">__iter__</span><span class="p">())][</span><span class="mi">0</span><span class="p">])</span>
@@ -188,40 +195,52 @@
 <span class="sd">        Make a leaf node holding a reference to a variable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Makeleaf with args = v=</span><span class="si">{}</span><span class="s2">, parent=</span><span class="si">{}</span><span class="s2">, cte=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">constant</span><span class="p">))</span>
-        <span class="n">children</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">getChildren</span><span class="p">()</span>
-        <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">children</span><span class="p">:</span>
-            <span class="n">position</span> <span class="o">=</span> <span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">VariableNode</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">n</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_addNode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">n</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">position</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">VariableNode</span><span class="p">(</span> <span class="n">position</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span>
-        <span class="n">parent</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_addNode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">n</span></div>
+            <span class="n">children</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">getChildren</span><span class="p">()</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">children</span><span class="p">:</span>
+                <span class="n">position</span> <span class="o">=</span> <span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">position</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">VariableNode</span><span class="p">(</span> <span class="n">position</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_addNode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">n</span></div>
 
 <div class="viewcode-block" id="Tree.makeConstant"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.makeConstant">[docs]</a>    <span class="k">def</span> <span class="nf">makeConstant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constant</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Node</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Make a leaf node holding a constant</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">children</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">getChildren</span><span class="p">()</span>
-        <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">children</span><span class="p">:</span>
-            <span class="n">position</span> <span class="o">=</span> <span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">ConstantNode</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_addNode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">n</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">position</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">ConstantNode</span><span class="p">(</span> <span class="n">position</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span>
-        <span class="n">parent</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_addNode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">n</span></div>
+            <span class="n">children</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">getChildren</span><span class="p">()</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">children</span><span class="p">:</span>
+                <span class="n">position</span> <span class="o">=</span> <span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">position</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">ConstantNode</span><span class="p">(</span> <span class="n">position</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_addNode</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">n</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;Fitness </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getFitness</span><span class="p">())</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">children</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">getChildren</span><span class="p">()[:]</span>
         <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">gchildren</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
-                <span class="n">output</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span>
                 <span class="n">gchildren</span> <span class="o">+=</span> <span class="n">c</span><span class="o">.</span><span class="n">getChildren</span><span class="p">()[:]</span>
             <span class="n">children</span> <span class="o">=</span> <span class="n">gchildren</span>
             <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -239,28 +258,28 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span></div>
-        
+
 <div class="viewcode-block" id="Tree.evaluateAll"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.evaluateAll">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateAll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            For each data point, evaluate this tree object.</span>
 <span class="sd">            :returns list : list of evaluations</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getVariables</span><span class="p">()</span>
-        <span class="n">dcount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getDatapointCount</span><span class="p">()</span>
         <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dcount</span><span class="p">):</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluateTree</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">dcount</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataPointCount</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dpoint</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluateTree</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">dpoint</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">updateIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">updateIndex</span><span class="p">()</span>
-            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">values</span></div>
-        
+
 <div class="viewcode-block" id="Tree.scoreTree"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.scoreTree">[docs]</a>    <span class="k">def</span> <span class="nf">scoreTree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">distancefunction</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Evaluate a tree w.r.t a distancefucntion.</span>
-<span class="sd">            </span>
+
 <span class="sd">            :param expected: list A set of expected output values for each datapoint.</span>
 <span class="sd">            :param distancefunction: Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -316,49 +335,69 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No Nodes in tree&quot;</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Tree.makeRandomTree"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.makeRandomTree">[docs]</a>    <span class="k">def</span> <span class="nf">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tokenLeafs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Tree.makeRandomTree"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.makeRandomTree">[docs]</a>    <span class="k">def</span> <span class="nf">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tokenLeafs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a random expression tree with a random selection of variables</span>
 <span class="sd">        Topdown construction, there is no guarantee that this construction renders a semantically valid tree</span>
+<span class="sd">        :param tokenLeafs : if set, only use constants</span>
+<span class="sd">        :param limit : raises Exception if no valid tree can be found</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;mkRandomTree with args </span><span class="si">{}</span><span class="s2"> depth </span><span class="si">{}</span><span class="s2"> seed </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">seed</span><span class="p">))</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
-        <span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">_rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">variables</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">_rng</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">makeLeaf</span><span class="p">(</span><span class="n">_rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">variables</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">makeConstant</span><span class="p">(</span><span class="n">Constant</span><span class="o">.</span><span class="n">generateConstant</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">_rng</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">t</span>
         <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">t</span><span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
             <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">makeInternalNode</span><span class="p">(</span><span class="n">getRandomFunction</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">_rng</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">depth</span><span class="p">):</span>
-                <span class="c1"># for all generated nodes in last iteration</span>
                 <span class="n">newnodes</span><span class="o">=</span><span class="p">[]</span>
+                <span class="n">addnode</span> <span class="o">=</span> <span class="n">newnodes</span><span class="o">.</span><span class="n">append</span>
                 <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">getArity</span><span class="p">()):</span>
                         <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">depth</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                             <span class="k">if</span> <span class="n">tokenLeafs</span><span class="p">:</span>
                                 <span class="n">child</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">makeConstant</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">node</span><span class="p">)</span>
                             <span class="k">else</span><span class="p">:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">_rng</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">variables</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="p">(</span><span class="n">_rng</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">variables</span><span class="p">:</span><span class="c1"># todo bias features</span>
                                     <span class="n">child</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">makeLeaf</span><span class="p">(</span><span class="n">_rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">variables</span><span class="p">),</span> <span class="n">node</span><span class="p">)</span>
                                 <span class="k">else</span><span class="p">:</span>
                                     <span class="n">child</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">makeConstant</span><span class="p">(</span><span class="n">Constant</span><span class="o">.</span><span class="n">generateConstant</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">_rng</span><span class="p">),</span> <span class="n">node</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">child</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">makeInternalNode</span><span class="p">(</span><span class="n">getRandomFunction</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">_rng</span><span class="p">),</span> <span class="n">node</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                            <span class="n">newnodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+                            <span class="n">addnode</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
                 <span class="n">nodes</span> <span class="o">=</span> <span class="n">newnodes</span>
             <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateTree</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">e</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Invalid result for generated random tree, retrying, attempt </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cnt</span><span class="p">))</span>
                 <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">cnt</span> <span class="o">&gt;=</span> <span class="n">limit</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid iteration count&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">setDataPointCount</span><span class="p">(</span><span class="n">dpoint</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">t</span></div>
 
     <span class="nd">@staticmethod</span>
-    <span class="nd">@traceFunction</span>
-<div class="viewcode-block" id="Tree.constructFromSubtrees"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.constructFromSubtrees">[docs]</a>    <span class="k">def</span> <span class="nf">constructFromSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;cfSubtree with args left </span><span class="si">{}</span><span class="s2"> right </span><span class="si">{}</span><span class="s2"> seed </span><span class="si">{}</span><span class="s2"> rng </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">rng</span><span class="p">))</span>
+<div class="viewcode-block" id="Tree.constructFromSubtrees"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.constructFromSubtrees">[docs]</a>    <span class="k">def</span> <span class="nf">constructFromSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Construct a valid tree from left and right subtrees.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;cfSubtree with args left </span><span class="si">{}</span><span class="s2"> right </span><span class="si">{}</span><span class="s2"> rng </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">rng</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span> <span class="n">tokenLeafs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">seed</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span> <span class="n">tokenLeafs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">dl</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">getDataPointCount</span><span class="p">()</span>
+            <span class="n">dr</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="n">getDataPointCount</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">getRoot</span><span class="p">()</span><span class="o">.</span><span class="n">getArity</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">t</span><span class="o">.</span><span class="n">spliceSubTree</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">left</span><span class="o">.</span><span class="n">getRoot</span><span class="p">())</span>
                 <span class="n">t</span><span class="o">.</span><span class="n">spliceSubTree</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">right</span><span class="o">.</span><span class="n">getRoot</span><span class="p">())</span>
@@ -368,60 +407,57 @@
             <span class="k">if</span> <span class="n">e</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Invalid evaluation of tree, retrying&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">setDataPointCount</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="n">dr</span><span class="p">))</span>
                 <span class="k">return</span> <span class="n">t</span></div>
 
 
     <span class="nd">@staticmethod</span>
-    <span class="nd">@traceFunction</span>
-<div class="viewcode-block" id="Tree.growTree"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.growTree">[docs]</a>    <span class="k">def</span> <span class="nf">growTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Tree.growTree"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.growTree">[docs]</a>    <span class="k">def</span> <span class="nf">growTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Grow a tree up to depth, with optional seed for the rng.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Tree</span><span class="o">.</span><span class="n">_growTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Tree</span><span class="o">.</span><span class="n">_growTree</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_growTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">left</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">right</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">left</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
-            <span class="n">right</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">left</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">_growTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
             <span class="n">right</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">_growTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
-        <span class="n">root</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">constructFromSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">constructFromSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">root</span>
 
 
     <span class="nd">@traceFunction</span>
-<div class="viewcode-block" id="Tree.getRandomNode"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getRandomNode">[docs]</a>    <span class="k">def</span> <span class="nf">getRandomNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Tree.getRandomNode"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getRandomNode">[docs]</a>    <span class="k">def</span> <span class="nf">getRandomNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a randomly selected node from this tree</span>
 <span class="sd">        If parameter depth is set, select only nodes at that depth</span>
 <span class="sd">        The returned node is never root.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">rng</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">r</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">lower</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">depth</span><span class="p">:</span>
-            <span class="c1"># We know our repr is a binary try, with depth slices equal in length to 2^k where k is depth</span>
+            <span class="c1"># We know our repr is a binary tree, with depth slices equal in length to 2^k where k is depth</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">depth</span> <span class="o">&lt;</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
             <span class="n">lower</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">depth</span><span class="o">-</span><span class="mi">1</span>
             <span class="n">upper</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">))</span>
-            <span class="n">node</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">while</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">i</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">upper</span><span class="p">)</span>
-                <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">node</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">node</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">while</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">i</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">))</span>
-                <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">node</span></div>
+        <span class="n">node</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">while</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">upper</span><span class="p">)</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span></div>
 
 <div class="viewcode-block" id="Tree.setModified"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.setModified">[docs]</a>    <span class="k">def</span> <span class="nf">setModified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="o">=</span> <span class="n">v</span></div>
@@ -569,7 +605,7 @@
                 <span class="n">variable</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">variable</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
-                
+
 <div class="viewcode-block" id="Tree.getRoot"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getRoot">[docs]</a>    <span class="k">def</span> <span class="nf">getRoot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span></div>
@@ -580,11 +616,14 @@
 <span class="sd">        Given two trees, pick random subtree roots and swap them between the trees.</span>
 <span class="sd">        Will swap out subtrees at equal depth.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">leftsubroot</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">getRandomNode</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">leftsubroot</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">getRandomNode</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">leftv</span> <span class="o">=</span> <span class="n">leftsubroot</span><span class="o">.</span><span class="n">getVariables</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Selected left node </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">leftsubroot</span><span class="p">))</span>
 
-        <span class="n">rightsubroot</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="n">getRandomNode</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="p">(</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">seed</span> <span class="k">else</span> <span class="n">seed</span><span class="p">),</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span>
+        <span class="n">rightsubroot</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="n">getRandomNode</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">rightv</span> <span class="o">=</span> <span class="n">rightsubroot</span><span class="o">.</span><span class="n">getVariables</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Selected right node </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rightsubroot</span><span class="p">))</span>
 
@@ -605,6 +644,9 @@
 <span class="sd">        Given an infix expression containing floats, operators, function defined in functions.functionset,</span>
 <span class="sd">        create a corresponding expression tree.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">variables</span><span class="p">:</span>
+            <span class="n">dpoint</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">pfix</span> <span class="o">=</span> <span class="n">infixToPrefix</span><span class="p">(</span><span class="n">tokenize</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">variables</span><span class="p">))</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
         <span class="n">lastnode</span> <span class="o">=</span> <span class="kc">None</span>
@@ -625,6 +667,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">break</span>
         <span class="n">result</span><span class="o">.</span><span class="n">testInvariant</span><span class="p">()</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">setDataPointCount</span><span class="p">(</span><span class="n">dpoint</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
 

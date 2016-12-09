@@ -15,6 +15,13 @@ logger = logging.getLogger('global')
 
 
 class GPAlgorithm():
+    """
+        A base class representing a Genetic Programming Algorithm instance.
+
+        The base class is responsible for data structures, configuration and control flow.
+
+        In itself it will not evolve a solution.
+    """
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None, history = None):
         """
         Initializes a forest of trees randomly constructed.
@@ -25,6 +32,7 @@ class GPAlgorithm():
         :param int maxdepth: the maximum depth a tree is initialized to
         :param int generations: generations to iterate
         :param int seed: seed value for the rng used in tree construction
+        :param int archivesize: size of the archive used between runs to store best-of-generation samples, which are in turn reused in next runs
         """
         # Sorted set of trees by fitness value
         self._population = SetPopulation(key=lambda _tree : _tree.getFitness())
@@ -49,6 +57,10 @@ class GPAlgorithm():
         self._history = history or 5
 
     def getSeed(self):
+        """
+            Retrieve seed, and modify it for the next call.
+            Seed is in [0, 0xffffffff]
+        """
         logger.debug("Retrieving seed {}".format(self._seed))
         s = self._seed
         if s is None:
@@ -104,6 +116,11 @@ class GPAlgorithm():
             self.addRandomTree()
 
     def addRandomTree(self):
+        """
+            Create a random tree using this algorithm's configuration.
+
+            The generated tree is guaranteed to be viable (i.e. has a non inf fitness)
+        """
         t = Tree.growTree(self._variables, self._maxdepth, rng=self._rng)
         t.scoreTree(self._Y, self._fitnessfunction)
         i = 0
@@ -123,12 +140,15 @@ class GPAlgorithm():
         return self._variables
 
     def printForestToDot(self, prefix):
+        """
+            Write out the entire population to .dot files with prefix
+        """
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
     def summarizeGeneration(self, replacementcount, generation):
         """
-            Compute fitness statistics for the current generation
+            Compute fitness statistics for the current generation and record them
         """
         fit = [d.getFitness() for d in self._population]
         mean = numpy.mean(fit)
@@ -140,10 +160,16 @@ class GPAlgorithm():
         return mean, sd, v, fit
 
     def setTrace(self, v, prefix):
+        """
+            Enables generation per generation tracing (e.g. writing to dot)
+        """
         self._trace = v
         self._prefix = prefix
 
     def printForest(self):
+        """
+            Write out population in ASCII
+        """
         print(str(self._population))
 
     def reseed(self):
@@ -164,6 +190,11 @@ class GPAlgorithm():
     def run(self):
         """
         Main algorithm loop. Evolve population through generations.
+
+        This loop is the main control flow of the algorithm, subclasses can simply override
+        called methods to alter behavior
+
+        Each call reset convergence statistics.
         """
         self.resetConvergenceStats()
         for i in range(self._generations):
@@ -204,7 +235,7 @@ class GPAlgorithm():
 
     def evaluate(self, sel=None):
         """
-            Recalculate the fitness of the population if sel == None, else the selection.
+        Recalculate the fitness of the population if sel == None, else the selection.
         """
         if sel is None:
             sel = self._population
@@ -218,8 +249,9 @@ class GPAlgorithm():
     def evolve(self, selection):
         """
         Evolve a selected set of the population, applying a set of operators.
+
         :param list selection: a subset of the population selected
-        :return tuple modified: a tuple of modified selection and changes made
+        :return tuple modified: a tuple of modified samples based on selection, and changes made
         """
         self.evaluate(selection)
         return selection, 0
@@ -229,6 +261,7 @@ class GPAlgorithm():
     def update(self, modified):
         """
         Process the new generation.
+        At the very least, add modified back to population based on a condition.
         """
         self.evaluate(modified)
         for i in modified:
@@ -244,11 +277,20 @@ class GPAlgorithm():
 
 
     def addToArchive(self, t):
+        """
+        Add t to the archive and truncate worst if necessary.
+        """
         self._archive.add(t)
         if len(self._archive) > self._archivesize:
             self._archive.popLast()
 
 class BruteElitist(GPAlgorithm):
+    """
+        Brute force Elitist GP Variant.
+
+        Applies mutation and subtree crossover to entire population and aggresively
+        replaces unfit samples.
+    """
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed)
 
@@ -260,6 +302,11 @@ class BruteElitist(GPAlgorithm):
 
     @traceFunction
     def evolve(self, selection):
+        """
+            Apply mutation on each sample, replacing if fitter
+            Apply subtree crossover using random selection of pairs, replacing if fitter.
+        """
+        # TODO add hook to replacement strategy
         l = len(selection)
         assert(l == self._popsize)
         if len(selection) < 2:
@@ -308,11 +355,15 @@ class BruteElitist(GPAlgorithm):
 
     @traceFunction
     def update(self, modified):
+        """
+            Add modified samples back to population, if needed fill population.
+        """
         for t in modified:
             self.addTree(t)
         remcount = self._popsize - len(modified)
         logger.debug("Adding {} new random trees".format(remcount))
         for _ in range(remcount):
+            # Use archive here with probability ?
             self.addRandomTree()
 
     def stopCondition(self):
@@ -330,6 +381,9 @@ class BruteElitist(GPAlgorithm):
 
     @traceFunction
     def archive(self, modified):
+        """
+            Simple archiving strategy, get best of generation and store.
+        """
         t = self.getBestTree()
         t = deepcopy(t)
         self._archive.add(t)
