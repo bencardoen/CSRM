@@ -61,7 +61,7 @@ class GPTest(unittest.TestCase):
 
     def testInitialization(self):
         X = generateVariables(3,3,seed=0)
-        Y = []
+        Y = [ 0 for d in range(3)]
         g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.printForestToDot(outputfolder + "forest")
 

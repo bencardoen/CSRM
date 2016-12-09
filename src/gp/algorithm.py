@@ -89,13 +89,15 @@ class GPAlgorithm():
             self.addRandomTree()
 
     def addRandomTree(self):
-        t = Tree.growTree(self._variables, self._maxdepth, self.getSeed())
+        t = Tree.growTree(self._variables, self._maxdepth, rng=self._rng)
         t.scoreTree(self._Y, self._fitnessfunction)
         i = 0
         while t.getFitness() == Constants.MINFITNESS:
-            print("Attempt {}".format(i))
-            t = Tree.growTree(self._variables, self._maxdepth, self.getSeed())
+            seed = self.getSeed()
+            assert(self._variables)
+            t = Tree.growTree(self._variables, self._maxdepth, rng=self._rng)
             t.scoreTree(self._Y, self._fitnessfunction)
+            logger.debug("Attempt {} with seed {} and t {}  and t {}".format(i, seed, t.getFitness(), t))
             i += 1
         self.addTree(t)
 
@@ -148,11 +150,11 @@ class GPAlgorithm():
         """
         for i in range(self._generations):
             logger.info("Generation {}".format(i))
-            logger.info("\nSelection\n")
+            logger.info("\tSelection")
             selected = self.select()
-            logger.info("\nEvolution\n")
+            logger.info("\tEvolution")
             modified = self.evolve(selected)
-            logger.info("\nUpdate\n")
+            logger.info("\tUpdate")
             self.update(modified)
             self.summarizeGeneration()
             if self.stopCondition():
@@ -160,7 +162,7 @@ class GPAlgorithm():
             self.testInvariant()
             if self._trace:
                 self.printForestToDot(self._prefix + "generation_{}_".format(i))
-        logger.info("\nArchival\n")
+        logger.info("\tArchival")
         self.archive(modified)
         self.reseed()
 
@@ -242,6 +244,7 @@ class BruteElitist(GPAlgorithm):
         if len(selection) < 2:
             return selection
         for i,t in enumerate(selection):
+            # TODO replace only when fitter
             logger.debug("Evolving {}".format(i))
             Mutate.mutate(t, variables=self._variables, seed=self.getSeed())
             logger.debug("Mutation results in {}".format(t.toExpression()))
@@ -250,7 +253,7 @@ class BruteElitist(GPAlgorithm):
             while right == left:
                 right = selection[self._rng.randint(0, len(selection)-1)]
             logger.debug("Right selected for crossover {}".format(right.toExpression()))
-            Crossover.subtreecrossover(left, right, seed=self.getSeed()) # TODO depth
+            Crossover.subtreecrossover(left, right, seed=self.getSeed())
         return selection
 
     @traceFunction
@@ -264,7 +267,7 @@ class BruteElitist(GPAlgorithm):
                 assert(t.getFitness() != Constants.MINFITNESS)
                 self.addTree(t)
         remcount = self._popsize - len(self._population)
-        logger.info("Adding {} new random trees".format(remcount))
+        logger.debug("Adding {} new random trees".format(remcount))
         for _ in range(remcount):
             self.addRandomTree()
 

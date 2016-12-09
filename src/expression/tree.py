@@ -366,14 +366,12 @@ class Tree:
 
 
     @staticmethod
-    def growTree(variables, depth: int, seed=None, rng=None):
+    def growTree(variables, depth: int, rng=None):
         """
         Grow a tree up to depth, with optional seed for the rng.
         """
         if rng is None:
             rng = random.Random()
-        if seed is not None:
-            rng.seed(seed)
         if depth <= 1:
             return Tree.makeRandomTree(variables=variables, depth=depth, rng=rng)
         return Tree._growTree(variables=variables, depth=depth, rng=rng)
@@ -393,31 +391,27 @@ class Tree:
 
 
     @traceFunction
-    def getRandomNode(self, seed = None, depth = None):
+    def getRandomNode(self, seed = None, depth = None, rng=None):
         """
         Return a randomly selected node from this tree
         If parameter depth is set, select only nodes at that depth
         The returned node is never root.
         """
-        r = random.Random()
+        r = rng or random.Random()
         if seed is not None:
             r.seed(seed)
+        lower = 1
+        upper = len(self.nodes)
         if depth:
-            # We know our repr is a binary try, with depth slices equal in length to 2^k where k is depth
+            # We know our repr is a binary tree, with depth slices equal in length to 2^k where k is depth
             assert(depth < math.log(len(self.nodes)+1, 2))
             lower = 2**depth-1
             upper = min(2**(depth+1)-1, len(self.nodes))
-            node = None
-            while node is None:
-                i = r.randrange(max(lower,1), upper)
-                node = self.getNode(i)
-            return node
-        else:
-            node = None
-            while node is None:
-                i = r.randrange(1, len(self.nodes))
-                node = self.getNode(i)
-            return node
+        node = None
+        while node is None:
+            i = r.randrange(max(lower,1), upper)
+            node = self.getNode(i)
+        return node
 
     def setModified(self, v):
         self.modified = v
@@ -576,11 +570,14 @@ class Tree:
         Given two trees, pick random subtree roots and swap them between the trees.
         Will swap out subtrees at equal depth.
         """
-        leftsubroot = left.getRandomNode(seed=seed, depth=depth)
+        rng = random.Random()
+        if seed is not None:
+            rng.seed(seed)
+        leftsubroot = left.getRandomNode(seed=None, depth=depth, rng=rng)
         leftv = leftsubroot.getVariables()
         logger.debug("Selected left node {}".format(leftsubroot))
 
-        rightsubroot = right.getRandomNode(seed=(seed + 1 if seed else seed), depth=depth)
+        rightsubroot = right.getRandomNode(seed=None, depth=depth, rng=rng)
         rightv = rightsubroot.getVariables()
         logger.debug("Selected right node {}".format(rightsubroot))
 

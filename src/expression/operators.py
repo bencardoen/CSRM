@@ -31,7 +31,7 @@ class Mutate():
         """
         rng = random.Random()
         rng.seed(seed)
-        insertpoint = tr.getRandomNode(seed)
+        insertpoint = tr.getRandomNode(rng=rng)
         d = tr.getDepth()
         depth_at_i = insertpoint.getDepth()
         targetdepth = d - depth_at_i
@@ -40,7 +40,7 @@ class Mutate():
         if variables is None:
             vs = variables or tr.getVariables()
             variables= [v[0] for k,v in vs.items()]
-        subtree = Tree.growTree(variables=variables, depth=targetdepth, seed=None, rng=rng)
+        subtree = Tree.growTree(variables=variables, depth=targetdepth, rng=rng)
         tr.spliceSubTree(insertpoint, subtree.getRoot())
         tr._mergeVariables(subtree.getVariables())
 

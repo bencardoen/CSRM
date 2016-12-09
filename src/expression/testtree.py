@@ -578,14 +578,18 @@ class TreeTest(unittest.TestCase):
 
     def testGrowTreeDeep(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        t = Tree.growTree(variables, depth=9, seed=1)
+        rng = random.Random()
+        rng.seed(0)
+        t = Tree.growTree(variables, depth=9, rng=rng)
         t.printToDot(outputfolder+"t35Grown.dot")
         e = t.evaluateTree()
-        self.assertEqual(e, 30.90267074966982)
+        self.assertEqual(e, 3108.4668090265263)
 
     def testGrowTree(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        t = Tree.growTree(variables, depth=3, seed=0)
+        rng = random.Random()
+        rng.seed(0)
+        t = Tree.growTree(variables, depth=3, rng=rng)
         t.printToDot(outputfolder+"t36Grown.dot")
         e = t.evaluateTree()
         self.assertNotEqual(e, None)
@@ -625,18 +629,18 @@ class TreeTest(unittest.TestCase):
 
     def testRegression(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        logger.info("Testing GT")
-        t = Tree.growTree(variables, depth=10, seed=1)
-        logger.info("Testing MK")
-        e = t.evaluateTree()
         rng = random.Random()
         rng.seed(0)
+        t = Tree.growTree(variables, depth=10, rng=rng)
+        e = t.evaluateTree()
         t = Tree.makeRandomTree(variables, depth=10, rng=rng)
         e = t.evaluateTree()
 
     def testMutateGrow(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        t = Tree.growTree(variables, depth=0, seed=1)
+        rng = random.Random()
+        rng.seed(0)
+        t = Tree.growTree(variables, depth=0, rng=rng)
         rng = random.Random()
         rng.seed(0)
         t = Tree.makeRandomTree(variables, depth=1, rng=rng)
