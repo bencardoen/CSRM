@@ -15,7 +15,7 @@ logger = logging.getLogger('global')
 
 
 class GPAlgorithm():
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None, history = None):
         """
         Initializes a forest of trees randomly constructed.
 
@@ -44,6 +44,9 @@ class GPAlgorithm():
         self._archive = SetPopulation(key=lambda _tree : _tree.getFitness())
         self._generations = generations
         self._archivesize = archivesize or self._popsize
+        # List of generation : tuple of stats
+        self._convergencestats = []
+        self._history = history or 5
 
     def getSeed(self):
         logger.debug("Retrieving seed {}".format(self._seed))
@@ -52,6 +55,18 @@ class GPAlgorithm():
             return None
         self._seed = self._rng.randint(0, 0xffffffff)
         return s
+
+    def addConvergenceStat(self, generation, stat):
+        if len(self._convergencestats) <= generation:
+            self._convergencestats.append(stat)
+        else:
+            self._convergencestats[generation] = stat
+
+    def getConvergenceStat(self, generation):
+        return self._convergencestats[generation]
+
+    def resetConvergenceStats(self):
+        self._convergencestats = []
 
     def _initialize(self):
         vlist = []
@@ -111,7 +126,7 @@ class GPAlgorithm():
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
-    def summarizeGeneration(self):
+    def summarizeGeneration(self, replacementcount, generation):
         """
             Compute fitness statistics for the current generation
         """
@@ -120,8 +135,9 @@ class GPAlgorithm():
         sd = numpy.std(fit)
         v = numpy.var(fit)
         sfit =  "".join('{:.2f}, '.format(d) for d in fit)
-        logger.info("Fitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {}".format(sfit, mean, sd, v))
-        return fit
+        logger.info("Generation {} SUMMARY:: Fitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, sfit, mean, sd, v, replacementcount))
+        self.addConvergenceStat(generation, {"mean":mean, "sd":sd, "var":v, "replacements":replacementcount})
+        return mean, sd, v, fit
 
     def setTrace(self, v, prefix):
         self._trace = v
@@ -144,20 +160,23 @@ class GPAlgorithm():
             self.addRandomTree()
         logger.info("Reseeding using archive {}".format(archived))
 
+
     def run(self):
         """
         Main algorithm loop. Evolve population through generations.
         """
+        self.resetConvergenceStats()
         for i in range(self._generations):
-            logger.info("Generation {}".format(i))
-            logger.info("\tSelection")
+            logger.debug("Generation {}".format(i))
+            logger.debug("\tSelection")
             selected = self.select()
-            logger.info("\tEvolution")
-            modified = self.evolve(selected)
-            logger.info("\tUpdate")
+            logger.debug("\tEvolution")
+            modified, count = self.evolve(selected)
+            logger.debug("\tUpdate")
             self.update(modified)
-            self.summarizeGeneration()
+            self.summarizeGeneration(count, generation=i)
             if self.stopCondition():
+                logger.info("Stop condition triggered")
                 break
             self.testInvariant()
             if self._trace:
@@ -200,10 +219,10 @@ class GPAlgorithm():
         """
         Evolve a selected set of the population, applying a set of operators.
         :param list selection: a subset of the population selected
-        :return list modified: a subset of modified specimens
+        :return tuple modified: a tuple of modified selection and changes made
         """
         self.evaluate(selection)
-        return selection
+        return selection, 0
 
 
     @traceFunction
@@ -241,9 +260,11 @@ class BruteElitist(GPAlgorithm):
 
     @traceFunction
     def evolve(self, selection):
+        l = len(selection)
+        assert(l == self._popsize)
         if len(selection) < 2:
             return selection
-
+        replacementcount = 0
         # Mutation
         selcount = len(selection)
         for i in range(selcount):
@@ -254,72 +275,58 @@ class BruteElitist(GPAlgorithm):
             candidate.scoreTree(self._Y, self._fitnessfunction)
 
             if candidate.getFitness() < t.getFitness():
-                logger.info("Mutation resulted in improved fitness, replacing")
+                logger.debug("Mutation resulted in improved fitness, replacing")
                 selection[i] = candidate
+                replacementcount += 1
 
         # Subtree Crossover
         # Select 2 random trees, crossover, if better than parent, replace
-            newgen = []
-            selector = randomizedConsume(selection)
-            while selection:
-                left = next(selector)
-                right = next(selector)
-                assert(left != right)
-                lc = deepcopy(left)
-                rc = deepcopy(right)
-                Crossover.subtreecrossover(lc, rc, seed=self.getSeed())
-                lc.scoreTree(self._Y, self._fitnessfunction)
-                rc.scoreTree(self._Y, self._fitnessfunction)
-                if lc.getFitness() < left.getFitness():
-                    logger.info("Crossover resulted in improved fitness, replacing")
-                    newgen.append(lc)
-                else:
-                    newgen.append(left)
-                if rc.getFitness() < left.getFitness():
-                    logger.info("Crossover resulted in improved fitness, replacing")
-                    newgen.append(rc)
-                else:
-                    newgen.append(right)
-            return newgen
-
-#            # Subtree crossover
-#            left = t
-#            leftcandidate = deepcopy(t)
-#
-#            right = selection[self._rng.randint(0, len(selection)-1)]
-#            while right == left:
-#                right = selection[self._rng.randint(0, len(selection)-1)]
-#            rightcandidate = deepcopy(right)
-#
-#            logger.debug("Right selected for crossover {}".format(right.toExpression()))
-#            Crossover.subtreecrossover(leftcandidate, rightcandidate, seed=self.getSeed())
-#
-#            rightcandidate.scoreTree(self._Y, self._fitnessfunction)
-#            leftcandidate.scoreTree(self._Y, self._fitnessfunction)
-#            if leftcandidate.getFitness() < left.getFitness():
-#                left = leftcandidate
-#            if rightcandidate.getFitness() < right.getFitness():
-#                right = rightcandidate
-#
-#            newgen.append(left)
-#            newgen.append(right)
+        newgen = []
+        selector = randomizedConsume(selection, seed=self.getSeed())
+        while selection:
+            left = next(selector)
+            right = next(selector)
+            assert(left != right)
+            lc = deepcopy(left)
+            rc = deepcopy(right)
+            Crossover.subtreecrossover(lc, rc, seed=self.getSeed())
+            lc.scoreTree(self._Y, self._fitnessfunction)
+            rc.scoreTree(self._Y, self._fitnessfunction)
+            scores = [left, right, lc, rc]
+            best = sorted(scores, key = lambda t : t.getFitness())[0:2]
+            if lc in best:
+                logger.info("Crossover resulted in improved fitness, replacing")
+                replacementcount += 1
+            if rc in best:
+                logger.info("Crossover resulted in improved fitness, replacing")
+                replacementcount += 1
+            newgen += best
+        assert(len(newgen) == l)
+        return newgen, replacementcount
 
 
 
     @traceFunction
     def update(self, modified):
         for t in modified:
-            oldfit = t.getFitness()
-            t.scoreTree(self._Y, self._fitnessfunction)
-            newfit = t.getFitness()
-            logger.debug("Updating \n{}n with fitness {} ---> {}".format(t.toExpression().replace(" ",""), oldfit, newfit))
-            if newfit != Constants.MINFITNESS:
-                assert(t.getFitness() != Constants.MINFITNESS)
-                self.addTree(t)
-        remcount = self._popsize - len(self._population)
+            self.addTree(t)
+        remcount = self._popsize - len(modified)
         logger.debug("Adding {} new random trees".format(remcount))
         for _ in range(remcount):
             self.addRandomTree()
+
+    def stopCondition(self):
+        """
+            Stop if the last @history generation no replacements could be made
+        """
+        generations = len(self._convergencestats)
+        if generations < self._history:
+            # not enough data
+            return False
+        for i in range(self._history):
+            if self.getConvergenceStat(generations-i-1)['replacements'] != 0:
+                return False
+        return True
 
     @traceFunction
     def archive(self, modified):

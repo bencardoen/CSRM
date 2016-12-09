@@ -115,11 +115,12 @@ class GPTest(unittest.TestCase):
         Y = [ 0 for d in range(3)]
         logger.debug("Y {} X {}".format(Y, X))
         logger.info("Starting BE algorithm")
-        g = BruteElitist(X, Y, popsize=10, maxdepth=6, fitnessfunction=_fit, seed=0, generations=10)
-        g.setTrace(True, outputfolder)
+        g = BruteElitist(X, Y, popsize=10, maxdepth=8, fitnessfunction=_fit, seed=0, generations=20)
+#        g.setTrace(True, outputfolder)
         g.run()
-        g.printForestToDot(outputfolder+"prefix")
+        g.printForestToDot(outputfolder+"firstresult")
         g.run()
+        g.printForestToDot(outputfolder+"secondresult")
 
 
 
