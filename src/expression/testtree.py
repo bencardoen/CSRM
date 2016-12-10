@@ -278,7 +278,7 @@ class TreeTest(unittest.TestCase):
         tnew.makeConstant(Constant(0.6), tr)
         tnew.makeConstant(Constant(0.3), tr)
         expr = tnew.toExpression()
-        expected = "( ( min( 5, 6 ) ) ** ( log( 0.6, 0.3 ) ) )"
+        expected = "( ( min( x0, x0 ) ) ** ( log( 0.6, 0.3 ) ) )"
         self.assertEqual(expected, expr)
 
 

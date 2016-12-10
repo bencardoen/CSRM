@@ -88,7 +88,7 @@ def matchVariable(expr: str):
     else:
         return None
 
-def generateVariables(varcount: int, datacount: int, seed: int):
+def generateVariables(varcount: int, datacount: int, seed: int, sort=False):
     """
     Generate a list of datapoints.
 
@@ -100,6 +100,9 @@ def generateVariables(varcount: int, datacount: int, seed: int):
     rng = random.Random()
     rng.seed(seed)
     result = [ [rng.random() for d in range(datacount)] for x in range(varcount)]
+    if sort:
+        for i in range(len(result)):
+            result[i].sort()
     return result
 
 def traceFunction(fn=None, logcall=None):
@@ -179,7 +182,7 @@ def randomizedConsume(lst, seed=None):
         lst[pos] = lst[-1]
         del lst[-1]
         yield item
-        
+
 
 def permutate(lst, seed=None):
     """

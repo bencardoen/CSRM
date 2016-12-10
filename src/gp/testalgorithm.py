@@ -19,6 +19,7 @@ from gp.algorithm import GPAlgorithm, BruteElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
 from expression.tree import Tree
 from expression.node import Variable
+from expression.functions import testfunctions
 from operator import neg
 logger = logging.getLogger('global')
 outputfolder = "../output/"
@@ -125,18 +126,31 @@ class GPTest(unittest.TestCase):
     def testBruteElitistExtended(self):
         rng = random.Random()
         rng.seed(0)
-        dpoint = 100
+        dpoint = 20
         vpoint = 3
         X = generateVariables(vpoint,dpoint,seed=0)
         print(X)
         Y = [ rng.random() for d in range(dpoint)]
         logger.debug("Y {} X {}".format(Y, X))
         logger.info("Starting BE algorithm")
-        g = BruteElitist(X, Y, popsize=20, maxdepth=6, fitnessfunction=_fit, seed=0, generations=20)
+        g = BruteElitist(X, Y, popsize=20, maxdepth=6, fitnessfunction=_fit, seed=0, generations=10)
         g.run()
         g.printForestToDot(outputfolder+"firstresult_extended")
         #g.run()
         #g.printForestToDot(outputfolder+"secondresult_extended")
+
+    def testBmark(self):
+        expr = testfunctions[1]
+        dpoint = 10
+        vpoint = 5
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True)
+        t = Tree.createTreeFromExpression(expr, X)
+        e = t.evaluateTree()
+        Y = t.evaluateAll()
+        g = BruteElitist(X, Y, popsize=30, maxdepth=5, fitnessfunction=_fit, seed=0, generations=10)
+        g.run()
+        g.printForestToDot(outputfolder+"bmark")
+
 
 
 

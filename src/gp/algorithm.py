@@ -331,7 +331,7 @@ class BruteElitist(GPAlgorithm):
             candidate.scoreTree(self._Y, self._fitnessfunction)
 
             if candidate.getFitness() < t.getFitness():
-                logger.debug("Mutation resulted in improved fitness, replacing")
+#                logger.debug("Mutation resulted in improved fitness, replacing")
                 selection[i] = candidate
                 replacementcount += 1
 
@@ -351,10 +351,10 @@ class BruteElitist(GPAlgorithm):
             scores = [left, right, lc, rc]
             best = sorted(scores, key = lambda t : t.getFitness())[0:2]
             if lc in best:
-                logger.info("Crossover resulted in improved fitness, replacing")
+#                logger.info("Crossover resulted in improved fitness, replacing")
                 replacementcount += 1
             if rc in best:
-                logger.info("Crossover resulted in improved fitness, replacing")
+#                logger.info("Crossover resulted in improved fitness, replacing")
                 replacementcount += 1
             newgen += best
         assert(len(newgen) == l)
@@ -386,6 +386,7 @@ class BruteElitist(GPAlgorithm):
         for i in range(self._history):
             if self.getConvergenceStat(generations-i-1, self._run)['replacements'] != 0:
                 return False
+        # Add more measures
         return True
 
     @traceFunction

@@ -150,7 +150,8 @@ class Node:
             else :
                 return "( {}( {} ) )".format(frepr, left)
         else:
-            return str(node.evaluate())
+            return str(node.expr())
+#            return str(node.evaluate())
 
 
     def __hash__(self):
@@ -179,6 +180,9 @@ class Node:
             if v:
                 vs.append(v)
         return vs
+
+    def expr(self):
+        raise NotImplementedError
 
 
 class Constant():
@@ -309,6 +313,9 @@ class VariableNode(Node):
             return result
         return not result
 
+    def expr(self):
+        return "x{}".format(self.getVariable().getIndex())
+
 
 class ConstantNode(Node):
     """
@@ -343,3 +350,6 @@ class ConstantNode(Node):
         if result is NotImplemented:
             return result
         return not result
+
+    def expr(self):
+        return self.evaluate()
