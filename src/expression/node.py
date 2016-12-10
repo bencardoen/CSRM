@@ -186,6 +186,8 @@ class Node:
 
 
 class Constant():
+    CONSTANTLOWER = 0
+    CONSTANTUPPER = 1
     def __init__(self, value):
         self._value = value
 
@@ -202,13 +204,13 @@ class Constant():
         return "Constant c = {}".format(self._value)
 
     @staticmethod
-    def generateConstant(lower=0, upper=1, seed=None, rng = None):
+    def generateConstant(seed=None, rng = None):
         """
             Generate a Constant object with value [lower, upper) by randomgenerator
         """
         _rng = rng or random.Random()
         if seed is not None: _rng.seed(seed)
-        return Constant(lower + _rng.random()*(upper-lower))
+        return Constant(Constant.CONSTANTLOWER + _rng.random()*(Constant.CONSTANTUPPER-Constant.CONSTANTLOWER))
 
 
 class Variable():

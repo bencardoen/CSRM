@@ -314,29 +314,30 @@ class BruteElitist(GPAlgorithm):
             Apply mutation on each sample, replacing if fitter
             Apply subtree crossover using random selection of pairs, replacing if fitter.
         """
-        # TODO add hook to replacement strategy
         l = len(selection)
         assert(l == self._popsize)
         if len(selection) < 2:
             return selection
         replacementcount = 0
-        # Mutation
+        # Mutation works only if the specimen is far from an optimal fitness, it is too invasive and not guided, as well as horrendously expensive.
         selcount = len(selection)
         rng = self._rng
-        for i in range(selcount):
+        for i in range(selcount//2, selcount):
             t = selection[i]
-            # Mutation
             candidate = deepcopy(t)
             Mutate.mutate(candidate, variables=self._variables, seed=None, rng=rng)
             candidate.scoreTree(self._Y, self._fitnessfunction)
 
             if candidate.getFitness() < t.getFitness():
-#                logger.debug("Mutation resulted in improved fitness, replacing")
+                logger.info("Mutation resulted in improved fitness, replacing {}".format(i))
                 selection[i] = candidate
                 replacementcount += 1
 
         # Subtree Crossover
         # Select 2 random trees, crossover, if better than parent, replace
+        # Crossover disseminates potentially 'good' subtrees, at the cost of diversity
+        # Experiments with only applying it to the best specimens increase mean fitness
+        # Both fit and unfit individuals benefit from crossbreeding.
         newgen = []
         selector = randomizedConsume(selection, seed=self.getSeed())
         while selection:
@@ -351,10 +352,10 @@ class BruteElitist(GPAlgorithm):
             scores = [left, right, lc, rc]
             best = sorted(scores, key = lambda t : t.getFitness())[0:2]
             if lc in best:
-#                logger.info("Crossover resulted in improved fitness, replacing")
+                logger.info("Crossover resulted in improved fitness, replacing")
                 replacementcount += 1
             if rc in best:
-#                logger.info("Crossover resulted in improved fitness, replacing")
+                logger.info("Crossover resulted in improved fitness, replacing")
                 replacementcount += 1
             newgen += best
         assert(len(newgen) == l)

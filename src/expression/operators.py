@@ -31,7 +31,7 @@ class Mutate():
             :param Random rng: prng used to generate the new subtree and its attaching location
         """
         rng = rng or random.Random()
-        if seed is None:
+        if seed is not None:
             rng.seed(seed)
         insertpoint = tr.getRandomNode(rng=rng)
         d = tr.getDepth()
