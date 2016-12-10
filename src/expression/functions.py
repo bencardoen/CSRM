@@ -102,14 +102,15 @@ def generateOrderedFunctionTable(fset):
 
 # function : {prettyprint, arity, precedence, associativity, class}
 # Default hash is location in memory, which changes, so for deterministic choice, use a one time sort.
-functionset = { plus:("+", 2, 2, 'L'), minus:("-", 2, 2, 'L'),
-                multiply:("*", 2, 3, 'L'), division:("/", 2, 3, 'L'),modulo:("%", 2, 3, 'L'),
-                power:("**", 2, 3, 'R'), square_root:("sqrt", 1,3,'R'),
-                logarithm:("log", 2, 4, 'F'), maximum:("max", 2, 4, 'F'), minimum:("min", 2, 4, 'F'),
-                ln:("ln", 1,4,'R'),exponential:("exp", 1,4,'R'),
-                sine:("sin", 1, 4, 'R'), cosine:("cos", 1, 4, 'R'), absolute:("abs",1, 4, 'F'),
-                tangenth:("tanh", 1,4, 'R'), tangent:("tan",1,4,'R')
+functionset = { plus:("+", 2, 2, 'L',1), minus:("-", 2, 2, 'L',1),
+                multiply:("*", 2, 3, 'L',2), division:("/", 2, 3, 'L',2),modulo:("%", 2, 3, 'L',2),
+                power:("**", 2, 3, 'R',3), square_root:("sqrt", 1,3,'R',3),
+                logarithm:("log", 2, 4, 'F',3), maximum:("max", 2, 4, 'F',2), minimum:("min", 2, 4, 'F',2),
+                ln:("ln", 1,4,'R',3),exponential:("exp", 1,4,'R',3),
+                sine:("sin", 1, 4, 'R',3), cosine:("cos", 1, 4, 'R',3), absolute:("abs",1, 4, 'F',2),
+                tangenth:("tanh", 1,4, 'R',4), tangent:("tan",1,4,'R',4)
                 }
+
 functions = generateOrderedFunctionTable(functionset)
 
 # Testfunctions from M.F. Korns' paper "A baseline symbolic regression algorithm"
@@ -137,6 +138,9 @@ def getRandomFunction(seed = None, rng=None):
     if seed is not None:
         _rng.seed(seed)
     return _rng.choice(functions)
+
+def getFunctionComplexity(f):
+    return functionset[f][4]
 
 @traceFunction
 def tokenize(expression, variables=None):

@@ -646,6 +646,13 @@ class TreeTest(unittest.TestCase):
         t = Tree.makeRandomTree(variables, depth=1, rng=rng)
         Mutate.mutate(t, seed=0)
 
+    def testComplexity(self):
+        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        rng = random.Random()
+        rng.seed(0)
+        t = Tree.makeRandomTree(variables, depth=4, rng=rng)
+        c = t.getComplexity()
+        self.assertEqual(c, 18)
 
 
 if __name__=="__main__":

@@ -55,6 +55,7 @@ class GPAlgorithm():
         # List of generation : tuple of stats
         self._convergencestats = []
         self._history = history or 5
+        self._run = 0
 
     def getSeed(self):
         """
@@ -68,14 +69,16 @@ class GPAlgorithm():
         self._seed = self._rng.randint(0, 0xffffffff)
         return s
 
-    def addConvergenceStat(self, generation, stat):
-        if len(self._convergencestats) <= generation:
-            self._convergencestats.append(stat)
+    def addConvergenceStat(self, generation, stat, run):
+        if len(self._convergencestats) <= run:
+            self._convergencestats.append([])
+        if len(self._convergencestats[run]) <= generation:
+            self._convergencestats[run].append(stat)
         else:
             self._convergencestats[generation] = stat
 
-    def getConvergenceStat(self, generation):
-        return self._convergencestats[generation]
+    def getConvergenceStat(self, generation, run):
+        return self._convergencestats[run][generation]
 
     def resetConvergenceStats(self):
         self._convergencestats = []
@@ -147,18 +150,21 @@ class GPAlgorithm():
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
-    def summarizeGeneration(self, replacementcount, generation):
+    def summarizeGeneration(self, replacementcount, generation, run):
         """
             Compute fitness statistics for the current generation and record them
         """
         fit = [d.getFitness() for d in self._population]
-        mean = numpy.mean(fit)
+        comp = [d.getComplexity() for d in self._population]
+        mean= numpy.mean(fit)
         sd = numpy.std(fit)
         v = numpy.var(fit)
-        sfit =  "".join('{:.2f}, '.format(d) for d in fit)
-        logger.info("Generation {} SUMMARY:: Fitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, sfit, mean, sd, v, replacementcount))
-        self.addConvergenceStat(generation, {"mean":mean, "sd":sd, "var":v, "replacements":replacementcount})
-        return mean, sd, v, fit
+        cmean = numpy.mean(comp)
+        csd = numpy.std(comp)
+        cv = numpy.var(comp)
+        logger.info("Generation {} SUMMARY:: Fitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, "".join('{:.2f}, '.format(d) for d in fit), mean, sd, v, replacementcount))
+        logger.info("Generation {} SUMMARY:: Complexity values {} \n\t\tmean {} \t\tsd {} \t\tvar {} ".format(generation, "".join('{}, '.format(d) for d in comp), cmean, csd, cv))
+        self.addConvergenceStat(generation, {"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "replacements":replacementcount, "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv}, run)
 
     def setTrace(self, v, prefix):
         """
@@ -197,7 +203,7 @@ class GPAlgorithm():
 
         Each call reset convergence statistics.
         """
-        self.resetConvergenceStats()
+        r = self._run
         for i in range(self._generations):
             logger.debug("Generation {}".format(i))
             logger.debug("\tSelection")
@@ -206,7 +212,7 @@ class GPAlgorithm():
             modified, count = self.evolve(selected)
             logger.debug("\tUpdate")
             self.update(modified)
-            self.summarizeGeneration(count, generation=i)
+            self.summarizeGeneration(count, generation=i, run=r)
             if self.stopCondition():
                 logger.info("Stop condition triggered")
                 break
@@ -214,6 +220,7 @@ class GPAlgorithm():
             if self._trace:
                 self.printForestToDot(self._prefix + "generation_{}_".format(i))
         logger.info("\tArchival")
+        self._run += 1
         self.archive(modified)
         self.reseed()
 
@@ -372,12 +379,12 @@ class BruteElitist(GPAlgorithm):
         """
             Stop if the last @history generation no replacements could be made
         """
-        generations = len(self._convergencestats)
+        generations = len(self._convergencestats[self._run])
         if generations < self._history:
             # not enough data
             return False
         for i in range(self._history):
-            if self.getConvergenceStat(generations-i-1)['replacements'] != 0:
+            if self.getConvergenceStat(generations-i-1, self._run)['replacements'] != 0:
                 return False
         return True
 

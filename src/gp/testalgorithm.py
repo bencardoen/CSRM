@@ -122,6 +122,23 @@ class GPTest(unittest.TestCase):
         g.run()
         g.printForestToDot(outputfolder+"secondresult")
 
+    def testBruteElitistExtended(self):
+        rng = random.Random()
+        rng.seed(0)
+        dpoint = 100
+        vpoint = 3
+        X = generateVariables(vpoint,dpoint,seed=0)
+        print(X)
+        Y = [ rng.random() for d in range(dpoint)]
+        logger.debug("Y {} X {}".format(Y, X))
+        logger.info("Starting BE algorithm")
+        g = BruteElitist(X, Y, popsize=20, maxdepth=6, fitnessfunction=_fit, seed=0, generations=20)
+        g.run()
+        g.printForestToDot(outputfolder+"firstresult_extended")
+        #g.run()
+        #g.printForestToDot(outputfolder+"secondresult_extended")
+
+
 
 
 

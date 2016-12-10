@@ -28,7 +28,7 @@ class Mutate():
             :param int seed: seed influencing the choice of node and new tree
             :param variables: set of variables
             :param bool equaldepth: if set the generated subtree will have the same depth as the node removed.
-            :param Random rng: PRNG
+            :param Random rng: prng used to generate the new subtree and its attaching location
         """
         rng = rng or random.Random()
         if seed is None:
@@ -56,12 +56,13 @@ class Crossover():
         """
             Perform a subtree crossover in place.
 
-            A subtree from left an right are chosen (influenced by seed) and exchanged.
+            A subtree from left and right are chosen (influenced by seed) and exchanged.
 
             :param Tree left: tree to modify with right's subtree
             :param Tree right: tree to modify with left's subtree
             :param int seed: seed for PRNG (selection of subtree)
             :param int depth: if not None, forces subtree selection to pick subtrees at equal depth. The chosen depth is in [1, min(left.getDepth(), right.getDepth())] This value restricts bloating.
+            :param Random rng: rng used in calls to select subtrees
         """
         if rng is None:
             rng = random.Random()

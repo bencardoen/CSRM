@@ -564,6 +564,9 @@ class Tree:
         assert(self.root)
         return self.root
 
+    def getComplexity(self):
+        return sum(d.getNodeComplexity() for d in self.nodes if d is not None)
+
     @staticmethod
     def swapSubtrees(left, right, seed = None, depth = None, rng = None):
         """

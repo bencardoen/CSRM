@@ -45,6 +45,12 @@ class Node:
     def getDepth(self):
         return self._depth
 
+    def getNodeComplexity(self):
+        if self.function:
+            logger.debug("Retrieving function complexity for {}".format(self.function))
+            return expression.functions.getFunctionComplexity(self.function)
+        return 0
+
     @traceFunction
     def evaluate(self, args=None):
         """
@@ -207,9 +213,9 @@ class Variable():
         """
             Converts a twodimensional array where each row is a set of data points to a list of Variables.
         """
-        return [Variable(row, i) for i,entry in enumerate(lst)] 
-        
-    
+        return [Variable(row, i) for i,entry in enumerate(lst)]
+
+
     def __init__(self, values, index):
         """
             Values is a list of datapoints this feature has
@@ -221,7 +227,7 @@ class Variable():
 
     def getValues(self):
         return self._values
-        
+
     def __len__(self):
         return len(self._values)
 
