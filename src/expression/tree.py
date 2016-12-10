@@ -565,12 +565,13 @@ class Tree:
         return self.root
 
     @staticmethod
-    def swapSubtrees(left, right, seed = None, depth = None):
+    def swapSubtrees(left, right, seed = None, depth = None, rng = None):
         """
         Given two trees, pick random subtree roots and swap them between the trees.
         Will swap out subtrees at equal depth.
         """
-        rng = random.Random()
+        if rng is None:
+            rng = random.Random()
         if seed is not None:
             rng.seed(seed)
         leftsubroot = left.getRandomNode(seed=None, depth=depth, rng=rng)

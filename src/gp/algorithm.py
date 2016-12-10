@@ -124,10 +124,11 @@ class GPAlgorithm():
         t = Tree.growTree(self._variables, self._maxdepth, rng=self._rng)
         t.scoreTree(self._Y, self._fitnessfunction)
         i = 0
+        rng = self._rng
         while t.getFitness() == Constants.MINFITNESS:
             seed = self.getSeed()
             assert(self._variables)
-            t = Tree.growTree(self._variables, self._maxdepth, rng=self._rng)
+            t = Tree.growTree(self._variables, self._maxdepth, rng=rng)
             t.scoreTree(self._Y, self._fitnessfunction)
             logger.debug("Attempt {} with seed {} and t {}  and t {}".format(i, seed, t.getFitness(), t))
             i += 1
@@ -314,11 +315,12 @@ class BruteElitist(GPAlgorithm):
         replacementcount = 0
         # Mutation
         selcount = len(selection)
+        rng = self._rng
         for i in range(selcount):
             t = selection[i]
             # Mutation
             candidate = deepcopy(t)
-            Mutate.mutate(candidate, variables=self._variables, seed=self.getSeed())
+            Mutate.mutate(candidate, variables=self._variables, seed=None, rng=rng)
             candidate.scoreTree(self._Y, self._fitnessfunction)
 
             if candidate.getFitness() < t.getFitness():
@@ -336,7 +338,7 @@ class BruteElitist(GPAlgorithm):
             assert(left != right)
             lc = deepcopy(left)
             rc = deepcopy(right)
-            Crossover.subtreecrossover(lc, rc, seed=self.getSeed())
+            Crossover.subtreecrossover(lc, rc, seed=None, depth=None, rng=rng)
             lc.scoreTree(self._Y, self._fitnessfunction)
             rc.scoreTree(self._Y, self._fitnessfunction)
             scores = [left, right, lc, rc]

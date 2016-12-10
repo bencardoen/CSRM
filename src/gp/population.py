@@ -12,9 +12,18 @@ logger = logging.getLogger('global')
 
 class Population():
     """
-    Interface to a population structure, aimed to keep a set of trees in sorted order.
+    Interface to a population structure. Sorts a population in order and provides iterators and if possible random access
+    and membership testing using hashes.
+
+    The Base class is unusable, serves only as an interface.
+
     """
     def __init__(self, iterable=None, key=None):
+        """
+            Construct using iterable as initial data with given key.
+
+            :param function key: a function object that returns the sorting key
+        """
         self._pop = []
 
     def __iter__(self):
@@ -68,6 +77,8 @@ class Population():
     def remove(self, item):
         """
         Remove item from the population
+
+        Item has to be in the collection.
         """
         raise NotImplementedError
 
@@ -94,7 +105,7 @@ class Population():
 
     def removeAll(self):
         return self.removeN(len(self))
-        
+
 
 class SLWKPopulation(Population):
     """
@@ -135,9 +146,15 @@ class OrderedPopulation(Population):
 
 class SetPopulation(Population):
     """
-    An ordered population structure, a wrapper around an ordered set with highest fitness first.
+    An ordered population structure, a wrapper around an ordered set with lowest fitness first.
+
+    Duplicate items are allowed.
     """
     def __init__(self, iterable=None, key=None):
+        """
+        :param iterator iterable: initial data
+        :param function key: default to id function, else a user provided function that returns for a given item a sortable key object.
+        """
         if not key:
             key = id
         self._key = key
@@ -163,7 +180,7 @@ class SetPopulation(Population):
         l = self.last()
         self.remove(l)
         return l
-        
+
     def remove(self, item):
         self._pop.remove(item)
 
@@ -187,6 +204,6 @@ class SetPopulation(Population):
             self.pop()
         assert(len(self) == oldlen - n)
         return kn
-        
+
     def __str__(self):
         return "".join(str(d) for d in self._pop)

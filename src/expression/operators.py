@@ -18,7 +18,7 @@ class Mutate():
     """
     @staticmethod
     @traceFunction
-    def mutate(tr, seed = None, variables = None, equaldepth=False):
+    def mutate(tr, seed = None, variables = None, equaldepth=False, rng=None):
         """
             Replace a random node with a new generated subexpression.
 
@@ -28,9 +28,11 @@ class Mutate():
             :param int seed: seed influencing the choice of node and new tree
             :param variables: set of variables
             :param bool equaldepth: if set the generated subtree will have the same depth as the node removed.
+            :param Random rng: PRNG
         """
-        rng = random.Random()
-        rng.seed(seed)
+        rng = rng or random.Random()
+        if seed is None:
+            rng.seed(seed)
         insertpoint = tr.getRandomNode(rng=rng)
         d = tr.getDepth()
         depth_at_i = insertpoint.getDepth()
@@ -50,7 +52,7 @@ class Crossover():
     """
     @staticmethod
     @traceFunction
-    def subtreecrossover(left, right, seed = None, depth = None):
+    def subtreecrossover(left, right, seed = None, depth = None, rng = None):
         """
             Perform a subtree crossover in place.
 
@@ -61,9 +63,13 @@ class Crossover():
             :param int seed: seed for PRNG (selection of subtree)
             :param int depth: if not None, forces subtree selection to pick subtrees at equal depth. The chosen depth is in [1, min(left.getDepth(), right.getDepth())] This value restricts bloating.
         """
-        mindepth = min(left.getDepth(), right.getDepth())
-        rng = random.Random()
-        rng.seed(seed)
-        chosendepth = rng.randint(1, mindepth)
-        logger.debug("Got chosen {} from {} ".format(chosendepth, mindepth))
-        Tree.swapSubtrees(left, right, seed=seed, depth=chosendepth)
+        if rng is None:
+            rng = random.Random()
+        if seed is not None:
+            rng.seed(seed)
+        if depth is None:
+            mindepth = min(left.getDepth(), right.getDepth())
+            chosendepth = rng.randint(1, mindepth)
+            logger.debug("Got chosen {} from {} ".format(chosendepth, mindepth))
+            depth = chosendepth
+        Tree.swapSubtrees(left, right, seed=seed, depth=depth, rng=rng)
