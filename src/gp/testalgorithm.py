@@ -133,14 +133,16 @@ class GPTest(unittest.TestCase):
         g.printForestToDot(outputfolder+"bmark")
 
     def testConvergence(self):
+        expr = testfunctions[2]
         rng = random.Random()
         rng.seed(0)
-        dpoint = 10
-        vpoint = 3
-        X = generateVariables(vpoint,dpoint,seed=0)
-        Y = [ rng.random() for d in range(dpoint)]
+        dpoint = 20
+        vpoint = 5
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0, generations=20)
+        g = BruteElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=30)
         g.run()
         g.run()
         stats = g.getConvergenceStatistics()

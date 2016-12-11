@@ -27,6 +27,7 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
     return p
 
 def plotFront(X, Y, labelx=None, labely=None, title=None):
+    output_file("{}.html".format(title or "title"))
     p = figure(title=title or "title", x_axis_label=labelx or "X", y_axis_label=labely or "Y")
     p.circle(X, Y, size=2, color="red", alpha=0.3)
     return p

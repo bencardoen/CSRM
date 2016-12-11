@@ -52,5 +52,6 @@ class Convergence:
         run = self._convergencestats[-1]
         fitnessvalues = run[-1]['fitness']
         complexity = run[-1]['complexity']
-        p = plotFront(X=fitnessvalues, Y=complexity, labelx="Fitness", labely="complexity", title="Pareto Front")
+        logger.info("Plotting fitness {} against complexity {}".format(fitnessvalues, complexity))
+        p = plotFront(X=fitnessvalues, Y=complexity, labelx="Fitness", labely="complexity", title="Front")
         displayPlot(p)

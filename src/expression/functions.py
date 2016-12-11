@@ -331,10 +331,9 @@ def fitnessfunction(actual, expected, tree):
         logger.debug("Tree instance has no matching datapoints : invalid")
         return Constants.MINFITNESS
 
-    d = tree.getDepth()
     for j, i in enumerate(actual):
         if i is None:
             logger.debug("Tree instance has an invalid expression for a datapoint {}".format(j))
             return Constants.MINFITNESS
     rms = rootmeansquare(actual, expected)
-    return rms * d
+    return rms
