@@ -350,6 +350,10 @@ class BruteElitist(GPAlgorithm):
         # Experiments with only applying it to the best specimens increase mean fitness
         # Both fit and unfit individuals benefit from crossbreeding.
         newgen = []
+        if l % 2:
+            logger.info("Selection not even")
+            newgen.append(selection[0])
+            del selection[0]
         selector = randomizedConsume(selection, seed=self.getSeed())
         while selection:
             left = next(selector)

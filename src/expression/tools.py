@@ -29,14 +29,12 @@ def msb(b):
     return i
 
 def rmtocm(lst):
-    colsize = len(lst[0])
-    rowsize = len(lst)
-    nlst = [[0 for d in range(rowsize)] for e in range(colsize)]
-    logger.debug("Converting {} with rowsize {} and colsize {}".format(lst, rowsize, colsize))
-    for i in range(rowsize):
-        for j in range(colsize):
-            nlst[j][i] = lst[i][j]
-    return nlst
+    """
+        Return a column major equivalent of row major encoded lst
+    """
+    rows = len(lst)
+    cols = len(lst[0])
+    return [ [lst[i][j] for i in range(rows)] for j in range(cols)]
 
 def compareLists(left: list, right: list):
     """
