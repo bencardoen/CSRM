@@ -45,10 +45,6 @@ class Convergence:
         """
             Plot fitness values against complexity in a front
         """
-        # get last fitness values
-        # get last complexity values
-        # Plot X as fitness
-        # Plot Y as complexity
         run = self._convergencestats[-1]
         fitnessvalues = run[-1]['fitness']
         complexity = run[-1]['complexity']

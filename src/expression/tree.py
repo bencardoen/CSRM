@@ -565,7 +565,21 @@ class Tree:
         return self.root
 
     def getComplexity(self):
+        """
+            Complexity is defined by the weight of the functions used in the expression.
+        """
         return sum(d.getNodeComplexity() for d in self.nodes if d is not None)
+
+    def getScaledComplexity(self):
+        c = self.getComplexity()
+        d = self.getDepth()
+        # a tree of depth d has 2^(d+1) - 1 nodes if full.
+        # Discarding leafs, this gives a set of 2^(d)-1 function nodes, with maximum complexity k this
+        # results into (2^-1)k
+        nodecount = pow(2,d)-1
+        maxc = nodecount * Constants.MAX_COMPLEXITY
+        return (c / maxc)
+
 
     @staticmethod
     def swapSubtrees(left, right, seed = None, depth = None, rng = None):

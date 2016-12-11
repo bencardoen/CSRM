@@ -12,3 +12,4 @@ class Constants():
     # Setting this to high values leads to explosion in fitness values
     CONSTANTS_LOWER=0
     CONSTANTS_UPPER=1
+    MAX_COMPLEXITY = 4
