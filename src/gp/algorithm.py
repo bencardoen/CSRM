@@ -247,7 +247,7 @@ class GPAlgorithm():
         self.run()
         for i in range(self._runs-1):
             self.restart()
-            logger.info("\n\n\n\nRun {}".format(i))
+            logger.info("\n\n\n\nRun {}".format(i+1))
             self.run()
 
 
@@ -342,13 +342,12 @@ class BruteElitist(GPAlgorithm):
         """
         l = len(selection)
         assert(l == self._popsize)
-        if len(selection) < 2:
-            return selection
         replacementcount = [0,0,0]
-        # Mutation works only if the specimen is far from an optimal fitness, it is too invasive and not guided, as well as horrendously expensive.
         selcount = len(selection)
         rng = self._rng
+        # TODO : mutate with cooling effect, modify based on current fitness, i.e. don't drastically alter a good tree
         for i in range(selcount//2, selcount):
+#        for i in range(selcount):
             t = selection[i]
             candidate = deepcopy(t)
             Mutate.mutate(candidate, variables=self._variables, seed=None, rng=rng)

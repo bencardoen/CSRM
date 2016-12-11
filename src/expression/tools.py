@@ -96,7 +96,7 @@ def matchVariable(expr: str):
     else:
         return None
 
-def generateVariables(varcount: int, datacount: int, seed: int, sort=False):
+def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lower=0, upper=1):
     """
     Generate a list of datapoints.
 
@@ -107,7 +107,7 @@ def generateVariables(varcount: int, datacount: int, seed: int, sort=False):
     """
     rng = random.Random()
     rng.seed(seed)
-    result = [ [rng.random() for d in range(datacount)] for x in range(varcount)]
+    result = [ [rng.uniform(lower, upper) for d in range(datacount)] for x in range(varcount)]
     if sort:
         for i in range(len(result)):
             result[i].sort()

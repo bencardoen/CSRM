@@ -12,6 +12,9 @@ import logging
 logger = logging.getLogger('global')
 
 class Convergence:
+    """
+        Utility class to parse and convert convergence statistics.
+    """
     def __init__(self, convergencestats):
         self._convergencestats = convergencestats
         self._runs = len(self._convergencestats)
@@ -52,7 +55,9 @@ class Convergence:
         self._plots.append(p)
 
     def plotOperators(self):
-        # Plot replacements, crossovers and mutations
+        """
+            Plot effective (i.e. rendering a fitter individual) modifications made by mutations and crossover
+        """
         converted = []
         generations = 0
         cvalues = [[],[]]
@@ -79,4 +84,7 @@ class Convergence:
         self._plots.append(p)
 
     def displayPlots(self, filename):
+        """
+            Collect all plots and write them out to a displayed html file.
+        """
         displayPlot(self._plots, filename)
