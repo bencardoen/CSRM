@@ -4,6 +4,14 @@ expression package
 Submodules
 ----------
 
+expression.constants module
+---------------------------
+
+.. automodule:: expression.constants
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 expression.functions module
 ---------------------------
 
@@ -24,6 +32,14 @@ expression.operators module
 ---------------------------
 
 .. automodule:: expression.operators
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+expression.testtools module
+---------------------------
+
+.. automodule:: expression.testtools
     :members:
     :undoc-members:
     :show-inheritance:

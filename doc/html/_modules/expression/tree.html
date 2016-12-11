@@ -96,7 +96,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Tree.getFitness"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getFitness">[docs]</a>    <span class="k">def</span> <span class="nf">getFitness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get this tree object&#39;s absolute fitness value (based on a distance measure)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span></div>
+
+<div class="viewcode-block" id="Tree.getMultiObjectiveFitness"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getMultiObjectiveFitness">[docs]</a>    <span class="k">def</span> <span class="nf">getMultiObjectiveFitness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getScaledComplexity</span><span class="p">()</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getFitness</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Tree.setFitness"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.setFitness">[docs]</a>    <span class="k">def</span> <span class="nf">setFitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fscore</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">fscore</span></div>
@@ -610,13 +616,42 @@
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span></div>
 
+<div class="viewcode-block" id="Tree.getComplexity"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getComplexity">[docs]</a>    <span class="k">def</span> <span class="nf">getComplexity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Complexity is defined by the weight of the functions used in the expression.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">getNodeComplexity</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tree.getScaledComplexity"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getScaledComplexity">[docs]</a>    <span class="k">def</span> <span class="nf">getScaledComplexity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Return the functional complexity of this tree.</span>
+<span class="sd">            This a a ratio in [1.0, 2.0] defining how complex the functions are used in this tree.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getComplexity</span><span class="p">()</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
+        <span class="c1"># a tree of depth d has 2^(d+1) - 1 nodes if full.</span>
+        <span class="c1"># Discarding leafs, this gives a set of 2^(d)-1 function nodes, with maximum complexity k this</span>
+        <span class="c1"># results into (2^-1)k</span>
+        <span class="n">nodecount</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">maxc</span> <span class="o">=</span> <span class="n">nodecount</span> <span class="o">*</span> <span class="n">Constants</span><span class="o">.</span><span class="n">MAX_COMPLEXITY</span>
+        <span class="c1"># Minimum complexity is with a tree all single arity min complex.</span>
+        <span class="n">minc</span> <span class="o">=</span> <span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Constants</span><span class="o">.</span><span class="n">MIN_COMPLEXITY</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Nodecount </span><span class="si">{}</span><span class="s2"> minc </span><span class="si">{}</span><span class="s2"> maxc </span><span class="si">{}</span><span class="s2"> ratio </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nodecount</span><span class="p">,</span> <span class="n">minc</span><span class="p">,</span> <span class="n">maxc</span><span class="p">,</span> <span class="p">(</span><span class="n">c</span><span class="o">-</span><span class="n">minc</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">c</span><span class="o">-</span><span class="n">minc</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span> <span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="o">-</span><span class="n">minc</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">maxc</span><span class="o">-</span><span class="n">minc</span><span class="p">))</span></div>
+
+
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Tree.swapSubtrees"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.swapSubtrees">[docs]</a>    <span class="k">def</span> <span class="nf">swapSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Tree.swapSubtrees"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.swapSubtrees">[docs]</a>    <span class="k">def</span> <span class="nf">swapSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given two trees, pick random subtree roots and swap them between the trees.</span>
 <span class="sd">        Will swap out subtrees at equal depth.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
         <span class="n">leftsubroot</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">getRandomNode</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>

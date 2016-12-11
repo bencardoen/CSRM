@@ -64,7 +64,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@staticmethod</span>
     <span class="nd">@traceFunction</span>
-<div class="viewcode-block" id="Mutate.mutate"><a class="viewcode-back" href="../../expression.html#expression.operators.Mutate.mutate">[docs]</a>    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">variables</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">equaldepth</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Mutate.mutate"><a class="viewcode-back" href="../../expression.html#expression.operators.Mutate.mutate">[docs]</a>    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">variables</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">equaldepth</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Replace a random node with a new generated subexpression.</span>
 
@@ -74,9 +74,11 @@
 <span class="sd">            :param int seed: seed influencing the choice of node and new tree</span>
 <span class="sd">            :param variables: set of variables</span>
 <span class="sd">            :param bool equaldepth: if set the generated subtree will have the same depth as the node removed.</span>
+<span class="sd">            :param Random rng: prng used to generate the new subtree and its attaching location</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
-        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
         <span class="n">insertpoint</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">getRandomNode</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
         <span class="n">depth_at_i</span> <span class="o">=</span> <span class="n">insertpoint</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
@@ -96,23 +98,28 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@staticmethod</span>
     <span class="nd">@traceFunction</span>
-<div class="viewcode-block" id="Crossover.subtreecrossover"><a class="viewcode-back" href="../../expression.html#expression.operators.Crossover.subtreecrossover">[docs]</a>    <span class="k">def</span> <span class="nf">subtreecrossover</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Crossover.subtreecrossover"><a class="viewcode-back" href="../../expression.html#expression.operators.Crossover.subtreecrossover">[docs]</a>    <span class="k">def</span> <span class="nf">subtreecrossover</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Perform a subtree crossover in place.</span>
 
-<span class="sd">            A subtree from left an right are chosen (influenced by seed) and exchanged.</span>
+<span class="sd">            A subtree from left and right are chosen (influenced by seed) and exchanged.</span>
 
 <span class="sd">            :param Tree left: tree to modify with right&#39;s subtree</span>
 <span class="sd">            :param Tree right: tree to modify with left&#39;s subtree</span>
 <span class="sd">            :param int seed: seed for PRNG (selection of subtree)</span>
 <span class="sd">            :param int depth: if not None, forces subtree selection to pick subtrees at equal depth. The chosen depth is in [1, min(left.getDepth(), right.getDepth())] This value restricts bloating.</span>
+<span class="sd">            :param Random rng: rng used in calls to select subtrees</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">mindepth</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">left</span><span class="o">.</span><span class="n">getDepth</span><span class="p">(),</span> <span class="n">right</span><span class="o">.</span><span class="n">getDepth</span><span class="p">())</span>
-        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
-        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-        <span class="n">chosendepth</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">mindepth</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Got chosen </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chosendepth</span><span class="p">,</span> <span class="n">mindepth</span><span class="p">))</span>
-        <span class="n">Tree</span><span class="o">.</span><span class="n">swapSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">chosendepth</span><span class="p">)</span></div></div>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mindepth</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">left</span><span class="o">.</span><span class="n">getDepth</span><span class="p">(),</span> <span class="n">right</span><span class="o">.</span><span class="n">getDepth</span><span class="p">())</span>
+            <span class="n">chosendepth</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">mindepth</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Got chosen </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chosendepth</span><span class="p">,</span> <span class="n">mindepth</span><span class="p">))</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">chosendepth</span>
+        <span class="n">Tree</span><span class="o">.</span><span class="n">swapSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

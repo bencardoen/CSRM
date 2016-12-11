@@ -172,16 +172,18 @@
         <span class="n">t</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;t5.dot&quot;</span><span class="p">)</span></div>
 
 
-    <span class="c1">#def testRandomTree(self):</span>
-    <span class="c1">#    variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]</span>
-    <span class="c1">#    for i in range(10):</span>
-    <span class="c1">#        rng = random.Random()</span>
-    <span class="c1">#        rng.seed(14)</span>
-    <span class="c1">#        t = Tree.makeRandomTree(variables, depth=10, rng=rng)</span>
-    <span class="c1">#        e = t.evaluateTree()</span>
-    <span class="c1">#        self.assertEqual(e,  2.746542827737955)</span>
-    <span class="c1">#        if not i:</span>
-    <span class="c1">#            t.printToDot(outputfolder+&quot;t6.dot&quot;)</span>
+<div class="viewcode-block" id="TreeTest.testRandomTree"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testRandomTree">[docs]</a>    <span class="k">def</span> <span class="nf">testRandomTree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">([</span><span class="mi">10</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">3</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">9</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span><span class="p">)]</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateTree</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ex</span> <span class="o">=</span> <span class="n">e</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">e</span><span class="p">,</span>  <span class="n">ex</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TreeTest.testCollectNodes"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testCollectNodes">[docs]</a>    <span class="k">def</span> <span class="nf">testCollectNodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -324,7 +326,7 @@
         <span class="n">tnew</span><span class="o">.</span><span class="n">makeConstant</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mf">0.6</span><span class="p">),</span> <span class="n">tr</span><span class="p">)</span>
         <span class="n">tnew</span><span class="o">.</span><span class="n">makeConstant</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mf">0.3</span><span class="p">),</span> <span class="n">tr</span><span class="p">)</span>
         <span class="n">expr</span> <span class="o">=</span> <span class="n">tnew</span><span class="o">.</span><span class="n">toExpression</span><span class="p">()</span>
-        <span class="n">expected</span> <span class="o">=</span> <span class="s2">&quot;( ( min( 5, 6 ) ) ** ( log( 0.6, 0.3 ) ) )&quot;</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="s2">&quot;( ( min( x0, x0 ) ) ** ( log( 0.6, 0.3 ) ) )&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span></div>
 
 
@@ -690,8 +692,19 @@
         <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
         <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
-        <span class="n">Mutate</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div></div>
+        <span class="n">Mutate</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="TreeTest.testComplexity"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testComplexity">[docs]</a>    <span class="k">def</span> <span class="nf">testComplexity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">([</span><span class="mi">10</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">3</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">9</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span><span class="p">)]</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">getComplexity</span><span class="p">()</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">getScaledComplexity</span><span class="p">()</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Tree depth </span><span class="si">{}</span><span class="s2"> absolute complexity </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">18</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">c</span><span class="o">-</span><span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="mi">57</span><span class="p">)</span></div></div>
 
 
 <span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
