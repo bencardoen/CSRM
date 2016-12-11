@@ -11,8 +11,13 @@
 * Numpy :
 
     ```
-       pip3 install numpy
+        $pip3 install numpy
     ```
+
+* Bokeh :
+   ```
+        $pip3 install bokeh
+   ```
 
 * Optional : graphviz
 
