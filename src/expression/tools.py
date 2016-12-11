@@ -28,6 +28,16 @@ def msb(b):
         i += 1
     return i
 
+def rmtocm(lst):
+    colsize = len(lst[0])
+    rowsize = len(lst)
+    nlst = [[0 for d in range(rowsize)] for e in range(colsize)]
+    logger.debug("Converting {} with rowsize {} and colsize {}".format(lst, rowsize, colsize))
+    for i in range(rowsize):
+        for j in range(colsize):
+            nlst[j][i] = lst[i][j]
+    return nlst
+
 def compareLists(left: list, right: list):
     """
     Return true if left and right contain the same elements, disregarding order and None
@@ -200,3 +210,9 @@ def permutate(lst, seed=None):
         lst[limit] = item
         limit -= 1
         yield item
+
+
+if __name__ == "__main__":
+    lst  = [[0,1,2],[3,4,5]]
+    clst = rmtocm(lst)
+    print(clst)

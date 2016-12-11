@@ -19,8 +19,11 @@ from gp.algorithm import GPAlgorithm, BruteElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
 from expression.tree import Tree
 from expression.node import Variable
-from expression.functions import testfunctions
+from expression.functions import testfunctions, fitnessfunction as _fit
 from operator import neg
+from analysis.convergence import Convergence
+
+
 logger = logging.getLogger('global')
 outputfolder = "../output/"
 
@@ -35,27 +38,6 @@ def generateForest(fsize=10, depth=4, seed=None):
         forest.append(Tree.makeRandomTree(variables, depth=depth, rng=rng))
     return forest
 
-def _fit(actual, expected, tree):
-    """
-        Discard trees with constant expressions, restrict depth and invalid results.
-    """
-    if not tree.getVariables():
-        logger.debug("Tree instance is a constant expression : invalid")
-        return Constants.MINFITNESS
-    if not actual:
-        logger.debug("Tree instance has no datapoints : invalid")
-        return Constants.MINFITNESS
-    if len(actual) != len(expected):
-        logger.debug("Tree instance has no matching datapoints : invalid")
-        return Constants.MINFITNESS
-
-    d = tree.getDepth()
-    for j, i in enumerate(actual):
-        if i is None:
-            logger.debug("Tree instance has an invalid expression for a datapoint {}".format(j))
-            return Constants.MINFITNESS
-    rms = rootmeansquare(actual, expected)
-    return rms * d
 
 class GPTest(unittest.TestCase):
 
@@ -146,20 +128,27 @@ class GPTest(unittest.TestCase):
             X = generateVariables(vpoint, dpoint, seed=0, sort=True)
             t = Tree.createTreeFromExpression(expr, X)
             Y = t.evaluateAll()
-            g = BruteElitist(X, Y, popsize=30, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20)
+            g = BruteElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=10)
             g.run()
         g.printForestToDot(outputfolder+"bmark")
 
     def testConvergence(self):
         rng = random.Random()
         rng.seed(0)
-        dpoint = 20
+        dpoint = 10
         vpoint = 3
         X = generateVariables(vpoint,dpoint,seed=0)
         Y = [ rng.random() for d in range(dpoint)]
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=20, maxdepth=4, fitnessfunction=_fit, seed=0, generations=200)
+        g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0, generations=20)
         g.run()
+        g.run()
+        stats = g.getConvergenceStatistics()
+        c = Convergence(stats)
+        c.plotFitness()
+        c.plotComplexity()
+        c.plotPareto()
+
 
 
 

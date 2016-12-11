@@ -7,23 +7,14 @@
 #      Author: Ben Cardoen
 
 from math import log, sin, cos
-from expression.tools import matchFloat, matchVariable, approximateMultiple, traceFunction
+from expression.tools import matchFloat, matchVariable, approximateMultiple, traceFunction, rootmeansquare
 from expression.node import Constant, Variable
+from expression.constants import Constants
 import random
 import logging
 import math
 logger = logging.getLogger('global')
 
-
-
-class Constants():
-    def __init__(self):
-        pass
-    #Fitness function (lower is better)
-    MINFITNESS = float('inf')
-    MAXFITNESS = 0
-    # Size limit for exponents
-    SIZE_LIMIT = 80
 
 # Function objects that can be used in an expression.
 # Most screen parameters to avoid expensive (frequent) exceptions.
@@ -324,3 +315,26 @@ def parseFunction(expression: str, index: int, output: list):
     else:
         raise ValueError("Invalid chars {}".format(name))
     return expression, index, output
+
+
+def fitnessfunction(actual, expected, tree):
+    """
+        Discard trees with constant expressions, restrict depth and invalid results.
+    """
+    if not tree.getVariables():
+        logger.debug("Tree instance is a constant expression : invalid")
+        return Constants.MINFITNESS
+    if not actual:
+        logger.debug("Tree instance has no datapoints : invalid")
+        return Constants.MINFITNESS
+    if len(actual) != len(expected):
+        logger.debug("Tree instance has no matching datapoints : invalid")
+        return Constants.MINFITNESS
+
+    d = tree.getDepth()
+    for j, i in enumerate(actual):
+        if i is None:
+            logger.debug("Tree instance has an invalid expression for a datapoint {}".format(j))
+            return Constants.MINFITNESS
+    rms = rootmeansquare(actual, expected)
+    return rms * d

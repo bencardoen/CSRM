@@ -10,6 +10,7 @@
 import logging
 import random
 import expression.functions
+from expression.constants import Constants
 from expression.tools import traceFunction
 
 logger = logging.getLogger('global')
@@ -34,6 +35,10 @@ class Node:
 
     @staticmethod
     def positionToDepth(pos):
+        """
+            Use the structure of the binary tree and its list encoding to retrieve
+            depth in log(N) steps without relying on a parent pointer.
+        """
         i = 0
         while pos:
             if pos & 2:
@@ -112,6 +117,10 @@ class Node:
 
     @traceFunction
     def updatePosition(self):
+        """
+            After operations on a tree, the position of this node can be invalidated.
+            After a valid call to setPosition(pos), update all children recursively to correct position.
+        """
         pos = self.getPosition()
         i = 1
         for c in self.getChildren():
@@ -122,6 +131,9 @@ class Node:
 
     @traceFunction
     def getAllChildren(self):
+        """
+            Returns all descendant nodes.
+        """
         children = self.getChildren()[:]
         collected = children[:]
         if children :
@@ -135,6 +147,11 @@ class Node:
     @staticmethod
     @traceFunction
     def nodeToExpression(node):
+        """
+            Top down traversal constructing an arithmetic expression from the tree
+            with this node as root.
+            Expression is in infix, so explicit usage of brackets.
+        """
         children = node.getChildren()
         arity = node.getArity()
         if children:
@@ -151,7 +168,6 @@ class Node:
                 return "( {}( {} ) )".format(frepr, left)
         else:
             return str(node.expr())
-#            return str(node.evaluate())
 
 
     def __hash__(self):
@@ -210,7 +226,7 @@ class Constant():
         """
         _rng = rng or random.Random()
         if seed is not None: _rng.seed(seed)
-        return Constant(Constant.CONSTANTLOWER + _rng.random()*(Constant.CONSTANTUPPER-Constant.CONSTANTLOWER))
+        return Constant(Constants.CONSTANTS_LOWER + _rng.random()*(Constants.CONSTANTS_UPPER-Constants.CONSTANTS_LOWER))
 
 
 class Variable():

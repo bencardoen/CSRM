@@ -2,7 +2,7 @@
 from expression.tree import Tree
 from expression.operators import Mutate, Crossover
 from expression.tools import traceFunction, randomizedConsume
-from expression.functions import Constants
+from expression.constants import Constants
 from gp.population import Population, SetPopulation
 from expression.node import Variable
 from copy import deepcopy
@@ -79,6 +79,17 @@ class GPAlgorithm():
 
     def getConvergenceStat(self, generation, run):
         return self._convergencestats[run][generation]
+
+    def getConvergenceStatistics(self):
+        """
+            Return all statistics
+
+            Returns a list indiced by run
+            Each sublist is indiced by generation and holds a dict:
+                "fitness", "mean_fitness, "var_fitness", "std_fitness", "replacements"
+                and equivalent for complexity
+        """
+        return self._convergencestats[:]
 
     def resetConvergenceStats(self):
         self._convergencestats = []
@@ -162,9 +173,9 @@ class GPAlgorithm():
         cmean = numpy.mean(comp)
         csd = numpy.std(comp)
         cv = numpy.var(comp)
-        logger.info("Generation {} SUMMARY:: Fitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, "".join('{:.2f}, '.format(d) for d in fit), mean, sd, v, replacementcount))
-        logger.info("Generation {} SUMMARY:: Complexity values {} \n\t\tmean {} \t\tsd {} \t\tvar {} ".format(generation, "".join('{}, '.format(d) for d in comp), cmean, csd, cv))
-        self.addConvergenceStat(generation, {"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "replacements":replacementcount, "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv}, run)
+        logger.info("Generation {} SUMMARY:: \n\tFitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, "".join('{:.2f}, '.format(d) for d in fit), mean, sd, v, replacementcount))
+        logger.info("\n\tComplexity values {} \n\t\tmean {} \t\tsd {} \t\tvar {} ".format(generation, "".join('{}, '.format(d) for d in comp), cmean, csd, cv))
+        self.addConvergenceStat(generation, {"fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "replacements":replacementcount, "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, run)
 
     def setTrace(self, v, prefix):
         """
