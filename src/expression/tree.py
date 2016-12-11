@@ -55,7 +55,7 @@ class Tree:
         """
         return self.fitness
 
-    def getMutliObjectiveFitness(self):
+    def getMultiObjectiveFitness(self):
         return self.getScaledComplexity()*self.getFitness()
 
     def setFitness(self, fscore):
@@ -588,11 +588,14 @@ class Tree:
         # results into (2^-1)k
         nodecount = 2**d-1
         maxc = nodecount * Constants.MAX_COMPLEXITY
-        minc = nodecount * Constants.MIN_COMPLEXITY
+        # Minimum complexity is with a tree all single arity min complex.
+        minc = (d-1) * Constants.MIN_COMPLEXITY
+
         logger.debug("Nodecount {} minc {} maxc {} ratio {}".format(nodecount, minc, maxc, (c-minc)))
-        if c-minc <= 0:
+        if c-minc < 0:
+            assert(False)
             return 1
-        return 1 + ( (c-minc) / (maxc-minc))
+        return 1 + ( float(c-minc) / float(maxc-minc))
 
 
     @staticmethod

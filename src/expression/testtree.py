@@ -658,7 +658,7 @@ class TreeTest(unittest.TestCase):
         d = t.getDepth()
         logger.debug("Tree depth {} absolute complexity {}".format(d, c))
         self.assertEqual(c, 18)
-        self.assertEqual(c2, 1+3/45)
+        self.assertEqual(c2, 1+(c-(d-1))/57)
 
 
 if __name__=="__main__":

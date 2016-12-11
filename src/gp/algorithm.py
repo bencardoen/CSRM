@@ -174,7 +174,8 @@ class GPAlgorithm():
         csd = numpy.std(comp)
         cv = numpy.var(comp)
         logger.info("Generation {} SUMMARY:: \n\tFitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, "".join('{:.2f}, '.format(d) for d in fit), mean, sd, v, replacementcount[0]))
-        logger.info("\n\tComplexity values {} \n\t\tmean {} \t\tsd {} \t\tvar {} ".format(generation, "".join('{}, '.format(d) for d in comp), cmean, csd, cv))
+        logger.info("\n\tComplexity values {} \n\t\tmean {} \t\tsd {} \t\tvar {} ".format(comp, cmean, csd, cv))
+
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
                                                  "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, run)
@@ -341,7 +342,7 @@ class BruteElitist(GPAlgorithm):
             Mutate.mutate(candidate, variables=self._variables, seed=None, rng=rng)
             candidate.scoreTree(self._Y, self._fitnessfunction)
 
-            if candidate.getFitness() < t.getFitness():
+            if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
                 logger.info("Mutation resulted in improved fitness, replacing {}".format(i))
                 selection[i] = candidate
                 replacementcount[0] += 1
@@ -368,7 +369,7 @@ class BruteElitist(GPAlgorithm):
             lc.scoreTree(self._Y, self._fitnessfunction)
             rc.scoreTree(self._Y, self._fitnessfunction)
             scores = [left, right, lc, rc]
-            best = sorted(scores, key = lambda t : t.getFitness())[0:2]
+            best = sorted(scores, key = lambda t : t.getMultiObjectiveFitness())[0:2]
             if lc in best:
                 logger.info("Crossover resulted in improved fitness, replacing")
                 replacementcount[0] += 1
