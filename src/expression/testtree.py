@@ -128,14 +128,16 @@ class TreeTest(unittest.TestCase):
 
     def testRandomTree(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        ex = None
         for i in range(10):
             rng = random.Random()
             rng.seed(14)
-            t = Tree.makeRandomTree(variables, depth=10, rng=rng)
+            t = Tree.makeRandomTree(variables, depth=5, rng=rng)
             e = t.evaluateTree()
-            self.assertEqual(e,  0.1868025994757769)
-            if not i:
-                t.printToDot(outputfolder+"t6.dot")
+            if i == 0:
+                ex = e
+            else:
+                self.assertEqual(e,  ex)
 
 
     def testCollectNodes(self):
@@ -654,9 +656,9 @@ class TreeTest(unittest.TestCase):
         c = t.getComplexity()
         c2 = t.getScaledComplexity()
         d = t.getDepth()
-        logger.debug("Tree depth {}".format(d))
+        logger.debug("Tree depth {} absolute complexity {}".format(d, c))
         self.assertEqual(c, 18)
-        self.assertEqual(c2, 0.3)
+        self.assertEqual(c2, 1+3/45)
 
 
 if __name__=="__main__":

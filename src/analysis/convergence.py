@@ -15,6 +15,7 @@ class Convergence:
     def __init__(self, convergencestats):
         self._convergencestats = convergencestats
         self._runs = len(self._convergencestats)
+        self._plots = []
 
     def plotFitness(self):
         """
@@ -27,7 +28,7 @@ class Convergence:
         converted = rmtocm(fitnessvalues)
         logger.info("Got {} generations".format(generations))
         p = plotDotData(converted, labelx="Generation", labely="Fitness", title="Fitness")
-        displayPlot(p)
+        self._plots.append(p)
 
     def plotComplexity(self):
         """
@@ -39,7 +40,7 @@ class Convergence:
         converted = rmtocm(complexity)
         logger.info("Got {} generations".format(generations))
         p = plotDotData(converted, labelx="Generation", labely="Complexity", title="Complexity")
-        displayPlot(p)
+        self._plots.append(p)
 
     def plotPareto(self):
         """
@@ -50,4 +51,7 @@ class Convergence:
         complexity = run[-1]['complexity']
         logger.info("Plotting fitness {} against complexity {}".format(fitnessvalues, complexity))
         p = plotFront(X=fitnessvalues, Y=complexity, labelx="Fitness", labely="complexity", title="Front")
-        displayPlot(p)
+        self._plots.append(p)
+
+    def displayPlots(self, filename):
+        displayPlot(self._plots, filename)

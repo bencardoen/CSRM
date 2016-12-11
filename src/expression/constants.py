@@ -13,3 +13,4 @@ class Constants():
     CONSTANTS_LOWER=0
     CONSTANTS_UPPER=1
     MAX_COMPLEXITY = 4
+    MIN_COMPLEXITY = 1

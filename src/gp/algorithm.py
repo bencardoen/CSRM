@@ -166,16 +166,18 @@ class GPAlgorithm():
             Compute fitness statistics for the current generation and record them
         """
         fit = [d.getFitness() for d in self._population]
-        comp = [d.getComplexity() for d in self._population]
+        comp = [d.getScaledComplexity() for d in self._population]
         mean= numpy.mean(fit)
         sd = numpy.std(fit)
         v = numpy.var(fit)
         cmean = numpy.mean(comp)
         csd = numpy.std(comp)
         cv = numpy.var(comp)
-        logger.info("Generation {} SUMMARY:: \n\tFitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, "".join('{:.2f}, '.format(d) for d in fit), mean, sd, v, replacementcount))
+        logger.info("Generation {} SUMMARY:: \n\tFitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, "".join('{:.2f}, '.format(d) for d in fit), mean, sd, v, replacementcount[0]))
         logger.info("\n\tComplexity values {} \n\t\tmean {} \t\tsd {} \t\tvar {} ".format(generation, "".join('{}, '.format(d) for d in comp), cmean, csd, cv))
-        self.addConvergenceStat(generation, {"fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "replacements":replacementcount, "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, run)
+        self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
+                                                 "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
+                                                 "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, run)
 
     def setTrace(self, v, prefix):
         """
@@ -329,7 +331,7 @@ class BruteElitist(GPAlgorithm):
         assert(l == self._popsize)
         if len(selection) < 2:
             return selection
-        replacementcount = 0
+        replacementcount = [0,0,0]
         # Mutation works only if the specimen is far from an optimal fitness, it is too invasive and not guided, as well as horrendously expensive.
         selcount = len(selection)
         rng = self._rng
@@ -342,7 +344,8 @@ class BruteElitist(GPAlgorithm):
             if candidate.getFitness() < t.getFitness():
                 logger.info("Mutation resulted in improved fitness, replacing {}".format(i))
                 selection[i] = candidate
-                replacementcount += 1
+                replacementcount[0] += 1
+                replacementcount[1] += 1
 
         # Subtree Crossover
         # Select 2 random trees, crossover, if better than parent, replace
@@ -368,10 +371,12 @@ class BruteElitist(GPAlgorithm):
             best = sorted(scores, key = lambda t : t.getFitness())[0:2]
             if lc in best:
                 logger.info("Crossover resulted in improved fitness, replacing")
-                replacementcount += 1
+                replacementcount[0] += 1
+                replacementcount[2] += 1
             if rc in best:
                 logger.info("Crossover resulted in improved fitness, replacing")
-                replacementcount += 1
+                replacementcount[0] += 1
+                replacementcount[2] += 1
             newgen += best
         assert(len(newgen) == l)
         return newgen, replacementcount

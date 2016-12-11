@@ -50,7 +50,13 @@ class Tree:
         return self.nodes[pos]
 
     def getFitness(self):
+        """
+            Get this tree object's absolute fitness value (based on a distance measure)
+        """
         return self.fitness
+
+    def getMutliObjectiveFitness(self):
+        return self.getScaledComplexity()*self.getFitness()
 
     def setFitness(self, fscore):
         self.fitness = fscore
@@ -571,14 +577,22 @@ class Tree:
         return sum(d.getNodeComplexity() for d in self.nodes if d is not None)
 
     def getScaledComplexity(self):
+        """
+            Return the functional complexity of this tree.
+            This a a ratio in [1.0, 2.0] defining how complex the functions are used in this tree.
+        """
         c = self.getComplexity()
         d = self.getDepth()
         # a tree of depth d has 2^(d+1) - 1 nodes if full.
         # Discarding leafs, this gives a set of 2^(d)-1 function nodes, with maximum complexity k this
         # results into (2^-1)k
-        nodecount = pow(2,d)-1
+        nodecount = 2**d-1
         maxc = nodecount * Constants.MAX_COMPLEXITY
-        return (c / maxc)
+        minc = nodecount * Constants.MIN_COMPLEXITY
+        logger.debug("Nodecount {} minc {} maxc {} ratio {}".format(nodecount, minc, maxc, (c-minc)))
+        if c-minc <= 0:
+            return 1
+        return 1 + ( (c-minc) / (maxc-minc))
 
 
     @staticmethod
