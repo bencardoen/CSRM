@@ -22,7 +22,7 @@ class GPAlgorithm():
 
         In itself it will not evolve a solution.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None, history = None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None, history = None, runs=None):
         """
         Initializes a forest of trees randomly constructed.
 
@@ -56,6 +56,7 @@ class GPAlgorithm():
         self._convergencestats = []
         self._history = history or 5
         self._run = 0
+        self._runs = runs or 1
 
     def getSeed(self):
         """
@@ -173,8 +174,9 @@ class GPAlgorithm():
         cmean = numpy.mean(comp)
         csd = numpy.std(comp)
         cv = numpy.var(comp)
-        logger.info("Generation {} SUMMARY:: \n\tFitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, "".join('{:.2f}, '.format(d) for d in fit), mean, sd, v, replacementcount[0]))
-        logger.info("\n\tComplexity values {} \n\t\tmean {} \t\tsd {} \t\tvar {} ".format(comp, cmean, csd, cv))
+        logger.debug("Generation {} SUMMARY:: \n\tFitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, "".join('{:.2f}, '.format(d) for d in fit), mean, sd, v, replacementcount[0]))
+        logger.debug("\n\tComplexity values {} \n\t\tmean {} \t\tsd {} \t\tvar {} ".format(comp, cmean, csd, cv))
+        logger.info("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
 
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
@@ -207,6 +209,10 @@ class GPAlgorithm():
             self.addRandomTree()
         logger.info("Reseeding using archive {}".format(archived))
 
+    def restart(self):
+        self._population.removeAll()
+        self.reseed()
+
 
     def run(self):
         """
@@ -215,7 +221,6 @@ class GPAlgorithm():
         This loop is the main control flow of the algorithm, subclasses can simply override
         called methods to alter behavior
 
-        Each call reset convergence statistics.
         """
         r = self._run
         for i in range(self._generations):
@@ -236,7 +241,14 @@ class GPAlgorithm():
         logger.info("\tArchival")
         self._run += 1
         self.archive(modified)
-        self.reseed()
+
+    def executeAlgorithm(self):
+        self._run = 0
+        self.run()
+        for i in range(self._runs-1):
+            self.restart()
+            logger.info("\n\n\n\nRun {}".format(i))
+            self.run()
 
 
     def stopCondition(self):
@@ -313,8 +325,8 @@ class BruteElitist(GPAlgorithm):
         Applies mutation and subtree crossover to entire population and aggresively
         replaces unfit samples.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed)
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, runs=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, runs=runs)
 
     @traceFunction
     def select(self):
@@ -343,7 +355,7 @@ class BruteElitist(GPAlgorithm):
             candidate.scoreTree(self._Y, self._fitnessfunction)
 
             if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
-                logger.info("Mutation resulted in improved fitness, replacing {}".format(i))
+                logger.debug("Mutation resulted in improved fitness, replacing {}".format(i))
                 selection[i] = candidate
                 replacementcount[0] += 1
                 replacementcount[1] += 1
@@ -371,11 +383,11 @@ class BruteElitist(GPAlgorithm):
             scores = [left, right, lc, rc]
             best = sorted(scores, key = lambda t : t.getMultiObjectiveFitness())[0:2]
             if lc in best:
-                logger.info("Crossover resulted in improved fitness, replacing")
+                logger.debug("Crossover resulted in improved fitness, replacing")
                 replacementcount[0] += 1
                 replacementcount[2] += 1
             if rc in best:
-                logger.info("Crossover resulted in improved fitness, replacing")
+                logger.debug("Crossover resulted in improved fitness, replacing")
                 replacementcount[0] += 1
                 replacementcount[2] += 1
             newgen += best

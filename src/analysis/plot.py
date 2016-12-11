@@ -16,7 +16,6 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
         Plot data values over generations.
     """
     logger.debug("Got {} to plot".format(data))
-    output_file("{}.html".format(title or "title"))
     labelx = labelx or "X"
     labely = labely or "Y"
     p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely)
@@ -26,8 +25,23 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
         p.circle(x, d, size=1, color="navy", alpha=0.5)
     return p
 
+def plotLineData(data,  mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, legend=None):
+    """
+        Plot data values over generations.
+    """
+    colors = ["blue", "green", "red"]
+    logger.debug("Got {} to plot".format(data))
+    labelx = labelx or "X"
+    labely = labely or "Y"
+    if legend is None:
+        legend = [d for d in range(len(data))]
+    p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely)
+    for i,d in enumerate(data):
+        x = [d for d in range(len(data[0]))]
+        p.line(x, d, line_width=1, line_color=colors[i], line_alpha=0.5, legend=legend[i])
+    return p
+
 def plotFront(X, Y, labelx=None, labely=None, title=None):
-    output_file("{}.html".format(title or "title"))
     p = figure(title=title or "title", x_axis_label=labelx or "X", y_axis_label=labely or "Y")
     p.circle(X, Y, size=2, color="red", alpha=0.3)
     return p

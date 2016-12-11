@@ -136,19 +136,19 @@ class GPTest(unittest.TestCase):
         expr = testfunctions[2]
         rng = random.Random()
         rng.seed(0)
-        dpoint = 20
+        dpoint = 40
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True)
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=40, maxdepth=5, fitnessfunction=_fit, seed=0, generations=40)
-        g.run()
-        g.run()
+        g = BruteElitist(X, Y, popsize=30, maxdepth=6, fitnessfunction=_fit, seed=0, generations=50, runs=5)
+        g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
         c.plotFitness()
         c.plotComplexity()
+        c.plotOperators()
         c.plotPareto()
         c.displayPlots("output")
 
