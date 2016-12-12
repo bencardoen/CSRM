@@ -13,6 +13,7 @@
 \usepackage{mathtools}
 \usepackage{url}
 \usepackage{hyperref}
+\usepackage{subfig}
 \usepackage{float}
 \usepackage{listings}
 \usepackage{graphicx}
@@ -36,17 +37,20 @@
 \section{Introduction}
 This report details the current state of the master thesis "Convergence of symbolic regression using metaheuristics".
 \section{Research Question}
-The aim of this project is to analyze convergence of symbolic regression using a baseline GP implementation. 
+The aim of this project is to analyze convergence of symbolic regression by combining a baseline GP implementation with metaheuristics.
 
-\subsection{Intermediary Results}
-% Show that convergence is non trivial, parameter dependent, bloat, then link to swarms
 
 \section{Installation and Running}
-The project uses Python3 and has minimal dependencies. In the accompanying README.md file all dependencies are listed as well as instructions on how to run the tests. The file "test.py" provides an example run of the algorithm. The results in this work can be reproduced by executing:
+You can obtain the source code (and documentation) by:
+\begin{lstlisting}[language=Bash]
+  $git clone git@bitbucket.org:bcardoen/csrm.git
+\end{lstlisting}
+The project is implemented Python3 and has minimal dependencies. In the accompanying README.md file all dependencies are listed as well as instructions on how to run the tests. The file "test.py" provides an example run of the algorithm. The results in this work can be reproduced by executing:
 \begin{lstlisting}[language=Python]
   $ python3 runbenchmarks.py
 \end{lstlisting}
 This produces html output files visualizing the algorithm output on each of the benchmark functions. These functions were taken from literature as instances of hard problems for GP SR solutions.
+Documentation can be found in ./doc/html/index.html.
 \section{Genetic Programming Implementation}
 \subsection{Algorithm}
 The algorithm is a depth constrained variant of Genetic Programming. The following flowchart shows the outline of the algorithm.
@@ -82,7 +86,7 @@ This restriction can be enforced by the fitness function, operators, or both.
 
 
 \paragraph{Datastructures}
-The population is kept in a sorted collection with O(1) random access and O(log N) insertion/addition complexity. 
+The population is kept in a sorted collection with O(1) random access and O(log N) insertion/removal complexity. 
 
 \paragraph{Control flow}
 The algorithm performs k runs, each run consists of j generations comprised of the following stages:
@@ -111,12 +115,13 @@ The population is then emptied and reseeded using the archive and random specime
 \subsection{Fitness function}
 A wide range of fitness functions is possible, in this project a distance function is used that evaluates the tree on a sample of the domain and compares the result with the expected output. 
 Several options are available as distance function, the current implementation uses a root mean square. Experiments with a normalized variant and Pearson correlation coefficient are planned. 
+The fitness functions is a multiplied by the complexity ratio explained next.
 
 \subsection{Complexity}
 A complexity measure is implemented based on the operator complexity and depth of the tree. Functions are ordered by complexity giving a higher weight to $\tanh$ compared to $+$. The idea behind this is that a complex function such as $\tanh$, while more expressive, will lead to overfitting more easily than a simpler function. The complexity score is a ratio of the current complexity of all nodes compared to the maximum complexity the tree could have given its depth. This ratio (within [1,2]) is used as a multiplier for the fitness score to influence the algorithm. 
 
 \subsection{Initialization}
-Initialization requires constructing a population of expression trees. In a random directed search algorithm this is a random process, but the generation of a random tree can easily generate an invalid tree. Consider a function node with division as operator. It is clear that the right subtree of such a node should never evaluate to zero. 
+Initialization requires constructing a population of expression trees. In a probabilistic directed search algorithm this is a random process, but the generation of a random tree can easily generate an invalid tree. Consider a function node with division as operator. It is clear that the right subtree of such a node should never evaluate to zero. 
 Several approaches in literature exist %todo ref 
 to solve this problem.
 As the depth of the tree grows, the complexity of this problem grows exponentially.
@@ -126,7 +131,7 @@ Invalid function input is caught in Python by way of exceptions.
 Exceptions are only justified in high performance code if the probability of an exception is very low. 
 It is clear that this is not the case, as the depth of the tree grows the probability of invalid input for a single node grows exponentially. To address this any function node that is invalid will return None to signal an invalid domain.
 A naive approach then constructs an entire tree and evaluates it on the domain. 
-With the increasing propability of invalid nodes as the depth of the tree increase, this becomes quickly infeasible.
+With the increasing propability of invalid nodes as the depth of the tree increases, this becomes quickly infeasible.
 We can constrict the domain to a few values to test at construction. 
 Should other values invalidate the tree, the corresponding fitness score will result in the elimination of the tree.
 We find thus a balance between generation of semantically correct trees and computational cost. 
@@ -136,7 +141,7 @@ In contrast with a top down approach this allows us to recover from invalid choi
 The initialization stage is repeated in the algorithm itself at a smaller scale when generating subtrees for the mutation operator and when reseeding the algorithm for a new run.
 
 \subsection{Operators}
-The GP algorithm features 2 operators.
+This GP algorithm features 2 operators.
 \subsubsection{Mutation}
 Mutation operates on a single specimen and modifies its structure. Typically a random subtree is chosen, removed and replaced with a newly generated subtree. 
 This operation is, depending on the depth of the subtree and the problem domain, expensive as the newly generated subtree has to result in a valid outcome. The same bottom up construction from the initialization code is reused here as a compromise between validity of the specimen and performance.
@@ -151,18 +156,43 @@ A mutated specimen replaces its original depending on its fitness.
 \subsubsection{Crossover}
 Two specimens are selected and copied. Each of the copies exchanges a randomly chosen subtree with the other. This exchange of information leads quickly to convergence, but does not introduce new information (e.g. diversity). 
 \paragraph{Configuration}
-Crossover can be configured to preserve depth by exchanging subtrees of equal depth. The same concept of modifying highly fit individuals to a smaller extent than less fit individuals can be applied here but with caution, the fitness of the subtree is higher than that of a randomly generated as is the case with mutation.
+Crossover can be configured to preserve depth by exchanging subtrees of equal depth. The same concept of modifying highly fit individuals to a smaller extent than less fit individuals can be applied here but with caution, the fitness of the subtree is higher than that of a randomly generated subtree.
 Crossover in the current implementation picks random pairs of specimens, and from the resulting 4 specimens (2 parents, 2 offspring) picks the 2 best to replace the parents depending on fitness.
 
 \subsection{Constants}
-% Demonstrate effect of varying limits of constant generation
+We differentiate here between 2 types of constants in an expression.
+\[
+y = a + b * ln( c * x_0)
+\]
+In this expression a is a standalone constant, b and c are coefficients. We will refer to b and c as embedded constants.
+The encoding of constants in the expression tree allows for several optimizations.
+In the analysis section we will observe the convergence behavior of the algorithm when we approximate the expression:
+\[
+y=213.80940889 - 213.80940889* e^{-0.54723748542*x_0}
+\]
+The large constant values here lead to poor convergence, the algorithm cannot easily generate them by random search.
+The parse tree in Figure \ref{fig:embedconstants} for this expression has 8 nodes with a depth of 4.
 
+\begin{figure}[H]
+    \centering
+    \subfloat{{\includegraphics[width=5cm]{figures/constants.png} }}%
+    \qquad
+    \subfloat{{\includegraphics[width=5cm]{figures/constantsembedded.png} }}%
+    \caption{Embedding of constants in nodes.}%
+    \label{fig:embedconstants}%
+\end{figure}
+In our implementation each node has a built in constant multiplier, by using this representation the parse tree for the equivalent expression only needs 4 nodes with depth 2. Given our earlier discussion on the impact of depth on the algorithm it should be clear that this is a valuable contribution. Furthermore, these constants can be optimized by a metaheuristic, instead of being generated by the GP algorithm. The latter process is very ineffective and leads to much of the convergence problems in GP inspired SR solutions. 
+Both standalone constants, with a dedicated node in the tree, and embedded coefficients are easily accessible as a vector for any optimization algorithm.
+
+Finally the range in which constants are generated influences convergence. If the optimal solution has constants outside of the chosen range, the algorithm will have to generate an expression resulting in the correct value, a very ineffective process. If the range is larger than any of the constants required in the optimal expression, the algorithm will invariable generate values that do not contribute to the solution. 
+With embedded constants this issue is still present. The underlying problem of generating a constant expression with an optimal value remains. 
+To contrast this with the problem of approximating a base function such as ln, consider that the probability of picking ln from the range of available base functions is approximately $\frac{1}{17}$, depending on the base function set. With a reasonable floating point range the probability of generating a number close to 213.80940889 is several orders of magnitude smaller.
 \subsection{Parameters}
 The algorithm has several key parameters. We will list each and detail the challenges in finding an optimal value.
 \begin{itemize}
-\item population size : A balance between maximizing diversity and information versus optimal fitness requires different optimal population sizing for each problem instance. 
+\item Population size : A balance between maximizing diversity and information versus optimal fitness requires different optimal population sizing for each problem instance. 
 \item Operator configuration : The operators can restrict bloating by preventing specimens from growing beyond a set limit. The key question remains what the exact valid limit is, and if this excludes optimal solutions from being found.
-\item depth limit : The algorithm can force each specimen to maintain a set depth. As before with the operators, this value is at most trial and error. A rule of thumb is to set this value so that at each feature can be present in a leaf in the tree. E.g. with 16 features, depth should be greater or equal to 4. Too large a value will lead to an exponential increase in memory and runtime. Especially validating specimens will become prohibitively expensive.
+\item Depth limit : The algorithm can force each specimen to maintain a set depth. As before with the operators, this value is at most trial and error. A rule of thumb is to set this value so that at each feature can be present in a leaf in the tree. E.g. with 16 features, depth should be greater or equal to 4. Too large a value will lead to an exponential increase in memory and runtime. Especially validating specimens will become prohibitively expensive.
 \item Constant ranges: The bounds for the generated constants influence the algorithm greatly. A small range allows for fast execution but risks losing optimal solutions. A large value leads to high variance in fitness values. 
 \item PRNG: the random process and distribution has a significant effect in all stages of the algorithm. For the moment a uniform distribution is used, but experiments are planned with other distributions such a Levy Flight.
 \item Generations : A simple problem instance will convergence in very few generations, although this also depends on the population size. More intractable problems require more generations. The optimal value is not known in advance, but the algorithm will detect convergence stalling so picking a large value is preferred.
@@ -172,8 +202,73 @@ The algorithm has several key parameters. We will list each and detail the chall
 \section{Visualization and Tracing}
 Each specimen in the population can be inspected by plotting it as a .dot file. Viewing such a tree in svg format allows for quick insights into how the operators work, how the tree is balanced and how it evolves during the algorithm.
 The convergence statistics gathered during execution can be displayed in interactive plots. This is vital for the analysis of the algorithm, especially the convergence over time and the effect of parameter configuration.
-Debugging and introspection of a probabilistic search algorithm is notoriously hard. To alleviate this each functioncall can be decorated with a logger, enabling a full blown trace of the entire algorithm. The code itself requires no changes to enable this, simply configuring the right logging object and level is enough.
+Debugging and introspection of a probabilistic search algorithm is notoriously hard. To alleviate this each functioncall can be decorated with a logger, enabling a full trace of the entire algorithm. The code itself requires no functional changes to enable this, simply configuring the right logging object and level is enough.
 \section{Analysis of results}
+To analyze the behavior of the algorithm we selected a series of functions from literature. These are characterized as being hard problems for GP inspired SR solutions, and therefore ideal in this project. 
+Each function is approximated by the algorithm in a number of runs. 
+The output of all benchmark functions is saved in "output\_\{x\}.html" files in the current working directory.
+In this section we will use these results to illustrate behavior of the algorithm.
+\subsection{Algorithm parameters}
+Base functions : [+,-,*,/,\%,log,ln,exp,sin,cos,tan,tanh,sqrt,pow,abs,min,max]\\
+Generations : 20\\
+Runs : 5\\
+Population : 40\\
+Fitness function : Root mean square multiplied by complexity\\
+Featureset : 5\\
+\subsection{Benchmark functions}
+\paragraph{Case 1}
+The benchmark function \[
+y=0.23+(14.2*((x_3+x_1)/(3.0*x_4))\]
+ is reasonably simple, using only 3 features of the 5 we give the algorithm. 
+In Figure \ref{fig:fit1} we see that fitness values converge in only 20 generations. Using multiple runs we obtain an increase in fitness by introducing new specimens, but the gain is small. 
+\begin{figure}[H]
+	\caption{Fitness values over generations.}
+	\label{fig:fit1}
+	\includegraphics[scale=0.3]{figures/fitness1.png}
+\end{figure}
+The complexity plot in Figure \ref{fig:comp1} shows that despite the penalty, functions with higher complexity survive more toward the end of the algorithm.
+\begin{figure}[H]
+	\caption{Complexity values over generations.}
+	\label{fig:comp1}
+	\includegraphics[scale=0.3]{figures/complexity1.png}
+\end{figure}
+Figure \ref{fig:operator1} shows for each generation how many operator applications were successful. Success is defined here as the resulting specimen being fitter than its predecessor. 
+As explained before, the mutation is only applied to the least fit half of the population, explaining the factor 2 offset showing in the initial values.
+Despite this offset, we can also observe that mutations are far less successful as the generations increase. From the previous plots we know that fitness is decreasing (a lower value denotes a better fitness). The explanation for this phenomenon is simple. 
+When a random mutation is applied to a fit individual, the probability of the random subtree being fitter than the subtree it replaces is lower. 
+A similar effect is seen with crossover, to a lesser extent. As the generations proceed, the information that can lead to a fitter individual is distributed over all specimens.
+\begin{figure}[H]
+	\caption{Operator success rate over generations}
+	\label{fig:operator1}
+	\includegraphics[scale=0.3]{figures/operator1.png}
+\end{figure}
+
+\paragraph{Case 2}
+The function 
+\[
+y=213.80940889 - (213.80940889*exp(-0.54723748542*x_0))
+\] is a more difficult problem for GP, due to the large constants present in the function. Only one feature is used, but the algorithm itself is not given this information, it has to select from 5 as in the previous case.
+The fitness values converge but to a far higher value than before. The algorithm fails to derive the constants using the existing population. Deriving such a constant is possible if the value is generated as a random value (with very low probability), or if a constant expression is generated that results in this value. The probability that an average random subtree results in this specific value is again very low. It would also require a higher depth, and in this instance the algorithm is limited to depth 4.
+In the last run we see a sudden gain in fitness. This demonstrates that introducing new information by using several runs can prevent premature convergence.
+Finally we see that the initially generated specimens have a very low fitness. The exponential term can be a factor in this result, as well as the constant generation problem. This effect repeats itself each run. 
+An interesting approach could be to reduce the number of random specimens when seeding a new run, and mutating the archived solutions instead. Or alternatively, seed the new run by smaller specimens (in this case depth 3 instead of 4). These will still introduce new information to the process, but   at a reduced rate and hopefully smaller initial error.
+\begin{figure}[H]
+	\caption{Fitness values over generations.}
+	\label{fig:fit2}
+	\includegraphics[scale=0.3]{figures/fitness2.png}
+\end{figure}
+The complexity plot \ref{fig:comp2} shows that fitter specimens prefer simpler functions. If we look at the given expression we see that once the multiplication and exponentiation are approximated, all that remains are simple base functions. Furthermore, generating the constants using subtrees is more efficient using simple functions. (e.g. sin is less likely to contribute to 213.80 than for instance * or +).
+\begin{figure}[H]
+	\caption{Complexity values over generations.}
+	\label{fig:comp2}
+	\includegraphics[scale=0.3]{figures/complexity2.png}
+\end{figure}
+From the operator activity plot  \ref{fig:operator2} we can see that crossover is far more effective here. Apart from the initial state mutation does not contribute here as much as in the previous case.
+\begin{figure}[H]
+	\caption{Operator success rate over generations}
+	\label{fig:operator2}
+	\includegraphics[scale=0.3]{figures/operator2.png}
+\end{figure}
 
 \section{Open Issues}
 \subsection{Parameter configuration}
@@ -182,14 +277,14 @@ has been extended with checks to make this process easier. For instance converge
 \subsection{Complexity measure and Pareto Front}
 Defining a 'good' complexity measure is still a work in progress. A balance has to be found between computational complexity (e.g. depth of the tree) and the resulting behavior of the tree (e.g. tendency to over and underfitting)
 \subsection{Planning}
-The project is on schedule, the last weeks of November saw a delay due to other projects, but this has been made up.
-The current phase is nearly concluded : implementation and analysis of a baseline GP algorithm with benchmarks
-The next phase starts after the examn period : implementation and integration of a selection of metaheuristic algorithms.
+Despite some delay in the last weeks of November, the project is on schedule.\\
+The current phase is nearly concluded : implementation and analysis of a baseline GP algorithm with benchmarks\\
+The next phase starts after the exam period : implementation and integration of a selection of metaheuristic algorithms.
 \section{Supporting Code}
 \subsection{Testing}
 Extensive tests are available guaranteeing correctness of each part of the project. 
-Considering the probabilistic nature of the algorithms this is required to ensure the results are valid and deterministic (if given a seed).
-This also means that results are reproducible, vital for the analysis and conclusions.
+Considering the probabilistic nature of the algorithms this is required to ensure the results are valid and deterministic (given a seed),
+leading to reproducible results.
 \subsection{Expressions}
 Conversion functions were written to enable parsing expressions from and to tree forms, including but not limited to a simple expression parser and tokenizer, and a number of utility functions.
 \subsection{Visualization}

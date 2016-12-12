@@ -14,7 +14,7 @@ def runBenchmarks():
 
         rng = random.Random()
         rng.seed(0)
-        dpoint = 10
+        dpoint = 25
         vpoint = 5
 
         # Input values
@@ -25,7 +25,7 @@ def runBenchmarks():
         Y = t.evaluateAll()
 
         # Configure the algorithm
-        g = BruteElitist(X, Y, popsize=20, maxdepth=4, fitnessfunction=_fit, seed=0, generations=15, runs=4)
+        g = BruteElitist(X, Y, popsize=40, maxdepth=4, fitnessfunction=_fit, seed=0, generations=20, runs=5)
         g.executeAlgorithm()
 
         # Plot results

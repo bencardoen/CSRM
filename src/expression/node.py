@@ -106,7 +106,7 @@ class Node:
     def __str__(self):
         output = "{}".format(expression.functions.functionset[self.function][0])
         if self.constant:
-            output += "*{}".format(self.constant.getValue())
+            output =  "{}".format(self.constant.getValue()) + " * " + output
         return output
 
     def __repr__(self):
@@ -313,7 +313,7 @@ class VariableNode(Node):
     def __repr__(self):
         output = "{}".format(self.variable)
         if self.constant:
-            output += " * {}".format(self.constant.getValue())
+            output = "{}".format(self.constant.getValue()) + " * " + output
         return output
 
     def __hash__(self):

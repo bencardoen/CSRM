@@ -11,6 +11,9 @@ import math
 logger = logging.getLogger('global')
 import random
 
+plotwidth = 200
+plotheigth = 200
+
 def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None):
     """
         Plot data values over generations.

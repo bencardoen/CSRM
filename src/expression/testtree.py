@@ -42,6 +42,24 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(t.evaluateTree(), 11)
         t.printToDot(outputfolder+"t1.dot")
 
+    def testExample(self):
+        """
+        Plot examples used in report.
+        """
+        dcount = 2
+        vcount = 5
+        variables = generateVariables(vcount, dcount, 0)
+        expr = testfunctions[6]
+        t = Tree.createTreeFromExpression(expr, variables=variables)
+        t.printToDot(outputfolder+"example.dot")
+
+        t = Tree()
+        root = t.makeInternalNode(minus, None, None)
+        t.makeConstant(Constant(213.80940889), root)
+        r = t.makeInternalNode(exponential, root, constant=Constant(-213.80940889))
+        t.makeLeaf(Variable([0.844], 0), r, constant=Constant(-0.54723748542))
+        t.printToDot(outputfolder+"example_embedded.dot")
+
     def testIsLeaf(self):
         t = Tree()
         root = t.makeInternalNode(plus, None, None)

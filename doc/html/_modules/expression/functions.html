@@ -188,8 +188,7 @@
     <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># Prepare input</span>
-    <span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;**&quot;</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">)</span>
+    <span class="n">expression</span> <span class="o">=</span> <span class="n">preParse</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>
     <span class="n">detect</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">functionset</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="c1"># list of tokens following a unary minus</span>
     <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="p">):</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">expression</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -361,6 +360,14 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid chars </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">expression</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="preParse"><a class="viewcode-back" href="../../expression.html#expression.functions.preParse">[docs]</a><span class="k">def</span> <span class="nf">preParse</span><span class="p">(</span><span class="n">expression</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clean up expression before tokenizer operates on it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;**&quot;</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">expression</span></div>
 
 
 <div class="viewcode-block" id="fitnessfunction"><a class="viewcode-back" href="../../expression.html#expression.functions.fitnessfunction">[docs]</a><span class="k">def</span> <span class="nf">fitnessfunction</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>

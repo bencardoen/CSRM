@@ -85,7 +85,7 @@
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.SIZE_LIMIT">
-<code class="descname">SIZE_LIMIT</code><em class="property"> = 80</em><a class="headerlink" href="#expression.constants.Constants.SIZE_LIMIT" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SIZE_LIMIT</code><em class="property"> = 30</em><a class="headerlink" href="#expression.constants.Constants.SIZE_LIMIT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -237,6 +237,12 @@
 <dt id="expression.functions.power">
 <code class="descclassname">expression.functions.</code><code class="descname">power</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/functions.html#power"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.functions.power" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="expression.functions.preParse">
+<code class="descclassname">expression.functions.</code><code class="descname">preParse</code><span class="sig-paren">(</span><em>expression: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/functions.html#preParse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.functions.preParse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean up expression before tokenizer operates on it.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="expression.functions.sine">
@@ -572,9 +578,17 @@ Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index
 <p>Mutate a subexpression in the tree</p>
 <dl class="staticmethod">
 <dt id="expression.operators.Mutate.mutate">
-<em class="property">static </em><code class="descname">mutate</code><span class="sig-paren">(</span><em>tr</em>, <em>seed=None</em>, <em>variables=None</em>, <em>equaldepth=False</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/operators.html#Mutate.mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.operators.Mutate.mutate" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">mutate</code><span class="sig-paren">(</span><em>tr: expression.tree.Tree</em>, <em>seed: int = None</em>, <em>variables=None</em>, <em>equaldepth=False</em>, <em>rng=None</em>, <em>limitdepth: int = 0</em>, <em>selectiondepth: int = -1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/operators.html#Mutate.mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.operators.Mutate.mutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace a random node with a new generated subexpression.</p>
 <p>If no variables are supplied, the existing set is reused.</p>
+<p>This operator is capable of operating using 3 policies specified by its parameters.</p>
+<p>With equaldepth set, the resulting mutation will always have the same depth as the original tree.
+With limitdepth set, the resulting tree will have a depth &lt;= limit
+With selectiondepth set, the target depth for the mutation point can be specified.</p>
+<dl class="docutils">
+<dt>For instance to create a mutation operator that mutates only leafs and replaces them with leafs:</dt>
+<dd>equaldepth=True, limitdepth=0, selectiondepth=tr.getDepth()</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -583,7 +597,9 @@ Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index
 <li><strong>tr</strong> (<a class="reference internal" href="#expression.tree.Tree" title="expression.tree.Tree"><em>Tree</em></a>) &#8211; Tree to modify in place</li>
 <li><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; seed influencing the choice of node and new tree</li>
 <li><strong>variables</strong> &#8211; set of variables</li>
-<li><strong>equaldepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if set the generated subtree will have the same depth as the node removed.</li>
+<li><strong>equaldepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if set the generated subtree will have the same depth as the node removed, resulting in a mutation which conserves tree depth</li>
+<li><strong>limitdepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; if not 0 prevent the mutation from growing a resulting tree with depth larger than limit</li>
+<li><strong>selectiondepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; if not -1 specify at which depth the insertion point is chosen</li>
 <li><strong>rng</strong> (<em>Random</em>) &#8211; prng used to generate the new subtree and its attaching location</li>
 </ul>
 </td>
@@ -641,6 +657,11 @@ Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index
 <dt id="expression.testtree.TreeTest">
 <em class="property">class </em><code class="descclassname">expression.testtree.</code><code class="descname">TreeTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="expression.testtree.TreeTest.testAdvancedOperators">
+<code class="descname">testAdvancedOperators</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testAdvancedOperators"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testAdvancedOperators" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="expression.testtree.TreeTest.testBasicFullExpression">
 <code class="descname">testBasicFullExpression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testBasicFullExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testBasicFullExpression" title="Permalink to this definition">¶</a></dt>
@@ -727,6 +748,12 @@ Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index
 <dt id="expression.testtree.TreeTest.testEvaluation">
 <code class="descname">testEvaluation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testEvaluation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testEvaluation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="expression.testtree.TreeTest.testExample">
+<code class="descname">testExample</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testExample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testExample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot examples used in report.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="expression.testtree.TreeTest.testExp">
@@ -1053,6 +1080,7 @@ Each node has an optional constant weight</p>
 <em class="property">static </em><code class="descname">createTreeFromExpression</code><span class="sig-paren">(</span><em>expr: str</em>, <em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.createTreeFromExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.createTreeFromExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given an infix expression containing floats, operators, function defined in functions.functionset,
 create a corresponding expression tree.</p>
+<p>:attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) allowed but not log(x) with implicit base e</p>
 </dd></dl>
 
 <dl class="method">
