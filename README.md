@@ -15,6 +15,7 @@
     ```
 
 * Bokeh :
+
    ```
         $pip3 install bokeh
    ```
