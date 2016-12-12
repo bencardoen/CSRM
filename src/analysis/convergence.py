@@ -6,7 +6,7 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-from analysis.plot import plotDotData, displayPlot, plotFront, plotLineData
+from analysis.plot import plotDotData, displayPlot, plotFront, plotLineData, savePlot
 from expression.tools import rmtocm
 import logging
 logger = logging.getLogger('global')
@@ -83,8 +83,11 @@ class Convergence:
         p = plotFront(X=fitnessvalues, Y=complexity, labelx="Fitness", labely="complexity", title="Front")
         self._plots.append(p)
 
-    def displayPlots(self, filename):
+    def displayPlots(self, filename, title):
         """
             Collect all plots and write them out to a displayed html file.
         """
-        displayPlot(self._plots, filename)
+        displayPlot(self._plots, filename, title)
+
+    def savePlots(self, filename, title):
+        savePlot(self._plots, filename, title)

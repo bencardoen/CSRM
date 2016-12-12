@@ -150,7 +150,7 @@ class GPTest(unittest.TestCase):
         c.plotComplexity()
         c.plotOperators()
         c.plotPareto()
-        c.displayPlots("output")
+        c.displayPlots("output", title=expr)
 
 
 

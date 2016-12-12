@@ -7,7 +7,7 @@ class Constants():
     MINFITNESS = float('inf')
     MAXFITNESS = 0
     # Size limit for exponents
-    SIZE_LIMIT = 80
+    SIZE_LIMIT = 30
     # Legal range for constants
     # Setting this to high values leads to explosion in fitness values
     CONSTANTS_LOWER=0

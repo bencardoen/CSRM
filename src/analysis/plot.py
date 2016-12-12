@@ -5,7 +5,7 @@
 #A full copy of the license is in COPYING.txt, or can be found at
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
-from bokeh.plotting import figure, output_file, show, gridplot
+from bokeh.plotting import figure, output_file, show, gridplot, save
 import logging
 import math
 logger = logging.getLogger('global')
@@ -46,14 +46,23 @@ def plotFront(X, Y, labelx=None, labely=None, title=None):
     p.circle(X, Y, size=2, color="red", alpha=0.3)
     return p
 
-def displayPlot(plots, title):
-    output_file("{}.html".format(title or "title"))
+def displayPlot(plots, filename, title):
+    output_file("{}.html".format(filename or "index"), title=title or "title")
     gplots = []
     if len(plots) % 2:
         plots.append(None)
     gplots = [[plots[2*d], plots[2*d+1]] for d in range(len(plots)//2)]
     p = gridplot(*gplots)
     show(p)
+
+def savePlot(plots, filename, title):
+    output_file("{}.html".format(filename or "index"), title=title or "title")
+    gplots = []
+    if len(plots) % 2:
+        plots.append(None)
+    gplots = [[plots[2*d], plots[2*d+1]] for d in range(len(plots)//2)]
+    p = gridplot(*gplots)
+    save(p)
 
 if __name__ == "__main__":
     rng = random.Random()
