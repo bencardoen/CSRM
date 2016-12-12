@@ -632,6 +632,8 @@ class Tree:
         """
         Given an infix expression containing floats, operators, function defined in functions.functionset,
         create a corresponding expression tree.
+
+        :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) allowed but not log(x) with implicit base e
         """
         dpoint = 0
         if variables:

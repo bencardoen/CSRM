@@ -142,8 +142,7 @@ def tokenize(expression, variables=None):
     output = []
     i = 0
     # Prepare input
-    expression = expression.replace(' ', '')
-    expression = expression.replace("**", "^")
+    expression = preParse(expression)
     detect = ['(', ','] + [x for x in list(functionset.keys())] # list of tokens following a unary minus
     while i < len(expression):
         c = expression[i]
@@ -315,6 +314,14 @@ def parseFunction(expression: str, index: int, output: list):
     else:
         raise ValueError("Invalid chars {}".format(name))
     return expression, index, output
+
+def preParse(expression:str):
+    """
+        Clean up expression before tokenizer operates on it.
+    """
+    expression = expression.replace(' ', '')
+    expression = expression.replace("**", "^")
+    return expression
 
 
 def fitnessfunction(actual, expected, tree):

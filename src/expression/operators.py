@@ -18,30 +18,62 @@ class Mutate():
     """
     @staticmethod
     @traceFunction
-    def mutate(tr, seed = None, variables = None, equaldepth=False, rng=None):
+    def mutate(tr:Tree, seed:int = None, variables = None, equaldepth=False, rng=None, limitdepth:int=0, selectiondepth:int=-1):
         """
             Replace a random node with a new generated subexpression.
 
             If no variables are supplied, the existing set is reused.
 
+            This operator is capable of operating using 3 policies specified by its parameters.
+
+            With equaldepth set, the resulting mutation will always have the same depth as the original tree.
+            With limitdepth set, the resulting tree will have a depth <= limit
+            With selectiondepth set, the target depth for the mutation point can be specified.
+
+            For instance to create a mutation operator that mutates only leafs and replaces them with leafs:
+                equaldepth=True, limitdepth=0, selectiondepth=tr.getDepth()
+
             :param Tree tr: Tree to modify in place
             :param int seed: seed influencing the choice of node and new tree
             :param variables: set of variables
-            :param bool equaldepth: if set the generated subtree will have the same depth as the node removed.
+            :param bool equaldepth: if set the generated subtree will have the same depth as the node removed, resulting in a mutation which conserves tree depth
+            :param int limitdepth: if not 0 prevent the mutation from growing a resulting tree with depth larger than limit
+            :param int selectiondepth: if not -1 specify at which depth the insertion point is chosen
             :param Random rng: prng used to generate the new subtree and its attaching location
         """
         rng = rng or random.Random()
         if seed is not None:
             rng.seed(seed)
-        insertpoint = tr.getRandomNode(rng=rng)
-        d = tr.getDepth()
-        depth_at_i = insertpoint.getDepth()
-        targetdepth = d - depth_at_i
-        logger.debug("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
-        assert(targetdepth >= 0)
         if variables is None:
-            vs = variables or tr.getVariables()
+            vs = tr.getVariables()
             variables= [v[0] for k,v in vs.items()]
+
+        d = tr.getDepth()
+
+        selectdepth = None
+        if selectiondepth != -1:
+            selectdepth = selectiondepth
+            logger.debug("Selection depth set with treedepth {} and chosen depth {}".format(d, selectdepth))
+            assert(d>=selectdepth)
+
+        insertpoint = tr.getRandomNode(rng=rng, depth=selectdepth)
+        depth_at_i = insertpoint.getDepth()
+        logger.debug("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
+
+        targetdepth = 0
+        if not equaldepth:
+            limit = d
+            if limitdepth:
+                # Have an existing tree with depth d.
+                limit = limitdepth - depth_at_i
+                logger.debug("Depth is limited by {} to {}".format(limitdepth, limit))
+            targetdepth = rng.randint(0, limit)
+            logger.debug("Picking a random depth {} for mutation".format(targetdepth))
+        else:
+            targetdepth = d-depth_at_i
+            logger.debug("Picking a fixed depth {} for mutation".format(targetdepth))
+
+        assert(targetdepth >= 0)
         subtree = Tree.growTree(variables=variables, depth=targetdepth, rng=rng)
         tr.spliceSubTree(insertpoint, subtree.getRoot())
         tr._mergeVariables(subtree.getVariables())

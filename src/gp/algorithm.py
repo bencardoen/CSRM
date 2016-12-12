@@ -347,14 +347,15 @@ class BruteElitist(GPAlgorithm):
         rng = self._rng
         # TODO : mutate with cooling effect, modify based on current fitness, i.e. don't drastically alter a good tree
         for i in range(selcount//2, selcount):
-#        for i in range(selcount):
             t = selection[i]
             candidate = deepcopy(t)
-            Mutate.mutate(candidate, variables=self._variables, seed=None, rng=rng)
+            #def mutate(tr:Tree, seed:int = None, variables = None, equaldepth=False, rng=None, limitdepth:int=0):
+            Mutate.mutate(candidate, variables=self._variables, seed=None, equaldepth=True, rng=rng)
             candidate.scoreTree(self._Y, self._fitnessfunction)
 
             if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
                 logger.debug("Mutation resulted in improved fitness, replacing {}".format(i))
+                assert(candidate.getDepth() <= self._maxdepth)
                 selection[i] = candidate
                 replacementcount[0] += 1
                 replacementcount[1] += 1
@@ -366,7 +367,7 @@ class BruteElitist(GPAlgorithm):
         # Both fit and unfit individuals benefit from crossbreeding.
         newgen = []
         if l % 2:
-            logger.info("Selection not even")
+            logger.debug("Selection not even")
             newgen.append(selection[0])
             del selection[0]
         selector = randomizedConsume(selection, seed=self.getSeed())

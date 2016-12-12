@@ -660,6 +660,39 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(c, 18)
         self.assertEqual(c2, 1+(c-(d-1))/57)
 
+    def testAdvancedOperators(self):
+        vcount = 4
+        dpoint = 1
+        vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
+        expr = "ln(x1) * sin(x2) - x3 + 7 / 17.32"
+        t = Tree.createTreeFromExpression(expr, variables=vs)
+        t.evaluateTree()
+        told = deepcopy(t)
+        last = deepcopy(t)
+        told.printToDot(outputfolder+"t40BeforeMutated.dot")
+        # Normal mutation, mutate an equal depth subexpression
+        d = t.getDepth()
+        Mutate.mutate(t, seed=0, equaldepth=True)
+        self.assertEqual(t.getDepth(), d)
+        t.printToDot(outputfolder+"t40Mutated1.dot")
+
+        # Variable mutation, mutate with a set limit to the generated mutation
+        d = t.getDepth()
+        limit = 6
+        Mutate.mutate(t, seed=0, equaldepth=False, limitdepth=limit)
+        logger.info("New depth = {}".format(t.getDepth()))
+        self.assertTrue(t.getDepth()<= max(d, limit))
+        t.printToDot(outputfolder+"t40Mutated2.dot")
+
+        # Mutate with a limit set, without equaldepth, with a set depth to select
+        d = told.getDepth()
+        Mutate.mutate(told, seed=0, equaldepth=False, limitdepth=limit, selectiondepth=d)
+        told.printToDot(outputfolder+"t40Mutated3.dot")
+
+        d = last.getDepth()
+        Mutate.mutate(last, seed=0, equaldepth=True, selectiondepth=d)
+        last.printToDot(outputfolder+"t40Mutated4.dot")
+
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)
