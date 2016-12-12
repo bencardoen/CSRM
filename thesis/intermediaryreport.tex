@@ -1,0 +1,117 @@
+
+
+\title{Master Thesis intermediary report}
+\author{
+	Ben Cardoen
+}
+\date{\today}
+
+\documentclass[10pt]{extarticle}
+
+\usepackage{seqsplit}
+\usepackage{verbatim}
+\usepackage{mathtools}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage[square,sort,comma,numbers]{natbib}
+\lstset{
+   basicstyle=\fontsize{10}{10}\selectfont\ttfamily
+}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This report details the current state of the master thesis "Convergence of symbolic regression using metaheuristics".
+\section{Research Question}
+The aim of this project is to analyze convergence of symbolic regression using a baseline GP implementation. 
+
+\subsection{Intermediary Results}
+% Show that convergence is non trivial, parameter dependent, bloat, then link to swarms
+
+\section{Genetic Programming Implementation}
+\subsection{Algorithm}
+The algorithm is a depth constrained variant of Genetic Programming. The following flowchart shows the outline of the algorithm.
+The restriction on depth is necessary to avoid bloat in the generated solutions.
+This restriction can be enforced by the fitness function, operators, or both.
+% Flowchart
+
+\paragraph{Datastructures}
+The population is kept in a sorted collection with O(1) random access and O(log N) insertion/addition complexity. 
+
+\paragraph{Control flow}
+The algorithm performs k runs, each run consists of j generations comprised of the following stages:
+
+\subparagraph{Selection}
+Select given a criteria k of the population to modify. The current implementation works on the entire population, this can be easily tuned to select only the k best specimens.
+
+\subparagraph{Evolution}
+In the evolution stage 2 operators modify the selected set of specimens.
+Mutation will generate a modified specimen which replaces the original based on the fitness score.
+Crossover will select 2 specimens and exchange subtrees randomly chosen between the two specimens. The best 2 specimens of the resulting set of 4 are then retained.
+
+\subparagraph{Update}
+In the update stage a validation check is done on the new specimens, the modified specimens are added to the population and if needed new specimens are generated.
+
+\subparagraph{Statistics}
+At the end of a generation statistics are gathered and stored. The fitness scores and their evolution is tracked for later analysis.
+The algorithm can use these to detect stalling convergence.
+The entire set of statistics allow for a perfect trace of the algorithm stage by stage.
+
+\subparagraph{Archive}
+At the end of a run a selection of the surviving population is stored in the archive. 
+The population is then emptied and reseeded using the archive and random specimens. The combination of these approaches ensures the best results of the previous generations are not lost, while introducing new information into the process.
+
+
+\subsection{Fitness function}
+A wide range of fitness functions is possible, in this project a distance function is used that evaluates the tree on a sample of the domain and compares the result with the expected output. 
+Several options are available as distance function, the current implementation uses a root mean square. Experiments with a normalized variant and Pearson correlation coefficient are planned. 
+
+\subsection{Complexity}
+A complexity measure is implemented based on the operator complexity and depth of the tree. Functions are ordered by complexity giving a higher weight to $\tanh$ compared to $+$. The idea behind this is that a complex function such as $\tanh$, while more expressive, will lead to overfitting more easily than a simpler function. The complexity score is a ratio of the current complexity of all nodes compared to the maximum complexity the tree could have given its depth. This ratio (within [1,2]) is used as a multiplier for the fitness score to influence the algorithm. 
+
+\subsection{Initialization}
+Initialization requires constructing a population of expression trees. In a random directed search algorithm this is a random process, but the generation of a random tree can easily generate an invalid tree. Consider a function node with division as operator. It is clear that the right subtree of such a node should never evaluate to zero. 
+Several approaches in literature exist %todo ref 
+to solve this problem.
+As the depth of the tree grows, the complexity of this problem grows exponentially.
+The problem is split into detection and remediation.
+To detect an invalid tree requires full knowledge of the domain the tree represent. Even if we have this domain, it is not feasible to validate the tree for the entire domain. 
+Invalid function input is caught in Python by way of exceptions. 
+Exceptions are only justified in high performance code if the probability of an exception is very low. 
+It is clear that this is not the case, as the depth of the tree grows the probability of invalid input for a single node grows exponentially. To address this any function node that is invalid will return None to signal an invalid domain.
+A naive approach then constructs an entire tree and evaluates it on the domain. 
+With the increasing propability of invalid nodes as the depth of the tree increase, this becomes quickly infeasible.
+We can constrict the domain to a few values to test at construction. 
+Should other values invalidate the tree, the corresponding fitness score will result in the elimination of the tree.
+We find thus a balance between generation of semantically correct trees and computational cost. 
+It is not feasible to delay all validation to the algorithm itself, this simply moves the naive approach to the algorithm loop.
+Finally, by constructing and validating a tree from the bottom up, we can detect early when a tree is invalid. 
+In contrast with a top down approach this allows us to recover from invalid choices in the random process without discarding valid subtrees.
+The initialization stage is repeated in the algorithm itself at a smaller scale when generating subtrees for the mutation operator and when reseeding the algorithm for a new run.
+
+\subsection{Operators}
+% Operators. For each, go into their effect, when to apply and how to configure them
+% Mutation : depth fixed, problem of generating new information without disturbing current state
+% Crossover : depth fixed, reasonably efficient but only conserves information.
+% Conclusion : information gain without fitness loss
+
+\subsection{Constants}
+% Demonstrate effect of varying limits of constant generation
+
+\subsection{Parameters}
+%Configure the algorithm how ?
+\section{Visualization and Tracing}
+% Visualization of trees (instances)
+% Visualization of convergence results
+% Logging each function call if needed
+\section{Analysis of results}
+
+\section{Supporting Code}
+% Expression parsing
+% Expression tree
+% Plotting, Convergence statistics
+\bibliography{papers}
+\end{document}

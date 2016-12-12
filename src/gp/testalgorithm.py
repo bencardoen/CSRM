@@ -136,13 +136,13 @@ class GPTest(unittest.TestCase):
         expr = testfunctions[2]
         rng = random.Random()
         rng.seed(0)
-        dpoint = 100
+        dpoint = 20
         vpoint = 5
-        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-100, upper=100)
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=40, maxdepth=4, fitnessfunction=_fit, seed=10, generations=15, runs=10)
+        g = BruteElitist(X, Y, popsize=25, maxdepth=4, fitnessfunction=_fit, seed=0, generations=15, runs=3)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)

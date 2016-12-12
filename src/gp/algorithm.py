@@ -171,6 +171,11 @@ class GPAlgorithm():
         mean= numpy.mean(fit)
         sd = numpy.std(fit)
         v = numpy.var(fit)
+        # Truncate outliers
+        for i, f in enumerate(fit):
+            if f > 1000 or f > mean+2*sd:
+                logger.error("Truncating outlier")
+                fit[i] = mean
         cmean = numpy.mean(comp)
         csd = numpy.std(comp)
         cv = numpy.var(comp)

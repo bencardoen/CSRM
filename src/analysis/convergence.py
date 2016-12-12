@@ -45,12 +45,12 @@ class Convergence:
         generations = 0
         cvalues = []
         runs = len(self._convergencestats)
-        logger.info("Have {} runs and {} generations".format(runs, generations))
         for i, run in enumerate(self._convergencestats):
             if i == 0:
                 generations = len(run[0])
             cvalues += [gen['complexity'] for gen in run]
         converted = rmtocm(cvalues)
+        logger.debug("Have {} runs and {} generations".format(runs, generations))
         p = plotDotData(converted, labelx="Generation", labely="Complexity", title="Complexity")
         self._plots.append(p)
 
