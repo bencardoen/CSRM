@@ -94,14 +94,17 @@ class Crossover():
             :param Tree right: tree to modify with left's subtree
             :param int seed: seed for PRNG (selection of subtree)
             :param int depth: if not None, forces subtree selection to pick subtrees at the given depth. Else the chosen depth is in [1, min(left.getDepth(), right.getDepth())]
-            :param bool equalDepth: if True, left and right will maintain depth after this operation
+            :param int limitdepth: if not -1, restricts the depth of the operation.
             :param Random rng: rng used in calls to select subtrees
         """
+        ld = left.getDepth()
+        rd = right.getDepth()
         if rng is None:
             rng = random.Random()
         if depth is None:
             mindepth = min(left.getDepth(), right.getDepth())
             chosendepth = rng.randint(1, mindepth)
-#            logger.info("Got chosen {} from {} ".format(chosendepth, mindepth))
             depth = chosendepth
+        if limitdepth != -1:
+            depth = min(ld, rd, limitdepth, depth)
         Tree.swapSubtrees(left, right, depth=depth, rng=rng)
