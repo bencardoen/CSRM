@@ -599,7 +599,7 @@ class Tree:
 
 
     @staticmethod
-    def swapSubtrees(left, right, seed = None, depth = None, rng = None, equalDepth=True, depthlimit=-1):
+    def swapSubtrees(left, right, depth = None, rng = None):
         """
         Given two trees, pick random subtree roots and swap them between the trees.
         Will swap out subtrees at equal depth.
@@ -608,8 +608,6 @@ class Tree:
         righttreedepth = right.getDepth()
         if rng is None:
             rng = random.Random()
-        if seed is not None:
-            rng.seed(seed)
 
         if depth is None:
             logger.info("Depth none, chosen {}".format(depth))
@@ -617,18 +615,10 @@ class Tree:
             logger.info("Depth none, chosen {}".format(depth))
 
         leftsubroot = left.getRandomNode(seed=None, depth=depth, rng=rng)
-        # Selected subtree has a root at depth=depth, so its maximum depth = leftdepth - depth
-
-        leftdepth = depth
         leftv = leftsubroot.getVariables()
         logger.debug("Selected left node {}".format(leftsubroot))
 
-        # not equal depth, pick a random depth and check if limit will be violated
-        rightdepth = righttreedepth-depth
-
-        if equalDepth:
-            rightdepth = leftdepth
-        rightsubroot = right.getRandomNode(seed=None, depth=rightdepth, rng=rng)
+        rightsubroot = right.getRandomNode(seed=None, depth=depth, rng=rng)
         rightv = rightsubroot.getVariables()
         logger.debug("Selected right node {}".format(rightsubroot))
 

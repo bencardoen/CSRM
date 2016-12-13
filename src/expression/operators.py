@@ -84,7 +84,7 @@ class Crossover():
     """
     @staticmethod
     @traceFunction
-    def subtreecrossover(left, right, seed = None, depth = None, rng = None, equalDepth=True):
+    def subtreecrossover(left, right, depth = None, rng = None, limitdepth=-1):
         """
             Perform a subtree crossover in place.
 
@@ -99,11 +99,9 @@ class Crossover():
         """
         if rng is None:
             rng = random.Random()
-        if seed is not None:
-            rng.seed(seed)
         if depth is None:
             mindepth = min(left.getDepth(), right.getDepth())
             chosendepth = rng.randint(1, mindepth)
-            logger.info("Got chosen {} from {} ".format(chosendepth, mindepth))
+#            logger.info("Got chosen {} from {} ".format(chosendepth, mindepth))
             depth = chosendepth
-        Tree.swapSubtrees(left, right, seed=seed, depth=depth, rng=rng, equalDepth=equalDepth)
+        Tree.swapSubtrees(left, right, depth=depth, rng=rng)

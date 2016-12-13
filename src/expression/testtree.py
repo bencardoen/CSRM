@@ -584,7 +584,9 @@ class TreeTest(unittest.TestCase):
         left.printToDot(outputfolder+"t34left.dot")
         right = Tree.createTreeFromExpression(expression, variables)
         right.printToDot(outputfolder+"t34right.dot")
-        Crossover.subtreecrossover(left, right, seed=42)
+        rng = random.Random()
+        rng.seed(0)
+        Crossover.subtreecrossover(left, right, rng=rng)
         left.printToDot(outputfolder+"t34leftafter.dot")
         right.printToDot(outputfolder+"t34rightafter.dot")
 
@@ -594,7 +596,10 @@ class TreeTest(unittest.TestCase):
         expression = "min(5, 4) + x4 ** 4 * sin(x2)"
         left = Tree.createTreeFromExpression(expression, variables)
         right = Tree.createTreeFromExpression(expression, variables)
-        Crossover.subtreecrossover(left, right, seed=42, depth=2)
+        rng=random.Random()
+        rng.seed(0)
+        Crossover.subtreecrossover(left, right, depth=2, rng=rng)
+        self.assertEqual(left.getDepth(), right.getDepth())
 
     def testBottomUpConstruction(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
@@ -733,7 +738,7 @@ class TreeTest(unittest.TestCase):
         right = Tree.makeRandomTree(variables, depth=4, rng=rng)
         cl = deepcopy(left)
         cr = deepcopy(right)
-        Crossover.subtreecrossover(left, right, seed=None, rng=rng, depth=None, equalDepth=True)
+        Crossover.subtreecrossover(left, right,rng=rng, depth=None)
         self.assertEqual(left.getDepth(), right.getDepth())
 
 

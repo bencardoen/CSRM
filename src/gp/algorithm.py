@@ -357,6 +357,7 @@ class BruteElitist(GPAlgorithm):
             Apply mutation on each sample, replacing if fitter
             Apply subtree crossover using random selection of pairs, replacing if fitter.
         """
+        d = self._maxdepth
         l = len(selection)
         assert(l == self._popsize)
         replacementcount = [0,0,0]
@@ -394,7 +395,7 @@ class BruteElitist(GPAlgorithm):
             assert(left != right)
             lc = deepcopy(left)
             rc = deepcopy(right)
-            Crossover.subtreecrossover(lc, rc, seed=None, depth=None, rng=rng)
+            Crossover.subtreecrossover(lc, rc, depth=None, rng=rng, limitdepth=d)
             lc.scoreTree(self._Y, self._fitnessfunction)
             rc.scoreTree(self._Y, self._fitnessfunction)
             scores = [left, right, lc, rc]
