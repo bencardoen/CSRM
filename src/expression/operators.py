@@ -84,7 +84,7 @@ class Crossover():
     """
     @staticmethod
     @traceFunction
-    def subtreecrossover(left, right, seed = None, depth = None, rng = None):
+    def subtreecrossover(left, right, seed = None, depth = None, rng = None, equalDepth=True):
         """
             Perform a subtree crossover in place.
 
@@ -93,7 +93,8 @@ class Crossover():
             :param Tree left: tree to modify with right's subtree
             :param Tree right: tree to modify with left's subtree
             :param int seed: seed for PRNG (selection of subtree)
-            :param int depth: if not None, forces subtree selection to pick subtrees at equal depth. The chosen depth is in [1, min(left.getDepth(), right.getDepth())] This value restricts bloating.
+            :param int depth: if not None, forces subtree selection to pick subtrees at the given depth. Else the chosen depth is in [1, min(left.getDepth(), right.getDepth())]
+            :param bool equalDepth: if True, left and right will maintain depth after this operation
             :param Random rng: rng used in calls to select subtrees
         """
         if rng is None:
@@ -103,6 +104,6 @@ class Crossover():
         if depth is None:
             mindepth = min(left.getDepth(), right.getDepth())
             chosendepth = rng.randint(1, mindepth)
-            logger.debug("Got chosen {} from {} ".format(chosendepth, mindepth))
+            logger.info("Got chosen {} from {} ".format(chosendepth, mindepth))
             depth = chosendepth
-        Tree.swapSubtrees(left, right, seed=seed, depth=depth, rng=rng)
+        Tree.swapSubtrees(left, right, seed=seed, depth=depth, rng=rng, equalDepth=equalDepth)

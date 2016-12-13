@@ -158,6 +158,9 @@ class GPAlgorithm():
 
     def testInvariant(self):
         assert(len(self._population) == self._popsize)
+        if self._maxdepth is not None:
+            for d in self._population:
+                assert(d.getDepth() <= self._maxdepth)
 
     def getVariables(self):
         return self._variables
@@ -194,6 +197,7 @@ class GPAlgorithm():
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
                                                  "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, run)
+
 
     def setTrace(self, v, prefix):
         """

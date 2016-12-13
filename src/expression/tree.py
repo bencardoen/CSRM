@@ -599,20 +599,36 @@ class Tree:
 
 
     @staticmethod
-    def swapSubtrees(left, right, seed = None, depth = None, rng = None):
+    def swapSubtrees(left, right, seed = None, depth = None, rng = None, equalDepth=True, depthlimit=-1):
         """
         Given two trees, pick random subtree roots and swap them between the trees.
         Will swap out subtrees at equal depth.
         """
+        lefttreedepth = left.getDepth()
+        righttreedepth = right.getDepth()
         if rng is None:
             rng = random.Random()
         if seed is not None:
             rng.seed(seed)
+
+        if depth is None:
+            logger.info("Depth none, chosen {}".format(depth))
+            depth = rng.randint(1, min(lefttreedepth, righttreedepth))
+            logger.info("Depth none, chosen {}".format(depth))
+
         leftsubroot = left.getRandomNode(seed=None, depth=depth, rng=rng)
+        # Selected subtree has a root at depth=depth, so its maximum depth = leftdepth - depth
+
+        leftdepth = depth
         leftv = leftsubroot.getVariables()
         logger.debug("Selected left node {}".format(leftsubroot))
 
-        rightsubroot = right.getRandomNode(seed=None, depth=depth, rng=rng)
+        # not equal depth, pick a random depth and check if limit will be violated
+        rightdepth = righttreedepth-depth
+
+        if equalDepth:
+            rightdepth = leftdepth
+        rightsubroot = right.getRandomNode(seed=None, depth=rightdepth, rng=rng)
         rightv = rightsubroot.getVariables()
         logger.debug("Selected right node {}".format(rightsubroot))
 
@@ -633,7 +649,7 @@ class Tree:
         Given an infix expression containing floats, operators, function defined in functions.functionset,
         create a corresponding expression tree.
 
-        :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) allowed but not log(x) with implicit base e
+        :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) is allowed but not log(x) with implicit base e
         """
         dpoint = 0
         if variables:

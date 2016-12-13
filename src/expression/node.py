@@ -235,7 +235,7 @@ class Variable():
         """
             Converts a twodimensional array where each row is a set of data points to a list of Variables.
         """
-        return [Variable(row, i) for i,entry in enumerate(lst)]
+        return [Variable(entry, i) for i,entry in enumerate(lst)]
 
 
     def __init__(self, values, index):

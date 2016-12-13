@@ -276,16 +276,26 @@ class TreeTest(unittest.TestCase):
         """
         Test subtree crossover operation with random trees.
         """
+        rng = random.Random()
+        rng.seed(0)
         variables = [Variable([10, 11],0),Variable([3, 12],0),Variable([9, 12],0),Variable([8, 9],0)]
-        left = Tree.makeRandomTree(variables, 6)
+        left = Tree.makeRandomTree(variables, depth=6)
         left.printToDot(outputfolder+"t13LeftBefore.dot")
 
-        right = Tree.makeRandomTree(variables, 6)
+        ld = left.getDepth()
+
+        right = Tree.makeRandomTree(variables, depth=6)
         right.printToDot(outputfolder+"t13RightBefore.dot")
 
-        Tree.swapSubtrees(left, right)
+        rd = right.getDepth()
+
+        self.assertEqual(ld, rd)
+
+        Tree.swapSubtrees(left, right, depth=3, rng=rng)
         left.printToDot(outputfolder+"t13LeftSwapped.dot")
         right.printToDot(outputfolder+"t13RightSwapped.dot")
+
+        self.assertEqual(left.getDepth(), right.getDepth())
 
 
     def testTreeToExpression(self):
@@ -678,7 +688,7 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(c, 18)
         self.assertEqual(c2, 1+(c-(d-1))/57)
 
-    def testAdvancedOperators(self):
+    def testAdvancedMutate(self):
         vcount = 4
         dpoint = 1
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
@@ -698,7 +708,7 @@ class TreeTest(unittest.TestCase):
         d = t.getDepth()
         limit = 6
         Mutate.mutate(t, seed=0, equaldepth=False, limitdepth=limit)
-        logger.info("New depth = {}".format(t.getDepth()))
+        logger.debug("New depth = {}".format(t.getDepth()))
         self.assertTrue(t.getDepth()<= max(d, limit))
         t.printToDot(outputfolder+"t40Mutated2.dot")
 
@@ -710,6 +720,23 @@ class TreeTest(unittest.TestCase):
         d = last.getDepth()
         Mutate.mutate(last, seed=0, equaldepth=True, selectiondepth=d)
         last.printToDot(outputfolder+"t40Mutated4.dot")
+
+
+    def testAdvancedCrossover(self):
+        vcount = 4
+        dpoint = 1
+        rng = random.Random()
+        rng.seed(0)
+        vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
+        variables = Variable.toVariables(vs)
+        left = Tree.makeRandomTree(variables, depth=6, rng=rng)
+        right = Tree.makeRandomTree(variables, depth=4, rng=rng)
+        cl = deepcopy(left)
+        cr = deepcopy(right)
+        Crossover.subtreecrossover(left, right, seed=None, rng=rng, depth=None, equalDepth=True)
+        self.assertEqual(left.getDepth(), right.getDepth())
+
+
 
 
 if __name__=="__main__":
