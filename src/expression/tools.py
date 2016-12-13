@@ -159,7 +159,18 @@ def rootmeansquarenormalized(actual, expected):
     Normalized RMSE with mean of actual.
     """
     a = numpy.asarray(actual)
-    return rootmeansquare(actual, expected)/a.mean()
+    ma = abs(a.mean())
+    # Avoid division by zero
+    # Two cases : mean(actual) is zero and all entries are zero
+    # Or mean zero and non zero entry.
+    if ma == 0:
+        f = a[0]
+        if f == 0:
+            ma = 1
+        else:
+            ma = abs(f)
+    rms = rootmeansquare(actual, expected)/ma
+    return rms
 
 def pearson(actual, expected):
     """

@@ -7,7 +7,7 @@
 #      Author: Ben Cardoen
 
 from math import log, sin, cos
-from expression.tools import matchFloat, matchVariable, approximateMultiple, traceFunction, rootmeansquare
+from expression.tools import matchFloat, matchVariable, approximateMultiple, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson
 from expression.node import Constant, Variable
 from expression.constants import Constants
 import random
@@ -323,10 +323,24 @@ def preParse(expression:str):
     expression = expression.replace("**", "^")
     return expression
 
+def rmsfitness(actual, expected, tree):
+    return fitnessfunction(actual, expected, tree, distancefunction=rootmeansquare)
 
-def fitnessfunction(actual, expected, tree):
+def rmsnormfitness(actual, expected, tree):
+    return fitnessfunction(actual, expected, tree, distancefunction=rootmeansquarenormalized)
+
+def pearsonfitness(actual, expected, tree):
+    return fitnessfunction(actual, expected, tree, distancefunction=pearson)
+
+def fitnessfunction(actual, expected, tree, distancefunction=None):
     """
-        Discard trees with constant expressions, restrict depth and invalid results.
+        Fitness function based on a distance measure.
+        :param list actual: Y', actual approximated valus
+        :param list expected: Y, expected values
+        :param Tree tree: the instance to operate on
+        :param function distancefunction: function object that accepts actual, expected as parameters and returns a numerical distance. If None, rootmeansquare is used.
+
+        Returns d(Y', Y).
     """
     if not tree.getVariables():
         logger.debug("Tree instance is a constant expression : invalid")
@@ -342,5 +356,10 @@ def fitnessfunction(actual, expected, tree):
         if i is None:
             logger.debug("Tree instance has an invalid expression for a datapoint {}".format(j))
             return Constants.MINFITNESS
-    rms = rootmeansquare(actual, expected)
-    return rms
+
+    distance = float('inf')
+    if distancefunction is None:
+        distance = rootmeansquare(actual, expected)
+    else:
+        distance = distancefunction(actual, expected)
+    return distance

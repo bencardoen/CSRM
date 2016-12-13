@@ -1,23 +1,48 @@
-
-from gp.algorithm import BruteElitist
-from expression.tree import Tree
-from expression.functions import fitnessfunction
 from expression.tools import generateVariables
-import logging
 import random
+from expression.tools import generateVariables
+from expression.tree import Tree
+from expression.functions import testfunctions, rmsfitness as _fit
+from analysis.convergence import Convergence
+from gp.algorithm import BruteElitist
+import logging
 logger = logging.getLogger('global')
+
+def runAlgorithm():
+    expr = testfunctions[2]
+
+    print("Testing {}".format(expr))
+
+    rng = random.Random()
+    rng.seed(0)
+    dpoint = 25
+    vpoint = 5
+
+    # Input values
+    X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=1, upper=5)
+    t = Tree.createTreeFromExpression(expr, X)
+
+    # Expected output values
+    Y = t.evaluateAll()
+
+    # Configure the algorithm
+    g = BruteElitist(X, Y, popsize=40, maxdepth=4, fitnessfunction=_fit, seed=0, generations=20, runs=5)
+    g.executeAlgorithm()
+
+    # Plot results
+    stats = g.getConvergenceStatistics()
+    c = Convergence(stats)
+    c.plotFitness()
+    c.plotComplexity()
+    c.plotOperators()
+    c.plotPareto()
+    #c.savePlots("output_{}".format(i), title=expr)
+    c.displayPlots("output_", title=expr)
+
+
+
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
-    rng = random.Random()
-    rng.seed(0)
-    dpoint = 20
-    vpoint = 3
-    X = generateVariables(vpoint,dpoint,seed=0)
-    Y = [ rng.random() for d in range(dpoint)]
-    logger.debug("Y {} X {}".format(Y, X))
-    g = BruteElitist(X, Y, popsize=10, maxdepth=4, fitnessfunction=fitnessfunction, seed=0, generations=20)
-    g.run()
-    print(g.getConvergenceStatistics())
-#    alg.printForest()
+    runAlgorithm()
