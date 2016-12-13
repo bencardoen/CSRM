@@ -172,7 +172,7 @@ class GPAlgorithm():
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
-    def summarizeGeneration(self, replacementcount, generation, run):
+    def summarizeGeneration(self, replacementcount:list, generation:int, run:int):
         """
             Compute fitness statistics for the current generation and record them
         """
@@ -190,8 +190,7 @@ class GPAlgorithm():
         cmean = numpy.mean(comp)
         csd = numpy.std(comp)
         cv = numpy.var(comp)
-        logger.debug("Generation {} SUMMARY:: \n\tFitness values {} \n\t\tmean {} \t\tsd {} \t\tvar {} \t\treplacements {}".format(generation, "".join('{:.2f}, '.format(d) for d in fit), mean, sd, v, replacementcount[0]))
-        logger.debug("\n\tComplexity values {} \n\t\tmean {} \t\tsd {} \t\tvar {} ".format(comp, cmean, csd, cv))
+        assert(isinstance(replacementcount, list))
         logger.info("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
 
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
@@ -248,6 +247,7 @@ class GPAlgorithm():
             modified, count = self.evolve(selected)
             logger.debug("\tUpdate")
             self.update(modified)
+            assert(isinstance(count, list))
             self.summarizeGeneration(count, generation=i, run=r)
             if self.stopCondition():
                 logger.info("Stop condition triggered")
@@ -305,7 +305,7 @@ class GPAlgorithm():
         :return tuple modified: a tuple of modified samples based on selection, and changes made
         """
         self.evaluate(selection)
-        return selection, 0
+        return selection, [0,0,0]
 
 
     @traceFunction
