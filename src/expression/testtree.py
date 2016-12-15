@@ -14,7 +14,7 @@ import unittest
 from copy import deepcopy
 import logging
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson
 import os
 import random
 from expression.operators import Mutate, Crossover
@@ -742,7 +742,36 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(left.getDepth(), right.getDepth())
 
 
+    def testDistanceFunctions(self):
+        # Staging test for distance functions: test for overflow/ div by zero
+        a = [1 for d in range(10)]
+        b = a[:]
+        rmse = rootmeansquare(a,b)
+        nrmse = rootmeansquarenormalized(a,b)
+        self.assertEqual(rmse, 0)
 
+        a = [1 for d in range(10)]
+        b = a[:]
+        rmse = rootmeansquare(a,b)
+        nrmse = rootmeansquarenormalized(a,b)
+        self.assertEqual(rmse, 0)
+
+        a = [1,3,4,4]
+        b = [2,5,5,8]
+        rmse = rootmeansquare(a,b)
+        nrmse = rootmeansquarenormalized(a,b)
+        p = pearson(a,b)
+        _p = _pearson(a,b)
+#        print(rmse, nrmse, p, _p)
+
+        a = [random.uniform(1,100) for d in range(100)]
+        b = [50 for d in range(100)]
+        rmse = rootmeansquare(a,b)
+        nrmse = rootmeansquarenormalized(a,b)
+        p = pearson(a,b)
+        _p = _pearson(a,b)
+
+#        print(rmse, nrmse, p, _p)
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)

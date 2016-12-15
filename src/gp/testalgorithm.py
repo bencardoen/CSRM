@@ -142,7 +142,7 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=25, maxdepth=4, fitnessfunction=_fit, seed=0, generations=15, runs=3)
+        g = BruteElitist(X, Y, popsize=25, maxdepth=4, fitnessfunction=_fit, seed=0, generations=15, phases=3)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)

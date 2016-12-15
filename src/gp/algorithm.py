@@ -29,7 +29,7 @@ class GPAlgorithm():
 
         In itself it will not evolve a solution.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None, history = None, runs=None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None, history = None, phases=None):
         """
         Initializes a forest of trees randomly constructed.
 
@@ -39,7 +39,7 @@ class GPAlgorithm():
         :param int maxdepth: the maximum depth a tree is initialized to
         :param int generations: generations to iterate
         :param int seed: seed value for the rng used in tree construction
-        :param int archivesize: size of the archive used between runs to store best-of-generation samples, which are in turn reused in next runs
+        :param int archivesize: size of the archive used between phases to store best-of-generation samples, which are in turn reused in next phases
         """
         # Sorted set of trees by fitness value
         self._population = SetPopulation(key=lambda _tree : _tree.getFitness())
@@ -62,8 +62,8 @@ class GPAlgorithm():
         # List of generation : tuple of stats
         self._convergencestats = []
         self._history = history or 5
-        self._run = 0
-        self._runs = runs or 1
+        self._phase = 0
+        self._phases = phases or 1
 
     def getSeed(self):
         """
@@ -77,22 +77,22 @@ class GPAlgorithm():
         self._seed = self._rng.randint(0, 0xffffffff)
         return s
 
-    def addConvergenceStat(self, generation, stat, run):
-        if len(self._convergencestats) <= run:
+    def addConvergenceStat(self, generation, stat, phase):
+        if len(self._convergencestats) <= phase:
             self._convergencestats.append([])
-        if len(self._convergencestats[run]) <= generation:
-            self._convergencestats[run].append(stat)
+        if len(self._convergencestats[phase]) <= generation:
+            self._convergencestats[phase].append(stat)
         else:
             self._convergencestats[generation] = stat
 
-    def getConvergenceStat(self, generation, run):
-        return self._convergencestats[run][generation]
+    def getConvergenceStat(self, generation, phase):
+        return self._convergencestats[phase][generation]
 
     def getConvergenceStatistics(self):
         """
             Return all statistics
 
-            Returns a list indiced by run
+            Returns a list indiced by phase
             Each sublist is indiced by generation and holds a dict:
                 "fitness", "mean_fitness, "var_fitness", "std_fitness", "replacements"
                 and equivalent for complexity
@@ -172,7 +172,7 @@ class GPAlgorithm():
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
-    def summarizeGeneration(self, replacementcount:list, generation:int, run:int):
+    def summarizeGeneration(self, replacementcount:list, generation:int, phase:int):
         """
             Compute fitness statistics for the current generation and record them
         """
@@ -181,6 +181,7 @@ class GPAlgorithm():
         mean= numpy.mean(fit)
         sd = numpy.std(fit)
         v = numpy.var(fit)
+        # TODO : remove when fitness is scaled.
         # Truncate outliers
         for i, f in enumerate(fit):
             if f > 2000:
@@ -195,7 +196,7 @@ class GPAlgorithm():
 
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
-                                                 "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, run)
+                                                 "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, phase)
 
 
     def setTrace(self, v, prefix):
@@ -238,7 +239,7 @@ class GPAlgorithm():
         called methods to alter behavior
 
         """
-        r = self._run
+        r = self._phase
         for i in range(self._generations):
             logger.debug("Generation {}".format(i))
             logger.debug("\tSelection")
@@ -248,7 +249,7 @@ class GPAlgorithm():
             logger.debug("\tUpdate")
             self.update(modified)
             assert(isinstance(count, list))
-            self.summarizeGeneration(count, generation=i, run=r)
+            self.summarizeGeneration(count, generation=i, phase=r)
             if self.stopCondition():
                 logger.info("Stop condition triggered")
                 break
@@ -256,15 +257,15 @@ class GPAlgorithm():
             if self._trace:
                 self.printForestToDot(self._prefix + "generation_{}_".format(i))
         logger.info("\tArchival")
-        self._run += 1
+        self._phase += 1
         self.archive(modified)
 
     def executeAlgorithm(self):
-        self._run = 0
+        self._phase = 0
         self.run()
-        for i in range(self._runs-1):
+        for i in range(self._phases-1):
             self.restart()
-            logger.info("\n\n\n\nRun {}".format(i+1))
+            logger.info("\n\n\n\n Phase {}".format(i+1))
             self.run()
 
 
@@ -342,8 +343,8 @@ class BruteElitist(GPAlgorithm):
         Applies mutation and subtree crossover to entire population and aggresively
         replaces unfit samples.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, runs=None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, runs=runs)
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases)
 
     @traceFunction
     def select(self):
@@ -364,6 +365,7 @@ class BruteElitist(GPAlgorithm):
         selcount = len(selection)
         rng = self._rng
         # TODO : mutate with cooling effect, modify based on current fitness, i.e. don't drastically alter a good tree
+        # Mutate on entire population, with regard to (scaled) fitness
         for i in range(selcount//2, selcount):
             t = selection[i]
             candidate = deepcopy(t)
@@ -431,12 +433,12 @@ class BruteElitist(GPAlgorithm):
         """
             Stop if the last @history generation no replacements could be made
         """
-        generations = len(self._convergencestats[self._run])
+        generations = len(self._convergencestats[self._phase])
         if generations < self._history:
             # not enough data
             return False
         for i in range(self._history):
-            if self.getConvergenceStat(generations-i-1, self._run)['replacements'] != 0:
+            if self.getConvergenceStat(generations-i-1, self._phase)['replacements'] != 0:
                 return False
         # Add more measures
         return True

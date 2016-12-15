@@ -15,6 +15,7 @@ import random
 import inspect, itertools
 import functools
 import numpy
+from scipy.stats.stats import pearsonr
 
 logger = logging.getLogger('global')
 
@@ -156,28 +157,21 @@ def rootmeansquare(actual, expected):
 
 def rootmeansquarenormalized(actual, expected):
     """
-    Normalized RMSE with mean of actual.
+    Normalized RMSE.
     """
+    assert(len(actual) == len(expected))
     a = numpy.asarray(actual)
-    ma = abs(a.mean())
-    # Avoid division by zero
-    # Two cases : mean(actual) is zero and all entries are zero
-    # Or mean zero and non zero entry.
-    if ma == 0:
-        f = a[0]
-        if f == 0:
-            ma = 1
-        else:
-            ma = abs(f)
-    rms = rootmeansquare(actual, expected)/ma
-    return rms
+    b = numpy.asarray(expected)
+    ma = numpy.mean(a-b)
+    nrmse = numpy.sqrt(numpy.sum(numpy.square(a-b))/len(actual))/(1+ma)
+    return nrmse
 
 def pearson(actual, expected):
     """
     Return Pearson correlation coefficient.
     """
     a = numpy.asarray(actual)
-    b = numpy.assaray(expected)
+    b = numpy.asarray(expected)
     meana = a.mean()
     meanb = b.mean()
     va = a - meana
@@ -185,6 +179,17 @@ def pearson(actual, expected):
     nom = numpy.sum( va*vb  )
     denom = numpy.sqrt( numpy.sum( numpy.square(va) ) * numpy.sum( numpy.square( vb ) ) )
     return nom/denom
+
+def _pearson(actual, expected):
+    N = len(actual)
+    a = numpy.asarray(actual)
+    b = numpy.asarray(expected)
+    nsum = numpy.sum
+    nsquare = numpy.square
+    nsqrt = numpy.sqrt
+    nom = nsum(a*b) - (nsum(a)*nsum(b))/N
+    denom = nsqrt( (nsum(nsquare(a)) - nsquare(nsum(a))/N)*(nsum(nsquare(b)) - nsquare(nsum(b))/N) )
+    return nom/(1+denom)
 
 
 def randomizedConsume(lst, seed=None):
