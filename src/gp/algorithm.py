@@ -355,7 +355,7 @@ class BruteElitist(GPAlgorithm):
             t = selection[i]
             candidate = deepcopy(t)
             #def mutate(tr:Tree, seed:int = None, variables = None, equaldepth=False, rng=None, limitdepth:int=0):
-            Mutate.mutate(candidate, variables=self._variables, seed=None, equaldepth=True, rng=rng)
+            Mutate.mutate(candidate, variables=self._variables, equaldepth=True, rng=rng)
             candidate.scoreTree(self._Y, self._fitnessfunction)
 
             if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():

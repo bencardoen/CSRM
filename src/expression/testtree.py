@@ -438,14 +438,11 @@ class TreeTest(unittest.TestCase):
         expected = [[160, (-5*sqrt(2)*2),(-5*sqrt(2)*2)],[1215, (-5*sqrt(3)*3),(-5*sqrt(3)*3)]]
         trees = [None for d in range(len(expressions))]
         for d in range(datapoints):
-            for t in trees:
-                if t:
-                    t.updateIndex()
             for i, expr in enumerate(expressions):
                 if not trees[i]:
                     trees[i]=Tree.createTreeFromExpression(expr, variables)
                 t=trees[i]
-                v = t.evaluateTree()
+                v = t.evaluateTree(increment=True)
                 t.printToDot(outputfolder+"t28unary{}.dot".format(i))
                 self.assertEqual(expected[d][i], v)
 
@@ -454,12 +451,10 @@ class TreeTest(unittest.TestCase):
         variables = [[1,2],[2,3]]
         t = Tree.createTreeFromExpression(expr, variables)
         d = t.evaluateTree()
-        d = t.evaluateTree()
-        t.updateIndex()
-        e = t.evaluateTree()
+        d = t.evaluateTree(increment=True)
+        e = t.evaluateTree(increment=True)
         self.assertNotEqual(d,e)
-        t.updateIndex()
-        e = t.evaluateTree()
+        e = t.evaluateTree(increment=True)
         self.assertEqual(d,e)
 
     def testExp(self):
@@ -478,14 +473,11 @@ class TreeTest(unittest.TestCase):
         results = [[None for d in range(dcount)] for x in range(funcs)]
         trees = [None for d in range(funcs)]
         for j in range(dcount):
-            for t in trees:
-                if t:
-                    t.updateIndex()
             for i, e in enumerate(testfunctions):
                 if not trees[i]:
                     trees[i] = Tree.createTreeFromExpression(e, variables)
                 t = trees[i]
-                ev = t.evaluateTree()
+                ev = t.evaluateTree(increment=True)
                 results[i][j] = ev
                 t.printToDot(outputfolder+"t29Benchmark{}{}.dot".format(i,j))
         for index, res in enumerate(results):
@@ -494,8 +486,11 @@ class TreeTest(unittest.TestCase):
 
     def testCaching(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        t = Tree.makeRandomTree(variables, 3, seed=9)
-        s = Tree.makeRandomTree(variables, 2, seed=1)
+        rng = random.Random()
+        rng.seed(9)
+        t = Tree.makeRandomTree(variables, 3, rng=rng)
+        rng.seed(1)
+        s = Tree.makeRandomTree(variables, 2, rng=rng)
         t.printToDot(outputfolder+"t30a.dot")
         s.printToDot(outputfolder+"t30b.dot")
         e = t.evaluateTree()
@@ -534,14 +529,16 @@ class TreeTest(unittest.TestCase):
             self.assertEqual(str(compnodes), str(nodes))
             self.assertEqual(e, e2)
 
-    def testCaching(self):
+    def testCachingExt(self):
         variables = [[ d for d in range(2,6)] for x in range(5)]
         expression = "log(5, 4) + x3 ** 4 * x1 * x1"
         t = Tree.createTreeFromExpression(expression, variables)
         self.assertTrue(t.isModified())
         e =t.evaluateTree()
         self.assertFalse(t.isModified())
-        Mutate.mutate(t, seed=2)
+        rng = random.Random()
+        rng.seed(2)
+        Mutate.mutate(t, rng=rng)
         self.assertTrue(t.isModified())
         t.getDepth()
         t.evaluateTree()
@@ -576,7 +573,9 @@ class TreeTest(unittest.TestCase):
         variables = [[ d for d in range(2,6)] for x in range(4)]
         expression = "log(5, 4) + x3 ** 4 * x2"
         t = Tree.createTreeFromExpression(expression, variables)
-        Mutate.mutate(t, seed=2)
+        rng = random.Random()
+        rng.seed(2)
+        Mutate.mutate(t, variables, rng=rng)
         t.printToDot(outputfolder+"t33.dot")
 
     def testCrossoverOperator(self):
@@ -674,16 +673,6 @@ class TreeTest(unittest.TestCase):
         t = Tree.makeRandomTree(variables, depth=10, rng=rng)
         e = t.evaluateTree()
 
-    def testMutateGrow(self):
-        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        rng = random.Random()
-        rng.seed(0)
-        t = Tree.growTree(variables, depth=0, rng=rng)
-        rng = random.Random()
-        rng.seed(0)
-        t = Tree.makeRandomTree(variables, depth=1, rng=rng)
-        Mutate.mutate(t, seed=0)
-
     def testComplexity(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         rng = random.Random()
@@ -708,25 +697,31 @@ class TreeTest(unittest.TestCase):
         told.printToDot(outputfolder+"t40BeforeMutated.dot")
         # Normal mutation, mutate an equal depth subexpression
         d = t.getDepth()
-        Mutate.mutate(t, seed=0, equaldepth=True)
+        rng = random.Random()
+        rng.seed(0)
+        Mutate.mutate(t, equaldepth=True, rng=rng)
         self.assertEqual(t.getDepth(), d)
         t.printToDot(outputfolder+"t40Mutated1.dot")
 
         # Variable mutation, mutate with a set limit to the generated mutation
         d = t.getDepth()
         limit = 6
-        Mutate.mutate(t, seed=0, equaldepth=False, limitdepth=limit)
+        rng.seed(0)
+        Mutate.mutate(t, rng=rng, equaldepth=False, limitdepth=limit)
         logger.debug("New depth = {}".format(t.getDepth()))
         self.assertTrue(t.getDepth()<= max(d, limit))
         t.printToDot(outputfolder+"t40Mutated2.dot")
 
         # Mutate with a limit set, without equaldepth, with a set depth to select
         d = told.getDepth()
-        Mutate.mutate(told, seed=0, equaldepth=False, limitdepth=limit, selectiondepth=d)
+        rng = random.Random()
+        rng.seed(0)
+        Mutate.mutate(told, rng=rng, equaldepth=False, limitdepth=limit, selectiondepth=d)
         told.printToDot(outputfolder+"t40Mutated3.dot")
 
         d = last.getDepth()
-        Mutate.mutate(last, seed=0, equaldepth=True, selectiondepth=d)
+        rng.seed(0)
+        Mutate.mutate(last, rng=rng, equaldepth=True, selectiondepth=d)
         last.printToDot(outputfolder+"t40Mutated4.dot")
 
 

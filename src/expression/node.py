@@ -58,7 +58,7 @@ class Node:
             return expression.functions.getFunctionComplexity(self.function)
         return 0
 
-    def evaluate(self, args=None):
+    def evaluate(self, args=None, increment=False):
         """
         Evaluate this node using the function object, optionally multiplying with the constant.
         """
@@ -296,12 +296,15 @@ class VariableNode(Node):
     def nextValue(self):
         self.variable.increment()
 
-    def evaluate(self, args=None):
+    def evaluate(self, args=None, increment=False):
         con = self.getConstant()
+        v = self.variable.getValue()
+        if increment:
+            self.variable.increment()
         if con :
-            return self.variable.getValue() * con.getValue()
+            return v * con.getValue()
         else:
-            return self.variable.getValue()
+            return v
 
     def getArity(self):
         return 0
@@ -344,7 +347,7 @@ class ConstantNode(Node):
     def __init__(self, pos, constant):
         Node.__init__(self, None, pos, constant)
 
-    def evaluate(self, args=None):
+    def evaluate(self, args=None, increment=False):
         return self.getConstant().getValue()
 
     def getArity(self):

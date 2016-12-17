@@ -206,13 +206,13 @@ class Tree:
             output += "\n"
         return output
 
-    def evaluateTree(self):
+    def evaluateTree(self, increment=False):
         """
         Evaluates tree if tree was modified, else returns a cached results.
         Updates depth if needed.
         """
-        if self.modified:
-            self.evaluated = self._evalTree(self.root)
+        if self.modified or increment:
+            self.evaluated = self._evalTree(self.root, increment)
             self.modified = False
         return self.evaluated
 
@@ -225,11 +225,7 @@ class Tree:
         values = []
         dpoint = self.getDataPointCount()
         for i in range(dpoint):
-            value = self.evaluateTree()
-            if i == dpoint-1:
-                self.updateIndex(0)
-            else:
-                self.updateIndex()
+            value = self.evaluateTree(increment=True)
             values.append(value)
         return values
 
@@ -245,7 +241,7 @@ class Tree:
         self.setFitness(f)
         return self.getFitness()
 
-    def _evalTree(self, node: Node):
+    def _evalTree(self, node: Node, increment=False):
         """
         Recursively evaluate tree with node as root.
         Returns None if evaluation is not valid
@@ -255,12 +251,12 @@ class Tree:
             arity = node.getArity()
             value = [None for d in range(arity)]
             for i, child in enumerate(children):
-                v=self._evalTree(child)
+                v=self._evalTree(child, increment)
                 if v is None: return None
                 value[i] = v
-            return node.evaluate(value) # function or operator
+            return node.evaluate(value, increment=increment) # function or operator
         else:
-            return node.evaluate() # leaf
+            return node.evaluate(increment=increment) # leaf
 
 
     def printToDot(self, name = None):
@@ -537,14 +533,14 @@ class Tree:
         Update the variables in the tree s.t. they point at the next datapoint
         """
         self.setModified(True)
-        for k, v in self.variables.items():
-            variable = self.variables[k][0]
-            #index = variable.getCurrentIndex()
-            #if i != -1:
-            #    variable.setCurrentIndex(i)
-            #else:
-            #    variable.setCurrentIndex(index + 1)
-            variable.increment()
+        #for k, v in self.variables.items():
+        #    variable = self.variables[k][0]
+        #    #index = variable.getCurrentIndex()
+        #    #if i != -1:
+        #    #    variable.setCurrentIndex(i)
+        #    #else:
+        #    #    variable.setCurrentIndex(index + 1)
+        #    variable.increment()
 
     def getRoot(self):
         assert(self.root)
@@ -588,9 +584,7 @@ class Tree:
             rng = random.Random()
 
         if depth is None:
-            logger.info("Depth none, chosen {}".format(depth))
             depth = rng.randint(1, min(lefttreedepth, righttreedepth))
-            logger.info("Depth none, chosen {}".format(depth))
 
         leftsubroot = left.getRandomNode(seed=None, depth=depth, rng=rng)
         leftv = leftsubroot.getVariables()
