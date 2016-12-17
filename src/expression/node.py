@@ -50,6 +50,9 @@ class Node:
     def getDepth(self):
         return self._depth
 
+    def nextValue(self):
+        pass
+
     def getNodeComplexity(self):
         if self.function:
             return expression.functions.getFunctionComplexity(self.function)
@@ -255,6 +258,10 @@ class Variable():
     def getCurrentIndex(self):
         return self._current
 
+    def increment(self):
+        self._current += 1
+        self._current %= len(self._values)
+
     def getValue(self):
         if self._values:
             return self._values[self._current]
@@ -285,6 +292,9 @@ class VariableNode(Node):
 
     def getVariable(self):
         return self.variable
+
+    def nextValue(self):
+        self.variable.increment()
 
     def evaluate(self, args=None):
         con = self.getConstant()

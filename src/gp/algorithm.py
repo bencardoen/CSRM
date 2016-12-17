@@ -102,12 +102,12 @@ class GPAlgorithm():
         self._convergencestats = []
 
     def _initialize(self):
-        vlist = []
-        assert(len(self._X))
-        for i, x in enumerate(self._X):
-            assert(isinstance(x, list))
-            vlist.append(Variable(x, i))
-        self._variables = vlist[:]
+        #vlist = []
+        #assert(len(self._X))
+        #for i, x in enumerate(self._X):
+        #    assert(isinstance(x, list))
+        #    vlist.append(Variable(x, i))
+        self._variables = [Variable(x, i) for i,x in enumerate(self._X)]
         self._initializePopulation()
 
 

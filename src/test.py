@@ -27,7 +27,7 @@ def runAlgorithm():
     Y = t.evaluateAll()
 
     # Configure the algorithm
-    g = BruteElitist(X, Y, popsize=40, maxdepth=4, fitnessfunction=_fit, seed=0, generations=20, phases=5)
+    g = BruteElitist(X, Y, popsize=60, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=5)
     g.executeAlgorithm()
 
     # Plot results

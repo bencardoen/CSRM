@@ -197,10 +197,8 @@ class SetPopulation(Population):
 
     def removeN(self, n):
         oldlen = len(self)
-        logger.debug("Removing {} from {}".format(n, str(self)))
         kn = self.getN(n)
         for i in kn:
-            logger.debug("Removing {} from selection {} and pop {}".format(repr(i), kn, self._pop))
             self.pop()
         assert(len(self) == oldlen - n)
         return kn

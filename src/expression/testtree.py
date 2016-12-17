@@ -458,6 +458,9 @@ class TreeTest(unittest.TestCase):
         t.updateIndex()
         e = t.evaluateTree()
         self.assertNotEqual(d,e)
+        t.updateIndex()
+        e = t.evaluateTree()
+        self.assertEqual(d,e)
 
     def testExp(self):
         expr = "1 - 2*exp(-3*5)"

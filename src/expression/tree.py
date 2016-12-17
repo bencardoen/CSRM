@@ -539,11 +539,12 @@ class Tree:
         self.setModified(True)
         for k, v in self.variables.items():
             variable = self.variables[k][0]
-            index = variable.getCurrentIndex()
-            if i != -1:
-                variable.setCurrentIndex(i)
-            else:
-                variable.setCurrentIndex(index + 1)
+            #index = variable.getCurrentIndex()
+            #if i != -1:
+            #    variable.setCurrentIndex(i)
+            #else:
+            #    variable.setCurrentIndex(index + 1)
+            variable.increment()
 
     def getRoot(self):
         assert(self.root)
