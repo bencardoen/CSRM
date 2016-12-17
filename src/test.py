@@ -27,18 +27,18 @@ def runAlgorithm():
     Y = t.evaluateAll()
 
     # Configure the algorithm
-    g = BruteElitist(X, Y, popsize=60, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=5)
+    g = BruteElitist(X, Y, popsize=60, maxdepth=7, fitnessfunction=_fit, seed=0, generations=20, phases=5)
     g.executeAlgorithm()
 
     # Plot results
-    #stats = g.getConvergenceStatistics()
-    #c = Convergence(stats)
-    #c.plotFitness()
-    #c.plotComplexity()
-    #c.plotOperators()
-    #c.plotPareto()
-    ##c.savePlots("output_{}".format(i), title=expr)
-    #c.displayPlots("output_", title=expr)
+    stats = g.getConvergenceStatistics()
+    c = Convergence(stats)
+    c.plotFitness()
+    c.plotComplexity()
+    c.plotOperators()
+    c.plotPareto()
+    #c.savePlots("output_{}".format(i), title=expr)
+    c.displayPlots("output_", title=expr)
 
 
 

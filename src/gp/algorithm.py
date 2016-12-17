@@ -220,9 +220,9 @@ class GPAlgorithm():
         # Retrim the current population by removing the least fit samples
         while len(self._population) > self._popsize:
             self._population.bottom()
-        while len(self._population) < self._popsize:
+        diff = self._popsize - len(self._population)
+        for _ in range(diff):
             self.addRandomTree()
-        logger.info("Reseeding using archive {}".format(archived))
 
     def restart(self):
         self._population.removeAll()
@@ -338,7 +338,6 @@ class BruteElitist(GPAlgorithm):
         assert(len(self._population)==0)
         return s
 
-#    @profile
     def evolve(self, selection):
         """
             Apply mutation on each sample, replacing if fitter

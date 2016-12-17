@@ -56,17 +56,13 @@ class Node:
             return expression.functions.getFunctionComplexity(self.function)
         return 0
 
+
     def evaluate(self, args=None, increment=False):
         """
         Evaluate this node using the function object, optionally multiplying with the constant.
         """
-        rv = 0
-        if(args and len(args) != self.arity):
-            raise  ValueError("Incompatible parity {} and arguments {}".format(self.arity, args))
-        if args is None:
-            rv = self.function()
-        else:
-            rv = self.function(*args)
+        assert(args and len(args) == self.arity)
+        rv = self.function(*args)
         if self.constant:
             rv*=self.constant.getValue()
         return rv

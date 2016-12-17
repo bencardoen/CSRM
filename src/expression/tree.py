@@ -226,7 +226,6 @@ class Tree:
         self.setFitness(f)
         return f
 
-#    @profile
     def _evalTree(self, node: Node, increment=False):
         """
         Recursively evaluate tree with node as root.
