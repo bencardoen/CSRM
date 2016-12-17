@@ -36,6 +36,7 @@ class Tree:
         # Cached evaluation
         self.evaluated = 0
         self.modified = False
+        self.modifiedDepth = False
         self.depth = None
         self.fitness = Constants.MINFITNESS
         self.fitnessfunction = None
@@ -80,12 +81,12 @@ class Tree:
         #            logger.error("Node {} has invalid set of children".format(n))
         #            raise ValueError("Invalid tree state")
 
-    @traceFunction
     def _addNode(self, node: Node, pos: int):
         """
         Add node to tree (without linking), insert variable if a terminal node.
         """
         self.modified = True
+        self.modifiedDepth=True
         if pos == 0:
             self.root = node
         curlen = len(self.nodes)
@@ -211,9 +212,7 @@ class Tree:
         Updates depth if needed.
         """
         if self.modified:
-            oe = self.evaluated
-            self.evaluated = self._evalTree(self.nodes[0])
-            self.getDepth()
+            self.evaluated = self._evalTree(self.root)
             self.modified = False
         return self.evaluated
 
@@ -253,11 +252,12 @@ class Tree:
         """
         children = node.getChildren()
         if children:
-            value = []
-            for child in children:
+            arity = node.getArity()
+            value = [None for d in range(arity)]
+            for i, child in enumerate(children):
                 v=self._evalTree(child)
-                if v is None: return v
-                value.append(v)
+                if v is None: return None
+                value[i] = v
             return node.evaluate(value) # function or operator
         else:
             return node.evaluate() # leaf
@@ -283,8 +283,9 @@ class Tree:
         Return depth of this tree.
         Returns a cached version or calculates a new one if needed.
         """
-        if self.modified:
+        if self.modifiedDepth:
             self.depth = self.calculateDepth()
+            self.modifiedDepth=False
         return self.depth
 
     def calculateDepth(self):
@@ -369,7 +370,7 @@ class Tree:
     @staticmethod
     def growTree(variables, depth: int, rng=None):
         """
-        Grow a tree up to depth, with optional seed for the rng.
+        Grow a tree up to depth.
         """
         if rng is None:
             rng = random.Random()
@@ -390,8 +391,6 @@ class Tree:
         root = Tree.constructFromSubtrees(left, right, rng=rng)
         return root
 
-
-    @traceFunction
     def getRandomNode(self, seed = None, depth = None, rng=None):
         """
         Return a randomly selected node from this tree
@@ -420,7 +419,6 @@ class Tree:
     def isModified(self):
         return self.modified
 
-    @traceFunction
     def getParent(self, node: Node):
         """
         Get parent of node
@@ -435,13 +433,13 @@ class Tree:
     def logState(self):
         logger.debug("Current state = rnodes {}\n lnodes = {}".format(self.getNodes(), self.nodes))
 
-    @traceFunction
     def _removeNode(self, node: Node, newnode: Node):
         """
         Remove node from tree, replace with newnode.
         First stage in splicing a subtree, subtree with root node is unlinked, newnode is placed in.
         """
         self.setModified(True)
+        self.modifiedDepth=True
         self.testInvariant()
         # Unlink the current node
         npos = node.getPosition()
@@ -466,7 +464,6 @@ class Tree:
             if var:
                 self._unreferenceVariable(var)
 
-    @traceFunction
     def _unreferenceVariable(self, varv: Variable):
         index = varv.getIndex()
         if index in self.variables:
@@ -477,7 +474,6 @@ class Tree:
                 self.variables[index] = [v[0], v[1]-1]
 
 
-    @traceFunction
     def spliceSubTree(self, node: Node, newnode: Node):
         """
         Remove subtree with root node, replace it with subtree with root newnode
@@ -522,7 +518,6 @@ class Tree:
                 variables[k] = v
         assert(variables == self.getVariables())
 
-    @traceFunction
     def _updateVariables(self, vlist: list):
         """
         When a set of variables from a different tree is merged, update the current set.
@@ -537,7 +532,6 @@ class Tree:
         for i, n in enumerate(self.nodes):
             print("Node {} at {}".format(n, i))
 
-    @traceFunction
     def updateIndex(self,i=-1):
         """
         Update the variables in the tree s.t. they point at the next datapoint
@@ -614,7 +608,6 @@ class Tree:
         right._updateVariables(leftv)
 
     @staticmethod
-    @traceFunction
     def createTreeFromExpression(expr: str, variables=None):
         """
         Given an infix expression containing floats, operators, function defined in functions.functionset,
@@ -647,8 +640,6 @@ class Tree:
         result.setDataPointCount(dpoint)
         return result
 
-
-    @traceFunction
     def toExpression(self):
         """
         Print the tree to an infix expression.

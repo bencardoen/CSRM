@@ -55,7 +55,6 @@ class Node:
             return expression.functions.getFunctionComplexity(self.function)
         return 0
 
-    @traceFunction
     def evaluate(self, args=None):
         """
         Evaluate this node using the function object, optionally multiplying with the constant.
@@ -113,7 +112,6 @@ class Node:
             fname = self.function.__name__
         return " f={} arity={} constant={}".format(fname, self.arity, self.constant or 1)
 
-    @traceFunction
     def updatePosition(self):
         """
             After operations on a tree, the position of this node can be invalidated.
@@ -126,7 +124,6 @@ class Node:
             i+=1
             c.updatePosition()
 
-    @traceFunction
     def getAllChildren(self):
         """
             Returns all descendant nodes.
@@ -141,7 +138,6 @@ class Node:
             return []
 
     @staticmethod
-    @traceFunction
     def nodeToExpression(node):
         """
             Top down traversal constructing an arithmetic expression from the tree

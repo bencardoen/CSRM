@@ -269,7 +269,6 @@ class GPAlgorithm():
         """
         return False
 
-    @traceFunction
     def select(self):
         """
         Select a subset of the current population to operate on.
@@ -290,7 +289,6 @@ class GPAlgorithm():
             t.scoreTree(self._Y, self._fitnessfunction)
             newfit = t.getFitness()
 
-    @traceFunction
     def evolve(self, selection):
         """
         Evolve a selected set of the population, applying a set of operators.
@@ -301,8 +299,6 @@ class GPAlgorithm():
         self.evaluate(selection)
         return selection, [0,0,0]
 
-
-    @traceFunction
     def update(self, modified):
         """
         Process the new generation.
@@ -313,13 +309,11 @@ class GPAlgorithm():
             self.addTree(i)
         return
 
-    @traceFunction
     def archive(self, modified):
         """
         Using the new and previous generation, determine the best specimens and store them.
         """
         return
-
 
     def addToArchive(self, t):
         """
@@ -339,13 +333,11 @@ class BruteElitist(GPAlgorithm):
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases)
 
-    @traceFunction
     def select(self):
         s = self._population.removeAll()
         assert(len(self._population)==0)
         return s
 
-    @traceFunction
     def evolve(self, selection):
         """
             Apply mutation on each sample, replacing if fitter
@@ -403,9 +395,6 @@ class BruteElitist(GPAlgorithm):
         assert(len(newgen) == l)
         return newgen, replacementcount
 
-
-
-    @traceFunction
     def update(self, modified):
         """
             Add modified samples back to population, if needed fill population.
@@ -431,7 +420,6 @@ class BruteElitist(GPAlgorithm):
         # Add more measures
         return True
 
-    @traceFunction
     def archive(self, modified):
         """
             Simple archiving strategy, get best of generation and store.

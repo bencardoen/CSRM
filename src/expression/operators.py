@@ -17,7 +17,6 @@ class Mutate():
         Mutate a subexpression in the tree
     """
     @staticmethod
-    @traceFunction
     def mutate(tr:Tree, seed:int = None, variables = None, equaldepth=False, rng=None, limitdepth:int=0, selectiondepth:int=-1):
         """
             Replace a random node with a new generated subexpression.
@@ -83,7 +82,6 @@ class Crossover():
         Subtree crossover operator
     """
     @staticmethod
-    @traceFunction
     def subtreecrossover(left, right, depth = None, rng = None, limitdepth=-1):
         """
             Perform a subtree crossover in place.
