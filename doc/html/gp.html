@@ -51,14 +51,14 @@
 <span id="gp-algorithm-module"></span><h2>gp.algorithm module<a class="headerlink" href="#module-gp.algorithm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="gp.algorithm.BruteElitist">
-<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">BruteElitist</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>runs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">BruteElitist</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gp.algorithm.GPAlgorithm" title="gp.algorithm.GPAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">gp.algorithm.GPAlgorithm</span></code></a></p>
 <p>Brute force Elitist GP Variant.</p>
 <p>Applies mutation and subtree crossover to entire population and aggresively
 replaces unfit samples.</p>
 <dl class="method">
 <dt id="gp.algorithm.BruteElitist.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>runs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -95,14 +95,14 @@ Apply subtree crossover using random selection of pairs, replacing if fitter.</p
 
 <dl class="class">
 <dt id="gp.algorithm.GPAlgorithm">
-<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">GPAlgorithm</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em>, <em>history=None</em>, <em>runs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">GPAlgorithm</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em>, <em>history=None</em>, <em>phases=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>A base class representing a Genetic Programming Algorithm instance.</p>
 <p>The base class is responsible for data structures, configuration and control flow.</p>
 <p>In itself it will not evolve a solution.</p>
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em>, <em>history=None</em>, <em>runs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em>, <em>history=None</em>, <em>phases=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a forest of trees randomly constructed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -115,7 +115,7 @@ Apply subtree crossover using random selection of pairs, replacing if fitter.</p
 <li><strong>maxdepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; the maximum depth a tree is initialized to</li>
 <li><strong>generations</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; generations to iterate</li>
 <li><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; seed value for the rng used in tree construction</li>
-<li><strong>archivesize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; size of the archive used between runs to store best-of-generation samples, which are in turn reused in next runs</li>
+<li><strong>archivesize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; size of the archive used between phases to store best-of-generation samples, which are in turn reused in next phases</li>
 </ul>
 </td>
 </tr>
@@ -125,7 +125,7 @@ Apply subtree crossover using random selection of pairs, replacing if fitter.</p
 
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.addConvergenceStat">
-<code class="descname">addConvergenceStat</code><span class="sig-paren">(</span><em>generation</em>, <em>stat</em>, <em>run</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.addConvergenceStat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.addConvergenceStat" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addConvergenceStat</code><span class="sig-paren">(</span><em>generation</em>, <em>stat</em>, <em>phase</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.addConvergenceStat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.addConvergenceStat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -194,14 +194,14 @@ Apply subtree crossover using random selection of pairs, replacing if fitter.</p
 
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.getConvergenceStat">
-<code class="descname">getConvergenceStat</code><span class="sig-paren">(</span><em>generation</em>, <em>run</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.getConvergenceStat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.getConvergenceStat" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getConvergenceStat</code><span class="sig-paren">(</span><em>generation</em>, <em>phase</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.getConvergenceStat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.getConvergenceStat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.getConvergenceStatistics">
 <code class="descname">getConvergenceStatistics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.getConvergenceStatistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.getConvergenceStatistics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all statistics</p>
-<p>Returns a list indiced by run
+<p>Returns a list indiced by phase
 Each sublist is indiced by generation and holds a dict:</p>
 <blockquote>
 <div>&#8220;fitness&#8221;, &#8220;mean_fitness, &#8220;var_fitness&#8221;, &#8220;std_fitness&#8221;, &#8220;replacements&#8221;
@@ -276,7 +276,7 @@ called methods to alter behavior</p>
 
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.summarizeGeneration">
-<code class="descname">summarizeGeneration</code><span class="sig-paren">(</span><em>replacementcount</em>, <em>generation</em>, <em>run</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.summarizeGeneration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.summarizeGeneration" title="Permalink to this definition">¶</a></dt>
+<code class="descname">summarizeGeneration</code><span class="sig-paren">(</span><em>replacementcount: list</em>, <em>generation: int</em>, <em>phase: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.summarizeGeneration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.summarizeGeneration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute fitness statistics for the current generation and record them</p>
 </dd></dl>
 
@@ -289,7 +289,7 @@ called methods to alter behavior</p>
 <dt id="gp.algorithm.GPAlgorithm.update">
 <code class="descname">update</code><span class="sig-paren">(</span><em>modified</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process the new generation.
-At the very least, add modified back to population based on a condition.</p>
+At the very least, adds modified back to population based on a condition.</p>
 </dd></dl>
 
 </dd></dl>
