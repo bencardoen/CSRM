@@ -342,9 +342,6 @@ def fitnessfunction(actual, expected, tree, distancefunction=None):
 
         Returns d(Y', Y).
     """
-    if not tree.getVariables():
-        logger.debug("Tree instance is a constant expression : invalid")
-        return Constants.MINFITNESS
     if not actual:
         logger.debug("Tree instance has no datapoints : invalid")
         return Constants.MINFITNESS

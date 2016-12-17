@@ -17,7 +17,7 @@ class Mutate():
         Mutate a subexpression in the tree
     """
     @staticmethod
-    def mutate(tr:Tree, variables = None, equaldepth=False, rng=None, limitdepth:int=0, selectiondepth:int=-1):
+    def mutate(tr:Tree, variables, equaldepth=False, rng=None, limitdepth:int=0, selectiondepth:int=-1):
         """
             Replace a random node with a new generated subexpression.
 
@@ -40,9 +40,6 @@ class Mutate():
             :param Random rng: prng used to generate the new subtree and its attaching location
         """
         rng = rng or random.Random()
-        if variables is None:
-            vs = tr.getVariables()
-            variables= [v[0] for k,v in vs.items()]
 
         d = tr.getDepth()
 
@@ -72,7 +69,6 @@ class Mutate():
         assert(targetdepth >= 0)
         subtree = Tree.growTree(variables=variables, depth=targetdepth, rng=rng)
         tr.spliceSubTree(insertpoint, subtree.getRoot())
-        tr._mergeVariables(subtree.getVariables())
 
 class Crossover():
     """

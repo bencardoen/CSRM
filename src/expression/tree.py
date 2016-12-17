@@ -32,7 +32,6 @@ class Tree:
         # List of nodes in order of generation
         self.nodes = []
         self.root = None
-        self.variables = {}
         # Cached evaluation
         self.evaluated = 0
         self.modified = False
@@ -97,14 +96,6 @@ class Tree:
         else:
             self.nodes[pos] = node
         # Update variable if needed
-        variable = node.getVariable()
-        if variable:
-            index = variable.getIndex()
-            if index in self.variables:
-                v = self.variables[index]
-                self.variables[index] = [v[0], v[1]+1]
-            else:
-                self.variables[index] = [variable, 1]
 
     def makeInternalNode(self, function, parent=None, constant=None):
         """
@@ -123,8 +114,7 @@ class Tree:
         return n
 
     def _getDatapointCount(self):
-        assert(len(self.variables))
-        return len(self.variables[next(self.variables.__iter__())][0])
+        assert(False)
 
     def getNodes(self):
         """
@@ -221,13 +211,9 @@ class Tree:
             For each data point, evaluate this tree object.
             :returns list : list of evaluations
         """
-        v = self.getVariables()
         values = []
         dpoint = self.getDataPointCount()
-        for i in range(dpoint):
-            value = self.evaluateTree(increment=True)
-            values.append(value)
-        return values
+        return [self.evaluateTree(increment=True) for i in range(dpoint)]
 
     def scoreTree(self, expected, distancefunction):
         """
@@ -456,18 +442,6 @@ class Tree:
         cdrn = node.getAllChildren()
         for c in cdrn:
             self.nodes[c.getPosition()]=None
-            var = c.getVariable()
-            if var:
-                self._unreferenceVariable(var)
-
-    def _unreferenceVariable(self, varv: Variable):
-        index = varv.getIndex()
-        if index in self.variables:
-            v = self.variables[index]
-            if v[1] == 1:
-                del self.variables[index]
-            else:
-                self.variables[index] = [v[0], v[1]-1]
 
 
     def spliceSubTree(self, node: Node, newnode: Node):
@@ -494,53 +468,12 @@ class Tree:
         """
         return [ c.getConstant() for c in self.nodes if c]
 
-    def getVariables(self):
-        """
-        Return an ordered list of all variables used in this tree
-        """
-        return self.variables
-
-    def _mergeVariables(self, otherset: dict):
-        """
-        When a new subtree is merged, update the variables
-        """
-        variables = self.getVariables()
-        for k, v in otherset.items():
-            if k in variables:
-                entry = variables[k]
-                entry[1] += v[1]
-                variables[k] = entry
-            else:
-                variables[k] = v
-        assert(variables == self.getVariables())
-
-    def _updateVariables(self, vlist: list):
-        """
-        When a set of variables from a different tree is merged, update the current set.
-        """
-        d = {v.getIndex():[v, 0] for v in vlist}
-        self._mergeVariables(d)
-
     def printNodes(self):
         """
         Print nodes to stdout in binary order (root, ... , ith generation, ....)
         """
         for i, n in enumerate(self.nodes):
             print("Node {} at {}".format(n, i))
-
-    def updateIndex(self,i=-1):
-        """
-        Update the variables in the tree s.t. they point at the next datapoint
-        """
-        self.setModified(True)
-        #for k, v in self.variables.items():
-        #    variable = self.variables[k][0]
-        #    #index = variable.getCurrentIndex()
-        #    #if i != -1:
-        #    #    variable.setCurrentIndex(i)
-        #    #else:
-        #    #    variable.setCurrentIndex(index + 1)
-        #    variable.increment()
 
     def getRoot(self):
         assert(self.root)
@@ -597,10 +530,8 @@ class Tree:
         rightcopy = deepcopy(rightsubroot)
 
         left.spliceSubTree(leftsubroot, rightcopy)
-        left._updateVariables(rightv)
 
         right.spliceSubTree(rightsubroot, leftcopy)
-        right._updateVariables(leftv)
 
     @staticmethod
     def createTreeFromExpression(expr: str, variables=None):
