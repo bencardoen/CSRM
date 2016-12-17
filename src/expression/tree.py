@@ -7,7 +7,7 @@
 #      Author: Ben Cardoen
 
 
-from expression.tools import msb, compareLists, traceFunction
+from expression.tools import msb, compareLists, traceFunction, copyObject
 from expression.functions import functionset, getRandomFunction, tokenize, infixToPostfix, isFunction, isOperator, infixToPrefix, Constants
 from random import  choice, random
 from copy import deepcopy
@@ -526,8 +526,8 @@ class Tree:
         rightv = rightsubroot.getVariables()
 
         # We don't want aliasing effects, note that variable set is still aliased
-        leftcopy = deepcopy(leftsubroot)
-        rightcopy = deepcopy(rightsubroot)
+        leftcopy = copyObject(leftsubroot)
+        rightcopy = copyObject(rightsubroot)
 
         left.spliceSubTree(leftsubroot, rightcopy)
 

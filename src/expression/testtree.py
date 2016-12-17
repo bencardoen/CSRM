@@ -13,11 +13,14 @@ from math import sqrt
 import unittest
 from copy import deepcopy
 import logging
+import time
 import re
 from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson
 import os
 import random
 from expression.operators import Mutate, Crossover
+import pickle
+
 
 logger = logging.getLogger('global')
 
@@ -599,6 +602,7 @@ class TreeTest(unittest.TestCase):
         e = t.evaluateTree()
         self.assertEqual(e, 3108.4668090265263)
 
+
     def testGrowTree(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         rng = random.Random()
@@ -749,6 +753,29 @@ class TreeTest(unittest.TestCase):
         _p = _pearson(a,b)
 
 #        print(rmse, nrmse, p, _p)
+
+
+
+
+    def testPickleCopyPerformance(self):
+        vcount = 4
+        dpoint = 1
+        rng = random.Random()
+        rng.seed(0)
+        vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
+        variables = Variable.toVariables(vs)
+        trees = [Tree.makeRandomTree(variables, depth=6, rng=rng) for i in range(1000)]
+        copies = [None]*1000
+        t0 = time.time()
+        for i in range(1000):
+            copies[i] = pickle.loads(pickle.dumps(trees[i], -1))
+        t1 = time.time()
+        total = t1-t0
+        t0 = time.time()
+        for i in range(1000):
+            copies[i] = deepcopy(trees[i])
+        t1 = time.time()
+        total = t1-t0
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)

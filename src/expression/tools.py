@@ -15,6 +15,7 @@ import random
 import inspect, itertools
 import functools
 import numpy
+import pickle
 from scipy.stats.stats import pearsonr
 
 logger = logging.getLogger('global')
@@ -61,6 +62,12 @@ def almostEqual(left, right, epsilon):
     if abs(left - right) < epsilon:
         return True
     return False
+
+
+def copyObject(o):
+    return pickle.loads(pickle.dumps(o, -1))
+
+
 
 def generateSVG(dotfile: str):
     call(["dot", "-o {}.svg".format(dotfile[-4]), "{}".format(dotfile)])

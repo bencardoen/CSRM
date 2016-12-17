@@ -8,7 +8,7 @@
 
 from expression.tree import Tree
 from expression.operators import Mutate, Crossover
-from expression.tools import traceFunction, randomizedConsume
+from expression.tools import traceFunction, randomizedConsume, copyObject
 from expression.constants import Constants
 from gp.population import Population, SetPopulation
 from expression.node import Variable
@@ -216,7 +216,7 @@ class GPAlgorithm():
         """
         archived = self._archive.getAll()
         for a in archived:
-            self.addTree(deepcopy(a))
+            self.addTree(copyObject(a))
         # Retrim the current population by removing the least fit samples
         while len(self._population) > self._popsize:
             self._population.bottom()
@@ -353,7 +353,7 @@ class BruteElitist(GPAlgorithm):
         # Mutate on entire population, with regard to (scaled) fitness
         for i in range(selcount//2, selcount):
             t = selection[i]
-            candidate = deepcopy(t)
+            candidate = copyObject(t)
             #def mutate(tr:Tree, seed:int = None, variables = None, equaldepth=False, rng=None, limitdepth:int=0):
             Mutate.mutate(candidate, variables=self._variables, equaldepth=True, rng=rng)
             candidate.scoreTree(self._Y, self._fitnessfunction)
@@ -378,8 +378,8 @@ class BruteElitist(GPAlgorithm):
             left = next(selector)
             right = next(selector)
             assert(left != right)
-            lc = deepcopy(left)
-            rc = deepcopy(right)
+            lc = copyObject(left)
+            rc = copyObject(right)
             Crossover.subtreecrossover(lc, rc, depth=None, rng=rng, limitdepth=d)
             lc.scoreTree(self._Y, self._fitnessfunction)
             rc.scoreTree(self._Y, self._fitnessfunction)
@@ -425,5 +425,6 @@ class BruteElitist(GPAlgorithm):
             Simple archiving strategy, get best of generation and store.
         """
         t = self.getBestTree()
-        t = deepcopy(t)
+        # TODO clean old pop, if so no copy is needed
+        t = copyObject(t)
         self._archive.add(t)

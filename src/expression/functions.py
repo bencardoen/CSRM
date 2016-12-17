@@ -123,7 +123,7 @@ braces = [',', '(',')']
 # A reverse map containing the first letter of each function object
 prefixes = { value[0][0]: (key, len(value[0])) for key, value in list(functionset.items())}
 
-@traceFunction
+
 def getRandomFunction(seed = None, rng=None):
     _rng = rng or random.Random()
     if seed is not None:
@@ -133,7 +133,6 @@ def getRandomFunction(seed = None, rng=None):
 def getFunctionComplexity(f):
     return functionset[f][4]
 
-@traceFunction
 def tokenize(expression, variables=None):
     """
 
