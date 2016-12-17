@@ -52,7 +52,6 @@ class Node:
 
     def getNodeComplexity(self):
         if self.function:
-            logger.debug("Retrieving function complexity for {}".format(self.function))
             return expression.functions.getFunctionComplexity(self.function)
         return 0
 
@@ -61,7 +60,6 @@ class Node:
         """
         Evaluate this node using the function object, optionally multiplying with the constant.
         """
-        logger.debug("Evaluating {} with args {}".format(self, args))
         rv = 0
         if(args and len(args) != self.arity):
             raise  ValueError("Incompatible parity {} and arguments {}".format(self.arity, args))
@@ -124,7 +122,6 @@ class Node:
         pos = self.getPosition()
         i = 1
         for c in self.getChildren():
-            logger.debug("Setting position of {} from {} to {}".format(c, c.getPosition(), 2*pos + i))
             c.setPosition(2*pos + i)
             i+=1
             c.updatePosition()
@@ -139,7 +136,6 @@ class Node:
         if children :
             for c in children:
                 collected += c.getAllChildren()[:]
-            logger.debug("Returning collected {}".format(collected))
             return collected
         else:
             return []

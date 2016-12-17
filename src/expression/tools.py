@@ -49,7 +49,6 @@ def approximateMultiple(a, b, epsilon):
     """
     let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True
     """
-    logger.debug("{} {} {}".format(a,b,epsilon))
     m = a / b
     if not m: return False
     return abs(m - round(m)) < epsilon

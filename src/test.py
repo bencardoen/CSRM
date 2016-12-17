@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
+
 from expression.tools import generateVariables
 import random
-from expression.tools import generateVariables
 from expression.tree import Tree
 from expression.functions import testfunctions, rmsfitness as _fit
 from analysis.convergence import Convergence
@@ -30,19 +31,19 @@ def runAlgorithm():
     g.executeAlgorithm()
 
     # Plot results
-    stats = g.getConvergenceStatistics()
-    c = Convergence(stats)
-    c.plotFitness()
-    c.plotComplexity()
-    c.plotOperators()
-    c.plotPareto()
-    #c.savePlots("output_{}".format(i), title=expr)
-    c.displayPlots("output_", title=expr)
+    #stats = g.getConvergenceStatistics()
+    #c = Convergence(stats)
+    #c.plotFitness()
+    #c.plotComplexity()
+    #c.plotOperators()
+    #c.plotPareto()
+    ##c.savePlots("output_{}".format(i), title=expr)
+    #c.displayPlots("output_", title=expr)
 
 
 
 
 if __name__=="__main__":
-    logger.setLevel(logging.INFO)
-    logging.disable(logging.DEBUG)
+    logger.setLevel(logging.ERROR)
+    logging.disable(logging.INFO)
     runAlgorithm()

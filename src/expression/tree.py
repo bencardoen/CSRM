@@ -154,7 +154,6 @@ class Tree:
         """
         Make a leaf node holding a reference to a variable.
         """
-        logger.debug("Makeleaf with args = v={}, parent={}, cte={}".format(variable, parent, constant))
         if parent is None:
             n = VariableNode( 0, variable, constant)
             self.root = n
@@ -214,7 +213,6 @@ class Tree:
         if self.modified:
             oe = self.evaluated
             self.evaluated = self._evalTree(self.nodes[0])
-            logger.debug("Tree state modified, reevaluating from {} to {}".format(oe, self.evaluated))
             self.getDepth()
             self.modified = False
         return self.evaluated
@@ -349,7 +347,6 @@ class Tree:
         """
             Construct a valid tree from left and right subtrees.
         """
-        logger.debug("cfSubtree with args left {} right {} rng {} ".format(left, right, rng))
         if rng is None:
             rng = random.Random()
         i = 0
@@ -364,9 +361,7 @@ class Tree:
             else:
                 t.spliceSubTree(t.getNode(1), left.getRoot())
             e = t.evaluateTree()
-            if e is None:
-                logger.debug("Invalid evaluation of tree, retrying")
-            else:
+            if e is not  None:
                 t.setDataPointCount(min(dl, dr))
                 return t
 
@@ -456,18 +451,15 @@ class Tree:
         # Replace current node with new node
         if parent:
             if npos & 1:
-                logger.debug("Setting newnode as first child of {}".format(parent))
                 assert(parent.getChildren())
                 parent.getChildren()[0] = newnode #trace
             else:
-                logger.debug("Setting newnode as second child of {}".format(parent))
                 parent.getChildren()[1] = newnode  #trace
         self.nodes[npos] = newnode
         if npos == 0:
             self.root=newnode
         # Unlink all children
         cdrn = node.getAllChildren()
-        logger.debug("unlinking all children {}".format(cdrn))
         for c in cdrn:
             self.nodes[c.getPosition()]=None
             var = c.getVariable()
@@ -480,10 +472,8 @@ class Tree:
         if index in self.variables:
             v = self.variables[index]
             if v[1] == 1:
-                logger.debug("Removing var {}".format(varv))
                 del self.variables[index]
             else:
-                logger.debug("Decrementing refcount var {} to {}".format(varv, v[1]-1))
                 self.variables[index] = [v[0], v[1]-1]
 
 
@@ -492,7 +482,6 @@ class Tree:
         """
         Remove subtree with root node, replace it with subtree with root newnode
         """
-        logger.debug("Splicing newnode {} in node's {} position".format(newnode, node))
         assert(node != self.getRoot())
         self._removeNode(node, newnode)
         # newnode is in place, make sure its subtree is updated and children linked in
@@ -502,7 +491,6 @@ class Tree:
             newnodes = []
             for c in nodes:
                 newnodes += c.getChildren()[:]
-                logger.debug("Adding child {} at pos {}".format(c, c.getPosition()))
                 self._addNode(c, c.getPosition())
             nodes = newnodes
         self.testInvariant()
@@ -525,16 +513,13 @@ class Tree:
         When a new subtree is merged, update the variables
         """
         variables = self.getVariables()
-        logger.debug("Variables is now {}".format(variables))
         for k, v in otherset.items():
-            logger.debug("Updating with {} {}".format(k, v))
             if k in variables:
                 entry = variables[k]
                 entry[1] += v[1]
                 variables[k] = entry
             else:
                 variables[k] = v
-        logger.debug("Variables is now {}".format(variables))
         assert(variables == self.getVariables())
 
     @traceFunction
@@ -590,8 +575,6 @@ class Tree:
         maxc = nodecount * Constants.MAX_COMPLEXITY
         # Minimum complexity is with a tree all single arity min complex.
         minc = (d-1) * Constants.MIN_COMPLEXITY
-
-        logger.debug("Nodecount {} minc {} maxc {} ratio {}".format(nodecount, minc, maxc, (c-minc)))
         if c-minc < 0:
             assert(False)
             return 1
@@ -616,11 +599,9 @@ class Tree:
 
         leftsubroot = left.getRandomNode(seed=None, depth=depth, rng=rng)
         leftv = leftsubroot.getVariables()
-        logger.debug("Selected left node {}".format(leftsubroot))
 
         rightsubroot = right.getRandomNode(seed=None, depth=depth, rng=rng)
         rightv = rightsubroot.getVariables()
-        logger.debug("Selected right node {}".format(rightsubroot))
 
         # We don't want aliasing effects, note that variable set is still aliased
         leftcopy = deepcopy(leftsubroot)
@@ -648,7 +629,6 @@ class Tree:
         result = Tree()
         lastnode = None
         for token in pfix:
-            logger.debug("Converting token {} to node".format(token))
             if isFunction(token) or isOperator(token):
                 lastnode = result.makeInternalNode(token, lastnode)
             else:

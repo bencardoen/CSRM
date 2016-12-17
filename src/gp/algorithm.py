@@ -70,7 +70,6 @@ class GPAlgorithm():
             Retrieve seed, and modify it for the next call.
             Seed is in [0, 0xffffffff]
         """
-        logger.debug("Retrieving seed {}".format(self._seed))
         s = self._seed
         if s is None:
             return None
@@ -152,7 +151,6 @@ class GPAlgorithm():
             assert(self._variables)
             t = Tree.growTree(self._variables, self._maxdepth, rng=rng)
             t.scoreTree(self._Y, self._fitnessfunction)
-            logger.debug("Attempt {} with seed {} and t {}  and t {}".format(i, seed, t.getFitness(), t))
             i += 1
         self.addTree(t)
 
@@ -241,12 +239,8 @@ class GPAlgorithm():
         """
         r = self._phase
         for i in range(self._generations):
-            logger.debug("Generation {}".format(i))
-            logger.debug("\tSelection")
             selected = self.select()
-            logger.debug("\tEvolution")
             modified, count = self.evolve(selected)
-            logger.debug("\tUpdate")
             self.update(modified)
             assert(isinstance(count, list))
             self.summarizeGeneration(count, generation=i, phase=r)
@@ -295,7 +289,6 @@ class GPAlgorithm():
             oldfit = t.getFitness()
             t.scoreTree(self._Y, self._fitnessfunction)
             newfit = t.getFitness()
-            logger.debug("Updating \n{}n with fitness {} ---> {}".format(t.toExpression().replace(" ",""), oldfit, newfit))
 
     @traceFunction
     def evolve(self, selection):
@@ -313,7 +306,7 @@ class GPAlgorithm():
     def update(self, modified):
         """
         Process the new generation.
-        At the very least, add modified back to population based on a condition.
+        At the very least, adds modified back to population based on a condition.
         """
         self.evaluate(modified)
         for i in modified:
@@ -374,7 +367,6 @@ class BruteElitist(GPAlgorithm):
             candidate.scoreTree(self._Y, self._fitnessfunction)
 
             if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
-                logger.debug("Mutation resulted in improved fitness, replacing {}".format(i))
                 assert(candidate.getDepth() <= self._maxdepth)
                 selection[i] = candidate
                 replacementcount[0] += 1
@@ -387,7 +379,6 @@ class BruteElitist(GPAlgorithm):
         # Both fit and unfit individuals benefit from crossbreeding.
         newgen = []
         if l % 2:
-            logger.debug("Selection not even")
             newgen.append(selection[0])
             del selection[0]
         selector = randomizedConsume(selection, seed=self.getSeed())
@@ -403,11 +394,9 @@ class BruteElitist(GPAlgorithm):
             scores = [left, right, lc, rc]
             best = sorted(scores, key = lambda t : t.getMultiObjectiveFitness())[0:2]
             if lc in best:
-                logger.debug("Crossover resulted in improved fitness, replacing")
                 replacementcount[0] += 1
                 replacementcount[2] += 1
             if rc in best:
-                logger.debug("Crossover resulted in improved fitness, replacing")
                 replacementcount[0] += 1
                 replacementcount[2] += 1
             newgen += best
@@ -424,7 +413,6 @@ class BruteElitist(GPAlgorithm):
         for t in modified:
             self.addTree(t)
         remcount = self._popsize - len(modified)
-        logger.debug("Adding {} new random trees".format(remcount))
         for _ in range(remcount):
             # Use archive here with probability ?
             self.addRandomTree()
