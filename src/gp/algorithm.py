@@ -338,31 +338,39 @@ class BruteElitist(GPAlgorithm):
         assert(len(self._population)==0)
         return s
 
+#    @profile
     def evolve(self, selection):
         """
             Apply mutation on each sample, replacing if fitter
             Apply subtree crossover using random selection of pairs, replacing if fitter.
         """
+        Y = self._Y
+        fit = self._fitnessfunction
         d = self._maxdepth
-        l = len(selection)
-        assert(l == self._popsize)
+        rng = self._rng
+        variables = self._variables
+
+
         replacementcount = [0,0,0]
         selcount = len(selection)
-        rng = self._rng
+        assert(selcount == self._popsize)
+
         # TODO : mutate with cooling effect, modify based on current fitness, i.e. don't drastically alter a good tree
         # Mutate on entire population, with regard to (scaled) fitness
         for i in range(selcount//2, selcount):
             t = selection[i]
             candidate = copyObject(t)
-            #def mutate(tr:Tree, seed:int = None, variables = None, equaldepth=False, rng=None, limitdepth:int=0):
-            Mutate.mutate(candidate, variables=self._variables, equaldepth=True, rng=rng)
-            candidate.scoreTree(self._Y, self._fitnessfunction)
+
+            Mutate.mutate(candidate, variables=variables, equaldepth=True, rng=rng)
+            candidate.scoreTree(Y, fit)
 
             if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
-                assert(candidate.getDepth() <= self._maxdepth)
+                assert(candidate.getDepth() <= d)
                 selection[i] = candidate
                 replacementcount[0] += 1
                 replacementcount[1] += 1
+
+
 
         # Subtree Crossover
         # Select 2 random trees, crossover, if better than parent, replace
@@ -370,9 +378,10 @@ class BruteElitist(GPAlgorithm):
         # Experiments with only applying it to the best specimens increase mean fitness
         # Both fit and unfit individuals benefit from crossbreeding.
         newgen = []
-        if l % 2:
+        if selcount % 2:
             newgen.append(selection[0])
             del selection[0]
+
         selector = randomizedConsume(selection, seed=self.getSeed())
         while selection:
             left = next(selector)
@@ -381,8 +390,8 @@ class BruteElitist(GPAlgorithm):
             lc = copyObject(left)
             rc = copyObject(right)
             Crossover.subtreecrossover(lc, rc, depth=None, rng=rng, limitdepth=d)
-            lc.scoreTree(self._Y, self._fitnessfunction)
-            rc.scoreTree(self._Y, self._fitnessfunction)
+            lc.scoreTree(Y, fit)
+            rc.scoreTree(Y, fit)
             scores = [left, right, lc, rc]
             best = sorted(scores, key = lambda t : t.getMultiObjectiveFitness())[0:2]
             if lc in best:
@@ -392,7 +401,7 @@ class BruteElitist(GPAlgorithm):
                 replacementcount[0] += 1
                 replacementcount[2] += 1
             newgen += best
-        assert(len(newgen) == l)
+        assert(len(newgen) == selcount)
         return newgen, replacementcount
 
     def update(self, modified):

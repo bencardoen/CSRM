@@ -28,9 +28,7 @@ class Node:
         if self.function:
             self.arity = expression.functions.functionset[self.function][1]
         else:
-            self.arity = 1
-        self._modified = True
-        self._cachedeval = 0
+            self.arity = 0
         self._depth = Node.positionToDepth(pos)
 
     @staticmethod

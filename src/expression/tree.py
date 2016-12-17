@@ -211,7 +211,6 @@ class Tree:
             For each data point, evaluate this tree object.
             :returns list : list of evaluations
         """
-        values = []
         dpoint = self.getDataPointCount()
         return [self.evaluateTree(increment=True) for i in range(dpoint)]
 
@@ -225,17 +224,18 @@ class Tree:
         actual = self.evaluateAll()
         f = distancefunction(actual, expected, tree=self)
         self.setFitness(f)
-        return self.getFitness()
+        return f
 
+#    @profile
     def _evalTree(self, node: Node, increment=False):
         """
         Recursively evaluate tree with node as root.
         Returns None if evaluation is not valid
         """
-        children = node.getChildren()
+        children = node.children
         if children:
-            arity = node.getArity()
-            value = [None for d in range(arity)]
+            arity = node.arity
+            value = [None] * arity
             for i, child in enumerate(children):
                 v=self._evalTree(child, increment)
                 if v is None: return None
