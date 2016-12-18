@@ -57,7 +57,7 @@ class Node:
         return 0
 
 
-    def evaluate(self, args=None, increment=False):
+    def evaluate(self, args=None, index:int=None):
         """
         Evaluate this node using the function object, optionally multiplying with the constant.
         """
@@ -234,7 +234,6 @@ class Variable():
         """
         self._values = values
         self._index = index
-        self._current = 0
 
     def getValues(self):
         return self._values
@@ -245,24 +244,11 @@ class Variable():
     def setValues(self,vals):
         self._values = vals
 
-    def setCurrentIndex(self,i):
-        assert(i < len(self._values))
-        self._current = i
-
-    def getCurrentIndex(self):
-        return self._current
-
-    def increment(self):
-        self._current += 1
-        self._current %= len(self._values)
-
-    def getValue(self):
-        if self._values:
-            return self._values[self._current]
-        else:
-            logger.error("Variable value not set : returning 1")
-            raise ValueError("Variable value not set!!")
-            return 1
+    def getValue(self, index=None):
+        assert(self._values)
+        if index is None:
+            index = 0
+        return self._values[index]
 
     def getIndex(self):
         """
@@ -283,18 +269,14 @@ class VariableNode(Node):
     def __init__(self, pos, variable, constant=None):
         Node.__init__(self, None, pos, constant)
         self.variable = variable
+        # TODO set arity
 
     def getVariable(self):
         return self.variable
 
-    def nextValue(self):
-        self.variable.increment()
-
-    def evaluate(self, args=None, increment=False):
+    def evaluate(self, args=None, index:int=None):
         con = self.getConstant()
-        v = self.variable.getValue()
-        if increment:
-            self.variable.increment()
+        v = self.variable.getValue(index)
         if con :
             return v * con.getValue()
         else:
@@ -341,7 +323,7 @@ class ConstantNode(Node):
     def __init__(self, pos, constant):
         Node.__init__(self, None, pos, constant)
 
-    def evaluate(self, args=None, increment=False):
+    def evaluate(self, args=None, index:int=None):
         return self.getConstant().getValue()
 
     def getArity(self):

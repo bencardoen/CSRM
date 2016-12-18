@@ -444,7 +444,7 @@ class TreeTest(unittest.TestCase):
                 if not trees[i]:
                     trees[i]=Tree.createTreeFromExpression(expr, variables)
                 t=trees[i]
-                v = t.evaluateTree(increment=True)
+                v = t.evaluateTree(index=d)
                 t.printToDot(outputfolder+"t28unary{}.dot".format(i))
                 self.assertEqual(expected[d][i], v)
 
@@ -453,10 +453,10 @@ class TreeTest(unittest.TestCase):
         variables = [[1,2],[2,3]]
         t = Tree.createTreeFromExpression(expr, variables)
         d = t.evaluateTree()
-        d = t.evaluateTree(increment=True)
-        e = t.evaluateTree(increment=True)
+        d = t.evaluateTree(index=0)
+        e = t.evaluateTree(index=1)
         self.assertNotEqual(d,e)
-        e = t.evaluateTree(increment=True)
+        e = t.evaluateTree(index=0)
         self.assertEqual(d,e)
 
     def testExp(self):
@@ -479,7 +479,7 @@ class TreeTest(unittest.TestCase):
                 if not trees[i]:
                     trees[i] = Tree.createTreeFromExpression(e, variables)
                 t = trees[i]
-                ev = t.evaluateTree(increment=True)
+                ev = t.evaluateTree(index=j)
                 results[i][j] = ev
                 t.printToDot(outputfolder+"t29Benchmark{}{}.dot".format(i,j))
         for index, res in enumerate(results):

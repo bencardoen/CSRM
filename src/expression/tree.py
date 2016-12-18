@@ -196,13 +196,13 @@ class Tree:
             output += "\n"
         return output
 
-    def evaluateTree(self, increment=False):
+    def evaluateTree(self, index = None):
         """
         Evaluates tree if tree was modified, else returns a cached results.
         Updates depth if needed.
         """
-        if self.modified or increment:
-            self.evaluated = self._evalTree(self.root, increment)
+        if self.modified or index is not None:
+            self.evaluated = self._evalTree(self.root, index)
             self.modified = False
         return self.evaluated
 
@@ -212,7 +212,7 @@ class Tree:
             :returns list : list of evaluations
         """
         dpoint = self.getDataPointCount()
-        return [self.evaluateTree(increment=True) for i in range(dpoint)]
+        return [self.evaluateTree(index=i) for i in range(dpoint)]
 
     def scoreTree(self, expected, distancefunction):
         """
@@ -226,7 +226,7 @@ class Tree:
         self.setFitness(f)
         return f
 
-    def _evalTree(self, node: Node, increment=False):
+    def _evalTree(self, node: Node, index=None):
         """
         Recursively evaluate tree with node as root.
         Returns None if evaluation is not valid
@@ -236,12 +236,12 @@ class Tree:
             arity = node.arity
             value = [None] * arity
             for i, child in enumerate(children):
-                v=self._evalTree(child, increment)
+                v=self._evalTree(child, index)
                 if v is None: return None
                 value[i] = v
-            return node.evaluate(value, increment=increment) # function or operator
+            return node.evaluate(value, index=index) # function or operator
         else:
-            return node.evaluate(increment=increment) # leaf
+            return node.evaluate(index=index) # leaf
 
 
     def printToDot(self, name = None):
