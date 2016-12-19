@@ -15,7 +15,7 @@ from copy import deepcopy
 import logging
 import time
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation
 import os
 import random
 from expression.operators import Mutate, Crossover
@@ -547,6 +547,17 @@ class TreeTest(unittest.TestCase):
         t.getDepth()
         t.evaluateTree()
         self.assertFalse(t.isModified())
+
+    def testRange(self):
+        rng = random.Random()
+        rng.seed(0)
+        c = [rng.randint(-2, 8) for d in range(10) ]
+        lower = -1
+        upper = 1
+        scaleTransformation(c, lower=lower, upper=upper)
+        for i in c:
+            self.assertTrue(i <= upper)
+            self.assertTrue(i >= lower)
 
 
     def testMutateOperator(self):

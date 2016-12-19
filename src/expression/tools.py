@@ -151,6 +151,32 @@ def traceFunction(fn=None, logcall=None):
         return _decorate(fn)
     return _decorate
 
+def scaleTransformation(elements, lower=-1, upper=1):
+    """
+    Scale iterable to fit within [lower, upper]
+    Returns min, max of elements
+    """
+    actuallow = float('inf')
+    actualhigh = -float('inf')
+    length = 0
+    for el in elements:
+        if el < actuallow:
+            actuallow = el
+        if el > actualhigh:
+            actualhigh = el
+        length += 1
+    actualrange = actualhigh-actuallow
+    requiredrange = upper-lower
+
+    for i in range(length):
+        e = elements[i]
+        elements[i] -= actuallow
+        elements[i] *= requiredrange/actualrange
+        elements[i] += lower
+    return actuallow, actualhigh
+
+
+
 
 def rootmeansquare(actual, expected):
     """

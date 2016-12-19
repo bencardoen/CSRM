@@ -5,7 +5,7 @@ class Constants():
         pass
     #Fitness function (lower is better)
     MINFITNESS = float('inf')
-    MAXFITNESS = 0
+    MAXFITNESS = 1
     # Size limit for exponents
     SIZE_LIMIT = 30
     # Legal range for constants
