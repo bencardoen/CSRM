@@ -3,7 +3,7 @@
 from expression.tools import generateVariables
 import random
 from expression.tree import Tree
-from expression.functions import testfunctions, rmsfitness as _fit
+from expression.functions import testfunctions, pearsonfitness as _fit
 from analysis.convergence import Convergence
 from gp.algorithm import BruteElitist
 import logging
@@ -27,7 +27,7 @@ def runAlgorithm():
     Y = t.evaluateAll()
 
     # Configure the algorithm
-    g = BruteElitist(X, Y, popsize=60, maxdepth=7, fitnessfunction=_fit, seed=0, generations=20, phases=5)
+    g = BruteElitist(X, Y, popsize=20, maxdepth=4, fitnessfunction=_fit, seed=0, generations=20, phases=5)
     g.executeAlgorithm()
 
     # Plot results

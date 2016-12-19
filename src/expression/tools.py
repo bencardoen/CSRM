@@ -181,10 +181,12 @@ def pearson(actual, expected):
     meana = a.mean()
     meanb = b.mean()
     va = a - meana
-    vb = a - meanb
+    vb = b - meanb
     nom = numpy.sum( va*vb  )
     denom = numpy.sqrt( numpy.sum( numpy.square(va) ) * numpy.sum( numpy.square( vb ) ) )
-    return nom/denom
+    if denom == 0:
+        return 2
+    return 2 - nom/denom
 
 def _pearson(actual, expected):
     N = len(actual)

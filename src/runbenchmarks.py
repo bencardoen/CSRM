@@ -2,7 +2,7 @@
 import random
 from expression.tools import generateVariables
 from expression.tree import Tree
-from expression.functions import testfunctions, rmsfitness as _fit
+from expression.functions import testfunctions, pearsonfitness as _fit
 from analysis.convergence import Convergence
 from gp.algorithm import BruteElitist
 import logging
