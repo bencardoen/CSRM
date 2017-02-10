@@ -45,6 +45,17 @@ julia> typeof(obj)
 ##### Type system
 Conversion isn't as loose as in C[++]. E.g. bool->int is legal, the reverse is not.
 
+Parametric typing : use {T}
+e.g.
+```
+m = Array{Int64,1} # 1 dimensional array of 64 bit signed int
+typeof(Array(Int64, 1)) == Vector{Int64} # true
+```
+Note expression{T} is a Type, not a value.
+```
+Array(Int64, 1) == Vector{Int64} # false, lhs is not a type but an object
+```
+
 Numeric types:
 Bool, Int{x}, Float{x} where x is [8,16,32,64], Complex{basetype}
 
@@ -73,6 +84,8 @@ julia> b = BigInt(value)
 julia> b = parse(BigInt,"123")
 ```
 *{zero|one}(x)* Returns 1,0 of any x type.
+
+*===* Tests if @lhs == @rhs
 
 Strings
 ```
@@ -107,12 +120,26 @@ julia> m = Array(<type>, <count>) #deprecated
 julia> m = Array{type}(dims)
 julia> m = fill(value, dims,)
 julia> m = [1 2; 3 4] # 2x2 array
+julia> m = [1;2;3;4] # NOT an 4x1 vector, flat array (4 element array)
+julia> m = [1 2 3 4]' # Transpose of 1x4 = 4x1 array
 ```
 Indices start from __1__
+```
+julia> m = [1 2; 3 4]
+julia> m[1] == 1
+julia> m[1, 1] == 1
+julia> m[1, :] == [1; 2]
+julia> b = [true false; false true]
+julia> m[b] == [1;4]
+julia> m[2:3] = 42 # [1 42; 42; 4]
+```
+Operations
 ```
 julia> pop!(m) # ! indicated mutating method
 julia> length(m) # all elements
 julia> push!(m, 1)
+julia> sort(m, rev=true) # reverse sorted copy of m
+# Others include {max|min}imum , mean, std, var
 ```
 Multidimensional (Vector = 1 dim, Matrix is n)
 ```
@@ -129,6 +156,23 @@ julia> b = reshape(m,2,2) # b is a 2x2 representation of a, if you modify either
 julia> b = b[:] # slice copy, destroys view gives original array
 julia> b = squeeze(b, dim)[:] #
 ```
+Matrix Operations
+```
+julia> c = [1 0 ; 0 1]
+julia> e = c' # transpose
+julia> i = inv(c)
+julia> b = [1 2 ; 3 4]
+julia> a = [1 1 ; 1 1]
+julia> b * a
+#a x = b, solve for x
+julia> a \ b
+julia> dot(ones(3), ones(3))
+julia> ones(2) * a # dim error (2x1 x 2x2)
+julia> a * ones(2) # ok
+julia> a .* 5 # element wise mult (.x where x is operator is element wise as in Matlab)
+julia> 5a == a.*5 # scalar mult is unambiguous
+```
+
 _end_ keyword in a sequence reference last element
 
 ###### Dicts
