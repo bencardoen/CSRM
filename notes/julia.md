@@ -45,6 +45,15 @@ julia> typeof(obj)
 ##### Type system
 Conversion isn't as loose as in C[++]. E.g. bool->int is legal, the reverse is not.
 
+Conversion
+```
+julia> oftype(x,y) : converts y to type of x
+```
+Alias
+```
+julia> typealias newname oldname
+```
+
 Parametric typing : use {T}
 e.g.
 ```
@@ -126,6 +135,30 @@ end
 julia> q = B{Int64}(7) #
 julia> r = B(7) #
 ```
+Note : fieldnames(<obj>) results in field names of object.
+
+Singleton:
+```
+type Singleton
+end
+```
+Only one such an object can exist, all are references to this one object.
+```
+julia> s = Singleton()
+julia> q = Singleton()
+julia> q===s
+```
+Immutable
+```
+immutable Im
+  field
+  list
+end
+julia> im = Im(2, [1 2 3])# im's fields cannot change
+julia> im.list = [2,3] # illegal
+julia> im.list[1] = 5 # legal
+```
+Note: immutable objects are copied (pass by value, mutables are pass by reference)
 
 Abstract types
 ```
@@ -286,7 +319,8 @@ julia> map(x->x^2, collection)
 ```
 Arguments: same rules as in Python.
 ```
-function f(first, second; third=named, fourth=named )
+function f(first, second; third=named, fourth[::Type]=named )
+function f(x; keywords...) # slow
 ```
 Multiple dispatch
 ```
@@ -393,3 +427,21 @@ For the same reason (type inference), avoid global variables.
 
 Important : on first call, a function will be compiled. So benchmarking with @time
 should either split that call, or use an average.
+
+Promote inlining by splitting aggregate function into smaller functions.
+
+Use zero(), one() to create type stable expressions
+
+```
+a = x < 0 ? zero(x) : x # x is Any Typed, so without zero(x) this expression can return 2 types
+```
+Similar, avoid type changing of variables
+```
+julia> x = 8 # Int64
+julia> x = x/5 # Float64
+```
+
+Split function in functions where argument type is known:
+If type variable x is known after y statements, split remaind of code into separate function to allow optimizations.
+
+Memory access is column major !!
