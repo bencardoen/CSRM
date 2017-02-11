@@ -98,7 +98,57 @@ julia> match(<pattern>, <string> )
 # returns matchobject
 # pattern is of the form r"<regex>"
 ```
+Hierarchy
+```
+julia> Int64 <= Real # true
+```
+Define a method for the abstract type as a fallback function.
 
+Defining types
+
+```
+julia> type <name> end #  <name> should follow CamelCase
+julia> n = <name>() # Default constructor is defined by env
+type MyType
+    a[::T] # force type
+    b
+    c
+end
+# defines a MyType as new type with a 3 arg constructor.
+julia> m = MyType(1,2,3)
+julia> m.a = 7
+```
+Parametric types
+```
+type B{T <: Number} # Accepts any subtype T of Number (<: S is optional)
+  a::T
+end
+julia> q = B{Int64}(7) #
+julia> r = B(7) #
+```
+
+Abstract types
+```
+abstract «name» <: «supertype»
+```
+
+
+Const
+```
+julia> const x = 7
+julia> x = 9 # triggers a warning "redefining constant"
+```
+
+global
+```
+julia> x = 9 # implied global
+function f()
+    x = 8 # shadowing x, x here is a new variable, and local
+    # if global x is intended, use:
+    global x = 9
+    # NOTE : once 'global x' is used, there is no more shadowing, e.g. a line x = 42 later on will still reference global x
+end
+```
 ##### Tuples
 Similar to Python
 ```
@@ -171,6 +221,13 @@ julia> ones(2) * a # dim error (2x1 x 2x2)
 julia> a * ones(2) # ok
 julia> a .* 5 # element wise mult (.x where x is operator is element wise as in Matlab)
 julia> 5a == a.*5 # scalar mult is unambiguous
+julia> a.>b # element wise comparison (boolean matrix as result)
+julia> a[a.>0] # get all elements larger than zero
+julia> log(a) # vectorized log of a, element wise, equal to [log(x) for x in a]
+```
+Linear algebra
+```
+julia> {det|trace|eigvals|rank}(A)
 ```
 
 _end_ keyword in a sequence reference last element
@@ -231,7 +288,29 @@ Arguments: same rules as in Python.
 ```
 function f(first, second; third=named, fourth=named )
 ```
+Multiple dispatch
+```
+julia> @which <functioncall> # returns exact method being executed
+```
+Method is function with certain set of arguments.
 
+E.g. function \*(T,T), method \*(Int64, Int64)
+
+Multiple dispatch : with statement f(S, T), lookup methods of f matching S,T.
+If none is found, match super(S), super(T)
+
+Defining typed Functions
+```
+function f(x::Int64)
+    println("Integer 64 version called")
+end
+function f(x)
+    println("Generic version called")
+end
+
+f("abc") # calls generic version
+f(42) # calls Int64 version
+```
 ##### IO
 ```
 julia> f = open(<fname>, mode) # mode is w,r
@@ -260,3 +339,57 @@ julia> b = [i for i in a if i % 2 == 0]
 ##### Logic
 Logical and/or/not  (bool only) : &&, ||, !
 Bitwise : &, |, ~ (watch out for signedness UInt8 != Int8)
+
+
+##### Performance
+Fully specifying type enhances performance
+```
+julia> x = [rand() for x in 1:1e5]
+function f(x)
+    s = 0
+    for y in x
+        s += y
+    end
+end
+function f(x::Array{Float64,1}) # typed method for float arrays
+    s = 0
+    for y in x
+        s += y
+    end
+end
+julia> @time g(x)
+julia> @time g(x) # Could be faster, but only if Julia isn't already able to infer type.
+julia> x = Any[rand() for x in 1:1e5] #
+julia> g(x) # Calls method with generic parameters. No type inference can be made, so no optimizations possible.
+```
+```
+type B
+     a # Impossible to infer typeof(a)
+end
+```
+Since the type of a can only be known at runtime, performance degrades. If a's Type is known not based on its runtime value, performance is high.
+
+If B is genericly typed with T, and field a as well, all depends on T. If T is an Abstract type, explicit, then it can still change at runtime
+(e.g Int64 v Int32 as subtypes of Numeric).
+```
+type B{T <: Number}
+    a::T
+end
+julia> b = B{Int64}(43) # typeof(b.a is Int64), type is set not by value at runtime, so opt is possible
+```
+
+Inspecting generated code
+```
+function f(x)
+    x+=1
+end    
+code_llvm(f,(B{Int64},))
+code_llvm(func,(B{Number},))
+code_llvm(func,(B,))
+```
+
+For the same reason (type inference), avoid global variables.
+
+
+Important : on first call, a function will be compiled. So benchmarking with @time
+should either split that call, or use an average.
