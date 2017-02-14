@@ -299,6 +299,43 @@ while <condition>
     # break, continue allowed
 end
 ```
+
+###### Exceptions
+```
+julia> throw(<exception instance>) # raise Except
+julia>
+```
+Info/Logging
+```
+julia> {info|warning|error}("z") # error raises error and logs.
+```
+```
+try
+<stmts>
+[catch [excp] # first symbol after catch is name exception, if anonymous use ;
+<stmts>
+]
+[finally
+<stmts> # executed regardless of exception
+]
+end
+```
+###### Compound expressions
+Idea : have a series of expressions executed, the result of the last is returned (as in C)
+```
+julia> a =begin
+          x=1+2  
+          y=3
+          x-y
+        end
+```
+Or single line variant
+```
+julia> a = (x=1+2; y=3; x-y)
+julia> a = begin x=1+2; y=3; x-y end
+```
+
+Without catch, the statement resolves to nothing.
 ##### Functions
 ```
 function <name>(<args>)
