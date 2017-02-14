@@ -334,8 +334,39 @@ Or single line variant
 julia> a = (x=1+2; y=3; x-y)
 julia> a = begin x=1+2; y=3; x-y end
 ```
+###### Coroutines
+Producer : f - object that calls produce(value)
+Consumer : f - object that calls consume(Task)
+```
+function exprod()
+    produce("first")
+    for n=1:10
+        produce(n)
+    end
+    produce("last")
+end
+```
 
+```
+julia> p = Task(exprod)
+julia> consume(p)
+julia> for x in p
+          println(p)
+       end
+```
+Single call usage, but equally effective as an iterator. Note that the function object is resumed on call, returning several times with the _same_ state.
+These not 12 invocations of the function with a clear function stack frame, but a resuming of the same function in the stack frame.
 Without catch, the statement resolves to nothing.
+
+Task expects a function without parameters, to give a producer parameters use :
+```
+function paramtask(arg)
+<stmts>
+end
+wrapper = Task(() -> paramtask(param))
+||
+wrapper = @task paramtask(param)
+```
 ##### Functions
 ```
 function <name>(<args>)
