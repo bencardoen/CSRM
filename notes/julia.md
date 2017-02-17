@@ -291,6 +291,15 @@ end
 for <vname> in collection
   <operate on vname>
 end
+# advanced ranges
+for j in start:end, k in start2:end2
+    <stmts>
+end
+# e.g.
+for j in 1:2, k in 1:3
+    println(j, k)
+end
+# results in 11, 12, 13, 21, 22, 23
 ```
 ###### While
 ```
@@ -370,7 +379,7 @@ wrapper = @task paramtask(param)
 
 ##### Parallel computing
 Note : start julia with *julia -p <processcount>* or in a notebook *addprocs<processcount>*
-Other means of controlling cluster : *rmprocs*, *workers* (list of pids), *procs(int)* list of pids registered for physical id=intm *procs(SharedArray)* pids sharing array, *procs* list of pids
+Other means of controlling cluster : *rmprocs*, *workers* (list of pids), *nworkers()* returns process count, *procs(int)* list of pids registered for physical id=intm *procs(SharedArray)* pids sharing array, *procs* list of pids
 Based on remote reference (Future, RemoteChannel) and remote call. Remote call returns a Future, extract value by (fetch() or wait() for immediate retrieval).
 
 ```
@@ -442,13 +451,90 @@ a=pmap(svd, M)
 A channel is more powerful, writeable exchange.
 
 ```
+@everywhere function removeprocs()
+    for n in procs()
+        if n>1
+            rmprocs(n)
+        end
+    end
+end
+
+if nprocs() < 2
+    addprocs(5)
+end
+# basic channel example
+worker_pool = Base.default_worker_pool()
+channels = [RemoteChannel() for i in 1:nworkers()]
+for (i, c) in enumerate(channels)
+    @show put!(c, i)
+end
+
+for c in channels
+    @show take!(c)
+end
+
+removeprocs()
+```
 
 ```
+# Example from the docs showing that colluding writes/reads will lead to performance regression
+# This function returns the (irange,jrange) indexes assigned to this worker
+@everywhere function myrange(q::SharedArray)
+    idx = indexpids(q)
+    if idx == 0
+        # This worker is not assigned a piece
+        return 1:0, 1:0
+    end
+    nchunks = length(procs(q)) # all processes referencing q
+    splits = [round(Int, s) for s in linspace(0,size(q,2),nchunks+1)]
+    1:size(q,1), splits[idx]+1:splits[idx+1]
+end
 
+
+@everywhere function advection_chunk!(q, u, irange, jrange, trange)
+    @show (irange, jrange, trange)  # display so we can see what's happening
+    for t in trange, j in jrange, i in irange
+        q[i,j,t+1] = q[i,j,t] +  u[i,j,t]
+    end
+    q
+end
+
+@everywhere advection_shared_chunk!(q, u) = advection_chunk!(q, u, myrange(q)..., 1:size(q,3)-1)
+
+@everywhere advection_serial!(q, u) = advection_chunk!(q, u, 1:size(q,1), 1:size(q,2), 1:size(q,3)-1)
+
+@everywhere function advection_parallel!(q, u)
+    for t = 1:size(q,3)-1
+        @sync @parallel for j = 1:size(q,2) # @sync : force tasks to wait on each other
+            for i = 1:size(q,1)
+                q[i,j,t+1]= q[i,j,t] + u[i,j,t]
+            end
+        end
+    end
+    q
+end
+
+@everywhere function advection_shared!(q, u)
+    @sync begin
+        for p in procs(q)
+            @async remotecall_wait(advection_shared_chunk!, p, q, u) # async, since there is no longer an interdependency.
+        end
+    end
+    q
+end
 ```
-julia -p 2 # ensure at least 2 processes are available
-julia> r = remotecall(
+
+Shared data (arrays)
 ```
+addprocs(4)
+# Create a shared array, 3x4, initialize with process index, localindexes splits indices over range.
+# init=<function>, where function = f(S::SharedArray)
+s = SharedArray(UInt, (3,4), init= s -> s[Base.localindexes(s)] = myid())
+# Get underlying data
+q = sdata(s)
+removeprocs()
+```
+Note : ! races if any item is shared
 
 ##### Functions
 ```
@@ -567,7 +653,7 @@ Inspecting generated code
 ```
 function f(x)
     x+=1
-end    
+end
 code_llvm(f,(B{Int64},))
 code_llvm(func,(B{Number},))
 code_llvm(func,(B,))
