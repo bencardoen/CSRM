@@ -367,6 +367,89 @@ wrapper = Task(() -> paramtask(param))
 ||
 wrapper = @task paramtask(param)
 ```
+
+##### Parallel computing
+Note : start julia with *julia -p <processcount>* or in a notebook *addprocs<processcount>*
+Other means of controlling cluster : *rmprocs*, *workers* (list of pids), *procs(int)* list of pids registered for physical id=intm *procs(SharedArray)* pids sharing array, *procs* list of pids
+Based on remote reference (Future, RemoteChannel) and remote call. Remote call returns a Future, extract value by (fetch() or wait() for immediate retrieval).
+
+```
+julia> f = remotecall(<callable>, processindex (1...), arg1, arg2, ...)
+# f.id, f.v (value), f.whence (called by), f.where (executed at)
+julia> fetch(f) # get value
+julia> wait(f) # wait for computation explicitly
+julia> remotecall_fetch(<function>, processindex, arg1, arg2, ...) # run and get, faster than fetch(rcall(...))
+julia> @spawnat <processindex> <expression> 
+# returns future object resulting from expression executed at processindex
+julia> @spawn <expression>
+# return future object resulting from expression, process indices resolved automatically
+# Processes don't have automatic scope sharing
+@everwhere function <name>(args)
+    <stmts>
+end
+#
+@everywhere x = existingfunction()
+f = remotecall_fetch(()->x, 2)
+```
+# Take care not to move data when not needed (obvious, but still)
+```
+a = [x for x in 1:100 ] # local variable a in process 1
+f = @spawn mean(a) # moves a to process 2 (or other), then calculates result
+f2 = @spawn mean([x for x in 1:100]) # array is created on process2 and processed there, eliding copy
+```
+
+Parallel computation
+```
+# Parallel for
+# [<name> =] @parallel <operator> for <range expression>
+#     <expression> # Value of expression is argument to operator
+# end
+# e.g. ^^ is a parallel sum (ENSURE operator is associative)
+# entire expression returns computation result
+nheads = @parallel (+) for i = 1:200000000
+    UInt(rand(Bool)) # This local variable is local per process
+end
+#
+a = zeros(10)
+@parallel for i = 1:10
+    #println(a[i])
+    a[i] = i
+    #println(a[i])
+end
+# Fails to initialize a in process 1, each has a local copy of a, not broadcasted.
+b = SharedArray(Float64, 10)
+@parallel for i= 1:10
+    b[i] = i
+end
+# without operator, the tasks run async (i.e. return future without waiting on each other)
+# with operator, the results have to be combined
+# Optionally, use @sync @parallel to explicitly wait for each task
+# Concept here is reduction, have x = f(x, v[i]) : accumulate result of f(x,v) in x.
+# last step (summing results of tasks is done on calling process)
+```
+
+Use @parallel for for large counts of small time consuming function calls. (e.g. summing array)
+Use pmap for expensive (item wise) function calls)
+
+```
+# Parallel Map
+# pmap(<function>, object)
+M = Matrix{Float64}[rand(1000,1000) for i=1:10] # A 10 element matrix where each element is a 1000x1000 random matrix
+a=pmap(svd, M)
+## optionally, use @sync, @async if needed for dynamic scheduling (todo)
+```
+
+A channel is more powerful, writeable exchange.
+
+```
+
+```
+
+```
+julia -p 2 # ensure at least 2 processes are available
+julia> r = remotecall(
+```
+
 ##### Functions
 ```
 function <name>(<args>)
