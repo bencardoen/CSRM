@@ -536,6 +536,19 @@ removeprocs()
 ```
 Note : ! races if any item is shared
 
+###### Threads (experimental)
+```
+export JULIA_NUM_THREADS=4
+```
+```
+Threads.nthreads() # see ^
+a = zeros(10) 
+Threads.:threads for i = 1:10
+    a[i] = Threads.threadid()
+end
+```
+Results in a initialized by 4 threads, without races.
+
 ##### Functions
 ```
 function <name>(<args>)
@@ -552,7 +565,8 @@ julia> x-> x^2
 ```
 Use unnamed functions (l's)
 ```
-julia> map(x->x^2, collection)
+julia> map(x->x^2, collection) #use map if result is needed
+julia> foreach(f, c) #call f on each in c, discard value
 ```
 Arguments: same rules as in Python.
 ```
@@ -596,6 +610,23 @@ julia> a = Dict(1=>2, 2=>1)
 julia> q = collect(keys(a))
 ```
 Collect transforms iterator to collection.
+
+```
+julia> a = [1,2,3]
+julia> s=start(a) # starting iterator state
+julia> next(a, s) # (current element, next iter)
+julia> done(a, s) # check if end is reached
+julia> rest(a, 4) # iterator starting at 4th (in this case, state index)
+julia> a = [x for x=10:20]
+julia> b = [(index, element) for (index, element) in enumerate(a)]
+julia> a5 = take(a, 5)
+julia> l5 = drop(a, 5) # generates all but first 5
+julia> cycle(a) # infinite cycle
+julia> repeated(x[, n]) # infinite loop of x, or n times x
+julia> countfrom(start, step) # infinite series
+```
+
+
 ```
 julia> a= [1,2,3]
 julia> b = [3,4,5]
@@ -605,6 +636,33 @@ List comprehension (pythonic)
 ```
 julia> a = [1,2,3]
 julia> b = [i for i in a if i % 2 == 0]
+```
+
+##### Collections
+```
+isempty(c)
+empty!(c) # clear c
+length(c) 
+endof(c) -> last index
+```
+Membership test
+```
+2 in a# compares by == for lists,isequal on key for dictitems
+2 in keys(a) # dicts
+haskey(a, 2) #
+eltype(a)
+findin(a, b) #indices of a in b
+```
+Operations
+```
+unique(iter[, dim]) # returns unique set in iter, in order of passing
+reduce(op, neutral, iter) #neutral is neutral element operator (if empty), op is binary associative operator
+extrema(a) # min, max
+ind{min|max}(a)
+find{min|max}(iter) # value, index
+foreach(f, c) # apply f for x in c, discarding result
+map(f, c) # get result of f on each c
+map!(f,c) #inplace
 ```
 
 ##### Logic
@@ -653,7 +711,6 @@ Inspecting generated code
 ```
 function f(x)
     x+=1
-end
 code_llvm(f,(B{Int64},))
 code_llvm(func,(B{Number},))
 code_llvm(func,(B,))
@@ -681,4 +738,6 @@ julia> x = x/5 # Float64
 Split function in functions where argument type is known:
 If type variable x is known after y statements, split remaind of code into separate function to allow optimizations.
 
+#### Final notes
+No interface to python (unless Python <C> Julia)
 Memory access is column major !!
