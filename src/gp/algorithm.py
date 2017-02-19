@@ -58,6 +58,7 @@ class GPAlgorithm():
         self._initialize()
         self._archive = SetPopulation(key=lambda _tree : _tree.getFitness())
         self._generations = generations
+        self._currentgeneration = 0
         self._archivesize = archivesize or self._popsize
         # List of generation : tuple of stats
         self._convergencestats = []
@@ -225,6 +226,7 @@ class GPAlgorithm():
             self.addRandomTree()
 
     def restart(self):
+        self._currentgeneration = 0
         self._population.removeAll()
         self.reseed()
 
@@ -243,6 +245,7 @@ class GPAlgorithm():
             modified, count = self.evolve(selected)
             self.update(modified)
             assert(isinstance(count, list))
+            self._currentgeneration = i
             self.summarizeGeneration(count, generation=i, phase=r)
             if self.stopCondition():
                 logger.info("Stop condition triggered")
@@ -338,6 +341,28 @@ class BruteElitist(GPAlgorithm):
         assert(len(self._population)==0)
         return s
 
+    def _probabilityMutate(self, popindex):
+        """
+        Decide if, given the current selected sample and generation state, a mutation is desirable.
+
+        With increasing generation, the probability decreases.
+        With an increasing populationindex, the probability increases. (samples are ordered by lesser fitness score)
+
+        :return boolean true if mutation is desired.
+        """
+        # 0 - 1
+        genratio = self._currentgeneration / self._generations
+        # 0 - 1
+        popratio = (popindex+1) / self._popsize
+        r = self._rng.uniform(0, 1)
+        # Decreasing fitness, more likely to mutate
+        if r < popratio:
+            return True
+        # Increasing generation, less likely to modify
+        if r > genratio:
+            return True
+        return False
+
     def evolve(self, selection):
         """
             Apply mutation on each sample, replacing if fitter
@@ -356,7 +381,12 @@ class BruteElitist(GPAlgorithm):
 
         # TODO : mutate with cooling effect, modify based on current fitness, i.e. don't drastically alter a good tree
         # Mutate on entire population, with regard to (scaled) fitness
-        for i in range(selcount//2, selcount):
+
+        # Replacement is done based on comparison t, t'. It's possible in highly varied populations that this strategy
+        # is not ideal.
+        for i in range(0, selcount):
+            if not self._probabilityMutate(i):
+                continue
             t = selection[i]
             candidate = copyObject(t)
 

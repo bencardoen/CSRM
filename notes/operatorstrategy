@@ -21,6 +21,17 @@ Approaches:
       - Modify trees less invasively based on generation. Assuming convergence, this
         would restrict the damage done by mutation. To clarify, in generation 100 mutation
         is more likely to worsen fitness than in generation 10.
+      - Take depth of modification into account
+        Modify a fit sample on with small changes. (i.e. cool depth)
+
+        Current implementation (19/2):
+          Trees are ordered first to last based on descending fitness (i.e. worse fitness)
+          A poor fitness score leads to a higher probability to mutate. (Reasoning : gained information in sample is more
+          valuable than new random information)
+          A higher generation count leads to a lower probability to mutate. (Reasoning, samples are increasing in fitness, so
+          there is less of a chance to improve)
+
+
 
   Apply mutation only on less fit part of population
     - Fast
