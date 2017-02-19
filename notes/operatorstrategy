@@ -1,0 +1,27 @@
+Notes on operator strategy.
+
+These describe what I tried, what works and what doesn't in configuring the operators.
+
+Mutation : Explorative operator, introduces new 'information', randomly generated.
+- works good initially and can unstuck search from a local optima
+- is destructive in later stages of search. Consider an expression tree that represents a
+highly fit sample, modifying it is far more likely to destroy fitness rather than improve it.
+- An expensive operation: growing a random tree is expensive, but ensuring that it is a valid tree
+makes this a very expensive operation.
+  - A bottom up approach generates valid subtrees that are combined, in contrast a top down approach
+  would be far more expensive
+  - Validation is partial, on a single sample. Ensuring full validation is too expensive,
+  the fitness function deals with remaining invalid samples.
+
+Approaches:
+  Use a cooling effect (as in SA).
+    Given a set of trees, modify based on current fitness ranking.
+      - Modify a fitter tree less invasively than a less fit sample.
+        This is in a single generation.
+      - Modify trees less invasively based on generation. Assuming convergence, this
+        would restrict the damage done by mutation. To clarify, in generation 100 mutation
+        is more likely to worsen fitness than in generation 10.
+
+  Apply mutation only on less fit part of population
+    - Fast
+    - Deprives explorative part from fitter population.
