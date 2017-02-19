@@ -19,7 +19,7 @@ from gp.algorithm import GPAlgorithm, BruteElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
 from expression.tree import Tree
 from expression.node import Variable
-from expression.functions import testfunctions, fitnessfunction as _fit
+from expression.functions import testfunctions, pearsonfitness as _fit
 from operator import neg
 from analysis.convergence import Convergence
 

@@ -32,6 +32,12 @@ You can execute the tests from the 'src' folder by executing:
     $python3 -m gp.testalgorithm
 ```
 
+Benchmarks
+
+```Shell
+    $python3 runbenchmarks.py
+```
+
 For most of the tests tree are generated, these are written in dot format in the 'output' folder.
 A small script is present in this folder that call graphviz to render the trees in svg format, run from within the output folder:
 

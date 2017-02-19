@@ -1,3 +1,10 @@
+#This file is part of the CSRM project.
+#Copyright 2016 - 2017 University of Antwerp
+#https://www.uantwerpen.be/en/
+#Licensed under the EUPL V.1.1
+#A full copy of the license is in COPYING.txt, or can be found at
+#https://joinup.ec.europa.eu/community/eupl/og_page/eupl
+#      Author: Ben Cardoen
 
 import random
 from expression.tools import generateVariables
