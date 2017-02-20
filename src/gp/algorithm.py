@@ -473,6 +473,15 @@ def probabilityMutate(generation:int, generations:int, ranking:int, population:i
     A fitter sample benefits less from mutation, there is a higher probability to lose fitness than there is to gain it.
     As the generations advance, fitness improves. The least fit sample will therefore have a higher probability of mutation, but even
     then this probability decreases with its age.
+
+    e.g. Given 4th generation of 10, 15th ranked in 20. 
+    p_mutate = p_rank and p_gen
+    with 
+        p_rank = random(0,1) < (15/20)*1.5
+        p_gen = random(0,1) > (4/10)*0.5
+        where 1.5, 0.5 are scaling factor to avoid an abscence of mutations
+            
+                
     :ranking int index in a fitness (best first) sorted array
     :generation int index of the current generation
     :generations int total generations allowed
@@ -480,31 +489,10 @@ def probabilityMutate(generation:int, generations:int, ranking:int, population:i
     :rng random.Random rng to reproduce results (optional)
     :return bool true if mutation is considered beneficial
     """
-    q = (generation / generations) * 0.5 # scaling factor to dampen effect (else last generations have next to 0 probability).
-    w = (ranking / population) * 1.5
+    q = (generation / generations) * 0.5 
+    w = (ranking / population) * 2
     r = rng.uniform(a=0,b=1)
     s = rng.uniform(a=0, b=1)
     return r > q and s < w
     
     
-#     def _probabilityMutate(self, popindex):
-#        """
-#        Decide if, given the current selected sample and generation state, a mutation is desirable.
-#
-#        With increasing generation, the probability decreases.
-#        With an increasing populationindex, the probability increases. (samples are ordered by lesser fitness score)
-#
-#        :return boolean true if mutation is desired.
-#        """
-#        # 0 - 1
-#        genratio = self._currentgeneration / self._generations
-#        # 0 - 1
-#        popratio = (popindex+1) / self._popsize
-#        r = self._rng.uniform(0, 1)
-#        # Decreasing fitness, more likely to mutate
-#        if r < popratio:
-#            return True
-#        # Increasing generation, less likely to modify
-#        if r > genratio:
-#            return True
-#        return False

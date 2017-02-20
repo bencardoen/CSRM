@@ -30,6 +30,16 @@ Approaches:
           valuable than new random information)
           A higher generation count leads to a lower probability to mutate. (Reasoning, samples are increasing in fitness, so
           there is less of a chance to improve)
+	  20/2: Finetune strategy:
+		use probability based on generation AND ranking
+		- ensure on average 1/2 mutations are executed, and latter half (with very low probability) are avoided
+		  reduction in workload in function of treesize, ~50%
+		- test results : convergence (until no replacement can be made) is faster:
+			allowing 5x75 generations (375)
+			cooling : 180 generations needed
+			without : 230 generations needed 
+			20% savings in convergence speed
+		- destructive behavior is reduced, while speed is gained.
 
 
 

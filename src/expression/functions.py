@@ -34,13 +34,8 @@ def power(a, b):
     if a < 0 or abs(b) > Constants.SIZE_LIMIT:
         return None
     if a == 0 and b<0:
-        return None
-    try:
-        return pow(a,b)
-    except OverflowError as e:
-        logger.error("Overflow with {} ^ {} and exc {}".format(a,b,e))
-        raise e
-
+        return None    
+    return pow(a,b)
 
 def division(a, b):
     if b == 0:

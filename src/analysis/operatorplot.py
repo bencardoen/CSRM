@@ -7,21 +7,22 @@
 #      Author: Ben Cardoen
 import random
 from bokeh.plotting import Figure, show, output_file
+from bokeh.palettes import Blues9
+from gp.algorithm import probabilityMutate as probability
 
-# prototype code to visualize mutation behavior with a cooling effect
-
-def probability(generation:int, generations:int, ranking:int, population:int, rng:random.Random=random.Random()):
-    q = (generation / generations) * 0.5
-    w = (ranking / population) * 1.5
-    r = rng.uniform(a=0,b=1)
-    s = rng.uniform(a=0, b=1)
-    return r > q and s < w
+#
+## prototype code to visualize mutation behavior with a cooling effect
+#
+#def probability(generation:int, generations:int, ranking:int, population:int, rng:random.Random=random.Random()):
+#    q = (generation / generations) * 0.5
+#    w = (ranking / population) * 2
+#    r = rng.uniform(a=0,b=1)
+#    s = rng.uniform(a=0, b=1)
+#    return r > q and s < w
     
 
 
-def plotValues(values):
-    rng = random.Random()
-    rng.seed(0)
+def plotValues(values, boolean=True):
     labelx = "Sample sorted in decreasing fitness"
     labely = "Generation"
     p = Figure(webgl=True,title="title", x_axis_label=labelx, y_axis_label=labely)
@@ -30,9 +31,13 @@ def plotValues(values):
     for x in range(xr):
         for y in range(yr):
             color = 'blue'
-            if values[y][x]:
-                color = 'red'
-            p.circle(x, y, color=color, fill_alpha=0.2, size=10)
+            alpha=0.2
+            if boolean:
+                if values[y][x]:
+                    color = 'red'
+            else:
+                alpha=values[y][x]
+            p.circle(x, y, color=color, fill_alpha=alpha, size=10)
 
     output_file("mutation.html", title="operator probability")
     
@@ -40,11 +45,28 @@ def plotValues(values):
 
 
 if __name__=="__main__":
-    generations = 20
-    population = 40
+    trials = 200
+    c = [0 for x in range(trials)]
+    generations = 15
+    population = 15
     rng = random.Random()
     rng.seed(0)
-    values = [[ probability(g, generations, r, population, rng) for r in range(population) ] for g in range(generations)] 
-    print(values)
-    print("plotting")
-    plotValues(values)
+    condensed = [[[0 for k in range(trials)] for r in range(population)] for g in range(generations)]
+    for i in range(trials):
+        k = 0
+        values = [[ probability(g, generations, r, population, rng) for r in range(population) ] for g in range(generations)] 
+        for g in range(generations):
+            for r in range(population):
+                if values[g][r]:
+                    k += 1    
+                condensed[g][r][i] = values[g][r]
+        c[i] = k / (generations*population)
+    print(sum(c) / len(c))
+    for g in range(generations):
+        for r in range(population):
+            l = condensed[g][r]
+            condensed[g][r] = (sum(l)/len(l))
+    plotValues(condensed, False)
+#        print(values)
+        #print("plotting")
+        #plotValues(values)

@@ -132,17 +132,19 @@ class GPTest(unittest.TestCase):
             g.run()
         g.printForestToDot(outputfolder+"bmark")
 
+
+# These two tests serve as a benchmark to verify cooling effect of mutation operator
     def testConvergence(self):
         expr = testfunctions[2]
         rng = random.Random()
         rng.seed(0)
-        dpoint = 20
+        dpoint = 30
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=35, maxdepth=5, fitnessfunction=_fit, seed=0, generations=25, phases=5)
+        g = BruteElitist(X, Y, popsize=40, maxdepth=5, fitnessfunction=_fit, seed=0, generations=75, phases=5)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
@@ -162,7 +164,7 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=35, maxdepth=5, fitnessfunction=_fit, seed=0, generations=25, phases=5)
+        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=5, fitnessfunction=_fit, seed=0, generations=75, phases=5)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
