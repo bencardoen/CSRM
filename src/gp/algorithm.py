@@ -301,6 +301,12 @@ class GPAlgorithm():
         """
         self.evaluate(selection)
         return selection, [0,0,0]
+        
+    def requireMutation(self, popindex:int)->bool:
+        """
+        Decide if mutation is desirable
+        """
+        return True
 
     def update(self, modified):
         """
@@ -341,28 +347,6 @@ class BruteElitist(GPAlgorithm):
         assert(len(self._population)==0)
         return s
 
-    def _probabilityMutate(self, popindex):
-        """
-        Decide if, given the current selected sample and generation state, a mutation is desirable.
-
-        With increasing generation, the probability decreases.
-        With an increasing populationindex, the probability increases. (samples are ordered by lesser fitness score)
-
-        :return boolean true if mutation is desired.
-        """
-        # 0 - 1
-        genratio = self._currentgeneration / self._generations
-        # 0 - 1
-        popratio = (popindex+1) / self._popsize
-        r = self._rng.uniform(0, 1)
-        # Decreasing fitness, more likely to mutate
-        if r < popratio:
-            return True
-        # Increasing generation, less likely to modify
-        if r > genratio:
-            return True
-        return False
-
     def evolve(self, selection):
         """
             Apply mutation on each sample, replacing if fitter
@@ -379,16 +363,15 @@ class BruteElitist(GPAlgorithm):
         selcount = len(selection)
         assert(selcount == self._popsize)
 
-        # TODO : mutate with cooling effect, modify based on current fitness, i.e. don't drastically alter a good tree
-        # Mutate on entire population, with regard to (scaled) fitness
 
+        # Mutate on entire population, with regard to (scaled) fitness
         # Replacement is done based on comparison t, t'. It's possible in highly varied populations that this strategy
         # is not ideal.
         for i in range(0, selcount):
-            if not self._probabilityMutate(i):
-                continue
             t = selection[i]
             candidate = copyObject(t)
+            if not self.requireMutation(i):
+                continue
 
             Mutate.mutate(candidate, variables=variables, equaldepth=True, rng=rng)
             candidate.scoreTree(Y, fit)
@@ -466,3 +449,62 @@ class BruteElitist(GPAlgorithm):
         # TODO clean old pop, if so no copy is needed
         t = copyObject(t)
         self._archive.add(t)
+        
+        
+class BruteCoolingElitist(BruteElitist):
+    """
+        Uses a cooling strategy to apply operators, maximizing gain in the initial process but
+        reducing cost when gain is no longer possible.
+    """
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases)
+
+    def requireMutation(self, popindex:int)->bool:
+        generation = self._currentgeneration
+        generations = self._generations
+        ranking = popindex
+        population = self._popsize
+        rng = self._rng
+        return probabilityMutate(generation, generations, ranking, population, rng=rng)
+
+def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=random.Random())->bool:
+    """
+    Generate a probability to mutate based on 2 parameters : the current generation and the the ranking of the sample.
+    A fitter sample benefits less from mutation, there is a higher probability to lose fitness than there is to gain it.
+    As the generations advance, fitness improves. The least fit sample will therefore have a higher probability of mutation, but even
+    then this probability decreases with its age.
+    :ranking int index in a fitness (best first) sorted array
+    :generation int index of the current generation
+    :generations int total generations allowed
+    :population int total nr of specimens
+    :rng random.Random rng to reproduce results (optional)
+    :return bool true if mutation is considered beneficial
+    """
+    q = (generation / generations) * 0.5 # scaling factor to dampen effect (else last generations have next to 0 probability).
+    w = (ranking / population) * 1.5
+    r = rng.uniform(a=0,b=1)
+    s = rng.uniform(a=0, b=1)
+    return r > q and s < w
+    
+    
+#     def _probabilityMutate(self, popindex):
+#        """
+#        Decide if, given the current selected sample and generation state, a mutation is desirable.
+#
+#        With increasing generation, the probability decreases.
+#        With an increasing populationindex, the probability increases. (samples are ordered by lesser fitness score)
+#
+#        :return boolean true if mutation is desired.
+#        """
+#        # 0 - 1
+#        genratio = self._currentgeneration / self._generations
+#        # 0 - 1
+#        popratio = (popindex+1) / self._popsize
+#        r = self._rng.uniform(0, 1)
+#        # Decreasing fitness, more likely to mutate
+#        if r < popratio:
+#            return True
+#        # Increasing generation, less likely to modify
+#        if r > genratio:
+#            return True
+#        return False

@@ -15,7 +15,7 @@ import os
 import random
 from expression.operators import Mutate, Crossover
 from expression.tools import generateVariables, rootmeansquare
-from gp.algorithm import GPAlgorithm, BruteElitist, Constants
+from gp.algorithm import GPAlgorithm, BruteElitist, BruteCoolingElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
 from expression.tree import Tree
 from expression.node import Variable
@@ -142,7 +142,7 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=25, maxdepth=4, fitnessfunction=_fit, seed=0, generations=15, phases=3)
+        g = BruteElitist(X, Y, popsize=35, maxdepth=5, fitnessfunction=_fit, seed=0, generations=25, phases=5)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
@@ -152,6 +152,25 @@ class GPTest(unittest.TestCase):
         c.plotPareto()
         c.displayPlots("output", title=expr)
 
+    def testCooling(self):
+        expr = testfunctions[2]
+        rng = random.Random()
+        rng.seed(0)
+        dpoint = 30
+        vpoint = 5
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
+        logger.debug("Y {} X {}".format(Y, X))
+        g = BruteCoolingElitist(X, Y, popsize=35, maxdepth=5, fitnessfunction=_fit, seed=0, generations=25, phases=5)
+        g.executeAlgorithm()
+        stats = g.getConvergenceStatistics()
+        c = Convergence(stats)
+        c.plotFitness()
+        c.plotComplexity()
+        c.plotOperators()
+        c.plotPareto()
+        c.displayPlots("output", title=expr+"_cooling")
 
 
 

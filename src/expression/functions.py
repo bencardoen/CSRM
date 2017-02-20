@@ -35,7 +35,12 @@ def power(a, b):
         return None
     if a == 0 and b<0:
         return None
-    return pow(a,b)
+    try:
+        return pow(a,b)
+    except OverflowError as e:
+        logger.error("Overflow with {} ^ {} and exc {}".format(a,b,e))
+        raise e
+
 
 def division(a, b):
     if b == 0:
