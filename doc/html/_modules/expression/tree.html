@@ -242,13 +242,13 @@
             <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="n">output</span>
 
-<div class="viewcode-block" id="Tree.evaluateTree"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.evaluateTree">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateTree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Tree.evaluateTree"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.evaluateTree">[docs]</a>    <span class="k">def</span> <span class="nf">evaluateTree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates tree if tree was modified, else returns a cached results.</span>
 <span class="sd">        Updates depth if needed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="ow">or</span> <span class="n">increment</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evalTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">increment</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="ow">or</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evalTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span></div>
 
@@ -258,7 +258,7 @@
 <span class="sd">            :returns list : list of evaluations</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataPointCount</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluateTree</span><span class="p">(</span><span class="n">increment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dpoint</span><span class="p">)]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluateTree</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dpoint</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Tree.scoreTree"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.scoreTree">[docs]</a>    <span class="k">def</span> <span class="nf">scoreTree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">distancefunction</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -272,7 +272,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setFitness</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-    <span class="k">def</span> <span class="nf">_evalTree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_evalTree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Recursively evaluate tree with node as root.</span>
 <span class="sd">        Returns None if evaluation is not valid</span>
@@ -282,12 +282,12 @@
             <span class="n">arity</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">arity</span>
             <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">arity</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">child</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">children</span><span class="p">):</span>
-                <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_evalTree</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">increment</span><span class="p">)</span>
+                <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_evalTree</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
                 <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-            <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="n">increment</span><span class="p">)</span> <span class="c1"># function or operator</span>
+            <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span> <span class="c1"># function or operator</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">increment</span><span class="o">=</span><span class="n">increment</span><span class="p">)</span> <span class="c1"># leaf</span>
+            <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span> <span class="c1"># leaf</span>
 
 
 <div class="viewcode-block" id="Tree.printToDot"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.printToDot">[docs]</a>    <span class="k">def</span> <span class="nf">printToDot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>

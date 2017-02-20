@@ -128,9 +128,13 @@ def traceFunction(fn=None, logcall=None):
 
     :param function fn: function object, implicit
     :param function logcall: logging callable, e.g. logcall=logger.getLogger('global').debug
+    
     Example usage :
-            @traceFunction(logcall=logging.getLogger('global').error) or @traceFunction
-            def myfunc(...):
+            
+    @traceFunction(logcall=logging.getLogger('global').error) or @traceFunction
+    
+    def myfunc(...):
+                
     Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
     """
     if not logcall:

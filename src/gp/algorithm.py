@@ -90,12 +90,10 @@ class GPAlgorithm():
 
     def getConvergenceStatistics(self):
         """
-            Return all statistics
+        Return all statistics
 
-            Returns a list indiced by phase
-            Each sublist is indiced by generation and holds a dict:
-                "fitness", "mean_fitness, "var_fitness", "std_fitness", "replacements"
-                and equivalent for complexity
+        Returns a list indiced by phase
+        Each sublist is indiced by generation and holds a dict:"fitness", "mean_fitness, "var_fitness", "std_fitness", "replacements" and equivalent for complexity
         """
         return self._convergencestats[:]
 
@@ -470,24 +468,22 @@ class BruteCoolingElitist(BruteElitist):
 def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=random.Random())->bool:
     """
     Generate a probability to mutate based on 2 parameters : the current generation and the the ranking of the sample.
-    A fitter sample benefits less from mutation, there is a higher probability to lose fitness than there is to gain it.
-    As the generations advance, fitness improves. The least fit sample will therefore have a higher probability of mutation, but even
-    then this probability decreases with its age.
+    
+    A fitter sample (either by age (generation) or rank) is less likely to gain from mutation, and will even lose fitness. 
+    The probability that random information introduced by mutation leads to a better result compared with evolved information decreases.
+    This function estimates this probability, thereby avoiding unnecessary mutations and surprisingly leading to faster convergence.
 
-    e.g. Given 4th generation of 10, 15th ranked in 20. 
-    p_mutate = p_rank and p_gen
-    with 
-        p_rank = random(0,1) < (15/20)*1.5
-        p_gen = random(0,1) > (4/10)*0.5
-        where 1.5, 0.5 are scaling factor to avoid an abscence of mutations
-            
-                
-    :ranking int index in a fitness (best first) sorted array
-    :generation int index of the current generation
-    :generations int total generations allowed
-    :population int total nr of specimens
-    :rng random.Random rng to reproduce results (optional)
-    :return bool true if mutation is considered beneficial
+    :param int ranking: index in a fitness (best first) sorted array
+    
+    :param int generation: the current generation
+    
+    :param int generations: total generations allowed
+    
+    :param int population: total nr of specimens
+    
+    :param random.Random rng: to reproduce results (optional)
+    
+    :rtype: bool true if mutation is considered beneficial
     """
     q = (generation / generations) * 0.5 
     w = (ranking / population) * 2

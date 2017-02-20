@@ -174,9 +174,13 @@
 
 <span class="sd">    :param function fn: function object, implicit</span>
 <span class="sd">    :param function logcall: logging callable, e.g. logcall=logger.getLogger(&#39;global&#39;).debug</span>
+<span class="sd">    </span>
 <span class="sd">    Example usage :</span>
-<span class="sd">            @traceFunction(logcall=logging.getLogger(&#39;global&#39;).error) or @traceFunction</span>
-<span class="sd">            def myfunc(...):</span>
+<span class="sd">            </span>
+<span class="sd">    @traceFunction(logcall=logging.getLogger(&#39;global&#39;).error) or @traceFunction</span>
+<span class="sd">    </span>
+<span class="sd">    def myfunc(...):</span>
+<span class="sd">                </span>
 <span class="sd">    Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">logcall</span><span class="p">:</span>
@@ -196,6 +200,32 @@
     <span class="k">if</span> <span class="n">fn</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_decorate</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_decorate</span></div>
+
+<div class="viewcode-block" id="scaleTransformation"><a class="viewcode-back" href="../../expression.html#expression.tools.scaleTransformation">[docs]</a><span class="k">def</span> <span class="nf">scaleTransformation</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scale iterable to fit within [lower, upper]</span>
+<span class="sd">    Returns min, max of elements</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">actuallow</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="n">actualhigh</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">el</span> <span class="o">&lt;</span> <span class="n">actuallow</span><span class="p">:</span>
+            <span class="n">actuallow</span> <span class="o">=</span> <span class="n">el</span>
+        <span class="k">if</span> <span class="n">el</span> <span class="o">&gt;</span> <span class="n">actualhigh</span><span class="p">:</span>
+            <span class="n">actualhigh</span> <span class="o">=</span> <span class="n">el</span>
+        <span class="n">length</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">actualrange</span> <span class="o">=</span> <span class="n">actualhigh</span><span class="o">-</span><span class="n">actuallow</span>
+    <span class="n">requiredrange</span> <span class="o">=</span> <span class="n">upper</span><span class="o">-</span><span class="n">lower</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">actuallow</span>
+        <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">requiredrange</span><span class="o">/</span><span class="n">actualrange</span>
+        <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lower</span>
+    <span class="k">return</span> <span class="n">actuallow</span><span class="p">,</span> <span class="n">actualhigh</span></div>
+
+
 
 
 <div class="viewcode-block" id="rootmeansquare"><a class="viewcode-back" href="../../expression.html#expression.tools.rootmeansquare">[docs]</a><span class="k">def</span> <span class="nf">rootmeansquare</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
@@ -227,10 +257,12 @@
     <span class="n">meana</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="n">meanb</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="n">va</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">meana</span>
-    <span class="n">vb</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">meanb</span>
+    <span class="n">vb</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">meanb</span>
     <span class="n">nom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">va</span><span class="o">*</span><span class="n">vb</span>  <span class="p">)</span>
     <span class="n">denom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">va</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span> <span class="n">vb</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
-    <span class="k">return</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span></div>
+    <span class="k">if</span> <span class="n">denom</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span></div>
 
 <span class="k">def</span> <span class="nf">_pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
     <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
