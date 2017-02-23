@@ -103,7 +103,7 @@
         <span class="k">return</span> <span class="mi">0</span></div>
 
 
-<div class="viewcode-block" id="Node.evaluate"><a class="viewcode-back" href="../../expression.html#expression.node.Node.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Node.evaluate"><a class="viewcode-back" href="../../expression.html#expression.node.Node.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate this node using the function object, optionally multiplying with the constant.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -279,8 +279,7 @@
 <span class="sd">            Index is the name, or identifier of this feature. E.g &quot;x_09&quot; : index = 9</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">values</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_current</span> <span class="o">=</span> <span class="mi">0</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span></div>
 
 <div class="viewcode-block" id="Variable.getValues"><a class="viewcode-back" href="../../expression.html#expression.node.Variable.getValues">[docs]</a>    <span class="k">def</span> <span class="nf">getValues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span></div>
@@ -291,24 +290,11 @@
 <div class="viewcode-block" id="Variable.setValues"><a class="viewcode-back" href="../../expression.html#expression.node.Variable.setValues">[docs]</a>    <span class="k">def</span> <span class="nf">setValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">vals</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">vals</span></div>
 
-<div class="viewcode-block" id="Variable.setCurrentIndex"><a class="viewcode-back" href="../../expression.html#expression.node.Variable.setCurrentIndex">[docs]</a>    <span class="k">def</span> <span class="nf">setCurrentIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">i</span><span class="p">):</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_current</span> <span class="o">=</span> <span class="n">i</span></div>
-
-<div class="viewcode-block" id="Variable.getCurrentIndex"><a class="viewcode-back" href="../../expression.html#expression.node.Variable.getCurrentIndex">[docs]</a>    <span class="k">def</span> <span class="nf">getCurrentIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current</span></div>
-
-<div class="viewcode-block" id="Variable.increment"><a class="viewcode-back" href="../../expression.html#expression.node.Variable.increment">[docs]</a>    <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_current</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_current</span> <span class="o">%=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Variable.getValue"><a class="viewcode-back" href="../../expression.html#expression.node.Variable.getValue">[docs]</a>    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_current</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Variable value not set : returning 1&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Variable value not set!!&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="Variable.getValue"><a class="viewcode-back" href="../../expression.html#expression.node.Variable.getValue">[docs]</a>    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Variable.getIndex"><a class="viewcode-back" href="../../expression.html#expression.node.Variable.getIndex">[docs]</a>    <span class="k">def</span> <span class="nf">getIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -329,18 +315,14 @@
 <div class="viewcode-block" id="VariableNode.__init__"><a class="viewcode-back" href="../../expression.html#expression.node.VariableNode.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">constant</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">Node</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">variable</span> <span class="o">=</span> <span class="n">variable</span></div>
+        <span class="c1"># TODO set arity</span>
 
 <div class="viewcode-block" id="VariableNode.getVariable"><a class="viewcode-back" href="../../expression.html#expression.node.VariableNode.getVariable">[docs]</a>    <span class="k">def</span> <span class="nf">getVariable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span></div>
 
-<div class="viewcode-block" id="VariableNode.nextValue"><a class="viewcode-back" href="../../expression.html#expression.node.VariableNode.nextValue">[docs]</a>    <span class="k">def</span> <span class="nf">nextValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="VariableNode.evaluate"><a class="viewcode-back" href="../../expression.html#expression.node.VariableNode.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="VariableNode.evaluate"><a class="viewcode-back" href="../../expression.html#expression.node.VariableNode.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">increment</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">con</span> <span class="p">:</span>
             <span class="k">return</span> <span class="n">v</span> <span class="o">*</span> <span class="n">con</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -387,7 +369,7 @@
 <div class="viewcode-block" id="ConstantNode.__init__"><a class="viewcode-back" href="../../expression.html#expression.node.ConstantNode.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">constant</span><span class="p">):</span>
         <span class="n">Node</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConstantNode.evaluate"><a class="viewcode-back" href="../../expression.html#expression.node.ConstantNode.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ConstantNode.evaluate"><a class="viewcode-back" href="../../expression.html#expression.node.ConstantNode.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConstantNode.getArity"><a class="viewcode-back" href="../../expression.html#expression.node.ConstantNode.getArity">[docs]</a>    <span class="k">def</span> <span class="nf">getArity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

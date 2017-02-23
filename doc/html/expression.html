@@ -65,7 +65,7 @@
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.MAXFITNESS">
-<code class="descname">MAXFITNESS</code><em class="property"> = 0</em><a class="headerlink" href="#expression.constants.Constants.MAXFITNESS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">MAXFITNESS</code><em class="property"> = 1</em><a class="headerlink" href="#expression.constants.Constants.MAXFITNESS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -85,7 +85,7 @@
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.SIZE_LIMIT">
-<code class="descname">SIZE_LIMIT</code><em class="property"> = 30</em><a class="headerlink" href="#expression.constants.Constants.SIZE_LIMIT" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SIZE_LIMIT</code><em class="property"> = 25</em><a class="headerlink" href="#expression.constants.Constants.SIZE_LIMIT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -349,7 +349,7 @@
 
 <dl class="method">
 <dt id="expression.node.ConstantNode.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>args=None</em>, <em>increment=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#ConstantNode.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.ConstantNode.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>args=None</em>, <em>index: int = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#ConstantNode.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.ConstantNode.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -382,7 +382,7 @@ constant multiplier. Arity of the function is assumed to be 1.</p>
 
 <dl class="method">
 <dt id="expression.node.Node.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>args=None</em>, <em>increment=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>args=None</em>, <em>index: int = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate this node using the function object, optionally multiplying with the constant.</p>
 </dd></dl>
 
@@ -494,11 +494,6 @@ Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index
 </dd></dl>
 
 <dl class="method">
-<dt id="expression.node.Variable.getCurrentIndex">
-<code class="descname">getCurrentIndex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.getCurrentIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.getCurrentIndex" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="expression.node.Variable.getIndex">
 <code class="descname">getIndex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.getIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.getIndex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the unique identifier of this feature, NOT the current datapoint</p>
@@ -506,22 +501,12 @@ Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index
 
 <dl class="method">
 <dt id="expression.node.Variable.getValue">
-<code class="descname">getValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.getValue" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getValue</code><span class="sig-paren">(</span><em>index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.getValue" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="expression.node.Variable.getValues">
 <code class="descname">getValues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.getValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.getValues" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="expression.node.Variable.increment">
-<code class="descname">increment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.increment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.increment" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="expression.node.Variable.setCurrentIndex">
-<code class="descname">setCurrentIndex</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Variable.setCurrentIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Variable.setCurrentIndex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -549,7 +534,7 @@ Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index
 
 <dl class="method">
 <dt id="expression.node.VariableNode.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>args=None</em>, <em>increment=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#VariableNode.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.VariableNode.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>args=None</em>, <em>index: int = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#VariableNode.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.VariableNode.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -565,11 +550,6 @@ Index is the name, or identifier of this feature. E.g &#8220;x_09&#8221; : index
 <dl class="method">
 <dt id="expression.node.VariableNode.getVariable">
 <code class="descname">getVariable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#VariableNode.getVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.VariableNode.getVariable" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="expression.node.VariableNode.nextValue">
-<code class="descname">nextValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#VariableNode.nextValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.VariableNode.nextValue" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -906,6 +886,11 @@ Fuzz tests all conversion functions.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="expression.testtree.TreeTest.testRange">
+<code class="descname">testRange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.testtree.TreeTest.testRegression">
 <code class="descname">testRegression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testRegression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testRegression" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1069,6 +1054,13 @@ When the generator halts, the list a random permumation (in place).</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="expression.tools.scaleTransformation">
+<code class="descclassname">expression.tools.</code><code class="descname">scaleTransformation</code><span class="sig-paren">(</span><em>elements</em>, <em>lower=-1</em>, <em>upper=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#scaleTransformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.scaleTransformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale iterable to fit within [lower, upper]
+Returns min, max of elements</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="expression.tools.showSVG">
 <code class="descclassname">expression.tools.</code><code class="descname">showSVG</code><span class="sig-paren">(</span><em>dotfile: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#showSVG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.showSVG" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1091,11 +1083,9 @@ else uses the logcall object.</p>
 </tr>
 </tbody>
 </table>
-<dl class="docutils">
-<dt>Example usage :</dt>
-<dd>&#64;traceFunction(logcall=logging.getLogger(&#8216;global&#8217;).error) or &#64;traceFunction
-def myfunc(...):</dd>
-</dl>
+<p>Example usage :</p>
+<p>&#64;traceFunction(logcall=logging.getLogger(&#8216;global&#8217;).error) or &#64;traceFunction</p>
+<p>def myfunc(...):</p>
 <p>Based on : <a class="reference external" href="https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments">https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments</a></p>
 </dd></dl>
 
@@ -1142,7 +1132,7 @@ create a corresponding expression tree.</p>
 
 <dl class="method">
 <dt id="expression.tree.Tree.evaluateTree">
-<code class="descname">evaluateTree</code><span class="sig-paren">(</span><em>increment=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.evaluateTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.evaluateTree" title="Permalink to this definition">¶</a></dt>
+<code class="descname">evaluateTree</code><span class="sig-paren">(</span><em>index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.evaluateTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.evaluateTree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates tree if tree was modified, else returns a cached results.
 Updates depth if needed.</p>
 </dd></dl>

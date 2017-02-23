@@ -34,7 +34,7 @@ def power(a, b):
     if a < 0 or abs(b) > Constants.SIZE_LIMIT:
         return None
     if a == 0 and b<0:
-        return None
+        return None    
     return pow(a,b)
 
 def division(a, b):
