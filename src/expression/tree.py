@@ -218,8 +218,9 @@ class Tree:
         """
             Evaluate a tree w.r.t a distancefucntion.
 
-            :param expected: list A set of expected output values for each datapoint.
+            :param expected list: list A set of expected output values for each datapoint.
             :param distancefunction: Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)
+            :returns float: A fitness value, with lower indicating better. Distancefunction determines the range and scale of the result.
         """
         actual = self.evaluateAll()
         f = distancefunction(actual, expected, tree=self)
@@ -279,8 +280,10 @@ class Tree:
         """
         Generate a random expression tree with a random selection of variables
         Topdown construction, there is no guarantee that this construction renders a semantically valid tree
-        :param tokenLeafs : if set, only use constants
-        :param limit : raises Exception if no valid tree can be found
+
+        :param bool tokenLeafs: if set, only use constants
+        :param int limit: raises Exception if no valid tree can be found in at least limit tries
+        :returns expression.tree.Tree: A randomized tree.
         """
         dpoint = 0 if not variables else len(variables[0])
         _rng = rng

@@ -174,13 +174,13 @@
 
 <span class="sd">    :param function fn: function object, implicit</span>
 <span class="sd">    :param function logcall: logging callable, e.g. logcall=logger.getLogger(&#39;global&#39;).debug</span>
-<span class="sd">    </span>
+
 <span class="sd">    Example usage :</span>
-<span class="sd">            </span>
+
 <span class="sd">    @traceFunction(logcall=logging.getLogger(&#39;global&#39;).error) or @traceFunction</span>
-<span class="sd">    </span>
+
 <span class="sd">    def myfunc(...):</span>
-<span class="sd">                </span>
+
 <span class="sd">    Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">logcall</span><span class="p">:</span>
@@ -249,8 +249,19 @@
     <span class="k">return</span> <span class="n">nrmse</span></div>
 
 <div class="viewcode-block" id="pearson"><a class="viewcode-back" href="../../expression.html#expression.tools.pearson">[docs]</a><span class="k">def</span> <span class="nf">pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
 <span class="sd">    Return Pearson correlation coefficient.</span>
+
+<span class="sd">    Calculates correlation between actual and expected, offsetting it so it can be used as a distance function.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        r = \frac{\sum{(a-E[a])*(b-E[b])}}{\sqrt{\sum{(a-E[a])^2}*\sum{(b-E[b])^2}}}</span>
+
+
+<span class="sd">    :param actual: Actual values returned by evaluating a single approximation</span>
+<span class="sd">    :param expected: Desired values</span>
+<span class="sd">    :returns float: 2 - r</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
@@ -278,8 +289,9 @@
 
 <div class="viewcode-block" id="randomizedConsume"><a class="viewcode-back" href="../../expression.html#expression.tools.randomizedConsume">[docs]</a><span class="k">def</span> <span class="nf">randomizedConsume</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return a generator to a random element in the list without repeating.</span>
-<span class="sd">        :lst list : modified in place, at the last call the list is empty.</span>
+<span class="sd">    Return a generator to a random element in the list without repeating.</span>
+
+<span class="sd">    :param list lst: modified in place, at the last call the list is empty.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
     <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>

@@ -317,7 +317,7 @@ At the very least, adds modified back to population based on a condition.</p>
 
 <dl class="function">
 <dt id="gp.algorithm.probabilityMutate">
-<code class="descclassname">gp.algorithm.</code><code class="descname">probabilityMutate</code><span class="sig-paren">(</span><em>generation: int</em>, <em>generations: int</em>, <em>ranking: int</em>, <em>population: int</em>, <em>rng: random.Random = &lt;random.Random object at 0x2e27f98&gt;</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/gp/algorithm.html#probabilityMutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.probabilityMutate" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">gp.algorithm.</code><code class="descname">probabilityMutate</code><span class="sig-paren">(</span><em>generation: int</em>, <em>generations: int</em>, <em>ranking: int</em>, <em>population: int</em>, <em>rng: random.Random = &lt;random.Random object&gt;</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/gp/algorithm.html#probabilityMutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.probabilityMutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a probability to mutate based on 2 parameters : the current generation and the the ranking of the sample.</p>
 <p>A fitter sample (either by age (generation) or rank) is less likely to gain from mutation, and will even lose fitness. 
 The probability that random information introduced by mutation leads to a better result compared with evolved information decreases.

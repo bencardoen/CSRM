@@ -128,13 +128,13 @@ def traceFunction(fn=None, logcall=None):
 
     :param function fn: function object, implicit
     :param function logcall: logging callable, e.g. logcall=logger.getLogger('global').debug
-    
+
     Example usage :
-            
+
     @traceFunction(logcall=logging.getLogger('global').error) or @traceFunction
-    
+
     def myfunc(...):
-                
+
     Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
     """
     if not logcall:
@@ -203,8 +203,19 @@ def rootmeansquarenormalized(actual, expected):
     return nrmse
 
 def pearson(actual, expected):
-    """
+    r"""
     Return Pearson correlation coefficient.
+
+    Calculates correlation between actual and expected, offsetting it so it can be used as a distance function.
+
+    .. math::
+        r = \frac{\sum{(a-E[a])*(b-E[b])}}{\sqrt{\sum{(a-E[a])^2}*\sum{(b-E[b])^2}}}
+
+
+    :param actual: Actual values returned by evaluating a single approximation
+    :param expected: Desired values
+    :returns float: 2 - r
+
     """
     a = numpy.asarray(actual)
     b = numpy.asarray(expected)
@@ -232,8 +243,9 @@ def _pearson(actual, expected):
 
 def randomizedConsume(lst, seed=None):
     """
-        Return a generator to a random element in the list without repeating.
-        :lst list : modified in place, at the last call the list is empty.
+    Return a generator to a random element in the list without repeating.
+
+    :param list lst: modified in place, at the last call the list is empty.
     """
     rng = random.Random()
     rng.seed(seed)

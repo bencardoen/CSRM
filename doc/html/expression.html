@@ -1019,6 +1019,24 @@ Fuzz tests all conversion functions.</p>
 <dt id="expression.tools.pearson">
 <code class="descclassname">expression.tools.</code><code class="descname">pearson</code><span class="sig-paren">(</span><em>actual</em>, <em>expected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#pearson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.pearson" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return Pearson correlation coefficient.</p>
+<p>Calculates correlation between actual and expected, offsetting it so it can be used as a distance function.</p>
+<div class="math">
+\[r = \frac{\sum{(a-E[a])*(b-E[b])}}{\sqrt{\sum{(a-E[a])^2}*\sum{(b-E[b])^2}}}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>actual</strong> &#8211; Actual values returned by evaluating a single approximation</li>
+<li><strong>expected</strong> &#8211; Desired values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns float:</th><td class="field-body"><p class="first last">2 - r</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -1031,8 +1049,15 @@ When the generator halts, the list a random permumation (in place).</p>
 <dl class="function">
 <dt id="expression.tools.randomizedConsume">
 <code class="descclassname">expression.tools.</code><code class="descname">randomizedConsume</code><span class="sig-paren">(</span><em>lst</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#randomizedConsume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.randomizedConsume" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a generator to a random element in the list without repeating.
-:lst list : modified in place, at the last call the list is empty.</p>
+<dd><p>Return a generator to a random element in the list without repeating.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lst</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; modified in place, at the last call the list is empty.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -1254,9 +1279,23 @@ This a a ratio in [1.0, 2.0] defining how complex the functions are used in this
 <dt id="expression.tree.Tree.makeRandomTree">
 <em class="property">static </em><code class="descname">makeRandomTree</code><span class="sig-paren">(</span><em>variables</em>, <em>depth: int</em>, <em>rng=None</em>, <em>tokenLeafs=False</em>, <em>limit=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.makeRandomTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.makeRandomTree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a random expression tree with a random selection of variables
-Topdown construction, there is no guarantee that this construction renders a semantically valid tree
-:param tokenLeafs : if set, only use constants
-:param limit : raises Exception if no valid tree can be found</p>
+Topdown construction, there is no guarantee that this construction renders a semantically valid tree</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tokenLeafs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if set, only use constants</li>
+<li><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; raises Exception if no valid tree can be found in at least limit tries</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Returns expression.tree.Tree:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">A randomized tree.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1278,10 +1317,13 @@ Topdown construction, there is no guarantee that this construction renders a sem
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>expected</strong> &#8211; list A set of expected output values for each datapoint.</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>list</strong> (<em>expected</em>) &#8211; list A set of expected output values for each datapoint.</li>
 <li><strong>distancefunction</strong> &#8211; Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns float:</th><td class="field-body"><p class="first last">A fitness value, with lower indicating better. Distancefunction determines the range and scale of the result.</p>
 </td>
 </tr>
 </tbody>

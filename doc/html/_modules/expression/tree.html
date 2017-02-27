@@ -264,8 +264,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Evaluate a tree w.r.t a distancefucntion.</span>
 
-<span class="sd">            :param expected: list A set of expected output values for each datapoint.</span>
+<span class="sd">            :param expected list: list A set of expected output values for each datapoint.</span>
 <span class="sd">            :param distancefunction: Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)</span>
+<span class="sd">            :returns float: A fitness value, with lower indicating better. Distancefunction determines the range and scale of the result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">actual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">distancefunction</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
@@ -325,8 +326,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a random expression tree with a random selection of variables</span>
 <span class="sd">        Topdown construction, there is no guarantee that this construction renders a semantically valid tree</span>
-<span class="sd">        :param tokenLeafs : if set, only use constants</span>
-<span class="sd">        :param limit : raises Exception if no valid tree can be found</span>
+
+<span class="sd">        :param bool tokenLeafs: if set, only use constants</span>
+<span class="sd">        :param int limit: raises Exception if no valid tree can be found in at least limit tries</span>
+<span class="sd">        :returns expression.tree.Tree: A randomized tree.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">variables</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span>
