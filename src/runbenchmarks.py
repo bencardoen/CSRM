@@ -9,9 +9,9 @@
 import random
 from expression.tools import generateVariables
 from expression.tree import Tree
-from expression.functions import testfunctions, pearsonfitness as _fit
+from expression.functions import testfunctions, rmsfitness as _fit
 from analysis.convergence import Convergence
-from gp.algorithm import BruteElitist
+from gp.algorithm import BruteElitist, BruteCoolingElitist
 import logging
 logger = logging.getLogger('global')
 
@@ -32,7 +32,7 @@ def runBenchmarks():
         Y = t.evaluateAll()
 
         # Configure the algorithm
-        g = BruteElitist(X, Y, popsize=40, maxdepth=4, fitnessfunction=_fit,seed=0, generations=20, phases=5)
+        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=4, fitnessfunction=_fit,seed=0, generations=20, phases=5)
         g.executeAlgorithm()
 
         # Plot results

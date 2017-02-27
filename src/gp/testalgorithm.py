@@ -151,7 +151,7 @@ class GPTest(unittest.TestCase):
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
-        c.plotPareto()
+#        c.plotPareto()
         c.displayPlots("output", title=expr)
 
     def testCooling(self):
@@ -171,7 +171,8 @@ class GPTest(unittest.TestCase):
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
-        c.plotPareto()
+#        c.plotPareto()
+
         c.displayPlots("output", title=expr+"_cooling")
 
 

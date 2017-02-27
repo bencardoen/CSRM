@@ -83,6 +83,10 @@ class Convergence:
         p = plotFront(X=fitnessvalues, Y=complexity, labelx="Fitness", labely="complexity", title="Front")
         self._plots.append(p)
 
+    def plotDataPoints(self, X):
+        p= plotDotData(X, labelx="X", labely="Y", title="Data Points")
+        self._plots.append(p)
+
     def displayPlots(self, filename, title):
         """
             Collect all plots and write them out to a displayed html file.
