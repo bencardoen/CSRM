@@ -299,7 +299,7 @@ class GPAlgorithm():
         """
         self.evaluate(selection)
         return selection, [0,0,0]
-        
+
     def requireMutation(self, popindex:int)->bool:
         """
         Decide if mutation is desirable
@@ -368,11 +368,9 @@ class BruteElitist(GPAlgorithm):
         for i in range(0, selcount):
             t = selection[i]
             candidate = copyObject(t)
-            if not self.requireMutation(i):
-                continue
-
-            Mutate.mutate(candidate, variables=variables, equaldepth=True, rng=rng)
-            candidate.scoreTree(Y, fit)
+            if self.requireMutation(i):
+                Mutate.mutate(candidate, variables=variables, equaldepth=True, rng=rng)
+                candidate.scoreTree(Y, fit)
 
             if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
                 assert(candidate.getDepth() <= d)
@@ -447,8 +445,8 @@ class BruteElitist(GPAlgorithm):
         # TODO clean old pop, if so no copy is needed
         t = copyObject(t)
         self._archive.add(t)
-        
-        
+
+
 class BruteCoolingElitist(BruteElitist):
     """
         Uses a cooling strategy to apply operators, maximizing gain in the initial process but
@@ -468,27 +466,25 @@ class BruteCoolingElitist(BruteElitist):
 def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=random.Random())->bool:
     """
     Generate a probability to mutate based on 2 parameters : the current generation and the the ranking of the sample.
-    
-    A fitter sample (either by age (generation) or rank) is less likely to gain from mutation, and will even lose fitness. 
+
+    A fitter sample (either by age (generation) or rank) is less likely to gain from mutation, and will even lose fitness.
     The probability that random information introduced by mutation leads to a better result compared with evolved information decreases.
     This function estimates this probability, thereby avoiding unnecessary mutations and surprisingly leading to faster convergence.
 
     :param int ranking: index in a fitness (best first) sorted array
-    
+
     :param int generation: the current generation
-    
+
     :param int generations: total generations allowed
-    
+
     :param int population: total nr of specimens
-    
+
     :param random.Random rng: to reproduce results (optional)
-    
+
     :rtype: bool true if mutation is considered beneficial
     """
-    q = (generation / generations) * 0.5 
+    q = (generation / generations) * 0.5
     w = (ranking / population) * 2
     r = rng.uniform(a=0,b=1)
     s = rng.uniform(a=0, b=1)
     return r > q and s < w
-    
-    

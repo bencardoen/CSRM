@@ -181,7 +181,7 @@ class GPTest(unittest.TestCase):
 
 
 if __name__=="__main__":
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.WARNING)
     logging.disable(logging.DEBUG)
     print("Running")
     if not os.path.isdir(outputfolder):
