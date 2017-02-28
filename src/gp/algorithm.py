@@ -367,16 +367,16 @@ class BruteElitist(GPAlgorithm):
         # is not ideal.
         for i in range(0, selcount):
             t = selection[i]
-            candidate = copyObject(t)
             if self.requireMutation(i):
+                candidate = copyObject(t)
                 Mutate.mutate(candidate, variables=variables, equaldepth=True, rng=rng)
                 candidate.scoreTree(Y, fit)
 
-            if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
-                assert(candidate.getDepth() <= d)
-                selection[i] = candidate
-                replacementcount[0] += 1
-                replacementcount[1] += 1
+                if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
+                    assert(candidate.getDepth() <= d)
+                    selection[i] = candidate
+                    replacementcount[0] += 1
+                    replacementcount[1] += 1
 
 
 
