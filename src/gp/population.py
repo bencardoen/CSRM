@@ -170,7 +170,7 @@ class SetPopulation(Population):
 
     def pop(self):
         t = self.top()
-        self._pop.pop()
+        self._pop.pop(0)
         return t
 
     def last(self):
@@ -192,8 +192,11 @@ class SetPopulation(Population):
         self.add(item)
 
     def getN(self, n):
+        logger.debug("Getting {} from {}".format(n, self))
         i = self._pop.islice(start=0, stop=n, reverse=False)
-        return [d for d in i]
+        rl = [d for d in i]
+        logger.debug("Returning {}, self is {}".format(rl, self))
+        return rl
 
     def removeN(self, n):
         oldlen = len(self)
@@ -201,7 +204,8 @@ class SetPopulation(Population):
         for i in kn:
             self.pop()
         assert(len(self) == oldlen - n)
+        logger.debug("After removal of {} self is {}".format(kn, self))
         return kn
 
     def __str__(self):
-        return "".join(str(d) for d in self._pop)
+        return "".join(str(hex(id(d))) + " "   for d in self._pop)

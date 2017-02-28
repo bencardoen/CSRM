@@ -29,7 +29,7 @@ class GPAlgorithm():
 
         In itself it will not evolve a solution.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None, history = None, phases=None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None, history = None, phases=None, tournamentsize = None):
         """
         Initializes a forest of trees randomly constructed.
 
@@ -40,9 +40,10 @@ class GPAlgorithm():
         :param int generations: generations to iterate
         :param int seed: seed value for the rng used in tree construction
         :param int archivesize: size of the archive used between phases to store best-of-generation samples, which are in turn reused in next phases
+        :param int tournamentsize: size of subset taken from population (fittest first) to evolve.
         """
         # Sorted set of trees by fitness value
-        self._population = SetPopulation(key=lambda _tree : _tree.getFitness())
+        self._population = SetPopulation(key=lambda _tree : (_tree.getFitness(), id(_tree)))
         self._datapointcount = len(X[0])
         self._fitnessfunction = fitnessfunction
         self._maxdepth = maxdepth
@@ -56,7 +57,7 @@ class GPAlgorithm():
         self._X = X
         self._Y = Y
         self._initialize()
-        self._archive = SetPopulation(key=lambda _tree : _tree.getFitness())
+        self._archive = SetPopulation(key=lambda _tree : (_tree.getFitness(), id(_tree)))
         self._generations = generations
         self._currentgeneration = 0
         self._archivesize = archivesize or self._popsize
@@ -65,6 +66,7 @@ class GPAlgorithm():
         self._history = history or 5
         self._phase = 0
         self._phases = phases or 1
+        self._tournamentsize= tournamentsize or popsize
 
     def getSeed(self):
         """
@@ -111,6 +113,7 @@ class GPAlgorithm():
 
 
     def addTree(self, t):
+        logger.debug("Adding tree with id {:0x} to pop {}".format(id(t), self._population))
         assert(t not in self._population)
         self._population.add(t)
 
@@ -129,7 +132,7 @@ class GPAlgorithm():
 
     def _initializePopulation(self):
         """
-            Seed the population with random samples.
+        Seed the population with random samples.
         """
         assert(len(self._variables))
         for i in range(self._popsize):
@@ -151,6 +154,7 @@ class GPAlgorithm():
             t = Tree.growTree(self._variables, self._maxdepth, rng=rng)
             t.scoreTree(self._Y, self._fitnessfunction)
             i += 1
+        logger.debug("Grown tree, adding with id {:0x}".format(id(t)))
         self.addTree(t)
 
     def testInvariant(self):
@@ -275,8 +279,11 @@ class GPAlgorithm():
         Select a subset of the current population to operate on.
         """
         assert(len(self._population))
-        sel = self._population.removeAll()
-        assert(len(self._population)==0)
+        logger.debug("Selecting {} from {}".format(self._tournamentsize, self._population))
+        sel = self._population.removeN(self._tournamentsize)
+        logger.debug("Selected {} ".format(sel))
+        assert(len(sel) == self._tournamentsize)
+        assert(len(self._population) == self._popsize - self._tournamentsize)
         return sel
 
     def evaluate(self, sel=None):
@@ -311,10 +318,16 @@ class GPAlgorithm():
         Process the new generation.
         At the very least, adds modified back to population based on a condition.
         """
-        self.evaluate(modified)
-        for i in modified:
-            self.addTree(i)
-        return
+        assert(len(modified) == self._tournamentsize)
+        assert(len(self._population) == self._popsize-self._tournamentsize)
+        logger.debug("Adding {} to population {}".format(modified, self._population))
+        for t in modified:
+            self.addTree(t)
+        remcount = self._popsize - len(self._population)
+        assert(remcount >= 0)
+        for _ in range(remcount):
+            # Use archive here with probability ?
+            self.addRandomTree()
 
     def archive(self, modified):
         """
@@ -340,10 +353,6 @@ class BruteElitist(GPAlgorithm):
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases)
 
-    def select(self):
-        s = self._population.removeAll()
-        assert(len(self._population)==0)
-        return s
 
     def evolve(self, selection):
         """
@@ -359,7 +368,7 @@ class BruteElitist(GPAlgorithm):
 
         replacementcount = [0,0,0]
         selcount = len(selection)
-        assert(selcount == self._popsize)
+        assert(selcount == self._tournamentsize)
 
 
         # Mutate on entire population, with regard to (scaled) fitness
@@ -412,20 +421,9 @@ class BruteElitist(GPAlgorithm):
         assert(len(newgen) == selcount)
         return newgen, replacementcount
 
-    def update(self, modified):
-        """
-            Add modified samples back to population, if needed fill population.
-        """
-        for t in modified:
-            self.addTree(t)
-        remcount = self._popsize - len(modified)
-        for _ in range(remcount):
-            # Use archive here with probability ?
-            self.addRandomTree()
-
     def stopCondition(self):
         """
-            Stop if the last @history generation no replacements could be made
+        Stop if the last @history generation no replacements could be made
         """
         generations = len(self._convergencestats[self._phase])
         if generations < self._history:

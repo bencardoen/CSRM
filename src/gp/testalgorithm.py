@@ -151,7 +151,6 @@ class GPTest(unittest.TestCase):
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
-#        c.plotPareto()
         c.displayPlots("output", title=expr)
 
     def testCooling(self):
@@ -171,17 +170,35 @@ class GPTest(unittest.TestCase):
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
-#        c.plotPareto()
+        c.displayPlots("output", title=expr+"_cooling")
 
+
+    def testTournament(self):
+        expr = testfunctions[2]
+        rng = random.Random()
+        rng.seed(0)
+        dpoint = 30
+        vpoint = 5
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
+        logger.debug("Y {} X {}".format(Y, X))
+        g = BruteCoolingElitist(X, Y, popsize=2, maxdepth=5, fitnessfunction=_fit, seed=0, generations=75, phases=5)
+        g._tournamentsize=1
+        g.executeAlgorithm()
+        stats = g.getConvergenceStatistics()
+        c = Convergence(stats)
+        c.plotFitness()
+        c.plotComplexity()
+        c.plotOperators()
         c.displayPlots("output", title=expr+"_cooling")
 
 
 
 
 
-
 if __name__=="__main__":
-    logger.setLevel(logging.WARNING)
+    logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
     print("Running")
     if not os.path.isdir(outputfolder):
