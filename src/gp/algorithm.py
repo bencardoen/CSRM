@@ -432,12 +432,18 @@ class BruteElitist(GPAlgorithm):
         if generations < self._history:
             # not enough data
             return False
+        # We want to return True if std_fitness < Epsilon for the last x generations
+        found = False
         for i in range(self._history):
-            if self.getConvergenceStat(generations-i-1, self._phase)['replacements'] != 0:
-                return False
-        # Add more measures
-        return True
-
+            if self.getConvergenceStat(generations-i-1, self._phase)['std_fitness'] > Constants.FITNESS_EPSILON:
+                found=True
+                break
+        if found: # Still enough variation
+            for i in range(self._history):
+                if self.getConvergenceStat(generations-i-1, self._phase)['replacements'] != 0:
+                    return False # enough variation, and replacements
+            # Replacements are no longer taking place, with enough variation, stop
+        return True # No more variation, stop
     def archive(self, modified):
         """
             Simple archiving strategy, get best of generation and store.

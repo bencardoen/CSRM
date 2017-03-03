@@ -675,7 +675,7 @@ class TreeTest(unittest.TestCase):
         d = t.getDepth()
         logger.debug("Tree depth {} absolute complexity {}".format(d, c))
         self.assertEqual(c, 18)
-        self.assertEqual(c2, 1+(c-(d-1))/57)
+        self.assertEqual(c2, (c-(d-1))/57)
 
     def testAdvancedMutate(self):
         vcount = 4

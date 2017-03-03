@@ -207,6 +207,7 @@ def pearson(actual, expected):
     Return Pearson correlation coefficient.
 
     Calculates correlation between actual and expected, offsetting it so it can be used as a distance function.
+    The returned value is in the range [0, 1] with 0 optimal distance.
 
     .. math::
         r = \frac{\sum{(a-E[a])*(b-E[b])}}{\sqrt{\sum{(a-E[a])^2}*\sum{(b-E[b])^2}}}
@@ -214,7 +215,7 @@ def pearson(actual, expected):
 
     :param actual: Actual values returned by evaluating a single approximation
     :param expected: Desired values
-    :returns float: 2 - r
+    :returns float: (1 - r)/2
 
     """
     a = numpy.asarray(actual)
@@ -226,8 +227,12 @@ def pearson(actual, expected):
     nom = numpy.sum( va*vb  )
     denom = numpy.sqrt( numpy.sum( numpy.square(va) ) * numpy.sum( numpy.square( vb ) ) )
     if denom == 0:
-        return 2
-    return 2 - nom/denom
+        return 1
+    p = nom/denom
+    if p > 1:
+        p = 1 # truncate rounding
+    r = (1 - nom/denom)/2.0
+    return r
 
 def _pearson(actual, expected):
     N = len(actual)

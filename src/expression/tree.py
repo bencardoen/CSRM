@@ -56,7 +56,9 @@ class Tree:
         return self.fitness
 
     def getMultiObjectiveFitness(self):
-        return self.getScaledComplexity()*self.getFitness()
+        f = Constants.COMPLEXITY_WEIGHT*self.getScaledComplexity() + Constants.FITNESS_WEIGHT*self.getFitness()
+        assert(f <= 1 or f == Constants.MINFITNESS)
+        return f
 
     def setFitness(self, fscore):
         self.fitness = fscore
@@ -490,7 +492,7 @@ class Tree:
     def getScaledComplexity(self):
         """
             Return the functional complexity of this tree.
-            This a a ratio in [1.0, 2.0] defining how complex the functions are used in this tree.
+            This a a ratio in [0.0, 1.0] defining how complex the functions are used in this tree.
         """
         c = self.getComplexity()
         d = self.getDepth()
@@ -504,7 +506,9 @@ class Tree:
         if c-minc < 0:
             assert(False)
             return 1
-        return 1 + ( float(c-minc) / float(maxc-minc))
+        val = ( float(c-minc) / float(maxc-minc))
+        assert(val <= 1)
+        return val
 
 
     @staticmethod
