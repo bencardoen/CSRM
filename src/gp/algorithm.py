@@ -222,7 +222,7 @@ class GPAlgorithm():
             self.addTree(copyObject(a))
         # Retrim the current population by removing the least fit samples
         while len(self._population) > self._popsize:
-            self._population.bottom()
+            self._population.drop()
         diff = self._popsize - len(self._population)
         for _ in range(diff):
             self.addRandomTree()
@@ -324,10 +324,13 @@ class GPAlgorithm():
         for t in modified:
             self.addTree(t)
         remcount = self._popsize - len(self._population)
-        assert(remcount >= 0)
-        for _ in range(remcount):
-            # Use archive here with probability ?
-            self.addRandomTree()
+        if remcount > 0:
+            for _ in range(remcount):
+                self.addRandomTree()
+        else:
+            for _ in range(- remcount):
+                self._population.drop()
+
 
     def archive(self, modified):
         """
@@ -479,7 +482,7 @@ def probabilityMutate(generation:int, generations:int, ranking:int, population:i
 
     :param random.Random rng: to reproduce results (optional)
 
-    :rtype: bool true if mutation is considered beneficial
+    :returns bool: true if mutation is considered beneficial
     """
     q = (generation / generations) * 0.5
     w = (ranking / population) * 2

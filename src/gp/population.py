@@ -20,9 +20,11 @@ class Population():
     """
     def __init__(self, iterable=None, key=None):
         """
-            Construct using iterable as initial data with given key.
+        Construct using iterable as initial data with given key.
 
-            :param function key: a function object that returns the sorting key
+        :example: p = Population(iterable=[(1,2),(1,3)], key=lambda x : (x[1], x[0]))
+
+        :param function key: a function object that returns the sorting key
         """
         self._pop = []
 
@@ -176,7 +178,7 @@ class SetPopulation(Population):
     def last(self):
         return self._pop[len(self)-1]
 
-    def bottom(self):
+    def drop(self):
         l = self.last()
         self.remove(l)
         return l

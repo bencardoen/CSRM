@@ -183,15 +183,15 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=2, maxdepth=5, fitnessfunction=_fit, seed=0, generations=75, phases=5)
-        g._tournamentsize=1
+        g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=75, phases=5)
+        g._tournamentsize=4
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
-        c.displayPlots("output", title=expr+"_cooling")
+        c.displayPlots("output", title=expr+"_tournament")
 
 
 

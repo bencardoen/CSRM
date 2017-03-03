@@ -13,7 +13,7 @@ print("Scattering {} for rank {}".format(objects, rank))
 localobj = comm.scatter(objects, root=0)
 print("rval for {} is {}".format(rank, localobj))
 
-# Check if we need a barrier, gather is blocking, it will wait until all have called it
+# Check if we need a barrier, gather is blocking, it will wait until all have called i
 if rank == 1:
     time.sleep(2)
 # Some trivial work
