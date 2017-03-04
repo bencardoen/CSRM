@@ -15,7 +15,7 @@ from copy import deepcopy
 import logging
 import time
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList
 import os
 import random
 from expression.operators import Mutate, Crossover
@@ -800,6 +800,17 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(len(Xk), vpoint)
         self.assertEqual(len(Xk[0]) , K)
         self.assertEqual(len(Yk) , K)
+
+    def testExclusiveList(self):
+        rng = random.Random()
+        rng.seed(0)
+        for i in range(10):
+            l = [x for x in range(20)]
+            slg = sampleExclusiveList(l, 3, 10, rng=rng, seed=None)
+            sl = [next(slg) for x in range(10)]
+            self.assertEqual(len(sl), 10)
+            self.assertEqual(3 not in sl, True)
+
 
 
 if __name__=="__main__":

@@ -9,6 +9,7 @@
 import logging
 import random
 from analysis.convergence import Convergence
+from math import sqrt
 from gp.algorithm import GPAlgorithm, BruteCoolingElitist
 
 logger = logging.getLogger('global')
@@ -18,29 +19,38 @@ class Topology():
         assert(size>1)
         self._size = size
 
-    def getTarget(self, source:int)->int:
+    @property
+    def size(self):
+        return self._size
+
+    def getTarget(self, source:int)->list:
+        raise NotImplementedError
+
+    def getSource(self, target:int)->list:
         raise NotImplementedError
 
 class RandomStaticTopology(Topology):
-    def __init__(self, size:int, rng=None, seed=None):
+    def __init__(self, size:int, rng=None, seed=None, links=None):
         super().__init__(size)
         self._rng = rng or random.Random()
         seed = 0 if seed is None else seed
+        self.links = links or 1
         self._rng.seed(seed)
         self.setMap()
-        self._reversemap = {v: k for k,v in enumerate(self._map)}
 
     @property
     def size(self):
         return self._size
 
-    def getTarget(self, source:int)->int:
-        return self._map[source]
+    def getTarget(self, source:int)->list:
+        return [self._map[source]]
 
-    def getSource(self, target:int)->int:
-        return self._reversemap[target]
+    def getSource(self, target:int)->list:
+        raise NotImplementedError
+        return [self._reversemap[target]]
 
     def setMap(self):
+        # todo add multilink support
         repeat = True
         i = 0
         map = None
@@ -62,6 +72,46 @@ class RandomStaticTopology(Topology):
     def __str__(self):
         return "Topology == {} , reversed = {}".format(self._map, self._reversemap)
 
+class RandomDynamicTopology(RandomStaticTopology):
+    """
+    Variation on Static, on demand a new mapping is calculated.
+    """
+    def __init__(self, size:int):
+        super().__init__(size)
+
+    def recalculate(self):
+        self.setMap()
+
+class RingTopology(Topology):
+    """
+    Simple Ring Topology
+    """
+    def __init__(self, size:int):
+        super.__init__(size)
+
+    def getSource(self, target:int):
+        raise NotImplementedError
+        #return [(target - 1)% self.size]
+
+    def getTarget(self, source:int):
+        return [(source+1) % self.size]
+
+class VonNeumannTopology(Topology):
+    """
+    2D grid, with each node connected with 4 nodes
+    """
+    def __init__(self, size:int):
+        r = sqrt(size)
+        assert(int(r)**2 == size)
+        super().__init__(size)
+        self.rt = int(sqrt(size))
+
+    def getSource(self, target:int):
+        raise NotImplementedError
+
+    def getTarget(self, source:int):
+        size = self.size
+        return [(source-1)%size, (source+1)%size, (source+rt)%size, (source-rt)%size]
 
 class ParallelGP():
     def __init__(self, algo:GPAlgorithm, communicationsize:int=None, topo:Topology=None, pid = None, MPI=False):
@@ -108,7 +158,7 @@ class ParallelGP():
         Receive from process *source* buffer
         """
         logger.info("Receving at {} from {} buffer {} ".format(self._pid, source, len(buffer)))
-        assert(self._topo.getTarget(source) == self._pid)
+        assert(self._pid in self._topo.getTarget(source))
         self.algorithm.archiveExternal(buffer)
 
         # read commratio*archivesize samples from algorithm, pass them
@@ -137,7 +187,8 @@ class SequentialPGP():
             for i, process in enumerate(self._processes):
                 process.executePhase()
                 buf, target = process.send()
-                process.receive(buf, target)
+                for t in target:
+                    process.receive(buf, t)
 
     def reportOutput(self):
         for i, process in enumerate(self._processes):

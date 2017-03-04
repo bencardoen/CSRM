@@ -285,7 +285,27 @@ def getKSamples(X, Y, K, rng=None, seed=None):
         Yk.append(Y[i])
     return Xk, Yk
 
-
+def sampleExclusiveList(lst, exclude, k, rng = None, seed=None):
+    """
+    Consume a list, get k random distinct values, with *exclude*
+    """
+    if rng is None:
+        rng = random.Random()
+        rng.seed(seed)
+    else:
+        if seed is not None:
+            rng.seed(seed)
+    lsize = len(lst)
+    while k != 0:
+        pos = rng.randint(0, len(lst)-1)
+        item = lst[pos]
+        lst[pos] = lst[-1]
+        del lst[-1]
+        if item == exclude:
+            pass
+        else:
+            k-=1
+            yield item
 
 def consume(lst:list):
     """
