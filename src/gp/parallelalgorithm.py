@@ -68,11 +68,11 @@ class RandomStaticTopology(Topology):
 
 
 class ParallelGP():
-    def __init__(self, algo:GPAlgorithm, communicationsize:int=None, topo:Topology=None, processnr = None, MPI=False):
+    def __init__(self, algo:GPAlgorithm, communicationsize:int=None, topo:Topology=None, pid = None, MPI=False):
         self._topo = topo
         self._algo = algo
         self._communicationsize = communicationsize or 1
-        self._pid = processnr or 0
+        self._pid = pid or 0
         self._MPI = MPI
         self._ran = False
 
@@ -107,8 +107,8 @@ class ParallelGP():
         else:
             return selectedsamples, target
 
-    def receive(self, buffer, source):
-        assert(self.topo.getTarget(source) == self._pid)
+    def receive(self, buffer, source:int):
+        assert(self._topo.getTarget(source) == self._pid)
         self.algorithm.archiveExternal(buffer)
 
         # read commratio*archivesize samples from algorithm, pass them

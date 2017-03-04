@@ -130,9 +130,10 @@ class GPAlgorithm():
         # have at least self._archivephase samples
         assert(len(self._archive))
         if n > len(self._archive):
+            logger.warning("Requesting more samples than archive contains")
             return self._archive.getAll()
         else:
-            return self._archive.getN()
+            return self._archive.getN(n)
 
     def archiveExternal(self, lst):
         """

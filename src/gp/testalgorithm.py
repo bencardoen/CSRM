@@ -184,8 +184,8 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=4, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=6)
-        g.tournamentsize=4
+        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=7, fitnessfunction=_fit, seed=0, generations=30, phases=8)
+        g.tournamentsize = 4
 
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
@@ -200,25 +200,34 @@ class PGPTest(unittest.TestCase):
         expr = testfunctions[2]
         rng = random.Random()
         rng.seed(0)
-        dpoint = 50
+        dpoint = 10
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=7, fitnessfunction=_fit, seed=0, generations=20, phases=6)
-
+        pcount = 4
+        processes = []
         topo = RandomStaticTopology(4)
-        pgp = ParallelGP(g, communicationsize=1, topo=topo)
-        for _ in range(pgp.phases):
-            pgp.executePhase()
+        for i in range(pcount):
+            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=7, fitnessfunction=_fit, seed=i, generations=30, phases=8)
+            pgp = ParallelGP(g, communicationsize=2, topo=topo, pid=i)
+            processes.append(pgp)
 
-        stats = pgp.algorithm.getConvergenceStatistics()
-        c = Convergence(stats)
-        c.plotFitness()
-        c.plotComplexity()
-        c.plotOperators()
-        c.displayPlots("output", title=expr+"_tournament")
+        for _ in range(pgp.phases):
+            for i in range(pcount):
+                processes[i].executePhase()
+                buf, target = processes[i].send()
+                processes[target].receive(buf, i)
+
+        for i in range(pcount):
+            pgp = processes[i]
+            stats = pgp.algorithm.getConvergenceStatistics()
+            c = Convergence(stats)
+            c.plotFitness()
+            c.plotComplexity()
+            c.plotOperators()
+            c.displayPlots("output_{}".format(i), title=expr+"_tournament")
 
 
 
