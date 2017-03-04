@@ -8,7 +8,7 @@
 
 from expression.tree import Tree
 from expression.operators import Mutate, Crossover
-from expression.tools import traceFunction, randomizedConsume, copyObject
+from expression.tools import traceFunction, randomizedConsume, copyObject, consume
 from expression.constants import Constants
 from gp.population import Population, SetPopulation
 from expression.node import Variable
@@ -42,9 +42,11 @@ class GPAlgorithm():
         :param int archivesize: size of the archive used between phases to store best-of-generation samples, which are in turn reused in next phases
         :param int tournamentsize: size of subset taken from population (fittest first) to evolve.
         """
-        # Sorted set of trees by fitness value
+        """ Sorted set of samples (best first)"""
         self._population = SetPopulation(key=lambda _tree : (_tree.getFitness(), id(_tree)))
+        """ Number of entries per feature. """
         self._datapointcount = len(X[0])
+        """ Fitness function, passed to tree instance to score."""
         self._fitnessfunction = fitnessfunction
         self._maxdepth = maxdepth
         self._popsize=popsize
@@ -53,20 +55,39 @@ class GPAlgorithm():
         if seed is not None:
             self._rng.seed(seed)
         self._trace = False
-        logging.info(" Data points for X {}".format(X))
+        """ Input data """
         self._X = X
+        """ Expected data """
         self._Y = Y
         self._initialize()
+        """ Archive : stores best of phase samples. """
         self._archive = SetPopulation(key=lambda _tree : (_tree.getFitness(), id(_tree)))
+        """ Generations per phase. The algorithm will execute no more than self._phases * self._generations"""
         self._generations = generations
         self._currentgeneration = 0
+        """ Size of the archive : collection of (shared) samples between phases """
         self._archivesize = archivesize or self._popsize
         # List of generation : tuple of stats
         self._convergencestats = []
+        """ History is nr of generations the stop condition investigates to determine a valid condition. E.g. : if the last <x> generations have no mutations, stop."""
         self._history = history or 5
+        """ Current phase of the algorithm : [0, self._phases). """
         self._phase = 0
+        """ Total phases requested """
         self._phases = phases or 1
-        self._tournamentsize= tournamentsize or popsize
+        """ Size of tournament, determines which samples compete. """
+        self._tournamentsize = tournamentsize or popsize
+        """
+        Randomizing the selection upon which crossover works can improve the quality of the converged results.
+        Non random crossover (e.g. best mates with second best) will lead to faster convergence, albeit to a less optimal solution.
+        """
+        self._randomconsume = True
+        """
+        If random consume is active, determine when this should be used (in order to get the best of both)
+        """
+        self._randomconsumeprobability = 0.5
+        # Parameters : Cooling ?, archive usage, ...
+
 
     def getSeed(self):
         """
@@ -336,6 +357,7 @@ class GPAlgorithm():
         """
         Using the new and previous generation, determine the best specimens and store them.
         """
+        logger.warning("Inactive archive function called")
         return
 
     def addToArchive(self, t):
@@ -344,7 +366,8 @@ class GPAlgorithm():
         """
         self._archive.add(t)
         if len(self._archive) > self._archivesize:
-            self._archive.popLast()
+            logger.info("Curtailing archive.")
+            self._archive.drop()
 
 class BruteElitist(GPAlgorithm):
     """
@@ -367,6 +390,7 @@ class BruteElitist(GPAlgorithm):
         d = self._maxdepth
         rng = self._rng
         variables = self._variables
+        tournament = self._popsize == self._tournamentsize
 
 
         replacementcount = [0,0,0]
@@ -402,7 +426,14 @@ class BruteElitist(GPAlgorithm):
             newgen.append(selection[0])
             del selection[0]
 
-        selector = randomizedConsume(selection, seed=self.getSeed())
+        selector = None
+        if self._randomconsume:
+            toss = self._rng.random()
+            if toss >= self._randomconsumeprobability:
+                selector = randomizedConsume(selection, seed=self.getSeed())
+        selector = selector if selector is not None else consume(selection)
+
+
         while selection:
             left = next(selector)
             right = next(selector)
@@ -444,14 +475,18 @@ class BruteElitist(GPAlgorithm):
                     return False # enough variation, and replacements
             # Replacements are no longer taking place, with enough variation, stop
         return True # No more variation, stop
+
     def archive(self, modified):
         """
-            Simple archiving strategy, get best of generation and store.
+        Simple archiving strategy, get best of generation and store.
+        If the best tree is present, try remaining values.
         """
-        t = self.getBestTree()
-        # TODO clean old pop, if so no copy is needed
-        t = copyObject(t)
-        self._archive.add(t)
+        for t in self._population:
+            if t not in self._archive:
+                self.addToArchive(copyObject(t))
+            else:
+                logger.warning("Archive already contains identical tree")
+                break
 
 
 class BruteCoolingElitist(BruteElitist):

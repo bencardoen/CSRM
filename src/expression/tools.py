@@ -262,6 +262,16 @@ def randomizedConsume(lst, seed=None):
         del lst[-1]
         yield item
 
+def consume(lst:list):
+    """
+    Return a generator to an element in the list.
+    :param lst list: empties the list
+    """
+    listlength = len(lst)
+    for _ in range(listlength):
+        item = lst.pop(0)
+        yield item
+
 
 def permutate(lst, seed=None):
     """

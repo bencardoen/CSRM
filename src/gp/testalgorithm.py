@@ -183,7 +183,7 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=75, phases=5)
+        g = BruteCoolingElitist(X, Y, popsize=4, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=6)
         g._tournamentsize=4
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
