@@ -102,7 +102,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span></div>
 
 <div class="viewcode-block" id="Tree.getMultiObjectiveFitness"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getMultiObjectiveFitness">[docs]</a>    <span class="k">def</span> <span class="nf">getMultiObjectiveFitness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getScaledComplexity</span><span class="p">()</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getFitness</span><span class="p">()</span></div>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">COMPLEXITY_WEIGHT</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getScaledComplexity</span><span class="p">()</span> <span class="o">+</span> <span class="n">Constants</span><span class="o">.</span><span class="n">FITNESS_WEIGHT</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getFitness</span><span class="p">()</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">f</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">f</span> <span class="o">==</span> <span class="n">Constants</span><span class="o">.</span><span class="n">MINFITNESS</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="Tree.setFitness"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.setFitness">[docs]</a>    <span class="k">def</span> <span class="nf">setFitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fscore</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">fscore</span></div>
@@ -536,7 +538,7 @@
 <div class="viewcode-block" id="Tree.getScaledComplexity"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getScaledComplexity">[docs]</a>    <span class="k">def</span> <span class="nf">getScaledComplexity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Return the functional complexity of this tree.</span>
-<span class="sd">            This a a ratio in [1.0, 2.0] defining how complex the functions are used in this tree.</span>
+<span class="sd">            This a a ratio in [0.0, 1.0] defining how complex the functions are used in this tree.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getComplexity</span><span class="p">()</span>
         <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
@@ -550,7 +552,9 @@
         <span class="k">if</span> <span class="n">c</span><span class="o">-</span><span class="n">minc</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">return</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span> <span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="o">-</span><span class="n">minc</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">maxc</span><span class="o">-</span><span class="n">minc</span><span class="p">))</span></div>
+        <span class="n">val</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="o">-</span><span class="n">minc</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">maxc</span><span class="o">-</span><span class="n">minc</span><span class="p">))</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">val</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">val</span></div>
 
 
     <span class="nd">@staticmethod</span>

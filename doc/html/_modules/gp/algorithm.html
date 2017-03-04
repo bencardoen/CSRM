@@ -54,7 +54,7 @@
 
 <span class="kn">from</span> <span class="nn">expression.tree</span> <span class="k">import</span> <span class="n">Tree</span>
 <span class="kn">from</span> <span class="nn">expression.operators</span> <span class="k">import</span> <span class="n">Mutate</span><span class="p">,</span> <span class="n">Crossover</span>
-<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">traceFunction</span><span class="p">,</span> <span class="n">randomizedConsume</span><span class="p">,</span> <span class="n">copyObject</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">traceFunction</span><span class="p">,</span> <span class="n">randomizedConsume</span><span class="p">,</span> <span class="n">copyObject</span><span class="p">,</span> <span class="n">consume</span>
 <span class="kn">from</span> <span class="nn">expression.constants</span> <span class="k">import</span> <span class="n">Constants</span>
 <span class="kn">from</span> <span class="nn">gp.population</span> <span class="k">import</span> <span class="n">Population</span><span class="p">,</span> <span class="n">SetPopulation</span>
 <span class="kn">from</span> <span class="nn">expression.node</span> <span class="k">import</span> <span class="n">Variable</span>
@@ -75,7 +75,7 @@
 
 <span class="sd">        In itself it will not evolve a solution.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="GPAlgorithm.__init__"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="p">,</span> <span class="n">maxdepth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">archivesize</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">history</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="GPAlgorithm.__init__"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="p">,</span> <span class="n">maxdepth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">archivesize</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">history</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tournamentsize</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a forest of trees randomly constructed.</span>
 
@@ -86,10 +86,13 @@
 <span class="sd">        :param int generations: generations to iterate</span>
 <span class="sd">        :param int seed: seed value for the rng used in tree construction</span>
 <span class="sd">        :param int archivesize: size of the archive used between phases to store best-of-generation samples, which are in turn reused in next phases</span>
+<span class="sd">        :param int tournamentsize: size of subset taken from population (fittest first) to evolve.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Sorted set of trees by fitness value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_population</span> <span class="o">=</span> <span class="n">SetPopulation</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_tree</span> <span class="p">:</span> <span class="n">_tree</span><span class="o">.</span><span class="n">getFitness</span><span class="p">())</span>
+        <span class="sd">&quot;&quot;&quot; Sorted set of samples (best first)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_population</span> <span class="o">=</span> <span class="n">SetPopulation</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_tree</span> <span class="p">:</span> <span class="p">(</span><span class="n">_tree</span><span class="o">.</span><span class="n">getFitness</span><span class="p">(),</span> <span class="nb">id</span><span class="p">(</span><span class="n">_tree</span><span class="p">)))</span>
+        <span class="sd">&quot;&quot;&quot; Number of entries per feature. &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_datapointcount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="sd">&quot;&quot;&quot; Fitness function, passed to tree instance to score.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fitnessfunction</span> <span class="o">=</span> <span class="n">fitnessfunction</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_maxdepth</span> <span class="o">=</span> <span class="n">maxdepth</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span><span class="o">=</span><span class="n">popsize</span>
@@ -98,19 +101,39 @@
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trace</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot; Data points for X </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+        <span class="sd">&quot;&quot;&quot; Input data &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="sd">&quot;&quot;&quot; Expected data &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_Y</span> <span class="o">=</span> <span class="n">Y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="n">SetPopulation</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_tree</span> <span class="p">:</span> <span class="n">_tree</span><span class="o">.</span><span class="n">getFitness</span><span class="p">())</span>
+        <span class="sd">&quot;&quot;&quot; Archive : stores best of phase samples. &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="n">SetPopulation</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_tree</span> <span class="p">:</span> <span class="p">(</span><span class="n">_tree</span><span class="o">.</span><span class="n">getFitness</span><span class="p">(),</span> <span class="nb">id</span><span class="p">(</span><span class="n">_tree</span><span class="p">)))</span>
+        <span class="sd">&quot;&quot;&quot; Generations per phase. The algorithm will execute no more than self._phases * self._generations&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_generations</span> <span class="o">=</span> <span class="n">generations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_currentgeneration</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="sd">&quot;&quot;&quot; Size of the archive : collection of (shared) samples between phases &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_archivesize</span> <span class="o">=</span> <span class="n">archivesize</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span>
         <span class="c1"># List of generation : tuple of stats</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convergencestats</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="sd">&quot;&quot;&quot; History is nr of generations the stop condition investigates to determine a valid condition. E.g. : if the last &lt;x&gt; generations have no mutations, stop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_history</span> <span class="o">=</span> <span class="n">history</span> <span class="ow">or</span> <span class="mi">5</span>
+        <span class="sd">&quot;&quot;&quot; Current phase of the algorithm : [0, self._phases). &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_phases</span> <span class="o">=</span> <span class="n">phases</span> <span class="ow">or</span> <span class="mi">1</span></div>
+        <span class="sd">&quot;&quot;&quot; Total phases requested &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phases</span> <span class="o">=</span> <span class="n">phases</span> <span class="ow">or</span> <span class="mi">1</span>
+        <span class="sd">&quot;&quot;&quot; Size of tournament, determines which samples compete. &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tournamentsize</span> <span class="o">=</span> <span class="n">tournamentsize</span> <span class="ow">or</span> <span class="n">popsize</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Randomizing the selection upon which crossover works can improve the quality of the converged results.</span>
+<span class="sd">        Non random crossover (e.g. best mates with second best) will lead to faster convergence, albeit to a less optimal solution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_randomconsume</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If random consume is active, determine when this should be used (in order to get the best of both)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_randomconsumeprobability</span> <span class="o">=</span> <span class="mf">0.5</span></div>
+        <span class="c1"># Parameters : Cooling ?, archive usage, ...</span>
+
 
 <div class="viewcode-block" id="GPAlgorithm.getSeed"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.getSeed">[docs]</a>    <span class="k">def</span> <span class="nf">getSeed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -157,6 +180,7 @@
 
 
 <div class="viewcode-block" id="GPAlgorithm.addTree"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.addTree">[docs]</a>    <span class="k">def</span> <span class="nf">addTree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding tree with id </span><span class="si">{:0x}</span><span class="s2"> to pop </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
@@ -175,7 +199,7 @@
 
     <span class="k">def</span> <span class="nf">_initializePopulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Seed the population with random samples.</span>
+<span class="sd">        Seed the population with random samples.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span><span class="p">):</span>
@@ -197,6 +221,7 @@
             <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">growTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maxdepth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
             <span class="n">t</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitnessfunction</span><span class="p">)</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Grown tree, adding with id </span><span class="si">{:0x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">t</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addTree</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GPAlgorithm.testInvariant"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.testInvariant">[docs]</a>    <span class="k">def</span> <span class="nf">testInvariant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -264,7 +289,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">addTree</span><span class="p">(</span><span class="n">copyObject</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
         <span class="c1"># Retrim the current population by removing the least fit samples</span>
         <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="o">.</span><span class="n">bottom</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span>
         <span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">diff</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addRandomTree</span><span class="p">()</span></div>
@@ -321,8 +346,11 @@
 <span class="sd">        Select a subset of the current population to operate on.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">))</span>
-        <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="o">.</span><span class="n">removeAll</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Selecting </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tournamentsize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">))</span>
+        <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="o">.</span><span class="n">removeN</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tournamentsize</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Selected </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sel</span><span class="p">))</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tournamentsize</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tournamentsize</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sel</span></div>
 
 <div class="viewcode-block" id="GPAlgorithm.evaluate"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -345,7 +373,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">selection</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span></div>
-        
+
 <div class="viewcode-block" id="GPAlgorithm.requireMutation"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.requireMutation">[docs]</a>    <span class="k">def</span> <span class="nf">requireMutation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">popindex</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decide if mutation is desirable</span>
@@ -357,15 +385,25 @@
 <span class="sd">        Process the new generation.</span>
 <span class="sd">        At the very least, adds modified back to population based on a condition.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">modified</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">modified</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addTree</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-        <span class="k">return</span></div>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">modified</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tournamentsize</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_tournamentsize</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding </span><span class="si">{}</span><span class="s2"> to population </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">modified</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">modified</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addTree</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">remcount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">remcount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">remcount</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addRandomTree</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span> <span class="n">remcount</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="GPAlgorithm.archive"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.archive">[docs]</a>    <span class="k">def</span> <span class="nf">archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modified</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Using the new and previous generation, determine the best specimens and store them.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Inactive archive function called&quot;</span><span class="p">)</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="GPAlgorithm.addToArchive"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.addToArchive">[docs]</a>    <span class="k">def</span> <span class="nf">addToArchive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
@@ -374,7 +412,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archivesize</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">popLast</span><span class="p">()</span></div></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Curtailing archive.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="BruteElitist"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteElitist">[docs]</a><span class="k">class</span> <span class="nc">BruteElitist</span><span class="p">(</span><span class="n">GPAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -386,10 +425,6 @@
 <div class="viewcode-block" id="BruteElitist.__init__"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteElitist.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="p">,</span> <span class="n">maxdepth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="p">,</span> <span class="n">generations</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="p">,</span> <span class="n">maxdepth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="p">,</span> <span class="n">generations</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BruteElitist.select"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteElitist.select">[docs]</a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="o">.</span><span class="n">removeAll</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">s</span></div>
 
 <div class="viewcode-block" id="BruteElitist.evolve"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteElitist.evolve">[docs]</a>    <span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -401,11 +436,12 @@
         <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maxdepth</span>
         <span class="n">rng</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span>
+        <span class="n">tournament</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tournamentsize</span>
 
 
         <span class="n">replacementcount</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">selcount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">selcount</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">selcount</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tournamentsize</span><span class="p">)</span>
 
 
         <span class="c1"># Mutate on entire population, with regard to (scaled) fitness</span>
@@ -413,18 +449,16 @@
         <span class="c1"># is not ideal.</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">selcount</span><span class="p">):</span>
             <span class="n">t</span> <span class="o">=</span> <span class="n">selection</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">candidate</span> <span class="o">=</span> <span class="n">copyObject</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">requireMutation</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-                <span class="k">continue</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">requireMutation</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">candidate</span> <span class="o">=</span> <span class="n">copyObject</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                <span class="n">Mutate</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">candidate</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">equaldepth</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+                <span class="n">candidate</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
 
-            <span class="n">Mutate</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">candidate</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">equaldepth</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
-            <span class="n">candidate</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">getMultiObjectiveFitness</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">getMultiObjectiveFitness</span><span class="p">():</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">)</span>
-                <span class="n">selection</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">candidate</span>
-                <span class="n">replacementcount</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">replacementcount</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">getMultiObjectiveFitness</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">getMultiObjectiveFitness</span><span class="p">():</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">)</span>
+                    <span class="n">selection</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">candidate</span>
+                    <span class="n">replacementcount</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">replacementcount</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
 
 
@@ -438,7 +472,14 @@
             <span class="n">newgen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selection</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">del</span> <span class="n">selection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="n">selector</span> <span class="o">=</span> <span class="n">randomizedConsume</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getSeed</span><span class="p">())</span>
+        <span class="n">selector</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randomconsume</span><span class="p">:</span>
+            <span class="n">toss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">toss</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randomconsumeprobability</span><span class="p">:</span>
+                <span class="n">selector</span> <span class="o">=</span> <span class="n">randomizedConsume</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getSeed</span><span class="p">())</span>
+        <span class="n">selector</span> <span class="o">=</span> <span class="n">selector</span> <span class="k">if</span> <span class="n">selector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">consume</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+
+
         <span class="k">while</span> <span class="n">selection</span><span class="p">:</span>
             <span class="n">left</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
             <span class="n">right</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
@@ -460,45 +501,48 @@
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">newgen</span><span class="p">)</span> <span class="o">==</span> <span class="n">selcount</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">newgen</span><span class="p">,</span> <span class="n">replacementcount</span></div>
 
-<div class="viewcode-block" id="BruteElitist.update"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteElitist.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modified</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Add modified samples back to population, if needed fill population.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">modified</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addTree</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-        <span class="n">remcount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_popsize</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">modified</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">remcount</span><span class="p">):</span>
-            <span class="c1"># Use archive here with probability ?</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addRandomTree</span><span class="p">()</span></div>
-
 <div class="viewcode-block" id="BruteElitist.stopCondition"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteElitist.stopCondition">[docs]</a>    <span class="k">def</span> <span class="nf">stopCondition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Stop if the last @history generation no replacements could be made</span>
+<span class="sd">        Composite stop condition.</span>
+<span class="sd">        Looks at x past generations (set by self._history), then decides if convergence has stalled (std deviation &lt; Constants.FITNESS_EPSILON).</span>
+<span class="sd">        If std deviation is still large enough, do a check of successful replacements. If no operator in the last x generation was able to generate</span>
+<span class="sd">        a single fitter sample, then obviously fitness will not improve any further.</span>
+<span class="sd">        :returns: True if algorithm should halt after this generation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">generations</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_convergencestats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">generations</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_history</span><span class="p">:</span>
             <span class="c1"># not enough data</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># We want to return True if std_fitness &lt; Epsilon for the last x generations</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_history</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConvergenceStat</span><span class="p">(</span><span class="n">generations</span><span class="o">-</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="p">)[</span><span class="s1">&#39;replacements&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
-        <span class="c1"># Add more measures</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConvergenceStat</span><span class="p">(</span><span class="n">generations</span><span class="o">-</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="p">)[</span><span class="s1">&#39;std_fitness&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">Constants</span><span class="o">.</span><span class="n">FITNESS_EPSILON</span><span class="p">:</span>
+                <span class="n">found</span><span class="o">=</span><span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">found</span><span class="p">:</span> <span class="c1"># Still enough variation</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_history</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConvergenceStat</span><span class="p">(</span><span class="n">generations</span><span class="o">-</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="p">)[</span><span class="s1">&#39;replacements&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span> <span class="c1"># enough variation, and replacements</span>
+            <span class="c1"># Replacements are no longer taking place, with enough variation, stop</span>
+        <span class="k">return</span> <span class="kc">True</span> <span class="c1"># No more variation, stop</span></div>
 
 <div class="viewcode-block" id="BruteElitist.archive"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteElitist.archive">[docs]</a>    <span class="k">def</span> <span class="nf">archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modified</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Simple archiving strategy, get best of generation and store.</span>
+<span class="sd">        Simple archiving strategy, get best of generation and store.</span>
+<span class="sd">        If the best tree is present, try remaining values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getBestTree</span><span class="p">()</span>
-        <span class="c1"># TODO clean old pop, if so no copy is needed</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">copyObject</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div></div>
-        
-        
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_population</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addToArchive</span><span class="p">(</span><span class="n">copyObject</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Archive already contains identical tree&quot;</span><span class="p">)</span>
+                <span class="k">break</span></div></div>
+
+
 <div class="viewcode-block" id="BruteCoolingElitist"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteCoolingElitist">[docs]</a><span class="k">class</span> <span class="nc">BruteCoolingElitist</span><span class="p">(</span><span class="n">BruteElitist</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Uses a cooling strategy to apply operators, maximizing gain in the initial process but</span>
-<span class="sd">        reducing cost when gain is no longer possible.</span>
+<span class="sd">    Uses a cooling strategy to apply operators, maximizing gain in the initial process but</span>
+<span class="sd">    reducing cost when gain is no longer possible. The cooling schedule &#39;predicts&#39; efficiency of the operators.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="BruteCoolingElitist.__init__"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteCoolingElitist.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="p">,</span> <span class="n">maxdepth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="p">,</span> <span class="n">generations</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="p">,</span> <span class="n">maxdepth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="p">,</span> <span class="n">generations</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">)</span></div>
@@ -514,30 +558,28 @@
 <div class="viewcode-block" id="probabilityMutate"><a class="viewcode-back" href="../../gp.html#gp.algorithm.probabilityMutate">[docs]</a><span class="k">def</span> <span class="nf">probabilityMutate</span><span class="p">(</span><span class="n">generation</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">generations</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">ranking</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">population</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">rng</span><span class="p">:</span><span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">())</span><span class="o">-&gt;</span><span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate a probability to mutate based on 2 parameters : the current generation and the the ranking of the sample.</span>
-<span class="sd">    </span>
-<span class="sd">    A fitter sample (either by age (generation) or rank) is less likely to gain from mutation, and will even lose fitness. </span>
+
+<span class="sd">    A fitter sample (either by age (generation) or rank) is less likely to gain from mutation, and will even lose fitness.</span>
 <span class="sd">    The probability that random information introduced by mutation leads to a better result compared with evolved information decreases.</span>
 <span class="sd">    This function estimates this probability, thereby avoiding unnecessary mutations and surprisingly leading to faster convergence.</span>
 
 <span class="sd">    :param int ranking: index in a fitness (best first) sorted array</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param int generation: the current generation</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param int generations: total generations allowed</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param int population: total nr of specimens</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param random.Random rng: to reproduce results (optional)</span>
-<span class="sd">    </span>
-<span class="sd">    :rtype: bool true if mutation is considered beneficial</span>
+
+<span class="sd">    :returns bool: true if mutation is considered beneficial</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">generation</span> <span class="o">/</span> <span class="n">generations</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span> 
+    <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">generation</span> <span class="o">/</span> <span class="n">generations</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
     <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="n">ranking</span> <span class="o">/</span> <span class="n">population</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">q</span> <span class="ow">and</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="n">w</span></div>
-    
-    
 </pre></div>
 
           </div>

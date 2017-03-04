@@ -54,6 +54,12 @@
 <em class="property">class </em><code class="descclassname">expression.constants.</code><code class="descname">Constants</code><a class="reference internal" href="_modules/expression/constants.html#Constants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.constants.Constants" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
+<dt id="expression.constants.Constants.COMPLEXITY_WEIGHT">
+<code class="descname">COMPLEXITY_WEIGHT</code><em class="property"> = 0.3</em><a class="headerlink" href="#expression.constants.Constants.COMPLEXITY_WEIGHT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weight used in fitness calculation, this is the weight factor for the fitness score.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="expression.constants.Constants.CONSTANTS_LOWER">
 <code class="descname">CONSTANTS_LOWER</code><em class="property"> = 0</em><a class="headerlink" href="#expression.constants.Constants.CONSTANTS_LOWER" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -61,17 +67,30 @@
 <dl class="attribute">
 <dt id="expression.constants.Constants.CONSTANTS_UPPER">
 <code class="descname">CONSTANTS_UPPER</code><em class="property"> = 1</em><a class="headerlink" href="#expression.constants.Constants.CONSTANTS_UPPER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weight used in fitness calculation, this is the weight factor for the complexity score.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="expression.constants.Constants.FITNESS_EPSILON">
+<code class="descname">FITNESS_EPSILON</code><em class="property"> = 0.0001</em><a class="headerlink" href="#expression.constants.Constants.FITNESS_EPSILON" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="expression.constants.Constants.FITNESS_WEIGHT">
+<code class="descname">FITNESS_WEIGHT</code><em class="property"> = 0.7</em><a class="headerlink" href="#expression.constants.Constants.FITNESS_WEIGHT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complexity upper limit</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="expression.constants.Constants.MAXFITNESS">
-<code class="descname">MAXFITNESS</code><em class="property"> = 1</em><a class="headerlink" href="#expression.constants.Constants.MAXFITNESS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">MAXFITNESS</code><em class="property"> = 0</em><a class="headerlink" href="#expression.constants.Constants.MAXFITNESS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.MAX_COMPLEXITY">
 <code class="descname">MAX_COMPLEXITY</code><em class="property"> = 4</em><a class="headerlink" href="#expression.constants.Constants.MAX_COMPLEXITY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Complexity lower limit</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.MINFITNESS">
@@ -81,7 +100,8 @@
 <dl class="attribute">
 <dt id="expression.constants.Constants.MIN_COMPLEXITY">
 <code class="descname">MIN_COMPLEXITY</code><em class="property"> = 1</em><a class="headerlink" href="#expression.constants.Constants.MIN_COMPLEXITY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Threshold value, indicating when convergence is reached.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.SIZE_LIMIT">
@@ -966,6 +986,13 @@ Fuzz tests all conversion functions.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="expression.tools.consume">
+<code class="descclassname">expression.tools.</code><code class="descname">consume</code><span class="sig-paren">(</span><em>lst: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#consume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.consume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a generator to an element in the list.
+:param lst list: empties the list</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="expression.tools.copyObject">
 <code class="descclassname">expression.tools.</code><code class="descname">copyObject</code><span class="sig-paren">(</span><em>o</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#copyObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.copyObject" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1019,7 +1046,8 @@ Fuzz tests all conversion functions.</p>
 <dt id="expression.tools.pearson">
 <code class="descclassname">expression.tools.</code><code class="descname">pearson</code><span class="sig-paren">(</span><em>actual</em>, <em>expected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#pearson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.pearson" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return Pearson correlation coefficient.</p>
-<p>Calculates correlation between actual and expected, offsetting it so it can be used as a distance function.</p>
+<p>Calculates correlation between actual and expected, offsetting it so it can be used as a distance function.
+The returned value is in the range [0, 1] with 0 optimal distance.</p>
 <div class="math">
 \[r = \frac{\sum{(a-E[a])*(b-E[b])}}{\sqrt{\sum{(a-E[a])^2}*\sum{(b-E[b])^2}}}\]</div>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1032,7 +1060,7 @@ Fuzz tests all conversion functions.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns float:</th><td class="field-body"><p class="first last">2 - r</p>
+<tr class="field-even field"><th class="field-name">Returns float:</th><td class="field-body"><p class="first last">(1 - r)/2</p>
 </td>
 </tr>
 </tbody>
@@ -1232,7 +1260,7 @@ The returned node is never root.</p>
 <dt id="expression.tree.Tree.getScaledComplexity">
 <code class="descname">getScaledComplexity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getScaledComplexity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getScaledComplexity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the functional complexity of this tree.
-This a a ratio in [1.0, 2.0] defining how complex the functions are used in this tree.</p>
+This a a ratio in [0.0, 1.0] defining how complex the functions are used in this tree.</p>
 </dd></dl>
 
 <dl class="staticmethod">

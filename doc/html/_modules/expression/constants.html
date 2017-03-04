@@ -49,17 +49,37 @@
 <div class="viewcode-block" id="Constants"><a class="viewcode-back" href="../../expression.html#expression.constants.Constants">[docs]</a><span class="k">class</span> <span class="nc">Constants</span><span class="p">():</span>
 <div class="viewcode-block" id="Constants.__init__"><a class="viewcode-back" href="../../expression.html#expression.constants.Constants.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
-    <span class="c1">#Fitness function (lower is better)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimum fitness value, lower is better, minimum in this sense means the worst possible value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">MINFITNESS</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
-    <span class="n">MAXFITNESS</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">MAXFITNESS</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># Size limit for exponents</span>
     <span class="n">SIZE_LIMIT</span> <span class="o">=</span> <span class="mi">25</span>
     <span class="c1"># Legal range for constants</span>
     <span class="c1"># Setting this to high values leads to explosion in fitness values</span>
     <span class="n">CONSTANTS_LOWER</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">CONSTANTS_UPPER</span><span class="o">=</span><span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Weight used in fitness calculation, this is the weight factor for the complexity score.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">COMPLEXITY_WEIGHT</span><span class="o">=</span><span class="mf">0.3</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Weight used in fitness calculation, this is the weight factor for the fitness score.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">FITNESS_WEIGHT</span><span class="o">=</span><span class="mf">0.7</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Complexity upper limit</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">MAX_COMPLEXITY</span> <span class="o">=</span> <span class="mi">4</span>
-    <span class="n">MIN_COMPLEXITY</span> <span class="o">=</span> <span class="mi">1</span></div>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Complexity lower limit</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">MIN_COMPLEXITY</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Threshold value, indicating when convergence is reached.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">FITNESS_EPSILON</span> <span class="o">=</span> <span class="mf">1.0e-4</span></div>
 </pre></div>
 
           </div>

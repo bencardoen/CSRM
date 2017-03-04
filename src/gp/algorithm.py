@@ -457,7 +457,11 @@ class BruteElitist(GPAlgorithm):
 
     def stopCondition(self):
         """
-        Stop if the last @history generation no replacements could be made
+        Composite stop condition.
+        Looks at x past generations (set by self._history), then decides if convergence has stalled (std deviation < Constants.FITNESS_EPSILON).
+        If std deviation is still large enough, do a check of successful replacements. If no operator in the last x generation was able to generate
+        a single fitter sample, then obviously fitness will not improve any further.
+        :returns: True if algorithm should halt after this generation.
         """
         generations = len(self._convergencestats[self._phase])
         if generations < self._history:
@@ -491,8 +495,8 @@ class BruteElitist(GPAlgorithm):
 
 class BruteCoolingElitist(BruteElitist):
     """
-        Uses a cooling strategy to apply operators, maximizing gain in the initial process but
-        reducing cost when gain is no longer possible.
+    Uses a cooling strategy to apply operators, maximizing gain in the initial process but
+    reducing cost when gain is no longer possible. The cooling schedule 'predicts' efficiency of the operators.
     """
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases)

@@ -253,6 +253,7 @@
 <span class="sd">    Return Pearson correlation coefficient.</span>
 
 <span class="sd">    Calculates correlation between actual and expected, offsetting it so it can be used as a distance function.</span>
+<span class="sd">    The returned value is in the range [0, 1] with 0 optimal distance.</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        r = \frac{\sum{(a-E[a])*(b-E[b])}}{\sqrt{\sum{(a-E[a])^2}*\sum{(b-E[b])^2}}}</span>
@@ -260,7 +261,7 @@
 
 <span class="sd">    :param actual: Actual values returned by evaluating a single approximation</span>
 <span class="sd">    :param expected: Desired values</span>
-<span class="sd">    :returns float: 2 - r</span>
+<span class="sd">    :returns float: (1 - r)/2</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
@@ -272,8 +273,12 @@
     <span class="n">nom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">va</span><span class="o">*</span><span class="n">vb</span>  <span class="p">)</span>
     <span class="n">denom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">va</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span> <span class="n">vb</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
     <span class="k">if</span> <span class="n">denom</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">2</span>
-    <span class="k">return</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span></div>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># truncate rounding</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span>
+    <span class="k">return</span> <span class="n">r</span></div>
 
 <span class="k">def</span> <span class="nf">_pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
     <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
@@ -301,6 +306,16 @@
         <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
         <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">del</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">yield</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="consume"><a class="viewcode-back" href="../../expression.html#expression.tools.consume">[docs]</a><span class="k">def</span> <span class="nf">consume</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a generator to an element in the list.</span>
+<span class="sd">    :param lst list: empties the list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">listlength</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">listlength</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">item</span></div>
 
 
