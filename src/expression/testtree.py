@@ -15,7 +15,7 @@ from copy import deepcopy
 import logging
 import time
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples
 import os
 import random
 from expression.operators import Mutate, Crossover
@@ -787,6 +787,20 @@ class TreeTest(unittest.TestCase):
             copies[i] = deepcopy(trees[i])
         t1 = time.time()
         total = t1-t0
+
+    def testSampling(self):
+        vpoint = 5
+        dpoint = 20
+        K = 10
+        rng = random.Random()
+        rng.seed(0)
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        Y = [rng.random() for x in range(dpoint)]
+        Xk, Yk = getKSamples(X, Y, 10, rng=rng)
+        self.assertEqual(len(Xk), vpoint)
+        self.assertEqual(len(Xk[0]) , K)
+        self.assertEqual(len(Yk) , K)
+
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)

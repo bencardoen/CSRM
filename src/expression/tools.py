@@ -262,6 +262,31 @@ def randomizedConsume(lst, seed=None):
         del lst[-1]
         yield item
 
+def getKSamples(X, Y, K, rng=None, seed=None):
+    """
+    Return a K-sample of X,Y.
+    X is a 2 dimensional array with f=len(X) features, each having g=len(X[0]) entries. fxg
+    Y is a 1 dimensional vector with g entries : 1xg
+
+    :returns: X', Y' of dimensions (fxk, 1xk) respectively
+    """
+    features = len(X)
+    values = len(X[0])
+    assert(K<= values)
+    _rng = rng or random.Random()
+    if rng is None:
+        _rng.seed(seed or 0)
+    indices = sorted(_rng.sample(range( values ), K))
+    Xk = [[] for _ in range(features)]
+    Yk = []
+    for i in indices:
+        for f in range(features):
+            Xk[f].append(X[f][i])
+        Yk.append(Y[i])
+    return Xk, Yk
+
+
+
 def consume(lst:list):
     """
     Return a generator to an element in the list.
