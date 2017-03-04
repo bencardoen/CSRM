@@ -17,6 +17,7 @@ from expression.operators import Mutate, Crossover
 from expression.tools import generateVariables, rootmeansquare
 from gp.algorithm import GPAlgorithm, BruteElitist, BruteCoolingElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
+from gp.parallelalgorithm import ParallelGP, RandomStaticTopology
 from expression.tree import Tree
 from expression.node import Variable
 from expression.functions import testfunctions, pearsonfitness as _fit
@@ -184,7 +185,8 @@ class GPTest(unittest.TestCase):
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
         g = BruteCoolingElitist(X, Y, popsize=4, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=6)
-        g._tournamentsize=4
+        g.tournamentsize=4
+
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
@@ -193,7 +195,30 @@ class GPTest(unittest.TestCase):
         c.plotOperators()
         c.displayPlots("output", title=expr+"_tournament")
 
+class PGPTest(unittest.TestCase):
+    def testConstruct(self):
+        expr = testfunctions[2]
+        rng = random.Random()
+        rng.seed(0)
+        dpoint = 50
+        vpoint = 5
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
+        logger.debug("Y {} X {}".format(Y, X))
+        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=7, fitnessfunction=_fit, seed=0, generations=20, phases=6)
 
+        topo = RandomStaticTopology(4)
+        pgp = ParallelGP(g, communicationsize=1, topo=topo)
+        for _ in range(pgp.phases):
+            pgp.executePhase()
+
+        stats = pgp.algorithm.getConvergenceStatistics()
+        c = Convergence(stats)
+        c.plotFitness()
+        c.plotComplexity()
+        c.plotOperators()
+        c.displayPlots("output", title=expr+"_tournament")
 
 
 

@@ -66,7 +66,8 @@ class GPAlgorithm():
         self._generations = generations
         self._currentgeneration = 0
         """ Size of the archive : collection of (shared) samples between phases """
-        self._archivesize = archivesize or self._popsize
+        self._archivesize = archivesize or max(self._popsize // Constants.POP_TO_ARCHIVERATIO, 1)
+        assert(self._archivesize > 0)
         # List of generation : tuple of stats
         self._convergencestats = []
         """ History is nr of generations the stop condition investigates to determine a valid condition. E.g. : if the last <x> generations have no mutations, stop."""
@@ -77,6 +78,10 @@ class GPAlgorithm():
         self._phases = phases or 1
         """ Size of tournament, determines which samples compete. """
         self._tournamentsize = tournamentsize or popsize
+        """ Number of samples to archive between phases. """
+        self._archivephase = max(self._archivesize// Constants.ARCHIVE_SELECTION_RATIO, 1)
+        """ Number of samples to use as seed in next phase """
+        self._archivephaseseed = max(self._archivesize// Constants.ARCHIVE_SELECTION_RATIO, 1)
         """
         Randomizing the selection upon which crossover works can improve the quality of the converged results.
         Non random crossover (e.g. best mates with second best) will lead to faster convergence, albeit to a less optimal solution.
@@ -88,17 +93,54 @@ class GPAlgorithm():
         self._randomconsumeprobability = 0.5
         # Parameters : Cooling ?, archive usage, ...
 
+    @property
+    def tournamentsize(self):
+        return self._tournamentsize
+
+    @tournamentsize.setter
+    def tournamentsize(self, value:int):
+        assert(value>0 and value <= self._popsize)
+        self._tournamentsize = value
+
+    @property
+    def phase(self):
+        return self._phase
+
+    @phase.setter
+    def phase(self, value:int):
+        assert(value >= 0)
+        self._phase = value
+
+    @property
+    def phases(self):
+        return self._phases
 
     def getSeed(self):
         """
-            Retrieve seed, and modify it for the next call.
-            Seed is in [0, 0xffffffff]
+        Retrieve seed, and modify it for the next call.
+        Seed is in [0, 0xffffffff]
         """
         s = self._seed
         if s is None:
             return None
         self._seed = self._rng.randint(0, 0xffffffff)
         return s
+
+    def getArchived(self, n:int):
+        # have at least self._archivephase samples
+        assert(len(self._archive))
+        if n > len(self._archive):
+            return self._archive.getAll()
+        else:
+            return self._archive.getN()
+
+    def archiveExternal(self, lst):
+        """
+        Add x in lst to archive, dropping the worst samples to make place if required
+        """
+        logger.info("Adding {} to archive".format(len(lst)))
+        for x in lst:
+            self.addToArchive(x)
 
     def addConvergenceStat(self, generation, stat, phase):
         if len(self._convergencestats) <= phase:
@@ -203,13 +245,6 @@ class GPAlgorithm():
         mean= numpy.mean(fit)
         sd = numpy.std(fit)
         v = numpy.var(fit)
-        # TODO : remove when fitness is scaled.
-        # Truncate outliers
-        for i, f in enumerate(fit):
-            if f > 2000:
-                v = min(mean, 1000)
-                logger.error("Truncating outlier {} to {} for plotting".format(f, v))
-                fit[i] = v
         cmean = numpy.mean(comp)
         csd = numpy.std(comp)
         cv = numpy.var(comp)
@@ -238,8 +273,11 @@ class GPAlgorithm():
         """
             After a run of x generations, reseed the population based on the archive
         """
+        # get a random sample from
         archived = self._archive.getAll()
-        for a in archived:
+        seed = self._rng.sample(archived, self._archivephaseseed)
+
+        for a in seed:
             self.addTree(copyObject(a))
         # Retrim the current population by removing the least fit samples
         while len(self._population) > self._popsize:
@@ -249,6 +287,10 @@ class GPAlgorithm():
             self.addRandomTree()
 
     def restart(self):
+        """
+        Called before a new phase runs, clear the last population and reseeds the new
+        using the archive.
+        """
         self._currentgeneration = 0
         self._population.removeAll()
         self.reseed()
@@ -278,6 +320,7 @@ class GPAlgorithm():
                 self.printForestToDot(self._prefix + "generation_{}_".format(i))
         logger.info("\tArchival")
         self._phase += 1
+        logger.info("Archiving last {} results".format(self._archivephase))
         self.archive(modified)
 
     def executeAlgorithm(self):
@@ -366,7 +409,7 @@ class GPAlgorithm():
         """
         self._archive.add(t)
         if len(self._archive) > self._archivesize:
-            logger.info("Curtailing archive.")
+            logger.debug("Curtailing archive.")
             self._archive.drop()
 
 class BruteElitist(GPAlgorithm):
@@ -483,14 +526,10 @@ class BruteElitist(GPAlgorithm):
     def archive(self, modified):
         """
         Simple archiving strategy, get best of generation and store.
-        If the best tree is present, try remaining values.
         """
-        for t in self._population:
-            if t not in self._archive:
-                self.addToArchive(copyObject(t))
-            else:
-                logger.warning("Archive already contains identical tree")
-                break
+        best = self._population.getN(self._archivephase)
+        for b in best:
+            self.addToArchive(copyObject(b))
 
 
 class BruteCoolingElitist(BruteElitist):

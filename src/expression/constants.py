@@ -34,3 +34,15 @@ class Constants():
     Threshold value, indicating when convergence is reached.
     """
     FITNESS_EPSILON = 1.0e-4
+    """
+    Number of generations to observe when deciding convergence
+    """
+    HISTORY = 5
+    """
+    Influences size of archive
+    """
+    POP_TO_ARCHIVERATIO = 4
+    """
+    Ratio of archive to selection in reseeding/archiving values.
+    """
+    ARCHIVE_SELECTION_RATIO = 4

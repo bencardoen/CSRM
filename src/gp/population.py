@@ -194,7 +194,6 @@ class SetPopulation(Population):
         self.add(item)
 
     def getN(self, n):
-        logger.debug("Getting {} from {}".format(n, self))
         i = self._pop.islice(start=0, stop=n, reverse=False)
         rl = [d for d in i]
         logger.debug("Returning {}, self is {}".format(rl, self))
