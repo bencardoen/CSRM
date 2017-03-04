@@ -6,14 +6,10 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-
-# A parallel GP instance that communicates by passing archived samples
-# It takes a GP instance, and runs it.
-# MPI will handle all processes, in sequential we use a controller to spawn x
-# instances that then use the same mode of operation but execute it in sequence.
 import logging
 import random
-from gp.algorithm import GPAlgorithm
+from analysis.convergence import Convergence
+from gp.algorithm import GPAlgorithm, BruteCoolingElitist
 
 logger = logging.getLogger('global')
 
@@ -64,7 +60,7 @@ class RandomStaticTopology(Topology):
         self._reversemap = {v: k for k,v in enumerate(self._map)}
 
     def __str__(self):
-        return "Topology == {} , reversed = {}".format(self.map, self._reversemap)
+        return "Topology == {} , reversed = {}".format(self._map, self._reversemap)
 
 
 class ParallelGP():
@@ -108,8 +104,46 @@ class ParallelGP():
             return selectedsamples, target
 
     def receive(self, buffer, source:int):
+        """
+        Receive from process *source* buffer
+        """
+        logger.info("Receving at {} from {} buffer {} ".format(self._pid, source, len(buffer)))
         assert(self._topo.getTarget(source) == self._pid)
         self.algorithm.archiveExternal(buffer)
 
         # read commratio*archivesize samples from algorithm, pass them
         # receive the same amount from another instance
+
+class SequentialPGP():
+    """
+    Executes Parallel GP in sequence. Useful to demonstrate speedup, and as a speedup in contrast to the plain GP version.
+    """
+    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, splitData=False):
+        assert(processcount>1)
+        self._processcount=processcount
+        self._processes = []
+        self._topo = topo or RandomStaticTopology(processcount)
+        assert(self._topo is not None)
+        self._phases = 1
+        for i in range(processcount):
+            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=7, fitnessfunction=fitnessfunction, seed=i, generations=30, phases=8)
+            pgp = ParallelGP(g, communicationsize=2, topo=self._topo, pid=i)
+            self._processes.append(pgp)
+            self._phases = pgp.phases
+        logger.info("Topology = \n{}".format(self._topo))
+
+    def executeAlgorithm(self):
+        for _ in range(self._phases):
+            for i, process in enumerate(self._processes):
+                process.executePhase()
+                buf, target = process.send()
+                process.receive(buf, target)
+
+    def reportOutput(self):
+        for i, process in enumerate(self._processes):
+            stats = process.algorithm.getConvergenceStatistics()
+            c = Convergence(stats)
+            c.plotFitness()
+            c.plotComplexity()
+            c.plotOperators()
+            c.displayPlots("output_{}".format(i), title="Sequential Parallel GP for process {}".format(i))

@@ -17,7 +17,7 @@ from expression.operators import Mutate, Crossover
 from expression.tools import generateVariables, rootmeansquare
 from gp.algorithm import GPAlgorithm, BruteElitist, BruteCoolingElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
-from gp.parallelalgorithm import ParallelGP, RandomStaticTopology
+from gp.parallelalgorithm import ParallelGP, RandomStaticTopology, SequentialPGP
 from expression.tree import Tree
 from expression.node import Variable
 from expression.functions import testfunctions, pearsonfitness as _fit
@@ -207,27 +207,9 @@ class PGPTest(unittest.TestCase):
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
         pcount = 4
-        processes = []
-        topo = RandomStaticTopology(4)
-        for i in range(pcount):
-            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=7, fitnessfunction=_fit, seed=i, generations=30, phases=8)
-            pgp = ParallelGP(g, communicationsize=2, topo=topo, pid=i)
-            processes.append(pgp)
-
-        for _ in range(pgp.phases):
-            for i in range(pcount):
-                processes[i].executePhase()
-                buf, target = processes[i].send()
-                processes[target].receive(buf, i)
-
-        for i in range(pcount):
-            pgp = processes[i]
-            stats = pgp.algorithm.getConvergenceStatistics()
-            c = Convergence(stats)
-            c.plotFitness()
-            c.plotComplexity()
-            c.plotOperators()
-            c.displayPlots("output_{}".format(i), title=expr+"_tournament")
+        algo = SequentialPGP(X, Y, pcount, 40, 7, fitnessfunction=_fit, seed=0, generations=25, phases=8, topo=None, splitData=False)
+        algo.executeAlgorithm()
+        algo.reportOutput()
 
 
 
