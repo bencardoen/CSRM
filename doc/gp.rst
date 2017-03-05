@@ -20,6 +20,15 @@ gp.parallelalgorithm module
     :undoc-members:
     :show-inheritance:
 
+gp.topology module
+---------------------------
+
+.. automodule:: gp.topology
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 gp.population module
 --------------------
 

@@ -76,6 +76,13 @@
         <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">i</span></div>
 
+<div class="viewcode-block" id="powerOf2"><a class="viewcode-back" href="../../expression.html#expression.tools.powerOf2">[docs]</a><span class="k">def</span> <span class="nf">powerOf2</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :returns: True if a is a power of 2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># source https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2</span>
+    <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">a</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="rmtocm"><a class="viewcode-back" href="../../expression.html#expression.tools.rmtocm">[docs]</a><span class="k">def</span> <span class="nf">rmtocm</span><span class="p">(</span><span class="n">lst</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a column major equivalent of row major encoded lst</span>
@@ -307,6 +314,51 @@
         <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">del</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">yield</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="getKSamples"><a class="viewcode-back" href="../../expression.html#expression.tools.getKSamples">[docs]</a><span class="k">def</span> <span class="nf">getKSamples</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a K-sample of X,Y.</span>
+<span class="sd">    X is a 2 dimensional array with f=len(X) features, each having g=len(X[0]) entries. fxg</span>
+<span class="sd">    Y is a 1 dimensional vector with g entries : 1xg</span>
+
+<span class="sd">    :returns: X&#39;, Y&#39; of dimensions (fxk, 1xk) respectively</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">K</span><span class="o">&lt;=</span> <span class="n">values</span><span class="p">)</span>
+    <span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span> <span class="n">values</span> <span class="p">),</span> <span class="n">K</span><span class="p">))</span>
+    <span class="n">Xk</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="p">)]</span>
+    <span class="n">Yk</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="p">):</span>
+            <span class="n">Xk</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">Yk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Xk</span><span class="p">,</span> <span class="n">Yk</span></div>
+
+<div class="viewcode-block" id="sampleExclusiveList"><a class="viewcode-back" href="../../expression.html#expression.tools.sampleExclusiveList">[docs]</a><span class="k">def</span> <span class="nf">sampleExclusiveList</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">exclude</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Consume a list, get k random distinct values, with *exclude*</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">lsize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">k</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="n">exclude</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k</span><span class="o">-=</span><span class="mi">1</span>
+            <span class="k">yield</span> <span class="n">item</span></div>
 
 <div class="viewcode-block" id="consume"><a class="viewcode-back" href="../../expression.html#expression.tools.consume">[docs]</a><span class="k">def</span> <span class="nf">consume</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>

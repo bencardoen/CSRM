@@ -54,6 +54,16 @@
 <em class="property">class </em><code class="descclassname">expression.constants.</code><code class="descname">Constants</code><a class="reference internal" href="_modules/expression/constants.html#Constants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.constants.Constants" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
+<dt id="expression.constants.Constants.ARCHIVE_SELECTION_RATIO">
+<code class="descname">ARCHIVE_SELECTION_RATIO</code><em class="property"> = 4</em><a class="headerlink" href="#expression.constants.Constants.ARCHIVE_SELECTION_RATIO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="expression.constants.Constants.BASE_LIMIT">
+<code class="descname">BASE_LIMIT</code><em class="property"> = 10000000000.0</em><a class="headerlink" href="#expression.constants.Constants.BASE_LIMIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="expression.constants.Constants.COMPLEXITY_WEIGHT">
 <code class="descname">COMPLEXITY_WEIGHT</code><em class="property"> = 0.3</em><a class="headerlink" href="#expression.constants.Constants.COMPLEXITY_WEIGHT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight used in fitness calculation, this is the weight factor for the fitness score.</p>
@@ -73,12 +83,19 @@
 <dl class="attribute">
 <dt id="expression.constants.Constants.FITNESS_EPSILON">
 <code class="descname">FITNESS_EPSILON</code><em class="property"> = 0.0001</em><a class="headerlink" href="#expression.constants.Constants.FITNESS_EPSILON" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Number of generations to observe when deciding convergence</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.FITNESS_WEIGHT">
 <code class="descname">FITNESS_WEIGHT</code><em class="property"> = 0.7</em><a class="headerlink" href="#expression.constants.Constants.FITNESS_WEIGHT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Complexity upper limit</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="expression.constants.Constants.HISTORY">
+<code class="descname">HISTORY</code><em class="property"> = 5</em><a class="headerlink" href="#expression.constants.Constants.HISTORY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Influences size of archive</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -104,8 +121,14 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="expression.constants.Constants.POP_TO_ARCHIVERATIO">
+<code class="descname">POP_TO_ARCHIVERATIO</code><em class="property"> = 4</em><a class="headerlink" href="#expression.constants.Constants.POP_TO_ARCHIVERATIO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ratio of archive to selection in reseeding/archiving values.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="expression.constants.Constants.SIZE_LIMIT">
-<code class="descname">SIZE_LIMIT</code><em class="property"> = 25</em><a class="headerlink" href="#expression.constants.Constants.SIZE_LIMIT" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SIZE_LIMIT</code><em class="property"> = 20</em><a class="headerlink" href="#expression.constants.Constants.SIZE_LIMIT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -806,6 +829,11 @@ With selectiondepth set, the target depth for the mutation point can be specifie
 </dd></dl>
 
 <dl class="method">
+<dt id="expression.testtree.TreeTest.testExclusiveList">
+<code class="descname">testExclusiveList</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testExclusiveList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testExclusiveList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.testtree.TreeTest.testExp">
 <code class="descname">testExp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testExp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testExp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -886,6 +914,11 @@ Fuzz tests all conversion functions.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="expression.testtree.TreeTest.testP2">
+<code class="descname">testP2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testP2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testP2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.testtree.TreeTest.testPickleCopyPerformance">
 <code class="descname">testPickleCopyPerformance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testPickleCopyPerformance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testPickleCopyPerformance" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -918,6 +951,11 @@ Fuzz tests all conversion functions.</p>
 <dl class="method">
 <dt id="expression.testtree.TreeTest.testRemove">
 <code class="descname">testRemove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testRemove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testRemove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="expression.testtree.TreeTest.testSampling">
+<code class="descname">testSampling</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testSampling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testSampling" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1025,6 +1063,22 @@ Fuzz tests all conversion functions.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="expression.tools.getKSamples">
+<code class="descclassname">expression.tools.</code><code class="descname">getKSamples</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>K</em>, <em>rng=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#getKSamples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.getKSamples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a K-sample of X,Y.
+X is a 2 dimensional array with f=len(X) features, each having g=len(X[0]) entries. fxg
+Y is a 1 dimensional vector with g entries : 1xg</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">X&#8217;, Y&#8217; of dimensions (fxk, 1xk) respectively</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="expression.tools.matchFloat">
 <code class="descclassname">expression.tools.</code><code class="descname">matchFloat</code><span class="sig-paren">(</span><em>expr: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#matchFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.matchFloat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to parse a floating point expression at begin of expr, return string representation if found or None.</p>
@@ -1075,6 +1129,19 @@ When the generator halts, the list a random permumation (in place).</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="expression.tools.powerOf2">
+<code class="descclassname">expression.tools.</code><code class="descname">powerOf2</code><span class="sig-paren">(</span><em>a: int</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/expression/tools.html#powerOf2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.powerOf2" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if a is a power of 2</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="expression.tools.randomizedConsume">
 <code class="descclassname">expression.tools.</code><code class="descname">randomizedConsume</code><span class="sig-paren">(</span><em>lst</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#randomizedConsume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.randomizedConsume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a generator to a random element in the list without repeating.</p>
@@ -1104,6 +1171,12 @@ When the generator halts, the list a random permumation (in place).</p>
 <dt id="expression.tools.rootmeansquarenormalized">
 <code class="descclassname">expression.tools.</code><code class="descname">rootmeansquarenormalized</code><span class="sig-paren">(</span><em>actual</em>, <em>expected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#rootmeansquarenormalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.rootmeansquarenormalized" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalized RMSE.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="expression.tools.sampleExclusiveList">
+<code class="descclassname">expression.tools.</code><code class="descname">sampleExclusiveList</code><span class="sig-paren">(</span><em>lst</em>, <em>exclude</em>, <em>k</em>, <em>rng=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#sampleExclusiveList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.sampleExclusiveList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Consume a list, get k random distinct values, with <em>exclude</em></p>
 </dd></dl>
 
 <dl class="function">
