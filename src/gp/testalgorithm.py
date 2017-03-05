@@ -17,7 +17,8 @@ from expression.operators import Mutate, Crossover
 from expression.tools import generateVariables, rootmeansquare
 from gp.algorithm import GPAlgorithm, BruteElitist, BruteCoolingElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
-from gp.parallelalgorithm import ParallelGP, RandomStaticTopology, SequentialPGP, TreeTopology, VonNeumannTopology, RandomDynamicTopology, RingTopology
+from gp.parallelalgorithm import ParallelGP, SequentialPGP
+from gp.topology import RandomStaticTopology, TreeTopology, VonNeumannTopology, RandomDynamicTopology, RingTopology
 from expression.tree import Tree
 from expression.node import Variable
 from expression.functions import testfunctions, pearsonfitness as _fit

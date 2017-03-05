@@ -331,7 +331,7 @@ class GPAlgorithm():
         self.run()
         for i in range(self._phases-1):
             self.restart()
-            logger.info("\n\n\n\n Phase {}".format(i+1))
+            logger.info("----Phase {}".format(i+1))
             self.run()
 
 
