@@ -15,7 +15,7 @@ from copy import deepcopy
 import logging
 import time
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2
 import os
 import random
 from expression.operators import Mutate, Crossover
@@ -810,6 +810,13 @@ class TreeTest(unittest.TestCase):
             sl = [next(slg) for x in range(10)]
             self.assertEqual(len(sl), 10)
             self.assertEqual(3 not in sl, True)
+
+    def testP2(self):
+        for i in range(10):
+            self.assertTrue( powerOf2(2**i) )
+        for i in range(2,100):
+            if i%2 != 0:
+                self.assertFalse( powerOf2(i))
 
 
 

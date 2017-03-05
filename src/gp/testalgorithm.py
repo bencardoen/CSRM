@@ -17,7 +17,7 @@ from expression.operators import Mutate, Crossover
 from expression.tools import generateVariables, rootmeansquare
 from gp.algorithm import GPAlgorithm, BruteElitist, BruteCoolingElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
-from gp.parallelalgorithm import ParallelGP, RandomStaticTopology, SequentialPGP
+from gp.parallelalgorithm import ParallelGP, RandomStaticTopology, SequentialPGP, TreeTopology
 from expression.tree import Tree
 from expression.node import Variable
 from expression.functions import testfunctions, pearsonfitness as _fit
@@ -215,6 +215,20 @@ class TopologyTest(unittest.TestCase):
         for i,targets in enumerate(trg):
             for t in targets:
                 self.assertTrue(i in rev[t])
+
+    def testTreeTopology(self):
+        size = 15
+        r = TreeTopology(size)
+        d = size.bit_length()-1
+        a = size - 2**d
+        b = size - 1
+        for i in range(a, b):
+            self.assertTrue(r.isLeaf(i))
+            self.assertTrue(r.getTarget(i) == [])
+        for j in range(0, size - 2**(size.bit_length()-1) ):
+            self.assertFalse(r.isLeaf(j))
+            self.assertTrue(r.getTarget(j) != [])
+        self.assertEqual(r.getSource(0) , [])
 
 
 class PGPTest(unittest.TestCase):

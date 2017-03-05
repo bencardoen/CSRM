@@ -30,6 +30,13 @@ def msb(b):
         i += 1
     return i
 
+def powerOf2(a:int)->bool:
+    """
+    :returns: True if a is a power of 2
+    """
+    # source https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
+    return False if a == 0 else (a & (a-1) == 0)
+
 def rmtocm(lst):
     """
         Return a column major equivalent of row major encoded lst

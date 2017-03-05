@@ -11,7 +11,7 @@ import random
 from analysis.convergence import Convergence
 from math import sqrt
 from gp.algorithm import GPAlgorithm, BruteCoolingElitist
-from expression.tools import sampleExclusiveList
+from expression.tools import sampleExclusiveList, powerOf2
 
 logger = logging.getLogger('global')
 
@@ -94,7 +94,44 @@ class RandomStaticTopology(Topology):
         return rev
 
 
+class TreeTopology(Topology):
+    """
+    Tree structure.
+    Each node sends to its children. Leaves send to None.
+    This is a full binary tree.
+    For N nodes, the tree has (N-1) links, with no cycling dependencies.
+    Communication overhead is minimized, while still allowing for diffusion.
+    With each node generating independently, the pipeline effect is largely avoided.
+    """
+    # TODO, add sibling links, or only in final level
+    def __init__(self, size:int):
+        """
+        :param int size: Number of nodes. Size+1 should be a power of 2
+        """
+        super().__init__(size)
+        assert(powerOf2(size+1))
+        self._depth = size.bit_length()-1
 
+    @property
+    def depth(self):
+        return self._depth
+
+    def getSource(self, target:int):
+        assert(target < self.size)
+        return [] if target == 0 else [(target - 1) // 2]
+
+    def getTarget(self, source:int):
+        assert(source < self.size)
+        return [] if self.isLeaf(source) else [2*self.size + 1, 2*self.size+2]
+
+    def isLeaf(self, node:int)->bool:
+        """
+        Return true if node is a leaf.
+        """
+        assert(node < self.size)
+        # use fact that last level of binary tree with k nodes has 2^log2(k) leaves
+        cutoff = (self.size - 2**self.depth)
+        return node >= cutoff
 
 class RandomDynamicTopology(RandomStaticTopology):
     """
@@ -106,6 +143,7 @@ class RandomDynamicTopology(RandomStaticTopology):
     def recalculate(self):
         self.setMapping()
 
+
 class RingTopology(Topology):
     """
     Simple Ring Topology
@@ -114,7 +152,6 @@ class RingTopology(Topology):
         super.__init__(size)
 
     def getSource(self, target:int):
-        raise NotImplementedError
         return [(target - 1)% self.size]
 
     def getTarget(self, source:int):
