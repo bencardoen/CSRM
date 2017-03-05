@@ -118,11 +118,15 @@ class TreeTopology(Topology):
 
     def getSource(self, target:int):
         assert(target < self.size)
-        return [] if target == 0 else [(target - 1) // 2]
+        v = [] if target == 0 else [(target - 1) // 2]
+        logger.debug("getSource called with {} ->{}".format(target, v))
+        return v
 
     def getTarget(self, source:int):
         assert(source < self.size)
-        return [] if self.isLeaf(source) else [2*self.size + 1, 2*self.size+2]
+        v = [] if self.isLeaf(source) else [2*source + 1, 2*source+2]
+        logger.debug("getTarget called with {} ->{}".format(source, v))
+        return v
 
     def isLeaf(self, node:int)->bool:
         """
@@ -149,7 +153,7 @@ class RingTopology(Topology):
     Simple Ring Topology
     """
     def __init__(self, size:int):
-        super.__init__(size)
+        super().__init__(size)
 
     def getSource(self, target:int):
         return [(target - 1)% self.size]
@@ -168,6 +172,7 @@ class VonNeumannTopology(Topology):
         self.rt = int(sqrt(size))
 
     def getSource(self, target:int):
+        # TODO
         raise NotImplementedError
 
     def getTarget(self, source:int):
@@ -205,12 +210,13 @@ class ParallelGP():
 
     def send(self):
         target = self._topo.getTarget(self._pid)
-        selectedsamples = self.algorithm.getArchived(self._communicationsize)
+        selectedsamples = self.algorithm.getArchived(self._communicationsize * len(target))
         logger.info("Sending from {} to {} buffer of length {}".format(self._pid, target, len(selectedsamples)))
         if self._MPI:
             pass
-            # Send to topology target
-            # retrieve
+            # send to targets
+            # move on
+            # get own targets, wait for all recevied, process
         else:
             return selectedsamples, target
 
@@ -219,8 +225,6 @@ class ParallelGP():
         Receive from process *source* buffer
         """
         logger.info("Receving at {} from {} buffer {} ".format(self._pid, source, len(buffer)))
-        logger.info(self._topo)
-        logger.info(self._topo.getTarget(source))
         assert(self._pid in self._topo.getTarget(source))
         self.algorithm.archiveExternal(buffer)
 
@@ -231,7 +235,7 @@ class SequentialPGP():
     """
     Executes Parallel GP in sequence. Useful to demonstrate speedup, and as a speedup in contrast to the plain GP version.
     """
-    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, splitData=False):
+    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, splitData=False, archivesize=None):
         assert(processcount>1)
         self._processcount=processcount
         self._processes = []
@@ -239,7 +243,7 @@ class SequentialPGP():
         assert(self._topo is not None)
         self._phases = 1
         for i in range(processcount):
-            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=7, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases)
+            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=7, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize)
             pgp = ParallelGP(g, communicationsize=2, topo=self._topo, pid=i)
             self._processes.append(pgp)
             self._phases = pgp.phases
@@ -250,6 +254,13 @@ class SequentialPGP():
             for i, process in enumerate(self._processes):
                 process.executePhase()
                 buf, target = process.send()
+                if not target:
+                    logger.warning("Nothing to send from {}".format(i))
+                    continue
+                targetcount = len(target)
+                # divide bug into equal sized sections
+                slicelength = len(buf) // targetcount
+                buffers = [ buf[i*slicelength : (i+1)*slicelength] for i in range(targetcount)]
                 for t in target:
                     self._processes[t].receive(buf, i)
 

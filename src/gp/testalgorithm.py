@@ -17,7 +17,7 @@ from expression.operators import Mutate, Crossover
 from expression.tools import generateVariables, rootmeansquare
 from gp.algorithm import GPAlgorithm, BruteElitist, BruteCoolingElitist, Constants
 from gp.population import Population, SLWKPopulation, OrderedPopulation, SetPopulation
-from gp.parallelalgorithm import ParallelGP, RandomStaticTopology, SequentialPGP, TreeTopology
+from gp.parallelalgorithm import ParallelGP, RandomStaticTopology, SequentialPGP, TreeTopology, VonNeumannTopology, RandomDynamicTopology, RingTopology
 from expression.tree import Tree
 from expression.node import Variable
 from expression.functions import testfunctions, pearsonfitness as _fit
@@ -246,6 +246,30 @@ class PGPTest(unittest.TestCase):
         algo = SequentialPGP(X, Y, pcount, 40, 7, fitnessfunction=_fit, seed=0, generations=25, phases=8, topo=None, splitData=False)
         algo.executeAlgorithm()
         algo.reportOutput()
+
+    def testAllTopologies(self):
+        expr = testfunctions[2]
+        rng = random.Random()
+        rng.seed(0)
+        dpoint = 20
+        vpoint = 5
+        generations=20
+        depth=7
+        phases=3
+        pcount = 7
+        population = 25
+        archivesize = pcount*2
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
+        logger.debug("Y {} X {}".format(Y, X))
+        #topos = [RandomStaticTopology(pcount), TreeTopology(pcount), VonNeumannTopology(pcount+2), RandomDynamicTopology(pcount), RingTopology(pcount)]
+        topos = [TreeTopology(pcount)]
+        print(topos[0])
+        for t in topos:
+            algo = SequentialPGP(X, Y, pcount, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
+            algo.executeAlgorithm()
+            algo.reportOutput()
 
 
 

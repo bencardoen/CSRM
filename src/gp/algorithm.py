@@ -67,6 +67,7 @@ class GPAlgorithm():
         self._currentgeneration = 0
         """ Size of the archive : collection of (shared) samples between phases """
         self._archivesize = archivesize or max(self._popsize // Constants.POP_TO_ARCHIVERATIO, 1)
+        logger.debug("Archive is set at {} defined by {} max({}//{}, 1)".format(archivesize, self._archivesize, self._popsize, Constants.POP_TO_ARCHIVERATIO))
         assert(self._archivesize > 0)
         # List of generation : tuple of stats
         self._convergencestats = []
@@ -80,6 +81,7 @@ class GPAlgorithm():
         self._tournamentsize = tournamentsize or popsize
         """ Number of samples to archive between phases. """
         self._archivephase = max(self._archivesize// Constants.ARCHIVE_SELECTION_RATIO, 1)
+        logger.debug("Archive sample per phases = {} defined by {} // max({}, 1)".format(self._archivephase, self._archivesize, Constants.ARCHIVE_SELECTION_RATIO))
         """ Number of samples to use as seed in next phase """
         self._archivephaseseed = max(self._archivesize// Constants.ARCHIVE_SELECTION_RATIO, 1)
         """
@@ -250,7 +252,7 @@ class GPAlgorithm():
         csd = numpy.std(comp)
         cv = numpy.var(comp)
         assert(isinstance(replacementcount, list))
-        logger.info("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
+        logger.debug("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
 
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
@@ -420,8 +422,8 @@ class BruteElitist(GPAlgorithm):
         Applies mutation and subtree crossover to entire population and aggresively
         replaces unfit samples.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases)
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None, archivesize=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases, archivesize=archivesize)
 
 
     def evolve(self, selection):
@@ -538,8 +540,8 @@ class BruteCoolingElitist(BruteElitist):
     Uses a cooling strategy to apply operators, maximizing gain in the initial process but
     reducing cost when gain is no longer possible. The cooling schedule 'predicts' efficiency of the operators.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases)
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None, archivesize=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases, archivesize=archivesize)
 
     def requireMutation(self, popindex:int)->bool:
         generation = self._currentgeneration
