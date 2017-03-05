@@ -195,6 +195,28 @@ class GPTest(unittest.TestCase):
         c.plotOperators()
         c.displayPlots("output", title=expr+"_tournament")
 
+class TopologyTest(unittest.TestCase):
+    def testInverse(self):
+        size = 4
+        rs = RandomStaticTopology(size, seed=5)
+        l = [x for x in range(size)]
+        trg = [rs.getTarget(i)[0] for i in range(size)]
+        rev = [rs.getSource(i)[0] for i in range(size)]
+        self.assertEqual(sorted(trg), l)
+        self.assertEqual(sorted(rev), l)
+
+    def testMultiLink(self):
+        size = 4
+        rs = RandomStaticTopology(size, seed=5)
+        l = [x for x in range(size)]
+        trg = [rs.getTarget(i) for i in range(size)]
+        rev = [rs.getSource(i) for i in range(size)]
+        # ensure i -> [a, b, c] => i in rev[a]
+        for i,targets in enumerate(trg):
+            for t in targets:
+                self.assertTrue(i in rev[t])
+
+
 class PGPTest(unittest.TestCase):
     def testConstruct(self):
         expr = testfunctions[2]

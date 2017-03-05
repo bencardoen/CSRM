@@ -12,6 +12,14 @@ gp.algorithm module
     :undoc-members:
     :show-inheritance:
 
+gp.parallelalgorithm module
+---------------------------
+
+.. automodule:: gp.parallelalgorithm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 gp.population module
 --------------------
 

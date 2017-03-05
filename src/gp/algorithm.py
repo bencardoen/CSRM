@@ -509,8 +509,8 @@ class BruteElitist(GPAlgorithm):
         """
         generations = len(self._convergencestats[self._phase])
         if generations < self._history:
-            # not enough data
             return False
+
         # We want to return True if std_fitness < Epsilon for the last x generations
         found = False
         for i in range(self._history):

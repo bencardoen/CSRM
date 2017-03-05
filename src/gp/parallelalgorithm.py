@@ -11,6 +11,7 @@ import random
 from analysis.convergence import Convergence
 from math import sqrt
 from gp.algorithm import GPAlgorithm, BruteCoolingElitist
+from expression.tools import sampleExclusiveList
 
 logger = logging.getLogger('global')
 
@@ -29,48 +30,71 @@ class Topology():
     def getSource(self, target:int)->list:
         raise NotImplementedError
 
+    def __str__(self):
+        return "Topology\n" + "".join(["{} --> {}\n".format(source, self.getTarget(source)) for source in range(self.size)])
+
+
+
 class RandomStaticTopology(Topology):
     def __init__(self, size:int, rng=None, seed=None, links=None):
         super().__init__(size)
         self._rng = rng or random.Random()
         seed = 0 if seed is None else seed
-        self.links = links or 1
+        self._links = links or 1
+        if seed is None:
+            logger.warning("Seed is None for RS Topology, this breaks determinism")
         self._rng.seed(seed)
-        self.setMap()
+        self.setMapping()
 
     @property
     def size(self):
         return self._size
 
+    @property
+    def links(self):
+        return self._links
+
     def getTarget(self, source:int)->list:
-        return [self._map[source]]
+        return self._map[source]
 
     def getSource(self, target:int)->list:
-        raise NotImplementedError
-        return [self._reversemap[target]]
+        return self._reversemap[target]
 
-    def setMap(self):
-        # todo add multilink support
-        repeat = True
-        i = 0
-        map = None
-        while repeat:
-            i += 1
-            repeat = False
-            map = self._rng.sample(range(self._size), self._size)
-            for i, e in enumerate(map):
-                if i == e:
-                    logger.warning("Source {} is Target {}, trying again".format(i, e))
-                    repeat = True
-                    break
-            if i > 10:
-                logger.error("Can't find unique topology!!")
-                raise RuntimeError("Exhausted attempts to generate topology")
-        self._map = map
-        self._reversemap = {v: k for k,v in enumerate(self._map)}
+    def setMapping(self):
+        """
+        Create a mapping where each node is not connected to itself, but to
+        *self._links* nodes. Where only one link is needed, ensure that each node
+        has both a source and target.
+        """
+        self._map = [[] for i in range(self.size)]
+        indices = [x for x in range(self.size)]
+        if self._links == 1:
+            repeat = True
+            while repeat:
+                repeat = False
+                self._rng.shuffle(indices)
+                for index, value in enumerate(indices):
+                    if index == value:
+                        repeat = True
+                        break
+            for index, value in enumerate(indices):
+                self._map[index] = [value]
+        else:
+            for i in range(self.size):
+                del indices[i]
+                self._map[i] = self._rng.sample(indices, self.links)
+                indices.insert(i, i)
+        self._reversemap = self._reverseMapping()
 
-    def __str__(self):
-        return "Topology == {} , reversed = {}".format(self._map, self._reversemap)
+    def _reverseMapping(self):
+        rev = [[] for x in range(self.size)]
+        for index, trglist in enumerate(self._map):
+            for t in trglist:
+                rev[t].append(index)
+        return rev
+
+
+
 
 class RandomDynamicTopology(RandomStaticTopology):
     """
@@ -80,7 +104,7 @@ class RandomDynamicTopology(RandomStaticTopology):
         super().__init__(size)
 
     def recalculate(self):
-        self.setMap()
+        self.setMapping()
 
 class RingTopology(Topology):
     """
@@ -91,7 +115,7 @@ class RingTopology(Topology):
 
     def getSource(self, target:int):
         raise NotImplementedError
-        #return [(target - 1)% self.size]
+        return [(target - 1)% self.size]
 
     def getTarget(self, source:int):
         return [(source+1) % self.size]
@@ -145,7 +169,7 @@ class ParallelGP():
     def send(self):
         target = self._topo.getTarget(self._pid)
         selectedsamples = self.algorithm.getArchived(self._communicationsize)
-        logger.info("Sending to {} buffer {}".format(target, len(selectedsamples)))
+        logger.info("Sending from {} to {} buffer of length {}".format(self._pid, target, len(selectedsamples)))
         if self._MPI:
             pass
             # Send to topology target
@@ -158,6 +182,8 @@ class ParallelGP():
         Receive from process *source* buffer
         """
         logger.info("Receving at {} from {} buffer {} ".format(self._pid, source, len(buffer)))
+        logger.info(self._topo)
+        logger.info(self._topo.getTarget(source))
         assert(self._pid in self._topo.getTarget(source))
         self.algorithm.archiveExternal(buffer)
 
@@ -176,7 +202,7 @@ class SequentialPGP():
         assert(self._topo is not None)
         self._phases = 1
         for i in range(processcount):
-            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=7, fitnessfunction=fitnessfunction, seed=i, generations=30, phases=8)
+            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=7, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases)
             pgp = ParallelGP(g, communicationsize=2, topo=self._topo, pid=i)
             self._processes.append(pgp)
             self._phases = pgp.phases
@@ -188,7 +214,7 @@ class SequentialPGP():
                 process.executePhase()
                 buf, target = process.send()
                 for t in target:
-                    process.receive(buf, t)
+                    self._processes[t].receive(buf, i)
 
     def reportOutput(self):
         for i, process in enumerate(self._processes):
