@@ -27,11 +27,12 @@ class ParallelGP():
         self._pid = pid or 0
         self._communicator = Communicator
         self._ran = False
-        self._sendbuffer = []
-        self._waits = []
+        self._sendbuffer = {}
+        self._waits = {}
         if self.communicator is not None:
             self._pid = self.communicator.Get_rank()
             logger.info("Process {} :: Running on MPI, asigning rank {} as processid".format(self.pid, self.pid))
+        logger.info("Process {} :: Topology is {}".format(self.pid, self.topo))
 
     @property
     def communicator(self):
@@ -48,6 +49,10 @@ class ParallelGP():
     @property
     def pid(self):
         return self._pid
+
+    @property
+    def topo(self):
+        return self._topo
 
     def executePhase(self):
         if self.algorithm.phase >= self.algorithm.phases:
@@ -67,10 +72,9 @@ class ParallelGP():
             self.executePhase()
             logging.info("Process {} :: Parallel sending in  Phase {}".format(self.pid, i))
             self.send()
-            # get my targets
             logging.info("Process {} :: Parallel receiving in  Phase {}".format(self.pid, i))
-            # for each, receive
-            #self.receive()
+            self.receiveCommunications()
+
 
     def splitBuffer(self, buffer, targets):
         """
@@ -78,24 +82,40 @@ class ParallelGP():
         """
         return buffer
 
+    def waitForSendRequests(self):
+        logger.info("Process {} :: MPI, waiting for sendrequests to complete".format(self.pid))
+        for k,v in self._waits.items():
+            logger.info("Process {} :: MPI, waiting for send to {}".format(self.pid, k))
+            v.wait()
+        logger.info("Process {} :: MPI, waiting complete, clearing requests".format(self.pid))
+        self._sendbuffer.clear()
+        self._waits.clear()
+
+
     def send(self):
         target = self._topo.getTarget(self._pid)
         selectedsamples = self.algorithm.getArchived(self._communicationsize * len(target))
         logger.info("Process {} :: Sending from {} to {} buffer of length {}".format(self.pid, self.pid, target, len(selectedsamples)))
         if self.communicator:
-            logger.info("Process {} :: MPI, preparing to send".format(self.pid))
-            # check callbacks
-            pass
+            self.waitForSendRequests()
             for t in target:
-                pass
-                # send async
-                # move on
-                # store callback in state, as wel a buffer
-            # send to targets
-            # move on
-            # get own targets, wait for all recevied, process
+                self._sendbuffer[t] = selectedsamples
+                logger.info("Process {} :: MPI, Sending ASYNC buffer {} to {}".format(self.pid, selectedsamples, t))
+                self._waits[t] = self.communicator.isend(selectedsamples, dest=t, tag=0)
         else:
             return selectedsamples, target
+
+    def receiveCommunications(self):
+        senders = self.topo.getSource(self.pid)
+        logger.info("Process {} :: MPI, Expecting buffers from {}".format(self.pid, senders))
+        received = []
+        for sender in senders:
+            logger.info("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
+            buf = self.communicator.recv(source=sender, tag=0)
+            logger.info("Process {} :: MPI, Received buffer {}".format(self.pid, buf))
+            received += buf
+        self.algorithm.archiveExternal(received)
+
 
     def receive(self, buffer, source:int):
         """

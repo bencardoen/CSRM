@@ -26,7 +26,7 @@ def communicate(communicator):
     received = []
     if r == 1:
         print("{}  is sending ".format(r))
-        communicator.send("abc", dest=0, tag=1)
+        communicator.isend("abc", dest=0, tag=1)
     if communicator.Get_rank() == 0:
         print("{}  is waiting for receipt".format(r))
         received = communicator.recv(source=1, tag=1)
