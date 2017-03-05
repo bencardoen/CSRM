@@ -12,6 +12,9 @@ from analysis.convergence import Convergence
 from math import sqrt
 from gp.algorithm import GPAlgorithm, BruteCoolingElitist
 from expression.tools import sampleExclusiveList, powerOf2
+from mpich.mpi4py import MPI
+import numpy
+import time
 
 logger = logging.getLogger('global')
 
@@ -93,6 +96,9 @@ class RandomStaticTopology(Topology):
                 rev[t].append(index)
         return rev
 
+    def __str__(self):
+        return "RandomStaticTopology with {} links per node ".format(self._links) + super().__str__()
+
 
 class TreeTopology(Topology):
     """
@@ -137,6 +143,9 @@ class TreeTopology(Topology):
         cutoff = (self.size - 2**self.depth)
         return node >= cutoff
 
+    def __str__(self):
+        return "TreeTopology " + super().__str__()
+
 class RandomDynamicTopology(RandomStaticTopology):
     """
     Variation on Static, on demand a new mapping is calculated.
@@ -146,6 +155,9 @@ class RandomDynamicTopology(RandomStaticTopology):
 
     def recalculate(self):
         self.setMapping()
+
+    def __str__(self):
+        return "Dynamic topology with {} links ".format(self.links) + Topology.__str__(self)
 
 
 class RingTopology(Topology):
@@ -161,32 +173,48 @@ class RingTopology(Topology):
     def getTarget(self, source:int):
         return [(source+1) % self.size]
 
+    def __str__(self):
+        return "RingTopology" + super().__str__()
+
 class VonNeumannTopology(Topology):
     """
-    2D grid, with each node connected with 4 nodes
+    2D grid, with each node connected with 4 nodes.
+    Edge nodes are connectect in a cyclic form. E.g. a square of 9 nodes (3x3),
+    node 0 is connected to [8,1,6,3]
     """
     def __init__(self, size:int):
+        """
+        :param int size: an integer square
+        """
         r = sqrt(size)
         assert(int(r)**2 == size)
         super().__init__(size)
         self.rt = int(sqrt(size))
 
     def getSource(self, target:int):
-        # TODO
-        raise NotImplementedError
+        # Symmetric relationship
+        return self.getTarget(target)
 
     def getTarget(self, source:int):
         size = self.size
-        return [(source-1)%size, (source+1)%size, (source+rt)%size, (source-rt)%size]
+        return [(source-1)%size, (source+1)%size, (source+self.rt)%size, (source-self.rt)%size]
+
+    def __str__(self):
+        return "VonNeumannTopology" + super().__str__()
 
 class ParallelGP():
-    def __init__(self, algo:GPAlgorithm, communicationsize:int=None, topo:Topology=None, pid = None, MPI=False):
+    def __init__(self, algo:GPAlgorithm, communicationsize:int=None, topo:Topology=None, pid = None, Communicator = None):
         self._topo = topo
         self._algo = algo
         self._communicationsize = communicationsize or 1
         self._pid = pid or 0
-        self._MPI = MPI
+        self._COMM = None
         self._ran = False
+        self._sendbuffer = []
+        self._waits = []
+        if self._COMM is not None:
+            self._pid = comm.Get_rank()
+            logger.info("Running on MPI, asigning rank {} as processid".format(self._pid))
 
     @property
     def algorithm(self):
@@ -200,7 +228,7 @@ class ParallelGP():
         if self.algorithm.phase >= self.algorithm.phases:
             logger.warning("Exceeding phase count")
             return
-        logger.info("\n\n\n\n Phase {}".format(self.algorithm.phase))
+        logger.info("--Phase-- {}".format(self.algorithm.phase))
         if self._ran == False:
             self.algorithm.phase = 0
             self._ran = True
@@ -208,12 +236,25 @@ class ParallelGP():
             self.algorithm.restart()
         self.algorithm.run()
 
+    def splitBuffer(self, buffer, targets):
+        """
+        Divide buffer of targets using a given policy. Default implementation is copying.
+        """
+        return buffer
+
     def send(self):
         target = self._topo.getTarget(self._pid)
         selectedsamples = self.algorithm.getArchived(self._communicationsize * len(target))
         logger.info("Sending from {} to {} buffer of length {}".format(self._pid, target, len(selectedsamples)))
-        if self._MPI:
+        if self._COMM:
+            logger.info("MPI, preparing to send")
+            # check callbacks
             pass
+            for t in target:
+                pass
+                # send async
+                # move on
+                # store callback in state, as wel a buffer
             # send to targets
             # move on
             # get own targets, wait for all recevied, process
@@ -224,7 +265,7 @@ class ParallelGP():
         """
         Receive from process *source* buffer
         """
-        logger.info("Receving at {} from {} buffer {} ".format(self._pid, source, len(buffer)))
+        logger.info("Receving at {} from {} buffer length {} ".format(self._pid, source, len(buffer)))
         assert(self._pid in self._topo.getTarget(source))
         self.algorithm.archiveExternal(buffer)
 
@@ -272,3 +313,6 @@ class SequentialPGP():
             c.plotComplexity()
             c.plotOperators()
             c.displayPlots("output_{}".format(i), title="Sequential Parallel GP for process {}".format(i))
+
+if __name__ == "__main__":
+    pass

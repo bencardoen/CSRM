@@ -10,6 +10,7 @@ class Constants():
     MAXFITNESS = 0
     # Size limit for exponents
     SIZE_LIMIT = 20
+    BASE_LIMIT = 1e10
     # Legal range for constants
     # Setting this to high values leads to explosion in fitness values
     CONSTANTS_LOWER=0
