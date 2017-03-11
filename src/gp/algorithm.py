@@ -147,6 +147,7 @@ class GPAlgorithm():
         """
         logger.info("Adding {} to archive".format(len(lst)))
         for x in lst:
+            x.updateVariables(self._X)
             self.addToArchive(x)
 
     def addConvergenceStat(self, generation, stat, phase):

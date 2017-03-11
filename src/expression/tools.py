@@ -15,6 +15,7 @@ import random
 import inspect, itertools
 import functools
 import numpy
+import json
 import pickle
 from scipy.stats.stats import pearsonr
 
@@ -74,7 +75,8 @@ def almostEqual(left, right, epsilon):
 def copyObject(o):
     return pickle.loads(pickle.dumps(o, -1))
 
-
+def copyJSON(o):
+    return json.loads(json.dumps(o))
 
 def generateSVG(dotfile: str):
     call(["dot", "-o {}.svg".format(dotfile[-4]), "{}".format(dotfile)])

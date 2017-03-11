@@ -15,7 +15,7 @@ from copy import deepcopy
 import logging
 import time
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2, copyObject
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2, copyObject, copyJSON
 import os
 import random
 from expression.operators import Mutate, Crossover
@@ -836,6 +836,15 @@ class TreeTest(unittest.TestCase):
             self.assertEqual(v.getValues(), X2[v.getIndex()])
             self.assertNotEqual(vmod[i], v)
             self.assertEqual(V[i], v)
+
+    def testCopying(self):
+        vpoint = 5
+        dpoint = 10
+        expr = testfunctions[2]
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        X2 = generateVariables(vpoint, 1, seed=20, sort=True, lower=-10, upper=10)
+        trees = [Tree.createTreeFromExpression(expr, X) for _ in range(1000)]
+        copies = [copyObject(t) for t in trees]
 
 
 
