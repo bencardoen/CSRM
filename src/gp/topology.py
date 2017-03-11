@@ -103,7 +103,6 @@ class TreeTopology(Topology):
     Communication overhead is minimized, while still allowing for diffusion.
     With each node generating independently, the pipeline effect is largely avoided.
     """
-    # TODO, add sibling links, or only in final level
     def __init__(self, size:int):
         """
         :param int size: Number of nodes. Size+1 should be a power of 2

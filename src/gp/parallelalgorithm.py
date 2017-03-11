@@ -83,6 +83,10 @@ class ParallelGP():
         return buffer
 
     def waitForSendRequests(self):
+        """
+        Before initiation a new send operation, ensure our last transmission was completed by checking the stored requests.
+        After this method completes all sent buffers and requests are purged.
+        """
         logger.info("Process {} :: MPI, waiting for sendrequests to complete".format(self.pid))
         for k,v in self._waits.items():
             logger.info("Process {} :: MPI, waiting for send to {}".format(self.pid, k))
@@ -95,7 +99,7 @@ class ParallelGP():
     def send(self):
         target = self._topo.getTarget(self._pid)
         selectedsamples = self.algorithm.getArchived(self._communicationsize * len(target))
-        logger.info("Process {} :: Sending from {} to {} buffer of length {}".format(self.pid, self.pid, target, len(selectedsamples)))
+        logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), target))
         if self.communicator:
             self.waitForSendRequests()
             for t in target:
@@ -106,13 +110,14 @@ class ParallelGP():
             return selectedsamples, target
 
     def receiveCommunications(self):
+        # todo investigate if async calling helps
         senders = self.topo.getSource(self.pid)
         logger.info("Process {} :: MPI, Expecting buffers from {}".format(self.pid, senders))
         received = []
         for sender in senders:
             logger.info("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
             buf = self.communicator.recv(source=sender, tag=0)
-            logger.info("Process {} :: MPI, Received buffer {}".format(self.pid, buf))
+            logger.info("Process {} :: MPI, Received buffer length {}".format(self.pid, len(buf)))
             received += buf
         self.algorithm.archiveExternal(received)
 

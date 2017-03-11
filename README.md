@@ -2,7 +2,7 @@
 
 ### Dependencies ###
 * Python3
-* Sortedcontainers : 
+* Sortedcontainers :
 
     ```
 	$pip3 install sortedcontainers
@@ -19,6 +19,8 @@
     ```
         $pip3 install bokeh
     ```
+* MPI and mpi4py:
+    https://pypi.python.org/pypi/mpi4py
 
 * Optional : graphviz
 

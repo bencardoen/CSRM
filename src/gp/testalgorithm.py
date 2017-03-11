@@ -265,9 +265,6 @@ class PGPTest(unittest.TestCase):
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
         topos = [RandomStaticTopology(pcount), TreeTopology(pcount), VonNeumannTopology(pcount+2), RandomDynamicTopology(pcount), RingTopology(pcount)]
-        #topos = [TreeTopology(pcount)]
-        #topos = [VonNeumannTopology(pcount+2)]
-        print(topos[0])
         for t in topos:
             logger.info("Testing topology {} which is mapped as \n{}\n".format(type(t).__name__, t))
             algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
