@@ -15,7 +15,7 @@ from copy import deepcopy
 import logging
 import time
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2, copyObject
 import os
 import random
 from expression.operators import Mutate, Crossover
@@ -824,23 +824,18 @@ class TreeTest(unittest.TestCase):
         dpoint = 10
         expr = testfunctions[2]
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        X2 = generateVariables(vpoint, 1, seed=20, sort=True, lower=-10, upper=10)
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         V = t.getRoot().getVariables()
-        for v in V:
-            i = v.getIndex()
-            vs = v.getValues()
-            print(vs)
-            vs[0] = 42
-            print(vs)
-        V = t.getRoot().getVariables()
-        for v in V:
-            i = v.getIndex()
-            vs = v.getValues()
-            print(vs)
-            
-
-        print(V)
+        vmod = copyObject(V)
+        t.updateVariables(X2)
+        self.assertNotEqual(vmod, t.getVariables())
+        vn = t.getVariables()
+        for i,v in enumerate(vn):
+            self.assertEqual(v.getValues(), X2[v.getIndex()])
+            self.assertNotEqual(vmod[i], v)
+            self.assertEqual(V[i], v)
 
 
 

@@ -472,6 +472,13 @@ class Tree:
         """
         return [ c.getConstant() for c in self.nodes if c]
 
+    def getVariables(self):
+        return self.getRoot().getVariables()
+
+    def updateVariables(self, newdataset):
+        V = self.getVariables()
+        for v in V:
+            v.setValues(newdataset[v.getIndex()])
 
     def printNodes(self):
         """
