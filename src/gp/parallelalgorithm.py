@@ -161,11 +161,14 @@ class SequentialPGP():
                 for t in target:
                     self._processes[t].receive(buf, i)
 
-    def reportOutput(self):
+    def reportOutput(self, save=False):
         for i, process in enumerate(self._processes):
             stats = process.algorithm.getConvergenceStatistics()
             c = Convergence(stats)
             c.plotFitness()
             c.plotComplexity()
             c.plotOperators()
-            c.displayPlots("output_{}".format(i), title="Sequential Parallel GP for process {}".format(i))
+            if save:
+                c.savePlots("output_{}".format(i), title="Sequential Parallel GP for process {}".format(i))
+            else:
+                c.displayPlots("output_{}".format(i), title="Sequential Parallel GP for process {}".format(i))

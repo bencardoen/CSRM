@@ -153,7 +153,7 @@ class GPTest(unittest.TestCase):
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
-        c.displayPlots("output", title=expr)
+        c.savePlots("output", title=expr)
 
     def testCooling(self):
         expr = testfunctions[2]
@@ -172,7 +172,7 @@ class GPTest(unittest.TestCase):
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
-        c.displayPlots("output", title=expr+"_cooling")
+        c.savePlots("output", title=expr+"_cooling")
 
 
     def testTournament(self):
@@ -194,7 +194,7 @@ class GPTest(unittest.TestCase):
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
-        c.displayPlots("output", title=expr+"_tournament")
+        c.savePlots("output", title=expr+"_tournament")
 
 class TopologyTest(unittest.TestCase):
     def testInverse(self):
@@ -246,7 +246,7 @@ class PGPTest(unittest.TestCase):
         pcount = 4
         algo = SequentialPGP(X, Y, pcount, 40, 7, fitnessfunction=_fit, seed=0, generations=25, phases=8, topo=None, splitData=False)
         algo.executeAlgorithm()
-        algo.reportOutput()
+        algo.reportOutput(save=True)
 
     def testAllTopologies(self):
         expr = testfunctions[2]
@@ -269,9 +269,10 @@ class PGPTest(unittest.TestCase):
         #topos = [VonNeumannTopology(pcount+2)]
         print(topos[0])
         for t in topos:
+            logger.info("Testing topology {} which is mapped as \n{}\n".format(type(t).__name__, t))
             algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
             algo.executeAlgorithm()
-            #algo.reportOutput()
+            algo.reportOutput(save=True)
 
 
 
