@@ -18,6 +18,8 @@ import argparse
 from gp.topology import RandomStaticTopology, topologies
 from gp.parallelalgorithm import ParallelGP, SequentialPGP
 from gp.algorithm import BruteCoolingElitist
+from expression.constants import Constants
+from expression.tools import getKSamples
 
 # Depending on system, mpi4py is either in mpich or global
 try:
@@ -34,18 +36,18 @@ def isMPI():
     return MPI.COMM_WORLD.Get_size() > 1
 
 def runBenchmark(topo=None, processcount = None, outfolder = None):
+    # do a sample, pass each instance the sample
+    # then verify the solution with all instances
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     expr = testfunctions[2]
-    rng = random.Random()
-    rng.seed(0)
     dpoint = 20
     vpoint = 5
-    generations=20
+    generations=25
     depth=7
-    phases=3
+    phases=5
     pcount = comm.Get_size()
-    population = 25
+    population = 40
     archivesize = pcount*2
     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
     t = Tree.createTreeFromExpression(expr, X)
@@ -57,7 +59,9 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
     if isMPI():
         logger.info("Starting MPI Parallel implementation")
         t = topo(pcount)
-        g = BruteCoolingElitist(X, Y, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize)
+        samplecount = int(Constants.SAMPLING_RATIO * len(Y))
+        Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
+        g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize)
         algo = ParallelGP(g, communicationsize=2, topo=t, pid=pid, Communicator=comm)
     else:
         assert(processcount)
@@ -66,8 +70,9 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
-    algo.reportOutput(save=True, outputfolder = outfolder)
+    algo.reportOutput(save=True, outputfolder = outfolder, display=True)
     logger.info("Benchmark complete")
+    # if MPI, merge all results and print
 
 
 
@@ -103,8 +108,6 @@ if __name__ == "__main__":
         outputfolder = args.outputfolder
         if outputfolder[-1] != '/':
             outputfolder += '/'
-    else:
-        assert(False)
 
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)

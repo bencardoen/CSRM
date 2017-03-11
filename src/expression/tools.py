@@ -283,6 +283,8 @@ def getKSamples(X, Y, K, rng=None, seed=None):
     _rng = rng or random.Random()
     if rng is None:
         _rng.seed(seed or 0)
+    if seed is not None:
+        _rng.seed(seed)
     indices = sorted(_rng.sample(range( values ), K))
     Xk = [[] for _ in range(features)]
     Yk = []

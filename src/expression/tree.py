@@ -472,6 +472,7 @@ class Tree:
         """
         return [ c.getConstant() for c in self.nodes if c]
 
+
     def printNodes(self):
         """
         Print nodes to stdout in binary order (root, ... , ith generation, ....)

@@ -105,6 +105,10 @@ class GPAlgorithm():
         self._tournamentsize = value
 
     @property
+    def population(self):
+        return [ x for x in self._population ]
+
+    @property
     def phase(self):
         return self._phase
 

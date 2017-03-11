@@ -252,13 +252,13 @@ class PGPTest(unittest.TestCase):
         expr = testfunctions[2]
         rng = random.Random()
         rng.seed(0)
-        dpoint = 20
+        dpoint = 10
         vpoint = 5
-        generations=20
+        generations=10
         depth=7
-        phases=3
+        phases=2
         pcount = 7
-        population = 25
+        population = 10
         archivesize = pcount*2
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
         t = Tree.createTreeFromExpression(expr, X)

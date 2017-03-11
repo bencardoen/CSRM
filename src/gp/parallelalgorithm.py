@@ -11,7 +11,8 @@ import random
 from analysis.convergence import Convergence
 from math import sqrt
 from gp.algorithm import GPAlgorithm, BruteCoolingElitist
-from expression.tools import sampleExclusiveList, powerOf2
+from expression.tools import sampleExclusiveList, powerOf2, getKSamples
+from expression.constants import Constants
 from gp.topology import Topology, RandomStaticTopology
 import numpy
 import time
@@ -142,7 +143,7 @@ class ParallelGP():
             c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
             c.saveData(title, outputfolder)
         if display:
-            c.displayPlots("output_{}".format(i), title=title)
+            c.displayPlots("output_{}".format(self.pid), title=title)
 
 class SequentialPGP():
     """
@@ -155,8 +156,13 @@ class SequentialPGP():
         self._topo = topo or RandomStaticTopology(processcount)
         assert(self._topo is not None)
         self._phases = 1
+        self._X = X
+        self._Y = Y
+        rng = random.Random()
+        samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         for i in range(processcount):
-            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=7, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize)
+            xsample, ysample = getKSamples(X, Y, samplecount, rng=rng, seed=i)
+            g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=7, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize)
             pgp = ParallelGP(g, communicationsize=2, topo=self._topo, pid=i)
             self._processes.append(pgp)
             self._phases = pgp.phases
@@ -190,3 +196,16 @@ class SequentialPGP():
                 c.saveData(title, outputfolder)
             if display:
                 c.displayPlots("output_{}".format(i), title)
+
+
+
+def scoreResults(X, Y, population, fitnessfunction):
+    """
+    Given a population trained on a subset of X, Y, measure fitness on the full data set.
+    """
+    pass
+    # todo left here
+    # fitnessvalues = []
+    # for p in population:
+    #     p.scoreTree
+    # pass

@@ -47,3 +47,5 @@ class Constants():
     Ratio of archive to selection in reseeding/archiving values.
     """
     ARCHIVE_SELECTION_RATIO = 4
+
+    SAMPLING_RATIO=0.8

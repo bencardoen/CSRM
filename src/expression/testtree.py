@@ -819,6 +819,30 @@ class TreeTest(unittest.TestCase):
                 self.assertFalse( powerOf2(i))
 
 
+    def testSwapVariables(self):
+        vpoint = 5
+        dpoint = 10
+        expr = testfunctions[2]
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
+        V = t.getRoot().getVariables()
+        for v in V:
+            i = v.getIndex()
+            vs = v.getValues()
+            print(vs)
+            vs[0] = 42
+            print(vs)
+        V = t.getRoot().getVariables()
+        for v in V:
+            i = v.getIndex()
+            vs = v.getValues()
+            print(vs)
+            
+
+        print(V)
+
+
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)
