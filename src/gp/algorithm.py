@@ -243,6 +243,25 @@ class GPAlgorithm():
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
+
+    def summarizeSamplingResults(X, Y):
+        for t in self._population:
+            t.updateVariables(X)
+            t.scoreTree(self.Y, self._fitnessfunction)
+        fit = [d.getFitness() for d in self._population]
+        comp = [d.getScaledComplexity() for d in self._population]
+        mean= numpy.mean(fit)
+        sd = numpy.std(fit)
+        v = numpy.var(fit)
+        cmean = numpy.mean(comp)
+        csd = numpy.std(comp)
+        cv = numpy.var(comp)
+
+        return {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
+                    "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp
+                }
+
+
     def summarizeGeneration(self, replacementcount:list, generation:int, phase:int):
         """
             Compute fitness statistics for the current generation and record them

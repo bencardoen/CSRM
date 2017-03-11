@@ -33,7 +33,7 @@ class ParallelGP():
         if self.communicator is not None:
             self._pid = self.communicator.Get_rank()
             logger.info("Process {} :: Running on MPI, asigning rank {} as processid".format(self.pid, self.pid))
-        logger.info("Process {} :: Topology is {}".format(self.pid, self.topo))
+        logger.debug("Process {} :: Topology is {}".format(self.pid, self.topo))
 
     @property
     def communicator(self):
@@ -145,6 +145,12 @@ class ParallelGP():
         if display:
             c.displayPlots("output_{}".format(self.pid), title=title)
 
+    def summarizeResults(self, X, Y):
+        results = self.algorithm.summarizeSamplingResults(X, Y)
+        logging.info("Results so far {}".format(results))
+        # request all data from other processes
+        pass
+
 class SequentialPGP():
     """
     Executes Parallel GP in sequence. Useful to demonstrate speedup, and as a speedup in contrast to the plain GP version.
@@ -196,16 +202,3 @@ class SequentialPGP():
                 c.saveData(title, outputfolder)
             if display:
                 c.displayPlots("output_{}".format(i), title)
-
-
-
-def scoreResults(X, Y, population, fitnessfunction):
-    """
-    Given a population trained on a subset of X, Y, measure fitness on the full data set.
-    """
-    pass
-    # todo left here
-    # fitnessvalues = []
-    # for p in population:
-    #     p.scoreTree
-    # pass
