@@ -194,3 +194,6 @@ class VonNeumannTopology(Topology):
 
     def __str__(self):
         return "VonNeumannTopology" + super().__str__()
+
+
+topologies = {"grid":VonNeumannTopology, "randomstatic":RandomStaticTopology, "randomdynamic":RandomDynamicTopology, "tree":TreeTopology}

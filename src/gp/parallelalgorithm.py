@@ -104,7 +104,7 @@ class ParallelGP():
             self.waitForSendRequests()
             for t in target:
                 self._sendbuffer[t] = selectedsamples
-                logger.info("Process {} :: MPI, Sending ASYNC buffer {} to {}".format(self.pid, selectedsamples, t))
+                logger.info("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), t))
                 self._waits[t] = self.communicator.isend(selectedsamples, dest=t, tag=0)
         else:
             return selectedsamples, target
@@ -130,8 +130,19 @@ class ParallelGP():
         assert(self._pid in self._topo.getTarget(source))
         self.algorithm.archiveExternal(buffer)
 
-        # read commratio*archivesize samples from algorithm, pass them
-        # receive the same amount from another instance
+
+    def reportOutput(self, save=False, display=False, outputfolder=None):
+        stats = self.algorithm.getConvergenceStatistics()
+        c = Convergence(stats)
+        c.plotFitness()
+        c.plotComplexity()
+        c.plotOperators()
+        title="Parallel GP for process {}".format(self.pid)
+        if save:
+            c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
+            c.saveData(title, outputfolder)
+        if display:
+            c.displayPlots("output_{}".format(i), title=title)
 
 class SequentialPGP():
     """
@@ -166,14 +177,16 @@ class SequentialPGP():
                 for t in target:
                     self._processes[t].receive(buf, i)
 
-    def reportOutput(self, save=False):
+    def reportOutput(self, save=False, display=False, outputfolder=None):
         for i, process in enumerate(self._processes):
             stats = process.algorithm.getConvergenceStatistics()
             c = Convergence(stats)
             c.plotFitness()
             c.plotComplexity()
             c.plotOperators()
+            title="Sequential Parallel GP for process {}".format(i)
             if save:
-                c.savePlots("output_{}".format(i), title="Sequential Parallel GP for process {}".format(i))
-            else:
-                c.displayPlots("output_{}".format(i), title="Sequential Parallel GP for process {}".format(i))
+                c.savePlots((outputfolder or "")+"output_{}".format(i), title)
+                c.saveData(title, outputfolder)
+            if display:
+                c.displayPlots("output_{}".format(i), title)

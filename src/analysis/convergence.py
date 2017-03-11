@@ -9,6 +9,7 @@
 from analysis.plot import plotDotData, displayPlot, plotFront, plotLineData, savePlot
 from expression.tools import rmtocm
 import logging
+import json
 logger = logging.getLogger('global')
 
 class Convergence:
@@ -95,3 +96,9 @@ class Convergence:
 
     def savePlots(self, filename, title):
         savePlot(self._plots, filename, title)
+
+    def saveData(self, filename, outputfolder=None):
+        logger.info("writing to output {} in folder {}".format(filename, outputfolder))
+        outputfolder = outputfolder or ""
+        with open(outputfolder+filename, 'w') as filename:
+            json.dump(self._convergencestats, filename, indent=4)

@@ -246,7 +246,7 @@ class PGPTest(unittest.TestCase):
         pcount = 4
         algo = SequentialPGP(X, Y, pcount, 40, 7, fitnessfunction=_fit, seed=0, generations=25, phases=8, topo=None, splitData=False)
         algo.executeAlgorithm()
-        algo.reportOutput(save=True)
+        algo.reportOutput()
 
     def testAllTopologies(self):
         expr = testfunctions[2]
@@ -269,7 +269,7 @@ class PGPTest(unittest.TestCase):
             logger.info("Testing topology {} which is mapped as \n{}\n".format(type(t).__name__, t))
             algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
             algo.executeAlgorithm()
-            algo.reportOutput(save=True)
+            algo.reportOutput()
 
 
 

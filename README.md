@@ -21,6 +21,10 @@
     ```
 * MPI and mpi4py:
     https://pypi.python.org/pypi/mpi4py
+    On Ubuntu a typical install would be
+    ```
+        $sudo apt-get mpich python3-mpi4py
+    ```
 
 * Optional : graphviz
 
@@ -38,6 +42,7 @@ Benchmarks
 
 ```Shell
     $python3 runbenchmarks.py
+    $mpiexec -n 3 python3 -m gp.paralleldriver
 ```
 
 For most of the tests tree are generated, these are written in dot format in the 'output' folder.

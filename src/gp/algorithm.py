@@ -321,7 +321,7 @@ class GPAlgorithm():
             self.testInvariant()
             if self._trace:
                 self.printForestToDot(self._prefix + "generation_{}_".format(i))
-        logger.info("\tArchival")
+        logger.debug("\tArchival")
         self._phase += 1
         logger.info("Archiving last {} results".format(self._archivephase))
         self.archive(modified)

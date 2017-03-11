@@ -14,6 +14,11 @@ from expression.functions import testfunctions, pearsonfitness as _fit
 import random
 from expression.tree import Tree
 from expression.tools import generateVariables
+import argparse
+from gp.topology import RandomStaticTopology, topologies
+from gp.parallelalgorithm import ParallelGP, SequentialPGP
+from gp.algorithm import BruteCoolingElitist
+
 # Depending on system, mpi4py is either in mpich or global
 try:
     from mpich.mpi4py import MPI
@@ -25,14 +30,10 @@ except ImportError as e:
     except ImportError as finale:
         logger.error("FAILED import mpi")
         exit(0)
+def isMPI():
+    return MPI.COMM_WORLD.Get_size() > 1
 
-from gp.topology import RandomStaticTopology
-from gp.parallelalgorithm import ParallelGP
-from gp.algorithm import BruteCoolingElitist
-
-
-
-def testMPI(topo=None):
+def runBenchmark(topo=None, processcount = None, outfolder = None):
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     expr = testfunctions[2]
@@ -50,16 +51,55 @@ def testMPI(topo=None):
     t = Tree.createTreeFromExpression(expr, X)
     Y = t.evaluateAll()
     if topo is None:
+        logger.info("Topology is None, using RStatic")
         topo = RandomStaticTopology
-    t = topo(pcount)
-    g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=7, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize)
-    pgp = ParallelGP(g, communicationsize=2, topo=t, pid=pid, Communicator=comm)
-
-    pgp.executeAlgorithm()
+    algo = None
+    if isMPI():
+        logger.info("Starting MPI Parallel implementation")
+        t = topo(pcount)
+        g = BruteCoolingElitist(X, Y, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize)
+        algo = ParallelGP(g, communicationsize=2, topo=t, pid=pid, Communicator=comm)
+    else:
+        assert(processcount)
+        logger.info("Starting Sequential implementation")
+        t = topo(processcount)
+        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
+    algo.executeAlgorithm()
+    logger.info("Writing output")
+    algo.reportOutput(save=True, outputfolder = outfolder)
     logger.info("Benchmark complete")
 
 
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Start/Stop AWS EC2 instances')
+    parser.add_argument('-t', '--topology', help='space separated ids of instances')
+    parser.add_argument('-p', '--processcount', type=int, help='Number of processes for sequential run')
+    parser.add_argument('-o', '--outputfolder', help="Folder to write data to")
+    parser.add_argument('-d', '--displaystats', help="Wether to dispay convergence statistics for each process")
+    args = parser.parse_args()
+    topo = None
+    if args.topology is not None:
+        toponame = args.topology
+        if toponame not in topologies:
+            logger.error("No such topogoly : should be one of {}".format([k for k in topologies.keys()]))
+            exit(0)
+        else:
+            topo = topologies[toponame]
+    processcount = 1
+    if isMPI():
+        logger.info("Ignoring processcount, using MPI value")
+        processcount = MPI.COMM_WORLD.Get_size()
+    else:
+        if args.processcount:
+            processcount = args.processcount
+            logger.info("using processcount {}".format(processcount))
+        else:
+            logger.error("No process count specified, ABORTING!")
+            exit(0)
+    outputfolder = "../output/"
+    if args.outputfolder:
+        outputfolder = args.outputfolder
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
-    testMPI()
+    runBenchmark(topo, processcount, outfolder = None)
