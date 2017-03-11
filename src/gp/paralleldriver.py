@@ -65,7 +65,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
         t = topo(processcount)
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
     algo.executeAlgorithm()
-    logger.info("Writing output")
+    logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder)
     logger.info("Benchmark complete")
 
@@ -98,8 +98,14 @@ if __name__ == "__main__":
             logger.error("No process count specified, ABORTING!")
             exit(0)
     outputfolder = "../output/"
+    logger.info("Output folder = {}".format(args.outputfolder))
     if args.outputfolder:
         outputfolder = args.outputfolder
+        if outputfolder[-1] != '/':
+            outputfolder += '/'
+    else:
+        assert(False)
+
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
-    runBenchmark(topo, processcount, outfolder = None)
+    runBenchmark(topo, processcount, outfolder=outputfolder)
