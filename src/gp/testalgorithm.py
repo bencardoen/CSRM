@@ -263,8 +263,9 @@ class PGPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        topos = [RandomStaticTopology(pcount), TreeTopology(pcount), VonNeumannTopology(pcount+2), RandomDynamicTopology(pcount), RingTopology(pcount)]
+        topos = [RandomStaticTopology(pcount, rng=rng), RandomStaticTopology(pcount, rng=rng, links=3), TreeTopology(pcount), VonNeumannTopology(pcount+2), RandomDynamicTopology(pcount), RingTopology(pcount)]
         for t in topos:
+            t.toDot("../output/{}.dot".format(t.__class__.__name__))
             logger.info("Testing topology {} which is mapped as \n{}\n".format(type(t).__name__, t))
             algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
             algo.executeAlgorithm()

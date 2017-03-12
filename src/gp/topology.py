@@ -30,6 +30,17 @@ class Topology():
     def __str__(self):
         return "Topology\n" + "".join(["{} --> {}\n".format(source, self.getTarget(source)) for source in range(self.size)])
 
+    def toDot(self, filename):
+        filename = filename or "output.dot"
+        with open(filename, 'w') as handle:
+            handle.write("digraph BST{\n")
+            for i in range(self.size):
+                handle.write( str( i ) + "[label = \"" + "P {}".format(i) + "\"]" "\n")
+            for i in range(self.size):
+                for j in self.getTarget(i):
+                    handle.write( str(i) + " -> " + str(j) + "\n")
+            handle.write("}\n")
+
 
 
 class RandomStaticTopology(Topology):
