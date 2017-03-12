@@ -252,7 +252,8 @@ class GPAlgorithm():
             t.updateVariables(X)
             t.scoreTree(self._Y, self._fitnessfunction)
         try:
-            fit = [d.getFitness() for d in self._population if d.getFitness() != Constants.MINFITNESS]
+            #fit = [d.getFitness() for d in self._population if d.getFitness() != Constants.MINFITNESS]
+            fit = [d.getFitness() if d.getFitness()!= Constants.MINFITNESS else Constants.PEARSONMINFITNESS for d in self._population]
             comp = [d.getScaledComplexity() for d in self._population]
             mean= numpy.mean(fit)
             sd = numpy.std(fit)
