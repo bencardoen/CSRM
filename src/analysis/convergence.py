@@ -12,7 +12,21 @@ import logging
 import json
 logger = logging.getLogger('global')
 
-class Convergence:
+class Plotter():
+    def __init__(self):
+        self._plots = []
+
+    def plotDataPoints(self, X):
+        p= plotDotData(X, labelx="X", labely="Y", title="Data Points")
+        self._plots.append(p)
+
+    def displayPlots(self, filename, title):
+        displayPlot(self._plots, filename, title)
+
+    def savePlots(self, filename, title):
+        savePlot(self._plots, filename, title)
+
+class Convergence(Plotter):
     """
         Utility class to parse and convert convergence statistics.
     """
@@ -84,21 +98,19 @@ class Convergence:
         p = plotFront(X=fitnessvalues, Y=complexity, labelx="Fitness", labely="complexity", title="Front")
         self._plots.append(p)
 
-    def plotDataPoints(self, X):
-        p= plotDotData(X, labelx="X", labely="Y", title="Data Points")
-        self._plots.append(p)
-
-    def displayPlots(self, filename, title):
-        """
-            Collect all plots and write them out to a displayed html file.
-        """
-        displayPlot(self._plots, filename, title)
-
-    def savePlots(self, filename, title):
-        savePlot(self._plots, filename, title)
-
     def saveData(self, filename, outputfolder=None):
         logger.info("writing to output {} in folder {}".format(filename, outputfolder))
         outputfolder = outputfolder or ""
         with open(outputfolder+filename, 'w') as filename:
             json.dump(self._convergencestats, filename, indent=4)
+
+
+class SummarizedResults(Plotter):
+    def __init__(self, results):
+        self._results = results
+
+    def plotFitness(self):
+        pass
+
+    def plotComplexity(self):
+        pass

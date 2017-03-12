@@ -61,7 +61,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
         g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize)
-        algo = ParallelGP(g, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
+        algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
         assert(pcount)
         logger.info("Starting Sequential implementation")
@@ -70,11 +70,8 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=True)
-    algo.summarizeResults(X, Y)
-    collected = algo.collectSummaries(X, Y)
     logger.info("Benchmark complete")
-    if collected:
-        logger.info("Collected results are {}".format(collected))
+
     # if MPI, merge all results and print
 
 

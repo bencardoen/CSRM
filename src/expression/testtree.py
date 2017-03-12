@@ -846,6 +846,15 @@ class TreeTest(unittest.TestCase):
         trees = [Tree.createTreeFromExpression(expr, X) for _ in range(1000)]
         copies = [copyObject(t) for t in trees]
 
+    def testStringCopy(self):
+        vpoint = 5
+        dpoint = 10
+        expr = testfunctions[2]
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        X2 = generateVariables(vpoint, 1, seed=20, sort=True, lower=-10, upper=10)
+        trees = [Tree.createTreeFromExpression(expr, X) for _ in range(1000)]
+        copies = [ Tree.createTreeFromExpression(t.toExpression(), X) for t in trees]
+
 
 
 if __name__=="__main__":

@@ -5,6 +5,8 @@ class Constants():
         pass
     """
     Minimum fitness value, lower is better, minimum in this sense means the worst possible value.
+    Note that the range of fitness values depends on the fitness function. A fitness value
+    of MINFITNESS indicates an invalid specimen (e.g y = x/0)
     """
     MINFITNESS = float('inf')
     MAXFITNESS = 0

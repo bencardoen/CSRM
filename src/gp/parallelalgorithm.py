@@ -8,7 +8,7 @@
 
 import logging
 import random
-from analysis.convergence import Convergence
+from analysis.convergence import Convergence, SummarizedResults
 from math import sqrt
 from gp.algorithm import GPAlgorithm, BruteCoolingElitist
 from expression.tools import sampleExclusiveList, powerOf2, getKSamples
@@ -38,7 +38,7 @@ class ParallelGP():
     Parallel GP Algorithm.
     Executes a composite GP algorithm in parallel, adding communication and synchronization to the algorithm.
     """
-    def __init__(self, algo:GPAlgorithm, communicationsize:int=None, topo:Topology=None, pid = None, Communicator = None):
+    def __init__(self, algo:GPAlgorithm,X, Y, communicationsize:int=None, topo:Topology=None, pid = None, Communicator = None,):
         """
         :param algo: Enclosed algorithm
         :param communicationsize: Nr of samples to request from the algorithm for distribution
@@ -46,6 +46,8 @@ class ParallelGP():
         :param pid: Process id. Either MPI rank or manually set. This value determines the process' location in the topology. (e.g. pid=0 is root in a tree)
         :param Communicator: MPI Comm object
         """
+        self._X = X
+        self._Y = Y
         self._topo = topo
         self._algo = algo
         self._communicationsize = communicationsize or 2
@@ -159,7 +161,7 @@ class ParallelGP():
             received += buf
         self.algorithm.archiveExternal(received)
 
-    def collectSummaries(self, X, Y):
+    def collectSummaries(self):
         """
         If root process, get all summarized results from the other processes.
         If not root, send to root all results.
@@ -168,7 +170,7 @@ class ParallelGP():
         assert(isMPI())
         logger.info("Process {} :: Collecting results ".format(self.pid))
 
-        results = self.summarizeResults(X, Y)
+        results = self.summarizeResults(self._X, self._Y)
         if self.pid == 0:
             collected = [results]
             logger.info("Process {} :: Collecting results as root ".format(self.pid))
@@ -181,7 +183,6 @@ class ParallelGP():
             logger.info("Process {} :: Sending results from {}".format(self.pid, self.pid))
             self.communicator.send(results, dest=0, tag=0)
             return None
-
 
     def receive(self, buffer, source:int):
         """
@@ -209,6 +210,16 @@ class ParallelGP():
             c.saveData(title, outputfolder)
         if display:
             c.displayPlots("output_{}".format(self.pid), title=title)
+        sums = collectSummaries()
+        if sums is not None:
+            s = SummarizedResults(sums)
+            title = "Collected results for all processes"
+            if save:
+                c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
+                s.saveData(title, outputfolder)
+            if display:
+                s.displayPlots("summary", title=title)
+
 
     def summarizeResults(self, X, Y):
         """
@@ -246,7 +257,7 @@ class SequentialPGP():
         for i in range(processcount):
             xsample, ysample = getKSamples(X, Y, samplecount, rng=rng, seed=i)
             g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=maxdepth, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize)
-            pgp = ParallelGP(g, communicationsize=self._communicationsize, topo=self._topo, pid=i)
+            pgp = ParallelGP(g, X, Y, communicationsize=self._communicationsize, topo=self._topo, pid=i)
             self._processes.append(pgp)
             self._phases = pgp.phases
         logger.info("Topology = \n{}".format(self._topo))
@@ -282,10 +293,18 @@ class SequentialPGP():
                 c.saveData(title, outputfolder)
             if display:
                 c.displayPlots("output_{}".format(i), title)
+        sums = self.collectSummaries()
+        s = SummarizedResults(sums)
+        title = "Collected results for all processes"
+        if save:
+            c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
+            s.saveData(title, outputfolder)
+        if display:
+            s.displayPlots("summary", title=title)
 
 
-    def collectSummaries(self, X, Y):
+    def collectSummaries(self):
         """
         From all processes, get summarized results.
         """
-        return [p.summarizeResults(X,Y) for p in self._processes]
+        return [p.summarizeResults(self._X, self._Y) for p in self._processes]

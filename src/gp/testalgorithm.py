@@ -270,8 +270,7 @@ class PGPTest(unittest.TestCase):
             algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
             algo.executeAlgorithm()
             algo.reportOutput()
-            sums = algo.collectSummaries(X, Y)
-            #logger.info("Summarized collected results :: {}".format(sums))
+            
 
 
 
