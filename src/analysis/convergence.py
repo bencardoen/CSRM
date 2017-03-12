@@ -10,6 +10,7 @@ from analysis.plot import plotDotData, displayPlot, plotFront, plotLineData, sav
 from expression.tools import rmtocm
 import logging
 import json
+from expression.tools import copyObject
 logger = logging.getLogger('global')
 
 class Plotter:
@@ -52,6 +53,8 @@ class Convergence(Plotter):
                 generations = len(run[0])
             fitnessvalues += [gen['fitness'] for gen in run]
         converted = rmtocm(fitnessvalues)
+        logger.info("Fitness values for plotting are {}".format(converted))
+        logger.info("{} rows {} cols".format(len(converted), len(converted[0])) )
         p = plotDotData(converted, labelx="Generation", labely="Fitness", title="Fitness")
         self.addPlot(p)
 
@@ -115,9 +118,14 @@ class SummarizedResults(Plotter):
         self._results = results
 
     def plotFitness(self):
-        print(results)
-        # fitness = []
-        # p = plotDotData(fitness, labelx="Generation", labely="Fitness", title="Fitness")
+        processes = len (self._results)
+        fitness = rmtocm([r['fitness'] for r in self._results])
+        logger.info("Fitness values for plotting are {}".format(fitness))
+        logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
+        for i in range(3):
+            p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness")
+            self.addPlot(p)
+
 
 
     def plotComplexity(self):

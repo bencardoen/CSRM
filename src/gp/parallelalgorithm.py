@@ -213,6 +213,7 @@ class ParallelGP():
         sums = collectSummaries()
         if sums is not None:
             s = SummarizedResults(sums)
+            s.plotFitness()
             title = "Collected results for all processes"
             if save:
                 c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
@@ -295,6 +296,7 @@ class SequentialPGP():
                 c.displayPlots("output_{}".format(i), title)
         sums = self.collectSummaries()
         s = SummarizedResults(sums)
+        s.plotFitness()
         title = "Collected results for all processes"
         if save:
             c.savePlots((outputfolder or "")+"output", title=title)
