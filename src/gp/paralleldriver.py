@@ -16,7 +16,7 @@ from expression.tree import Tree
 from expression.tools import generateVariables
 import argparse
 from gp.topology import RandomStaticTopology, topologies
-from gp.parallelalgorithm import ParallelGP, SequentialPGP
+from gp.parallelalgorithm import ParallelGP, SequentialPGP, isMPI
 from gp.algorithm import BruteCoolingElitist
 from expression.constants import Constants
 from expression.tools import getKSamples
@@ -32,12 +32,9 @@ except ImportError as e:
     except ImportError as finale:
         logger.error("FAILED import mpi")
         exit(0)
-def isMPI():
-    return MPI.COMM_WORLD.Get_size() > 1
+
 
 def runBenchmark(topo=None, processcount = None, outfolder = None):
-    # do a sample, pass each instance the sample
-    # then verify the solution with all instances
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     expr = testfunctions[2]
@@ -46,7 +43,8 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
     generations=25
     depth=7
     phases=5
-    pcount = comm.Get_size()
+    pcount = 1
+    pcount = comm.Get_size() if isMPI() else processcount
     population = 40
     archivesize = pcount*2
     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
@@ -64,9 +62,9 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
         g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize)
         algo = ParallelGP(g, communicationsize=2, topo=t, pid=pid, Communicator=comm)
     else:
-        assert(processcount)
+        assert(pcount)
         logger.info("Starting Sequential implementation")
-        t = topo(processcount)
+        t = topo(pcount)
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
@@ -74,7 +72,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
     algo.summarizeResults(X, Y)
     logger.info("Benchmark complete")
     # if MPI, merge all results and print
-    
+
 
 
 

@@ -19,6 +19,7 @@ import logging
 import math
 import numpy
 logger = logging.getLogger('global')
+numpy.seterr('raise')
 
 
 class GPAlgorithm():
@@ -246,11 +247,11 @@ class GPAlgorithm():
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
 
-    def summarizeSamplingResults(X, Y):
+    def summarizeSamplingResults(self, X, Y):
         for t in self._population:
             t.updateVariables(X)
-            t.scoreTree(self.Y, self._fitnessfunction)
-        fit = [d.getFitness() for d in self._population]
+            t.scoreTree(self._Y, self._fitnessfunction)
+        fit = [Constants.MAXFITNESS if d.getFitness() is None else d.getFitness() for d in self._population]
         comp = [d.getScaledComplexity() for d in self._population]
         mean= numpy.mean(fit)
         sd = numpy.std(fit)

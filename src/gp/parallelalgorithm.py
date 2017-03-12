@@ -16,9 +16,22 @@ from expression.constants import Constants
 from gp.topology import Topology, RandomStaticTopology
 import numpy
 import time
-
 logger = logging.getLogger('global')
+# Depending on system, mpi4py is either in mpich or global
+try:
+    from mpich.mpi4py import MPI
+    logger.info("Using mpi4py with mpich import")
+except ImportError as e:
+    try:
+        from mpi4py import MPI
+        logger.info("Using mpi4py without mpich import")
+    except ImportError as finale:
+        logger.error("FAILED import mpi")
+        exit(0)
 
+
+def isMPI():
+    return MPI.COMM_WORLD.Get_size() > 1
 
 class ParallelGP():
     """
@@ -145,6 +158,33 @@ class ParallelGP():
             logger.info("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
             received += buf
         self.algorithm.archiveExternal(received)
+
+    def collectResults(self, X, Y):
+        """
+        If root process, get all summarized results from the other processes.
+        If not root, send to root all results.
+        :returns : None if not pid==0, else all collectResults
+        """
+        assert(isMPI())
+        logger.info("Process {} :: Collecting results ".format(self.pid))
+
+        results = self.algorithm.summarizeSamplingResults(X, Y)
+        if self.pid == 0:
+            collected = [results]
+            logger.info("Process {} :: Collecting results as root ".format(self.pid))
+            for processid in range(1,self._communicator.Get_size()):
+                resi = self.communicator.recv(source=processid, tag=0)
+                collected.append(resi)
+                logger.info("Process {} :: Collected results from {}".format(self.pid, processid))
+            # for p in other processes
+            # result += self.getResults
+            # results = self.communicator.
+            # append own
+        else:
+            logger.info("Process {} :: Sending results from {}".format(self.pid, self.pid))
+            results = self.algorithm.summarizeSamplingResults(X, Y)
+            self.communicator.send(results, dest=0, tag=0)
+            return None
 
 
     def receive(self, buffer, source:int):
