@@ -409,6 +409,14 @@ Executes a composite GP algorithm in parallel, adding communication and synchron
 <code class="descname">algorithm</code><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.algorithm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="gp.parallelalgorithm.ParallelGP.collectResults">
+<code class="descname">collectResults</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.collectResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.collectResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>If root process, get all summarized results from the other processes.
+If not root, send to root all results.
+:returns : None if not pid==0, else all collectResults</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="gp.parallelalgorithm.ParallelGP.communicator">
 <code class="descname">communicator</code><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.communicator" title="Permalink to this definition">¶</a></dt>
@@ -556,6 +564,11 @@ This is a driver class for the ParallelGP class, to be used when MPI is not acti
 </dd></dl>
 
 </dd></dl>
+
+<dl class="function">
+<dt id="gp.parallelalgorithm.isMPI">
+<code class="descclassname">gp.parallelalgorithm.</code><code class="descname">isMPI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#isMPI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.isMPI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-gp.topology">
@@ -741,6 +754,14 @@ node 0 is connected to [8,1,6,3]</p>
 <dd></dd></dl>
 
 </dd></dl>
+
+</div>
+<div class="section" id="module-gp.paralleldriver">
+<span id="gp-paralleldriver-module"></span><h2>gp.paralleldriver module<a class="headerlink" href="#module-gp.paralleldriver" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="gp.paralleldriver.runBenchmark">
+<code class="descclassname">gp.paralleldriver.</code><code class="descname">runBenchmark</code><span class="sig-paren">(</span><em>topo=None</em>, <em>processcount=None</em>, <em>outfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/paralleldriver.html#runBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.paralleldriver.runBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-gp.population">
@@ -1055,6 +1076,7 @@ and membership testing using hashes.</p>
 <li><a class="reference internal" href="#module-gp.algorithm">gp.algorithm module</a></li>
 <li><a class="reference internal" href="#module-gp.parallelalgorithm">gp.parallelalgorithm module</a></li>
 <li><a class="reference internal" href="#module-gp.topology">gp.topology module</a></li>
+<li><a class="reference internal" href="#module-gp.paralleldriver">gp.paralleldriver module</a></li>
 <li><a class="reference internal" href="#module-gp.population">gp.population module</a></li>
 <li><a class="reference internal" href="#module-gp.testalgorithm">gp.testalgorithm module</a></li>
 <li><a class="reference internal" href="#module-gp">Module contents</a></li>
