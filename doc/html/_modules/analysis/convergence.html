@@ -55,6 +55,7 @@
 <span class="kn">from</span> <span class="nn">analysis.plot</span> <span class="k">import</span> <span class="n">plotDotData</span><span class="p">,</span> <span class="n">displayPlot</span><span class="p">,</span> <span class="n">plotFront</span><span class="p">,</span> <span class="n">plotLineData</span><span class="p">,</span> <span class="n">savePlot</span>
 <span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">rmtocm</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Convergence"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.Convergence">[docs]</a><span class="k">class</span> <span class="nc">Convergence</span><span class="p">:</span>
@@ -140,7 +141,13 @@
         <span class="n">displayPlot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plots</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Convergence.savePlots"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.Convergence.savePlots">[docs]</a>    <span class="k">def</span> <span class="nf">savePlots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
-        <span class="n">savePlot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plots</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span></div></div>
+        <span class="n">savePlot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plots</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Convergence.saveData"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.Convergence.saveData">[docs]</a>    <span class="k">def</span> <span class="nf">saveData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">outputfolder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;writing to output </span><span class="si">{}</span><span class="s2"> in folder </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">outputfolder</span><span class="p">))</span>
+        <span class="n">outputfolder</span> <span class="o">=</span> <span class="n">outputfolder</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_convergencestats</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

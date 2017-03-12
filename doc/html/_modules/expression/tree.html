@@ -518,6 +518,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span> <span class="n">c</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="k">if</span> <span class="n">c</span><span class="p">]</span></div>
 
+<div class="viewcode-block" id="Tree.getVariables"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getVariables">[docs]</a>    <span class="k">def</span> <span class="nf">getVariables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRoot</span><span class="p">()</span><span class="o">.</span><span class="n">getVariables</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Tree.updateVariables"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.updateVariables">[docs]</a>    <span class="k">def</span> <span class="nf">updateVariables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newdataset</span><span class="p">):</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getVariables</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">V</span><span class="p">:</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">setValues</span><span class="p">(</span><span class="n">newdataset</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">getIndex</span><span class="p">()])</span></div>
+
 <div class="viewcode-block" id="Tree.printNodes"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.printNodes">[docs]</a>    <span class="k">def</span> <span class="nf">printNodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Print nodes to stdout in binary order (root, ... , ith generation, ....)</span>

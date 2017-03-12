@@ -127,6 +127,11 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="expression.constants.Constants.SAMPLING_RATIO">
+<code class="descname">SAMPLING_RATIO</code><em class="property"> = 0.8</em><a class="headerlink" href="#expression.constants.Constants.SAMPLING_RATIO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="expression.constants.Constants.SIZE_LIMIT">
 <code class="descname">SIZE_LIMIT</code><em class="property"> = 20</em><a class="headerlink" href="#expression.constants.Constants.SIZE_LIMIT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -786,6 +791,11 @@ With selectiondepth set, the target depth for the mutation point can be specifie
 </dd></dl>
 
 <dl class="method">
+<dt id="expression.testtree.TreeTest.testCopying">
+<code class="descname">testCopying</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testCopying"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testCopying" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.testtree.TreeTest.testCrossover">
 <code class="descname">testCrossover</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testCrossover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testCrossover" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test subtree crossover operation with random trees.</p>
@@ -959,6 +969,11 @@ Fuzz tests all conversion functions.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="expression.testtree.TreeTest.testSwapVariables">
+<code class="descname">testSwapVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testSwapVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testSwapVariables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.testtree.TreeTest.testTokenize">
 <code class="descname">testTokenize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testTokenize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testTokenize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1029,6 +1044,11 @@ Fuzz tests all conversion functions.</p>
 <dd><p>Return a generator to an element in the list.
 :param lst list: empties the list</p>
 </dd></dl>
+
+<dl class="function">
+<dt id="expression.tools.copyJSON">
+<code class="descclassname">expression.tools.</code><code class="descname">copyJSON</code><span class="sig-paren">(</span><em>o</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#copyJSON"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.copyJSON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.copyObject">
@@ -1336,6 +1356,11 @@ The returned node is never root.</p>
 This a a ratio in [0.0, 1.0] defining how complex the functions are used in this tree.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="expression.tree.Tree.getVariables">
+<code class="descname">getVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getVariables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="expression.tree.Tree.growTree">
 <em class="property">static </em><code class="descname">growTree</code><span class="sig-paren">(</span><em>variables</em>, <em>depth: int</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.growTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.growTree" title="Permalink to this definition">¶</a></dt>
@@ -1470,6 +1495,11 @@ Will swap out subtrees at equal depth.</p>
 <code class="descname">toExpression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.toExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.toExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print the tree to an infix expression.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="expression.tree.Tree.updateVariables">
+<code class="descname">updateVariables</code><span class="sig-paren">(</span><em>newdataset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.updateVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.updateVariables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

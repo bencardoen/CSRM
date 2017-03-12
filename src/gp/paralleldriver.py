@@ -74,6 +74,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
     algo.summarizeResults(X, Y)
     logger.info("Benchmark complete")
     # if MPI, merge all results and print
+    
 
 
 

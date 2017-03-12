@@ -167,7 +167,8 @@ a single fitter sample, then obviously fitness will not improve any further.
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.archiveExternal">
 <code class="descname">archiveExternal</code><span class="sig-paren">(</span><em>lst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.archiveExternal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.archiveExternal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add x in lst to archive, dropping the worst samples to make place if required</p>
+<dd><p>Add x in lst to archive, dropping the worst samples to make place if required
+Each sample will have its variable set updated to match the rest of the population.</p>
 </dd></dl>
 
 <dl class="method">
@@ -250,6 +251,11 @@ Seed is in [0, 0xffffffff]</p>
 <code class="descname">phases</code><a class="headerlink" href="#gp.algorithm.GPAlgorithm.phases" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="gp.algorithm.GPAlgorithm.population">
+<code class="descname">population</code><a class="headerlink" href="#gp.algorithm.GPAlgorithm.population" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.printForest">
 <code class="descname">printForest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.printForest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.printForest" title="Permalink to this definition">¶</a></dt>
@@ -319,6 +325,11 @@ called methods to alter behavior</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.summarizeSamplingResults">
+<code class="descname">summarizeSamplingResults</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.summarizeSamplingResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.summarizeSamplingResults" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.testInvariant">
 <code class="descname">testInvariant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.testInvariant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.testInvariant" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -369,12 +380,29 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 <span id="gp-parallelalgorithm-module"></span><h2>gp.parallelalgorithm module<a class="headerlink" href="#module-gp.parallelalgorithm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="gp.parallelalgorithm.ParallelGP">
-<em class="property">class </em><code class="descclassname">gp.parallelalgorithm.</code><code class="descname">ParallelGP</code><span class="sig-paren">(</span><em>algo: gp.algorithm.GPAlgorithm</em>, <em>communicationsize: int = None</em>, <em>topo: gp.topology.Topology = None</em>, <em>pid=None</em>, <em>Communicator=None</em>, <em>splitData=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.parallelalgorithm.</code><code class="descname">ParallelGP</code><span class="sig-paren">(</span><em>algo: gp.algorithm.GPAlgorithm</em>, <em>communicationsize: int = None</em>, <em>topo: gp.topology.Topology = None</em>, <em>pid=None</em>, <em>Communicator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Parallel GP Algorithm.
+Executes a composite GP algorithm in parallel, adding communication and synchronization to the algorithm.</p>
 <dl class="method">
 <dt id="gp.parallelalgorithm.ParallelGP.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>algo: gp.algorithm.GPAlgorithm</em>, <em>communicationsize: int = None</em>, <em>topo: gp.topology.Topology = None</em>, <em>pid=None</em>, <em>Communicator=None</em>, <em>splitData=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>algo: gp.algorithm.GPAlgorithm</em>, <em>communicationsize: int = None</em>, <em>topo: gp.topology.Topology = None</em>, <em>pid=None</em>, <em>Communicator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>algo</strong> &#8211; Enclosed algorithm</li>
+<li><strong>communicationsize</strong> &#8211; Nr of samples to request from the algorithm for distribution</li>
+<li><strong>topo</strong> &#8211; topology to use in communications</li>
+<li><strong>pid</strong> &#8211; Process id. Either MPI rank or manually set. This value determines the process&#8217; location in the topology. (e.g. pid=0 is root in a tree)</li>
+<li><strong>Communicator</strong> &#8211; MPI Comm object</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="gp.parallelalgorithm.ParallelGP.algorithm">
@@ -389,12 +417,15 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 <dl class="method">
 <dt id="gp.parallelalgorithm.ParallelGP.executeAlgorithm">
 <code class="descname">executeAlgorithm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.executeAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.executeAlgorithm" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Main driver method</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="gp.parallelalgorithm.ParallelGP.executePhase">
 <code class="descname">executePhase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.executePhase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.executePhase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run a single phase of the algorithm.
+This step executes a limited number of generations (depending on the algorithm)</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="gp.parallelalgorithm.ParallelGP.phases">
@@ -415,17 +446,43 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 <dl class="method">
 <dt id="gp.parallelalgorithm.ParallelGP.receiveCommunications">
 <code class="descname">receiveCommunications</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.receiveCommunications"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.receiveCommunications" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Receive incoming samples (blocking) and update the algorithm</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.parallelalgorithm.ParallelGP.reportOutput">
+<code class="descname">reportOutput</code><span class="sig-paren">(</span><em>save=False</em>, <em>display=False</em>, <em>outputfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.reportOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.reportOutput" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>save</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Save results to file</li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Display results in browser (WARNING : CPU intensive for large sets)</li>
+<li><strong>outputfolder</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; modify output directory</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="gp.parallelalgorithm.ParallelGP.send">
 <code class="descname">send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.send" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Retrieve samples from the algorithm, lookup targets in the topology and send them.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="gp.parallelalgorithm.ParallelGP.splitBuffer">
 <code class="descname">splitBuffer</code><span class="sig-paren">(</span><em>buffer</em>, <em>targets</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.splitBuffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.splitBuffer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Divide buffer of targets using a given policy. Default implementation is copying.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.parallelalgorithm.ParallelGP.summarizeResults">
+<code class="descname">summarizeResults</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.summarizeResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.summarizeResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>After the algorithm has completed, collect results on the entire data set (ict samples)</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -436,19 +493,44 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 <dl class="method">
 <dt id="gp.parallelalgorithm.ParallelGP.waitForSendRequests">
 <code class="descname">waitForSendRequests</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.waitForSendRequests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.waitForSendRequests" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Before initiation a new send operation, ensure our last transmission was completed by checking the stored requests.
+After this method completes all sent buffers and requests are purged.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="gp.parallelalgorithm.SequentialPGP">
-<em class="property">class </em><code class="descclassname">gp.parallelalgorithm.</code><code class="descname">SequentialPGP</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>splitData=False</em>, <em>archivesize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.parallelalgorithm.</code><code class="descname">SequentialPGP</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>splitData=False</em>, <em>archivesize=None</em>, <em>communicationsize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Executes Parallel GP in sequence. Useful to demonstrate speedup, and as a speedup in contrast to the plain GP version.</p>
+<p>Executes Parallel GP in sequential mode, controlling a set of processes.
+This is a driver class for the ParallelGP class, to be used when MPI is not active.</p>
 <dl class="method">
 <dt id="gp.parallelalgorithm.SequentialPGP.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>splitData=False</em>, <em>archivesize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>splitData=False</em>, <em>archivesize=None</em>, <em>communicationsize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>X</strong> &#8211; Input data set, a set of points per feature.</li>
+<li><strong>Y</strong> &#8211; Output data set to approximate</li>
+<li><strong>processcount</strong> &#8211; Number of active processes</li>
+<li><strong>popsize</strong> &#8211; Population (per process instance)</li>
+<li><strong>maxdepth</strong> &#8211; Maximum depth of a tree</li>
+<li><strong>communicationsize</strong> &#8211; Nr of samples sent per process</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.parallelalgorithm.SequentialPGP.collectSummaries">
+<code class="descname">collectSummaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.collectSummaries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.collectSummaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>From all processes, get summarized results.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="gp.parallelalgorithm.SequentialPGP.executeAlgorithm">
@@ -457,8 +539,21 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 
 <dl class="method">
 <dt id="gp.parallelalgorithm.SequentialPGP.reportOutput">
-<code class="descname">reportOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.reportOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.reportOutput" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">reportOutput</code><span class="sig-paren">(</span><em>save=False</em>, <em>display=False</em>, <em>outputfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.reportOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.reportOutput" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>save</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Save results to file</li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Display results in browser (WARNING : CPU intensive for large sets)</li>
+<li><strong>outputfolder</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; modify output directory</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 

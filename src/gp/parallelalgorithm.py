@@ -21,10 +21,21 @@ logger = logging.getLogger('global')
 
 
 class ParallelGP():
-    def __init__(self, algo:GPAlgorithm, communicationsize:int=None, topo:Topology=None, pid = None, Communicator = None, splitData=False):
+    """
+    Parallel GP Algorithm.
+    Executes a composite GP algorithm in parallel, adding communication and synchronization to the algorithm.
+    """
+    def __init__(self, algo:GPAlgorithm, communicationsize:int=None, topo:Topology=None, pid = None, Communicator = None):
+        """
+        :param algo: Enclosed algorithm
+        :param communicationsize: Nr of samples to request from the algorithm for distribution
+        :param topo: topology to use in communications
+        :param pid: Process id. Either MPI rank or manually set. This value determines the process' location in the topology. (e.g. pid=0 is root in a tree)
+        :param Communicator: MPI Comm object
+        """
         self._topo = topo
         self._algo = algo
-        self._communicationsize = communicationsize or 1
+        self._communicationsize = communicationsize or 2
         self._pid = pid or 0
         self._communicator = Communicator
         self._ran = False
@@ -56,6 +67,10 @@ class ParallelGP():
         return self._topo
 
     def executePhase(self):
+        """
+        Run a single phase of the algorithm.
+        This step executes a limited number of generations (depending on the algorithm)
+        """
         if self.algorithm.phase >= self.algorithm.phases:
             logger.warning("Process {} :: Exceeding phase count".format(self.pid))
             return
@@ -68,6 +83,9 @@ class ParallelGP():
         self.algorithm.run()
 
     def executeAlgorithm(self):
+        """
+        Main driver method
+        """
         for i in range(self.phases):
             logging.info("Process {} :: Parallel executing Phase {}".format(self.pid, i))
             self.executePhase()
@@ -88,16 +106,19 @@ class ParallelGP():
         Before initiation a new send operation, ensure our last transmission was completed by checking the stored requests.
         After this method completes all sent buffers and requests are purged.
         """
-        logger.info("Process {} :: MPI, waiting for sendrequests to complete".format(self.pid))
+        logger.debug("Process {} :: MPI, waiting for sendrequests to complete".format(self.pid))
         for k,v in self._waits.items():
-            logger.info("Process {} :: MPI, waiting for send to {}".format(self.pid, k))
+            logger.debug("Process {} :: MPI, waiting for send to {}".format(self.pid, k))
             v.wait()
-        logger.info("Process {} :: MPI, waiting complete, clearing requests".format(self.pid))
+        logger.debug("Process {} :: MPI, waiting complete, clearing requests".format(self.pid))
         self._sendbuffer.clear()
         self._waits.clear()
 
 
     def send(self):
+        """
+        Retrieve samples from the algorithm, lookup targets in the topology and send them.
+        """
         target = self._topo.getTarget(self._pid)
         selectedsamples = self.algorithm.getArchived(self._communicationsize * len(target))
         logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), target))
@@ -105,20 +126,23 @@ class ParallelGP():
             self.waitForSendRequests()
             for t in target:
                 self._sendbuffer[t] = selectedsamples
-                logger.info("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), t))
+                logger.debug("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), t))
                 self._waits[t] = self.communicator.isend(selectedsamples, dest=t, tag=0)
         else:
             return selectedsamples, target
 
     def receiveCommunications(self):
+        """
+        Receive incoming samples (blocking) and update the algorithm
+        """
         # todo investigate if async calling helps
         senders = self.topo.getSource(self.pid)
         logger.info("Process {} :: MPI, Expecting buffers from {}".format(self.pid, senders))
         received = []
         for sender in senders:
-            logger.info("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
-            buf = self.communicator.recv(source=sender, tag=0)
-            logger.info("Process {} :: MPI, Received buffer length {}".format(self.pid, len(buf)))
+            logger.debug("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
+            buf = self.communicator.recv(source=sender, tag=0) # todo extend tag usage
+            logger.info("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
             received += buf
         self.algorithm.archiveExternal(received)
 
@@ -133,6 +157,11 @@ class ParallelGP():
 
 
     def reportOutput(self, save=False, display=False, outputfolder=None):
+        """
+        :param bool save: Save results to file
+        :param bool display: Display results in browser (WARNING : CPU intensive for large sets)
+        :param str outputfolder: modify output directory
+        """
         stats = self.algorithm.getConvergenceStatistics()
         c = Convergence(stats)
         c.plotFitness()
@@ -146,16 +175,27 @@ class ParallelGP():
             c.displayPlots("output_{}".format(self.pid), title=title)
 
     def summarizeResults(self, X, Y):
+        """
+        After the algorithm has completed, collect results on the entire data set (ict samples)
+        """
         results = self.algorithm.summarizeSamplingResults(X, Y)
         logging.info("Results so far {}".format(results))
-        # request all data from other processes
-        pass
+        return results
 
 class SequentialPGP():
     """
-    Executes Parallel GP in sequence. Useful to demonstrate speedup, and as a speedup in contrast to the plain GP version.
+    Executes Parallel GP in sequential mode, controlling a set of processes.
+    This is a driver class for the ParallelGP class, to be used when MPI is not active.
     """
-    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, splitData=False, archivesize=None):
+    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, splitData=False, archivesize=None, communicationsize=None):
+        """
+        :param X: Input data set, a set of points per feature.
+        :param Y: Output data set to approximate
+        :param processcount: Number of active processes
+        :param popsize: Population (per process instance)
+        :param maxdepth: Maximum depth of a tree
+        :param communicationsize: Nr of samples sent per process
+        """
         assert(processcount>1)
         self._processcount=processcount
         self._processes = []
@@ -164,12 +204,13 @@ class SequentialPGP():
         self._phases = 1
         self._X = X
         self._Y = Y
+        self._communicationsize = communicationsize or 2
         rng = random.Random()
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         for i in range(processcount):
             xsample, ysample = getKSamples(X, Y, samplecount, rng=rng, seed=i)
-            g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=7, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize)
-            pgp = ParallelGP(g, communicationsize=2, topo=self._topo, pid=i)
+            g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=maxdepth, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize)
+            pgp = ParallelGP(g, communicationsize=self._communicationsize, topo=self._topo, pid=i)
             self._processes.append(pgp)
             self._phases = pgp.phases
         logger.info("Topology = \n{}".format(self._topo))
@@ -183,13 +224,16 @@ class SequentialPGP():
                     logger.warning("Nothing to send from {}".format(i))
                     continue
                 targetcount = len(target)
-                # divide buf into equal sized sections
-                slicelength = len(buf) // targetcount
-                buffers = [ buf[i*slicelength : (i+1)*slicelength] for i in range(targetcount)]
+                # todo align with parallel approach
                 for t in target:
                     self._processes[t].receive(buf, i)
 
     def reportOutput(self, save=False, display=False, outputfolder=None):
+        """
+        :param bool save: Save results to file
+        :param bool display: Display results in browser (WARNING : CPU intensive for large sets)
+        :param str outputfolder: modify output directory
+        """
         for i, process in enumerate(self._processes):
             stats = process.algorithm.getConvergenceStatistics()
             c = Convergence(stats)
@@ -202,3 +246,10 @@ class SequentialPGP():
                 c.saveData(title, outputfolder)
             if display:
                 c.displayPlots("output_{}".format(i), title)
+
+
+    def collectSummaries(self):
+        """
+        From all processes, get summarized results.
+        """
+        return [p.summarizeResults() for p in self._processes]

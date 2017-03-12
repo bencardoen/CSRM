@@ -144,6 +144,7 @@ class GPAlgorithm():
     def archiveExternal(self, lst):
         """
         Add x in lst to archive, dropping the worst samples to make place if required
+        Each sample will have its variable set updated to match the rest of the population.
         """
         logger.info("Adding {} to archive".format(len(lst)))
         for x in lst:
