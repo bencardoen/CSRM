@@ -46,6 +46,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
     pcount = 1
     pcount = comm.Get_size() if isMPI() else processcount
     population = 40
+    commsize = 2
     archivesize = pcount*2
     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
     t = Tree.createTreeFromExpression(expr, X)
@@ -60,17 +61,20 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
         g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize)
-        algo = ParallelGP(g, communicationsize=2, topo=t, pid=pid, Communicator=comm)
+        algo = ParallelGP(g, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
         assert(pcount)
         logger.info("Starting Sequential implementation")
         t = topo(pcount)
-        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
+        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize, communicationsize=commsize)
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=True)
     algo.summarizeResults(X, Y)
+    collected = algo.collectSummaries(X, Y)
     logger.info("Benchmark complete")
+    if collected:
+        logger.info("Collected results are {}".format(collected))
     # if MPI, merge all results and print
 
 
@@ -91,6 +95,7 @@ if __name__ == "__main__":
             exit(0)
         else:
             topo = topologies[toponame]
+            logger.info("Chosen topology {}".format(topo))
     processcount = 1
     if isMPI():
         logger.info("Ignoring processcount, using MPI value")

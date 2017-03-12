@@ -159,7 +159,7 @@ class ParallelGP():
             received += buf
         self.algorithm.archiveExternal(received)
 
-    def collectResults(self, X, Y):
+    def collectSummaries(self, X, Y):
         """
         If root process, get all summarized results from the other processes.
         If not root, send to root all results.
@@ -168,7 +168,7 @@ class ParallelGP():
         assert(isMPI())
         logger.info("Process {} :: Collecting results ".format(self.pid))
 
-        results = self.algorithm.summarizeSamplingResults(X, Y)
+        results = self.summarizeResults(X, Y)
         if self.pid == 0:
             collected = [results]
             logger.info("Process {} :: Collecting results as root ".format(self.pid))
@@ -176,13 +176,9 @@ class ParallelGP():
                 resi = self.communicator.recv(source=processid, tag=0)
                 collected.append(resi)
                 logger.info("Process {} :: Collected results from {}".format(self.pid, processid))
-            # for p in other processes
-            # result += self.getResults
-            # results = self.communicator.
-            # append own
+            return collected
         else:
             logger.info("Process {} :: Sending results from {}".format(self.pid, self.pid))
-            results = self.algorithm.summarizeSamplingResults(X, Y)
             self.communicator.send(results, dest=0, tag=0)
             return None
 
@@ -288,8 +284,8 @@ class SequentialPGP():
                 c.displayPlots("output_{}".format(i), title)
 
 
-    def collectSummaries(self):
+    def collectSummaries(self, X, Y):
         """
         From all processes, get summarized results.
         """
-        return [p.summarizeResults() for p in self._processes]
+        return [p.summarizeResults(X,Y) for p in self._processes]

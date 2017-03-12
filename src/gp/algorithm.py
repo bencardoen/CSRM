@@ -241,7 +241,7 @@ class GPAlgorithm():
 
     def printForestToDot(self, prefix):
         """
-            Write out the entire population to .dot files with prefix
+        Write out the entire population to .dot files with prefix
         """
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
@@ -251,14 +251,17 @@ class GPAlgorithm():
         for t in self._population:
             t.updateVariables(X)
             t.scoreTree(self._Y, self._fitnessfunction)
-        fit = [Constants.MAXFITNESS if d.getFitness() is None else d.getFitness() for d in self._population]
-        comp = [d.getScaledComplexity() for d in self._population]
-        mean= numpy.mean(fit)
-        sd = numpy.std(fit)
-        v = numpy.var(fit)
-        cmean = numpy.mean(comp)
-        csd = numpy.std(comp)
-        cv = numpy.var(comp)
+        try:
+            fit = [d.getFitness() for d in self._population if d.getFitness() != Constants.MINFITNESS]
+            comp = [d.getScaledComplexity() for d in self._population]
+            mean= numpy.mean(fit)
+            sd = numpy.std(fit)
+            v = numpy.var(fit)
+            cmean = numpy.mean(comp)
+            csd = numpy.std(comp)
+            cv = numpy.var(comp)
+        except FloatingPointError as e:
+            logger.error("Floating point error on values fit {} ".format(fit))
 
         return {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
                     "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp

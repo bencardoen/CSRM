@@ -119,8 +119,7 @@ class GPTest(unittest.TestCase):
         g = BruteElitist(X, Y, popsize=20, maxdepth=6, fitnessfunction=_fit, seed=0, generations=10)
         g.run()
         g.printForestToDot(outputfolder+"firstresult_extended")
-        #g.run()
-        #g.printForestToDot(outputfolder+"secondresult_extended")
+
 
     def testBmark(self):
         expr = testfunctions[1]
@@ -244,7 +243,7 @@ class PGPTest(unittest.TestCase):
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
         pcount = 4
-        algo = SequentialPGP(X, Y, pcount, 40, 7, fitnessfunction=_fit, seed=0, generations=25, phases=8, topo=None, splitData=False)
+        algo = SequentialPGP(X, Y, pcount, 20, 7, fitnessfunction=_fit, seed=0, generations=15, phases=4, topo=None, splitData=False)
         algo.executeAlgorithm()
         algo.reportOutput()
 
@@ -270,6 +269,8 @@ class PGPTest(unittest.TestCase):
             algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
             algo.executeAlgorithm()
             algo.reportOutput()
+            sums = algo.collectSummaries(X, Y)
+            #logger.info("Summarized collected results :: {}".format(sums))
 
 
 
