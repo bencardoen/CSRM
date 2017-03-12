@@ -40,12 +40,12 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
     expr = testfunctions[2]
     dpoint = 20
     vpoint = 5
-    generations=25
+    generations=10
     depth=7
-    phases=5
+    phases=2
     pcount = 1
     pcount = comm.Get_size() if isMPI() else processcount
-    population = 40
+    population = 10
     commsize = 2
     archivesize = pcount*2
     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)

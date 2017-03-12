@@ -297,7 +297,7 @@ class SequentialPGP():
         s = SummarizedResults(sums)
         title = "Collected results for all processes"
         if save:
-            c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
+            c.savePlots((outputfolder or "")+"output", title=title)
             s.saveData(title, outputfolder)
         if display:
             s.displayPlots("summary", title=title)

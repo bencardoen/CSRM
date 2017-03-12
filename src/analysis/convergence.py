@@ -12,7 +12,7 @@ import logging
 import json
 logger = logging.getLogger('global')
 
-class Plotter():
+class Plotter:
     def __init__(self):
         self._plots = []
 
@@ -26,14 +26,17 @@ class Plotter():
     def savePlots(self, filename, title):
         savePlot(self._plots, filename, title)
 
+    def addPlot(self, p):
+        self._plots.append(p)
+
 class Convergence(Plotter):
     """
         Utility class to parse and convert convergence statistics.
     """
     def __init__(self, convergencestats):
+        super().__init__()
         self._convergencestats = convergencestats
         self._runs = len(self._convergencestats)
-        self._plots = []
 
     def plotFitness(self):
         """
@@ -50,7 +53,7 @@ class Convergence(Plotter):
             fitnessvalues += [gen['fitness'] for gen in run]
         converted = rmtocm(fitnessvalues)
         p = plotDotData(converted, labelx="Generation", labely="Fitness", title="Fitness")
-        self._plots.append(p)
+        self.addPlot(p)
 
     def plotComplexity(self):
         """
@@ -67,7 +70,8 @@ class Convergence(Plotter):
         converted = rmtocm(cvalues)
         logger.debug("Have {} runs and {} generations".format(runs, generations))
         p = plotDotData(converted, labelx="Generation", labely="Complexity", title="Complexity")
-        self._plots.append(p)
+        self.addPlot(p)
+
 
     def plotOperators(self):
         """
@@ -85,7 +89,7 @@ class Convergence(Plotter):
             cvalues[0] += [gen['mutations'] for gen in run]
             cvalues[1] += [gen['crossovers'] for gen in run]
         p = plotLineData(cvalues, labelx="Generation", labely="Successful operations", title="Modifications", legend=["Mutations","Crossovers"])
-        self._plots.append(p)
+        self.addPlot(p)
 
     def plotPareto(self):
         """
@@ -96,7 +100,7 @@ class Convergence(Plotter):
         complexity = run[-1]['complexity']
         logger.debug("Plotting fitness {} against complexity {}".format(fitnessvalues, complexity))
         p = plotFront(X=fitnessvalues, Y=complexity, labelx="Fitness", labely="complexity", title="Front")
-        self._plots.append(p)
+        self.addPlot(p)
 
     def saveData(self, filename, outputfolder=None):
         logger.info("writing to output {} in folder {}".format(filename, outputfolder))
@@ -107,10 +111,20 @@ class Convergence(Plotter):
 
 class SummarizedResults(Plotter):
     def __init__(self, results):
+        super().__init__()
         self._results = results
 
     def plotFitness(self):
-        pass
+        print(results)
+        # fitness = []
+        # p = plotDotData(fitness, labelx="Generation", labely="Fitness", title="Fitness")
+
 
     def plotComplexity(self):
         pass
+
+    def saveData(self, filename, outputfolder=None):
+        logger.info("writing to output {} in folder {}".format(filename, outputfolder))
+        outputfolder = outputfolder or ""
+        with open(outputfolder+filename, 'w') as filename:
+            json.dump(self._results, filename, indent=4)
