@@ -9,6 +9,7 @@ class Constants():
     of MINFITNESS indicates an invalid specimen (e.g y = x/0)
     """
     MINFITNESS = float('inf')
+    """ Worst value of fitness in the scaled pearson r fitness function"""
     PEARSONMINFITNESS = 1
     MAXFITNESS = 0
     # Size limit for exponents

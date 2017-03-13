@@ -55,17 +55,15 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
         logger.info("Topology is None, using RStatic")
         topo = RandomStaticTopology
     algo = None
+    t = topo(pcount)
     if isMPI():
         logger.info("Starting MPI Parallel implementation")
-        t = topo(pcount)
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
         g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize)
         algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
-        assert(pcount)
         logger.info("Starting Sequential implementation")
-        t = topo(pcount)
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize, communicationsize=commsize)
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
@@ -80,9 +78,10 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Start/Stop AWS EC2 instances')
     parser.add_argument('-t', '--topology', help='space separated ids of instances')
-    parser.add_argument('-p', '--processcount', type=int, help='Number of processes for sequential run')
+    parser.add_argument('-c', '--processcount', type=int, help='Number of processes for sequential run')
     parser.add_argument('-o', '--outputfolder', help="Folder to write data to")
     parser.add_argument('-d', '--displaystats', help="Wether to dispay convergence statistics for each process")
+    parser.add_argument('-p', '--poplulation', type=int, help="Population per instance")
     args = parser.parse_args()
     topo = None
     if args.topology is not None:
