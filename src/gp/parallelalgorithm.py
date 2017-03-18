@@ -145,7 +145,7 @@ class ParallelGP():
             self.waitForSendRequests()
             for index, target in enumerate(targets):
                 self._sendbuffer[target] = buf[index]
-                logger.debug("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), t))
+                logger.debug("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), target))
                 self._waits[target] = self.communicator.isend(buf[index], dest=target, tag=0)
         else:
             return buf, targets
@@ -213,14 +213,15 @@ class ParallelGP():
             c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
             c.saveData(title, outputfolder)
         if display:
-            c.displayPlots("output_{}".format(self.pid), title=title)
-        sums = collectSummaries()
+            if not isMPI():
+                c.displayPlots("output_{}".format(self.pid), title=title)
+        sums = self.collectSummaries()
         if sums is not None:
             s = SummarizedResults(sums)
             s.plotFitness()
             title = "Collected results for all processes"
             if save:
-                c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
+                s.savePlots((outputfolder or "")+"collected", title=title)
                 s.saveData(title, outputfolder)
             if display:
                 s.displayPlots("summary", title=title)
@@ -301,7 +302,7 @@ class SequentialPGP():
         s.plotFitness()
         title = "Collected results for all processes"
         if save:
-            c.savePlots((outputfolder or "")+"output", title=title)
+            s.savePlots((outputfolder or "")+"collected", title=title)
             s.saveData(title, outputfolder)
         if display:
             s.displayPlots("summary", title=title)

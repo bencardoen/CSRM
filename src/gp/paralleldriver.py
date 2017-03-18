@@ -34,18 +34,17 @@ except ImportError as e:
         exit(0)
 
 
-def runBenchmark(topo=None, processcount = None, outfolder = None, display=False):
+def runBenchmark(topo=None, processcount = None, outfolder = None, display=False, generations=None, population=None, phases=None):
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     expr = testfunctions[2]
     dpoint = 20
     vpoint = 5
-    generations=20
-    depth=7
-    phases=5
-    pcount = 1
+    generations= generations or 20
+    depth=5
+    phases= phases or 1
     pcount = comm.Get_size() if isMPI() else processcount
-    population = 30
+    population = population or 20
     commsize = 2
     archivesize = pcount*2
     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
@@ -79,10 +78,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Start/Stop AWS EC2 instances')
     parser.add_argument('-t', '--topology', help='space separated ids of instances')
     parser.add_argument('-c', '--processcount', type=int, help='Number of processes for sequential run')
+    parser.add_argument('-g', '--generations', type=int, help='Number of generations')
+    parser.add_argument('-f', '--phases', type=int, help='Number of phases')
     parser.add_argument('-o', '--outputfolder', help="Folder to write data to")
     parser.add_argument('-d', '--displaystats', action='store_true', help="Wether to dispay convergence statistics for each process")
-    parser.add_argument('-p', '--poplulation', type=int, help="Population per instance")
+    parser.add_argument('-p', '--population', type=int, help="Population per instance")
     args = parser.parse_args()
+    print(args)
     topo = None
     if args.topology is not None:
         toponame = args.topology
@@ -110,6 +112,9 @@ if __name__ == "__main__":
         if outputfolder[-1] != '/':
             outputfolder += '/'
     displaystats = True if args.displaystats else False
+    generations =  args.generations
+    population = args.population
+    phases = args.phases
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
-    runBenchmark(topo, processcount, outfolder=outputfolder, display=displaystats)
+    runBenchmark(topo, processcount, outfolder=outputfolder, display=displaystats, generations=generations, population=population, phases=phases)
