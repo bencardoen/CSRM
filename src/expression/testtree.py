@@ -735,35 +735,46 @@ class TreeTest(unittest.TestCase):
 
 
     def testDistanceFunctions(self):
-        # Staging test for distance functions: test for overflow/ div by zero
-        a = [1 for d in range(10)]
-        b = a[:]
-        rmse = rootmeansquare(a,b)
-        nrmse = rootmeansquarenormalized(a,b)
-        self.assertEqual(rmse, 0)
+#         # Staging test for distance functions: test for overflow/ div by zero
+#         a = [1 for d in range(10)]
+#         b = a[:]
+#         rmse = rootmeansquare(a,b)
+#         nrmse = rootmeansquarenormalized(a,b)
+#         self.assertEqual(rmse, 0)
+#
+#         a = [1 for d in range(10)]
+#         b = a[:]
+#         rmse = rootmeansquare(a,b)
+#         nrmse = rootmeansquarenormalized(a,b)
+#         self.assertEqual(rmse, 0)
+#
+#         a = [1,3,4,4]
+#         b = [2,5,5,8]
+#         rmse = rootmeansquare(a,b)
+#         nrmse = rootmeansquarenormalized(a,b)
+#         p = pearson(a,b)
+#         _p = _pearson(a,b)
+# #        print(rmse, nrmse, p, _p)
+#
+#         a = [random.uniform(1,100) for d in range(100)]
+#         b = [50 for d in range(100)]
+#         rmse = rootmeansquare(a,b)
+#         nrmse = rootmeansquarenormalized(a,b)
+#         p = pearson(a,b)
+#         _p = _pearson(a,b)
+#
+# #        print(rmse, nrmse, p, _p)
+        a = [0.0096416794856030164, 0.0096416794856030164, 0.0096416794856030164, 0.26241624623590931, 0.27751012100799344, 0.29467203565038796, 0.36028300074390873, 0.36028300074390873, 1, 0.3901901995195628]
+        b = [0.0093714999389968856, 0.0093714999389968856, 0.0093714999389968856, 0.26110518104903135, 0.27141310496620774, 0.29636300309085484, 0.30491503735452846, 0.30491503735452846, 0.30755147098842195, 0.35777767106738589]
+        fvalue = pearson(a,b)
+        self.assertNotEqual(fvalue, 1)
 
-        a = [1 for d in range(10)]
-        b = a[:]
-        rmse = rootmeansquare(a,b)
-        nrmse = rootmeansquarenormalized(a,b)
-        self.assertEqual(rmse, 0)
-
-        a = [1,3,4,4]
-        b = [2,5,5,8]
-        rmse = rootmeansquare(a,b)
-        nrmse = rootmeansquarenormalized(a,b)
-        p = pearson(a,b)
-        _p = _pearson(a,b)
-#        print(rmse, nrmse, p, _p)
-
-        a = [random.uniform(1,100) for d in range(100)]
-        b = [50 for d in range(100)]
-        rmse = rootmeansquare(a,b)
-        nrmse = rootmeansquarenormalized(a,b)
-        p = pearson(a,b)
-        _p = _pearson(a,b)
-
-#        print(rmse, nrmse, p, _p)
+        a = [0, 1, 2, 3, 4]
+        b = [1, 1, 2, 3, 4]
+        fvalue = pearson(a,b)
+        b[0] = 2
+        fvaluen = pearson(a,b)
+        self.assertTrue(fvaluen > fvalue)
 
 
 

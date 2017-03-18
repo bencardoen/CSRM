@@ -30,6 +30,9 @@ class Plotter:
     def addPlot(self, p):
         self._plots.append(p)
 
+    def getPlots(self):
+        return self._plots
+
 class Convergence(Plotter):
     """
         Utility class to parse and convert convergence statistics.
@@ -121,11 +124,25 @@ class SummarizedResults(Plotter):
         fitness = rmtocm([r['fitness'] for r in self._results])
         #logger.info("Fitness values for plotting are {}".format(fitness))
         logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
-        for i in range(3):
-            p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness")
+        for i in range(1):
+            p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the test entire set (sample + test).")
             self.addPlot(p)
 
+    def plotPrediction(self):
+        processes = len (self._results)
+        fitness = rmtocm([r['corr_fitness'] for r in self._results])
+        #logger.info("Fitness values for plotting are {}".format(fitness))
+        logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
+        p = plotDotData(fitness, labelx="Process", labely="Correlation (less is better)", title="Correlation between fitness on sample data and test data per phase best value", cool=True)
+        self.addPlot(p)
 
+    def plotDifference(self):
+        processes = len (self._results)
+        fitness = rmtocm([r['diff_fitness'] for r in self._results])
+        #logger.info("Fitness values for plotting are {}".format(fitness))
+        logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
+        p = plotDotData(fitness, labelx="Process", labely="Difference", title="Difference between fitness on sample data and test data per phase best value")
+        self.addPlot(p)
 
     def plotComplexity(self):
         pass

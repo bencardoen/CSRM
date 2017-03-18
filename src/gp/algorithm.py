@@ -8,7 +8,7 @@
 
 from expression.tree import Tree
 from expression.operators import Mutate, Crossover
-from expression.tools import traceFunction, randomizedConsume, copyObject, consume
+from expression.tools import traceFunction, randomizedConsume, copyObject, consume, pearson as correlator
 from expression.constants import Constants
 from gp.population import Population, SetPopulation
 from expression.node import Variable
@@ -176,11 +176,6 @@ class GPAlgorithm():
         self._convergencestats = []
 
     def _initialize(self):
-        #vlist = []
-        #assert(len(self._X))
-        #for i, x in enumerate(self._X):
-        #    assert(isinstance(x, list))
-        #    vlist.append(Variable(x, i))
         self._variables = [Variable(x, i) for i,x in enumerate(self._X)]
         self._initializePopulation()
 
@@ -252,20 +247,27 @@ class GPAlgorithm():
             t.updateVariables(X)
             t.scoreTree(self._Y, self._fitnessfunction)
         try:
-            #fit = [d.getFitness() for d in self._population if d.getFitness() != Constants.MINFITNESS]
+            # fitness values on full data set
             fit = [d.getFitness() if d.getFitness()!= Constants.MINFITNESS else Constants.PEARSONMINFITNESS for d in self._population]
             comp = [d.getScaledComplexity() for d in self._population]
-            mean= numpy.mean(fit)
-            sd = numpy.std(fit)
-            v = numpy.var(fit)
-            cmean = numpy.mean(comp)
-            csd = numpy.std(comp)
-            cv = numpy.var(comp)
+            mean, sd, v= numpy.mean(fit), numpy.std(fit), numpy.var(fit)
+            cmean, csd, cv = numpy.mean(comp), numpy.std(comp), numpy.var(comp)
+            # fitness values for entire pop for all phases
+            lastfit = [self.getConvergenceStat(-1, phase)['fitness'] for phase in range(self.phases)]
+            cfit = [correlator(fit, best) for best in lastfit]
+            assert(len(cfit) == self.phases)
+            # difference in fitness for the last generation, last phase
+            dfit = [abs(a-b) for a,b in zip(lastfit[-1], fit)]
+            dmeanfit, dsdfit, dvfit = numpy.mean(dfit), numpy.std(dfit), numpy.var(dfit)
+
         except FloatingPointError as e:
             logger.error("Floating point error on values fit {} ".format(fit))
+            raise e
 
         return {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
-                    "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp
+                    "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
+                    "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
+                    "diff_fitness":dfit
                 }
 
 
@@ -535,7 +537,7 @@ class BruteElitist(GPAlgorithm):
                 replacementcount[2] += 1
             newgen += best
         assert(len(newgen) == selcount)
-        replacementratio = [x/y for x, y in zip(replacementcount, operationcount)]
+        replacementratio = [x/y if y!=0 else 0 for x, y in zip(replacementcount, operationcount)]
         return newgen, replacementratio
 
     def stopCondition(self):

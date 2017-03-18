@@ -6,6 +6,7 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 from bokeh.plotting import figure, output_file, show, gridplot, save
+from bokeh.palettes import magma, inferno, viridis
 import logging
 import math
 logger = logging.getLogger('global')
@@ -14,7 +15,7 @@ import random
 plotwidth = 200
 plotheigth = 200
 
-def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None):
+def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, cool=False):
     """
         Plot data values over generations.
     """
@@ -23,9 +24,18 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
     labely = labely or "Y"
     p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely)
     x = [d for d in range(len(data[0]))]
+    dlen = len(data)
+    ratio = 10/dlen
+    colors = ["navy" for _ in range(dlen)]
+    if cool:
+        diff = 0
+        if dlen <= 256:
+            colors = viridis(dlen)
+        else:
+            colors = viridis(256)
+            colors += [colors[-1] for _ in range(dlen-256)]
     for i,d in enumerate(data):
-        logger.debug("Plotting {}".format(d))
-        p.circle(x, d, size=1, color="navy", alpha=0.5)
+        p.circle(x, d, size=4 if cool else 1, color=colors[dlen-i-1], alpha=0.5)
     return p
 
 def plotLineData(data,  mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, legend=None):
@@ -41,7 +51,7 @@ def plotLineData(data,  mean=None, std=None, var=None, generationstep=1, labelx=
     p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely)
     for i,d in enumerate(data):
         x = [d for d in range(len(data[0]))]
-        p.line(x, d, line_width=1, line_color=colors[i], line_alpha=0.5, legend=legend[i])
+        p.circle(x, d, line_width=1, line_color=colors[i], line_alpha=0.5, legend=legend[i])
     return p
 
 def plotFront(X, Y, labelx=None, labely=None, title=None):

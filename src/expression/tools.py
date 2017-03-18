@@ -234,13 +234,17 @@ def pearson(actual, expected):
     va = a - meana
     vb = b - meanb
     nom = numpy.sum( va*vb  )
-    denom = numpy.sqrt( numpy.sum( numpy.square(va) ) * numpy.sum( numpy.square( vb ) ) )
+    denom = 1
+    try:
+        denom = numpy.sqrt( numpy.sum( numpy.square(va) ) * numpy.sum( numpy.square( vb ) ) )
+    except FloatingPointError as e:
+        denom = 0
     if denom == 0:
         return 1
     p = nom/denom
     if p > 1:
         p = 1 # truncate rounding
-    r = (1 - nom/denom)/2.0
+    r = (1 - p)/2.0
     return r
 
 def _pearson(actual, expected):
