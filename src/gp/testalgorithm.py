@@ -24,6 +24,7 @@ from expression.node import Variable
 from expression.functions import testfunctions, pearsonfitness as _fit
 from operator import neg
 from analysis.convergence import Convergence
+from gp.spreadpolicy import DistributeSpreadPolicy, CopySpreadPolicy
 
 
 logger = logging.getLogger('global')
@@ -230,6 +231,43 @@ class TopologyTest(unittest.TestCase):
             self.assertTrue(r.getTarget(j) != [])
         self.assertEqual(r.getSource(0) , [])
 
+    def testSpreadPolicy(self):
+        buffer = [x for x in range(12)]
+        result = DistributeSpreadPolicy.spread(buffer, 4)
+        for r in result:
+            self.assertEqual(len(r), 3)
+
+        buffer = [x for x in range(11)]
+        result = DistributeSpreadPolicy.spread(buffer, 4)
+        lengths = [3,3,3,2]
+        for i, r in enumerate(result):
+            self.assertEqual(len(r), lengths[i])
+
+        buffer = [x for x in range(15)]
+        result = DistributeSpreadPolicy.spread(buffer, 4)
+        lengths = [4,4,4,3]
+        for i, r in enumerate(result):
+            self.assertEqual(len(r), lengths[i])
+
+        buffer = [x for x in range(11)]
+        result = DistributeSpreadPolicy.spread(buffer, 12)
+        for r in result:
+            self.assertEqual(len(r), 11)
+
+        buffer = [x for x in range(12)]
+        result = DistributeSpreadPolicy.spread(buffer, 5)
+        for r in result:
+            self.assertTrue(len(r) in (2, 4))
+
+        rng = random.Random()
+        rng.seed(0)
+        for s in range(10, 20):
+            buffer = [x for x in range(s)]
+            result = CopySpreadPolicy.spread(buffer, rng.randint(5,10))
+            for r in result:
+                self.assertTrue(len(r) == s)
+
+
 
 class PGPTest(unittest.TestCase):
     def testConstruct(self):
@@ -270,7 +308,7 @@ class PGPTest(unittest.TestCase):
             algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
             algo.executeAlgorithm()
             algo.reportOutput()
-            
+
 
 
 

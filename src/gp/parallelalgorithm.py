@@ -33,6 +33,7 @@ except ImportError as e:
 def isMPI():
     return MPI.COMM_WORLD.Get_size() > 1
 
+
 class ParallelGP():
     """
     Parallel GP Algorithm.
