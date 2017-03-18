@@ -1,5 +1,12 @@
-import logging
+#This file is part of the CSRM project.
+#Copyright 2016 - 2017 University of Antwerp
+#https://www.uantwerpen.be/en/
+#Licensed under the EUPL V.1.1
+#A full copy of the license is in COPYING.txt, or can be found at
+#https://joinup.ec.europa.eu/community/eupl/og_page/eupl
+#      Author: Ben Cardoen
 
+import logging
 logger = logging.getLogger('global')
 
 class DistributeSpreadPolicy:
@@ -8,8 +15,6 @@ class DistributeSpreadPolicy:
         Divide buffer over n parts, with the last part taking a remainder.
         If len buffer <= n, return n instances of buffer
         """
-        if not n:
-            raise ValueError("n is zero")
         bl = len(buf)
         d, m = divmod(bl, n)
         if d:

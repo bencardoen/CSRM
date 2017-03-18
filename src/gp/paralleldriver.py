@@ -34,7 +34,7 @@ except ImportError as e:
         exit(0)
 
 
-def runBenchmark(topo=None, processcount = None, outfolder = None):
+def runBenchmark(topo=None, processcount = None, outfolder = None, display=False):
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     expr = testfunctions[2]
@@ -67,7 +67,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None):
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize, communicationsize=commsize)
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
-    algo.reportOutput(save=True, outputfolder = outfolder, display=True)
+    algo.reportOutput(save=True, outputfolder = outfolder, display=display)
     logger.info("Benchmark complete")
 
     # if MPI, merge all results and print
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--topology', help='space separated ids of instances')
     parser.add_argument('-c', '--processcount', type=int, help='Number of processes for sequential run')
     parser.add_argument('-o', '--outputfolder', help="Folder to write data to")
-    parser.add_argument('-d', '--displaystats', help="Wether to dispay convergence statistics for each process")
+    parser.add_argument('-d', '--displaystats', action='store_true', help="Wether to dispay convergence statistics for each process")
     parser.add_argument('-p', '--poplulation', type=int, help="Population per instance")
     args = parser.parse_args()
     topo = None
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         outputfolder = args.outputfolder
         if outputfolder[-1] != '/':
             outputfolder += '/'
-
+    displaystats = True if args.displaystats else False
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
-    runBenchmark(topo, processcount, outfolder=outputfolder)
+    runBenchmark(topo, processcount, outfolder=outputfolder, display=displaystats)

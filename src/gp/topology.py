@@ -9,17 +9,27 @@
 import logging
 import random
 from expression.tools import powerOf2
+from gp.spreadpolicy import DistributeSpreadPolicy, CopySpreadPolicy
 from math import sqrt
 logger = logging.getLogger('global')
 
 class Topology():
-    def __init__(self, size:int):
+    def __init__(self, size:int, spreadpolicy = None):
         assert(size>1)
         self._size = size
+        self._spreadpolicy = CopySpreadPolicy
 
     @property
     def size(self):
         return self._size
+
+    @property
+    def spreadpolicy(self):
+        return self._spreadpolicy
+
+    @spreadpolicy.setter
+    def spreadpolicy(self, value):
+        self._spreadpolicy = value
 
     def getTarget(self, source:int)->list:
         raise NotImplementedError
@@ -121,6 +131,7 @@ class TreeTopology(Topology):
         super().__init__(size)
         assert(powerOf2(size+1))
         self._depth = size.bit_length()-1
+        self.spreadpolicy = DistributeSpreadPolicy
 
     @property
     def depth(self):

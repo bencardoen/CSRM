@@ -58,7 +58,6 @@ class ParallelGP():
         self._ran = False
         self._sendbuffer = {}
         self._waits = {}
-        self._spreadpolicy = DistributeSpreadPolicy
         if self.communicator is not None:
             self._pid = self.communicator.Get_rank()
             logger.info("Process {} :: Running on MPI, asigning rank {} as processid".format(self.pid, self.pid))
@@ -66,11 +65,7 @@ class ParallelGP():
 
     @property
     def spreadpolicy(self):
-        return self._spreadpolicy
-
-    @spreadpolicy.setter
-    def spreadpolicy(self, value):
-        self._spreadpolicy = value
+        return self.topo.spreadpolicy
 
     @property
     def communicator(self):
@@ -139,11 +134,11 @@ class ParallelGP():
         """
         Retrieve samples from the algorithm, lookup targets in the topology and send them.
         """
-        targets = self._topo.getTarget(self._pid)
+        targets = self.topo.getTarget(self._pid)
         targetcount = len (targets)
         selectedsamples, buf = [], []
         if targetcount:
-            selectedsamples = self.algorithm.getArchived(self._communicationsize * targetcount)
+            selectedsamples = self.algorithm.getArchived(self._communicationsize)
             buf = self.spreadpolicy.spread(selectedsamples, targetcount)
         logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
         if self.communicator:
@@ -198,7 +193,7 @@ class ParallelGP():
         Receive from process *source* buffer
         """
         logger.info("Process {} :: Receiving at {} from {} buffer length {} ".format(self.pid, self.pid, source, len(buffer)))
-        assert(self._pid in self._topo.getTarget(source))
+        assert(self._pid in self.topo.getTarget(source))
         self.algorithm.archiveExternal(buffer)
 
 
