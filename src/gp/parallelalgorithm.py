@@ -14,6 +14,7 @@ from gp.algorithm import GPAlgorithm, BruteCoolingElitist
 from expression.tools import sampleExclusiveList, powerOf2, getKSamples
 from expression.constants import Constants
 from gp.topology import Topology, RandomStaticTopology
+from gp.spreadpolicy import DistributeSpreadPolicy
 import numpy
 import time
 logger = logging.getLogger('global')
@@ -57,10 +58,19 @@ class ParallelGP():
         self._ran = False
         self._sendbuffer = {}
         self._waits = {}
+        self._spreadpolicy = DistributeSpreadPolicy
         if self.communicator is not None:
             self._pid = self.communicator.Get_rank()
             logger.info("Process {} :: Running on MPI, asigning rank {} as processid".format(self.pid, self.pid))
         logger.debug("Process {} :: Topology is {}".format(self.pid, self.topo))
+
+    @property
+    def spreadpolicy(self):
+        return self._spreadpolicy
+
+    @spreadpolicy.setter
+    def spreadpolicy(self, value):
+        self._spreadpolicy = value
 
     @property
     def communicator(self):
@@ -111,12 +121,6 @@ class ParallelGP():
             self.receiveCommunications()
 
 
-    def splitBuffer(self, buffer, targets):
-        """
-        Divide buffer of targets using a given policy. Default implementation is copying.
-        """
-        return buffer
-
     def waitForSendRequests(self):
         """
         Before initiation a new send operation, ensure our last transmission was completed by checking the stored requests.
@@ -135,17 +139,21 @@ class ParallelGP():
         """
         Retrieve samples from the algorithm, lookup targets in the topology and send them.
         """
-        target = self._topo.getTarget(self._pid)
-        selectedsamples = self.algorithm.getArchived(self._communicationsize * len(target))
-        logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), target))
+        targets = self._topo.getTarget(self._pid)
+        targetcount = len (targets)
+        selectedsamples, buf = [], []
+        if targetcount:
+            selectedsamples = self.algorithm.getArchived(self._communicationsize * targetcount)
+            buf = self.spreadpolicy.spread(selectedsamples, targetcount)
+        logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
         if self.communicator:
             self.waitForSendRequests()
-            for t in target:
-                self._sendbuffer[t] = selectedsamples
+            for index, target in enumerate(targets):
+                self._sendbuffer[target] = buf[index]
                 logger.debug("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), t))
-                self._waits[t] = self.communicator.isend(selectedsamples, dest=t, tag=0)
+                self._waits[target] = self.communicator.isend(buf[index], dest=target, tag=0)
         else:
-            return selectedsamples, target
+            return buf, targets
 
     def receiveCommunications(self):
         """
@@ -268,14 +276,12 @@ class SequentialPGP():
         for _ in range(self._phases):
             for i, process in enumerate(self._processes):
                 process.executePhase()
-                buf, target = process.send()
-                if not target:
+                buf, targets = process.send()
+                if not targets:
                     logger.warning("Nothing to send from {}".format(i))
                     continue
-                targetcount = len(target)
-                # todo align with parallel approach
-                for t in target:
-                    self._processes[t].receive(buf, i)
+                for index, target in enumerate(targets):
+                    self._processes[target].receive(buf[index], i)
 
     def reportOutput(self, save=False, display=False, outputfolder=None):
         """
