@@ -468,8 +468,10 @@ class BruteElitist(GPAlgorithm):
         variables = self._variables
         tournament = self._popsize == self._tournamentsize
 
-
+        # successful total, mutations, crossover
         replacementcount = [0,0,0]
+        # total
+        operationcount = [0,0,0]
         selcount = len(selection)
         assert(selcount == self._tournamentsize)
 
@@ -483,6 +485,8 @@ class BruteElitist(GPAlgorithm):
                 candidate = copyObject(t)
                 Mutate.mutate(candidate, variables=variables, equaldepth=True, rng=rng)
                 candidate.scoreTree(Y, fit)
+                operationcount[0] += 1
+                operationcount[1] += 1
 
                 if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
                     assert(candidate.getDepth() <= d)
@@ -517,6 +521,8 @@ class BruteElitist(GPAlgorithm):
             lc = copyObject(left)
             rc = copyObject(right)
             Crossover.subtreecrossover(lc, rc, depth=None, rng=rng, limitdepth=d)
+            operationcount[0] += 2
+            operationcount[2] += 2
             lc.scoreTree(Y, fit)
             rc.scoreTree(Y, fit)
             scores = [left, right, lc, rc]
@@ -529,7 +535,8 @@ class BruteElitist(GPAlgorithm):
                 replacementcount[2] += 1
             newgen += best
         assert(len(newgen) == selcount)
-        return newgen, replacementcount
+        replacementratio = [x/y for x, y in zip(replacementcount, operationcount)]
+        return newgen, replacementratio
 
     def stopCondition(self):
         """

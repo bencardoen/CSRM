@@ -53,8 +53,7 @@ class Convergence(Plotter):
                 generations = len(run[0])
             fitnessvalues += [gen['fitness'] for gen in run]
         converted = rmtocm(fitnessvalues)
-        #logger.info("Fitness values for plotting are {}".format(converted))
-        logger.info("{} rows {} cols".format(len(converted), len(converted[0])) )
+        logger.debug("{} rows {} cols".format(len(converted), len(converted[0])) )
         p = plotDotData(converted, labelx="Generation", labely="Fitness", title="Fitness")
         self.addPlot(p)
 
@@ -91,7 +90,7 @@ class Convergence(Plotter):
 #            cvalues[0] += [gen['replacements'] for gen in run]
             cvalues[0] += [gen['mutations'] for gen in run]
             cvalues[1] += [gen['crossovers'] for gen in run]
-        p = plotLineData(cvalues, labelx="Generation", labely="Successful operations", title="Modifications", legend=["Mutations","Crossovers"])
+        p = plotLineData(cvalues, labelx="Generation", labely="Succes ratio of operator", title="Modifications", legend=["Mutations","Crossovers"])
         self.addPlot(p)
 
     def plotPareto(self):
