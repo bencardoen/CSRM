@@ -426,7 +426,7 @@ class GPAlgorithm():
         Using the new and previous generation, determine the best specimens and store them.
         """
         logger.warning("Inactive archive function called")
-        return
+        raise NotImplementedError
 
     def addToArchive(self, t):
         """

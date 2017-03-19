@@ -30,6 +30,7 @@ from gp.spreadpolicy import DistributeSpreadPolicy, CopySpreadPolicy
 logger = logging.getLogger('global')
 outputfolder = "../output/"
 
+
 def generateForest(fsize=10, depth=4, seed=None):
     variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
     forest = []
@@ -81,20 +82,6 @@ class GPTest(unittest.TestCase):
         rem = p.getAll()
         self.assertEqual(len(rem) , len(p))
         self.assertEqual(len(rem), len(p.removeAll()))
-
-    def testVirtualBase(self):
-        X = generateVariables(3,3,seed=0)
-        Y = [ 0 for d in range(3)]
-        logger.debug("Y {} X {}".format(Y, X))
-        g = GPAlgorithm(X, Y, popsize=2, maxdepth=4, fitnessfunction=_fit, seed=0)
-        #g.printForest()
-        g.run()
-        #g.printForest()
-        logger.info("Starting BE algorithm")
-        g = BruteElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=5)
-        g.run()
-        g.printForestToDot(outputfolder+"prefix")
-        #g.printForest()
 
     def testBruteElitist(self):
         X = generateVariables(3,3,seed=0)
@@ -196,6 +183,7 @@ class GPTest(unittest.TestCase):
         c.plotOperators()
         c.savePlots("output", title=expr+"_tournament")
 
+
 class TopologyTest(unittest.TestCase):
     def testInverse(self):
         size = 4
@@ -209,7 +197,6 @@ class TopologyTest(unittest.TestCase):
     def testMultiLink(self):
         size = 4
         rs = RandomStaticTopology(size, seed=5)
-        l = [x for x in range(size)]
         trg = [rs.getTarget(i) for i in range(size)]
         rev = [rs.getSource(i) for i in range(size)]
         # ensure i -> [a, b, c] => i in rev[a]
@@ -313,7 +300,7 @@ class PGPTest(unittest.TestCase):
 
 
 if __name__=="__main__":
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.WARNING)
     logging.disable(logging.DEBUG)
     print("Running")
     if not os.path.isdir(outputfolder):

@@ -12,7 +12,8 @@ import webbrowser
 import re
 import logging
 import random
-import inspect, itertools
+import inspect
+import itertools
 import functools
 import numpy
 import json
@@ -20,6 +21,7 @@ import pickle
 from scipy.stats.stats import pearsonr
 
 logger = logging.getLogger('global')
+
 
 def msb(b):
     """
@@ -31,6 +33,7 @@ def msb(b):
         i += 1
     return i
 
+
 def powerOf2(a:int)->bool:
     """
     :returns: True if a is a power of 2
@@ -38,13 +41,15 @@ def powerOf2(a:int)->bool:
     # source https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
     return False if a == 0 else (a & (a-1) == 0)
 
+
 def rmtocm(lst):
     """
-        Return a column major equivalent of row major encoded lst
+    Return a column major equivalent of row major encoded lst
     """
     rows = len(lst)
     cols = len(lst[0])
     return [ [lst[i][j] for i in range(rows)] for j in range(cols)]
+
 
 def compareLists(left: list, right: list):
     """
@@ -54,12 +59,14 @@ def compareLists(left: list, right: list):
     righttrim = [y for y in right if y]
     return Counter(lefttrim) == Counter(righttrim)
 
+
 def approximateMultiple(a, b, epsilon):
     """
-    let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True
+    Let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True
     """
     m = a / b
-    if not m: return False
+    if not m:
+        return False
     return abs(m - round(m)) < epsilon
 
 
@@ -73,13 +80,19 @@ def almostEqual(left, right, epsilon):
 
 
 def copyObject(o):
+    """Deep copies given object."""
     return pickle.loads(pickle.dumps(o, -1))
 
+
 def copyJSON(o):
+    """Use json to copy objects."""
     return json.loads(json.dumps(o))
 
+
 def generateSVG(dotfile: str):
+    """Generate SVG from a given dot files, writes <>.dot to <>.svg"""
     call(["dot", "-o {}.svg".format(dotfile[-4]), "{}".format(dotfile)])
+
 
 def showSVG(dotfile: str):
     outfile = dotfile[:-4] + ".svg"
@@ -112,6 +125,7 @@ def matchVariable(expr: str):
     else:
         return None
 
+
 def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lower=0, upper=1):
     """
     Generate a list of datapoints.
@@ -129,9 +143,11 @@ def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lowe
             result[i].sort()
     return result
 
+
 def traceFunction(fn=None, logcall=None):
     """
     Decorator to log a function with an optional logger.
+
     Logs arguments and return value of the function object at debug level if no logger is given,
     else uses the logcall object.
 
@@ -164,10 +180,12 @@ def traceFunction(fn=None, logcall=None):
         return _decorate(fn)
     return _decorate
 
+
 def scaleTransformation(elements, lower=-1, upper=1):
     """
-    Scale iterable to fit within [lower, upper]
-    Returns min, max of elements
+    Scale iterable to fit within [lower, upper].
+
+    :returns: min, max of elements, modifies elements in place
     """
     actuallow = float('inf')
     actualhigh = -float('inf')
@@ -182,7 +200,6 @@ def scaleTransformation(elements, lower=-1, upper=1):
     requiredrange = upper-lower
 
     for i in range(length):
-        e = elements[i]
         elements[i] -= actuallow
         elements[i] *= requiredrange/actualrange
         elements[i] += lower
@@ -200,6 +217,7 @@ def rootmeansquare(actual, expected):
     b = numpy.asarray(expected)
     return numpy.sqrt(numpy.sum(numpy.square(a-b))/len(actual))
 
+
 def rootmeansquarenormalized(actual, expected):
     """
     Normalized RMSE.
@@ -210,6 +228,7 @@ def rootmeansquarenormalized(actual, expected):
     ma = numpy.mean(a-b)
     nrmse = numpy.sqrt(numpy.sum(numpy.square(a-b))/len(actual))/(1+ma)
     return nrmse
+
 
 def pearson(actual, expected):
     r"""
@@ -247,6 +266,7 @@ def pearson(actual, expected):
     r = (1 - p)/2.0
     return r
 
+
 def _pearson(actual, expected):
     N = len(actual)
     a = numpy.asarray(actual)
@@ -275,9 +295,11 @@ def randomizedConsume(lst, seed=None):
         del lst[-1]
         yield item
 
+
 def getKSamples(X, Y, K, rng=None, seed=None):
     """
     Return a K-sample of X,Y.
+
     X is a 2 dimensional array with f=len(X) features, each having g=len(X[0]) entries. fxg
     Y is a 1 dimensional vector with g entries : 1xg
 
@@ -300,17 +322,18 @@ def getKSamples(X, Y, K, rng=None, seed=None):
         Yk.append(Y[i])
     return Xk, Yk
 
+
 def sampleExclusiveList(lst, exclude, k, rng = None, seed=None):
     """
     Consume a list, get k random distinct values, with *exclude*
     """
     if rng is None:
+        logger.warning("Using non deterministic mode")
         rng = random.Random()
         rng.seed(seed)
     else:
         if seed is not None:
             rng.seed(seed)
-    lsize = len(lst)
     while k != 0:
         pos = rng.randint(0, len(lst)-1)
         item = lst[pos]
@@ -322,9 +345,11 @@ def sampleExclusiveList(lst, exclude, k, rng = None, seed=None):
             k-=1
             yield item
 
+
 def consume(lst:list):
     """
     Return a generator to an element in the list.
+
     :param lst list: empties the list
     """
     listlength = len(lst)
@@ -335,10 +360,13 @@ def consume(lst:list):
 
 def permutate(lst, seed=None):
     """
-        Return a generator to a random element in the list without repeating.
-        When the generator halts, the list a random permumation (in place).
+    Return a generator to a random element in the list without repeating.
+
+    When the generator halts, the list a random permumation (in place).
     """
     rng = random.Random()
+    if seed is None:
+        logger.warning("Using non deterministic mode")
     rng.seed(seed)
     lsize = len(lst)
     limit = lsize-1
@@ -349,9 +377,3 @@ def permutate(lst, seed=None):
         lst[limit] = item
         limit -= 1
         yield item
-
-
-if __name__ == "__main__":
-    lst  = [[0,1,2],[3,4,5]]
-    clst = rmtocm(lst)
-    print(clst)
