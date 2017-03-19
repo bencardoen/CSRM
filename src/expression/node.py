@@ -123,7 +123,7 @@ class Node:
 
     def getAllChildren(self):
         """
-            Returns all descendant nodes.
+        Returns all descendant nodes.
         """
         children = self.getChildren()[:]
         collected = children[:]
@@ -137,9 +137,9 @@ class Node:
     @staticmethod
     def nodeToExpression(node):
         """
-            Top down traversal constructing an arithmetic expression from the tree
-            with this node as root.
-            Expression is in infix, so explicit usage of brackets.
+        Top down traversal constructing an arithmetic expression from the tree with this node as root.
+
+        Expression is in infix, so explicit usage of brackets.
         """
         children = node.getChildren()
         arity = node.getArity()
@@ -160,7 +160,7 @@ class Node:
 
 
     def __hash__(self):
-        #despite docs, this isn't always the default implementation
+        """ despite docs, this isn't always the default implementation """
         return id(self)
 
     def __eq__(self, other):

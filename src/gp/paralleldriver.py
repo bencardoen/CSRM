@@ -38,7 +38,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None, display=False
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     expr = testfunctions[2]
-    dpoint = 20
+    dpoint = 40
     vpoint = 5
     generations= generations or 20
     depth=5

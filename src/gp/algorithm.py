@@ -8,15 +8,12 @@
 
 from expression.tree import Tree
 from expression.operators import Mutate, Crossover
-from expression.tools import traceFunction, randomizedConsume, copyObject, consume, pearson as correlator
+from expression.tools import randomizedConsume, copyObject, consume, pearson as correlator
 from expression.constants import Constants
-from gp.population import Population, SetPopulation
+from gp.population import SetPopulation
 from expression.node import Variable
-from copy import deepcopy
-from operator import neg
 import random
 import logging
-import math
 import numpy
 logger = logging.getLogger('global')
 numpy.seterr('raise')
@@ -24,13 +21,14 @@ numpy.seterr('raise')
 
 class GPAlgorithm():
     """
-        A base class representing a Genetic Programming Algorithm instance.
+    A base class representing a Genetic Programming Algorithm instance.
 
-        The base class is responsible for data structures, configuration and control flow.
+    The base class is responsible for data structures, configuration and control flow.
 
-        In itself it will not evolve a solution.
+    In itself it will not evolve a solution.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed = None, archivesize= None, history = None, phases=None, tournamentsize = None):
+
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed=None, archivesize=None, history=None, phases=None, tournamentsize=None):
         """
         Initializes a forest of trees randomly constructed.
 
@@ -44,13 +42,13 @@ class GPAlgorithm():
         :param int tournamentsize: size of subset taken from population (fittest first) to evolve.
         """
         """ Sorted set of samples (best first)"""
-        self._population = SetPopulation(key=lambda _tree : (_tree.getFitness(), id(_tree)))
+        self._population = SetPopulation(key=lambda _tree: (_tree.getFitness(), id(_tree)))
         """ Number of entries per feature. """
         self._datapointcount = len(X[0])
         """ Fitness function, passed to tree instance to score."""
         self._fitnessfunction = fitnessfunction
         self._maxdepth = maxdepth
-        self._popsize=popsize
+        self._popsize = popsize
         self._seed = seed
         self._rng = random.Random()
         if seed is not None:
@@ -62,7 +60,7 @@ class GPAlgorithm():
         self._Y = Y
         self._initialize()
         """ Archive : stores best of phase samples. """
-        self._archive = SetPopulation(key=lambda _tree : (_tree.getFitness(), id(_tree)))
+        self._archive = SetPopulation(key=lambda _tree: (_tree.getFitness(), id(_tree)))
         """ Generations per phase. The algorithm will execute no more than self._phases * self._generations"""
         self._generations = generations
         self._currentgeneration = 0
@@ -81,10 +79,10 @@ class GPAlgorithm():
         """ Size of tournament, determines which samples compete. """
         self._tournamentsize = tournamentsize or popsize
         """ Number of samples to archive between phases. """
-        self._archivephase = max(self._archivesize// Constants.ARCHIVE_SELECTION_RATIO, 1)
+        self._archivephase = max(self._archivesize // Constants.ARCHIVE_SELECTION_RATIO, 1)
         logger.debug("Archive sample per phases = {} defined by {} // max({}, 1)".format(self._archivephase, self._archivesize, Constants.ARCHIVE_SELECTION_RATIO))
         """ Number of samples to use as seed in next phase """
-        self._archivephaseseed = max(self._archivesize// Constants.ARCHIVE_SELECTION_RATIO, 1)
+        self._archivephaseseed = max(self._archivesize // Constants.ARCHIVE_SELECTION_RATIO, 1)
         """
         Randomizing the selection upon which crossover works can improve the quality of the converged results.
         Non random crossover (e.g. best mates with second best) will lead to faster convergence, albeit to a less optimal solution.
@@ -101,7 +99,7 @@ class GPAlgorithm():
         return self._tournamentsize
 
     @tournamentsize.setter
-    def tournamentsize(self, value:int):
+    def tournamentsize(self, value: int):
         assert(value>0 and value <= self._popsize)
         self._tournamentsize = value
 
@@ -125,6 +123,7 @@ class GPAlgorithm():
     def getSeed(self):
         """
         Retrieve seed, and modify it for the next call.
+
         Seed is in [0, 0xffffffff]
         """
         s = self._seed
@@ -144,7 +143,8 @@ class GPAlgorithm():
 
     def archiveExternal(self, lst):
         """
-        Add x in lst to archive, dropping the worst samples to make place if required
+        Add x in lst to archive, dropping the worst samples to make place if required.
+
         Each sample will have its variable set updated to match the rest of the population.
         """
         logger.info("Adding {} to archive".format(len(lst)))
@@ -179,12 +179,10 @@ class GPAlgorithm():
         self._variables = [Variable(x, i) for i,x in enumerate(self._X)]
         self._initializePopulation()
 
-
     def addTree(self, t):
         logger.debug("Adding tree with id {:0x} to pop {}".format(id(t), self._population))
         assert(t not in self._population)
         self._population.add(t)
-
 
     def getBestTree(self):
         """
@@ -208,16 +206,15 @@ class GPAlgorithm():
 
     def addRandomTree(self):
         """
-            Create a random tree using this algorithm's configuration.
+        Create a random tree using this algorithm's configuration.
 
-            The generated tree is guaranteed to be viable (i.e. has a non inf fitness)
+        The generated tree is guaranteed to be viable (i.e. has a non inf fitness)
         """
         t = Tree.growTree(self._variables, self._maxdepth, rng=self._rng)
         t.scoreTree(self._Y, self._fitnessfunction)
         i = 0
         rng = self._rng
         while t.getFitness() == Constants.MINFITNESS:
-            seed = self.getSeed()
             assert(self._variables)
             t = Tree.growTree(self._variables, self._maxdepth, rng=rng)
             t.scoreTree(self._Y, self._fitnessfunction)
@@ -241,7 +238,6 @@ class GPAlgorithm():
         for i,t in enumerate(self._population):
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
-
     def summarizeSamplingResults(self, X, Y):
         for t in self._population:
             t.updateVariables(X)
@@ -264,16 +260,14 @@ class GPAlgorithm():
             logger.error("Floating point error on values fit {} ".format(fit))
             raise e
 
-        return {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
-                    "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
-                    "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
-                    "diff_fitness":dfit
-                }
-
+        return {"fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
+                "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
+                "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
+                "diff_fitness":dfit}
 
     def summarizeGeneration(self, replacementcount:list, generation:int, phase:int):
         """
-            Compute fitness statistics for the current generation and record them
+        Compute fitness statistics for the current generation and record them
         """
         fit = [d.getFitness() for d in self._population]
         comp = [d.getScaledComplexity() for d in self._population]
@@ -290,23 +284,22 @@ class GPAlgorithm():
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
                                                  "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, phase)
 
-
     def setTrace(self, v, prefix):
         """
-            Enables generation per generation tracing (e.g. writing to dot)
+        Enables generation per generation tracing (e.g. writing to dot)
         """
         self._trace = v
         self._prefix = prefix
 
     def printForest(self):
         """
-            Write out population in ASCII
+        Write out population in ASCII
         """
         print(str(self._population))
 
     def reseed(self):
         """
-            After a run of x generations, reseed the population based on the archive
+        After a run of x generations, reseed the population based on the archive
         """
         # get a random sample from
         archived = self._archive.getAll()
@@ -329,7 +322,6 @@ class GPAlgorithm():
         self._currentgeneration = 0
         self._population.removeAll()
         self.reseed()
-
 
     def run(self):
         """
@@ -365,7 +357,6 @@ class GPAlgorithm():
             self.restart()
             logger.info("----Phase {}".format(i+1))
             self.run()
-
 
     def stopCondition(self):
         """
@@ -430,7 +421,6 @@ class GPAlgorithm():
             for _ in range(- remcount):
                 self._population.drop()
 
-
     def archive(self, modified):
         """
         Using the new and previous generation, determine the best specimens and store them.
@@ -447,28 +437,27 @@ class GPAlgorithm():
             logger.debug("Curtailing archive.")
             self._archive.drop()
 
+
 class BruteElitist(GPAlgorithm):
     """
-        Brute force Elitist GP Variant.
+    Brute force Elitist GP Variant.
 
-        Applies mutation and subtree crossover to entire population and aggresively
-        replaces unfit samples.
+    Applies mutation and subtree crossover to entire population and aggresively
+    replaces unfit samples.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None, archivesize=None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases, archivesize=archivesize)
-
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize)
 
     def evolve(self, selection):
         """
-            Apply mutation on each sample, replacing if fitter
-            Apply subtree crossover using random selection of pairs, replacing if fitter.
+        Apply mutation on each sample, replacing if fitter
+        Apply subtree crossover using random selection of pairs, replacing if fitter.
         """
         Y = self._Y
         fit = self._fitnessfunction
         d = self._maxdepth
         rng = self._rng
         variables = self._variables
-        tournament = self._popsize == self._tournamentsize
 
         # successful total, mutations, crossover
         replacementcount = [0,0,0]
@@ -476,7 +465,6 @@ class BruteElitist(GPAlgorithm):
         operationcount = [0,0,0]
         selcount = len(selection)
         assert(selcount == self._tournamentsize)
-
 
         # Mutate on entire population, with regard to (scaled) fitness
         # Replacement is done based on comparison t, t'. It's possible in highly varied populations that this strategy
@@ -496,8 +484,6 @@ class BruteElitist(GPAlgorithm):
                     replacementcount[0] += 1
                     replacementcount[1] += 1
 
-
-
         # Subtree Crossover
         # Select 2 random trees, crossover, if better than parent, replace
         # Crossover disseminates potentially 'good' subtrees, at the cost of diversity
@@ -515,7 +501,6 @@ class BruteElitist(GPAlgorithm):
                 selector = randomizedConsume(selection, seed=self.getSeed())
         selector = selector if selector is not None else consume(selection)
 
-
         while selection:
             left = next(selector)
             right = next(selector)
@@ -528,7 +513,7 @@ class BruteElitist(GPAlgorithm):
             lc.scoreTree(Y, fit)
             rc.scoreTree(Y, fit)
             scores = [left, right, lc, rc]
-            best = sorted(scores, key = lambda t : t.getMultiObjectiveFitness())[0:2]
+            best = sorted(scores, key = lambda t:t.getMultiObjectiveFitness())[0:2]
             if lc in best:
                 replacementcount[0] += 1
                 replacementcount[2] += 1
@@ -543,6 +528,7 @@ class BruteElitist(GPAlgorithm):
     def stopCondition(self):
         """
         Composite stop condition.
+
         Looks at x past generations (set by self._history), then decides if convergence has stalled (std deviation < Constants.FITNESS_EPSILON).
         If std deviation is still large enough, do a check of successful replacements. If no operator in the last x generation was able to generate
         a single fitter sample, then obviously fitness will not improve any further.
@@ -558,12 +544,12 @@ class BruteElitist(GPAlgorithm):
             if self.getConvergenceStat(generations-i-1, self._phase)['std_fitness'] > Constants.FITNESS_EPSILON:
                 found=True
                 break
-        if found: # Still enough variation
+        if found:  # Still enough variation
             for i in range(self._history):
                 if self.getConvergenceStat(generations-i-1, self._phase)['replacements'] != 0:
-                    return False # enough variation, and replacements
+                    return False  # enough variation, and replacements
             # Replacements are no longer taking place, with enough variation, stop
-        return True # No more variation, stop
+        return True  # No more variation, stop
 
     def archive(self, modified):
         """
@@ -576,11 +562,13 @@ class BruteElitist(GPAlgorithm):
 
 class BruteCoolingElitist(BruteElitist):
     """
-    Uses a cooling strategy to apply operators, maximizing gain in the initial process but
-    reducing cost when gain is no longer possible. The cooling schedule 'predicts' efficiency of the operators.
+    Uses a cooling strategy to apply operators, maximizing gain in the initial process but reducing cost when gain is no longer possible.
+
+    The cooling schedule 'predicts' efficiency of the operators.
     """
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed = None, phases=None, archivesize=None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed = seed, phases=phases, archivesize=archivesize)
+
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize)
 
     def requireMutation(self, popindex:int)->bool:
         generation = self._currentgeneration
@@ -589,6 +577,7 @@ class BruteCoolingElitist(BruteElitist):
         population = self._popsize
         rng = self._rng
         return probabilityMutate(generation, generations, ranking, population, rng=rng)
+
 
 def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=random.Random())->bool:
     """

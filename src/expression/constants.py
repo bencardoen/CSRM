@@ -46,7 +46,7 @@ class Constants():
     """
     Influences size of archive
     """
-    POP_TO_ARCHIVERATIO = 4
+    POP_TO_ARCHIVERATIO = 2
     """
     Ratio of archive to selection in reseeding/archiving values.
     """
@@ -54,4 +54,4 @@ class Constants():
     """
     Given a data set of size N, ensure that K = int(SAMPLING_RATIO * N) samples are collected.
     """
-    SAMPLING_RATIO=0.8
+    SAMPLING_RATIO=0.5
