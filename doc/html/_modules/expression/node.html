@@ -169,7 +169,7 @@
 
 <div class="viewcode-block" id="Node.getAllChildren"><a class="viewcode-back" href="../../expression.html#expression.node.Node.getAllChildren">[docs]</a>    <span class="k">def</span> <span class="nf">getAllChildren</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Returns all descendant nodes.</span>
+<span class="sd">        Returns all descendant nodes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getChildren</span><span class="p">()[:]</span>
         <span class="n">collected</span> <span class="o">=</span> <span class="n">children</span><span class="p">[:]</span>
@@ -183,9 +183,9 @@
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="Node.nodeToExpression"><a class="viewcode-back" href="../../expression.html#expression.node.Node.nodeToExpression">[docs]</a>    <span class="k">def</span> <span class="nf">nodeToExpression</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Top down traversal constructing an arithmetic expression from the tree</span>
-<span class="sd">            with this node as root.</span>
-<span class="sd">            Expression is in infix, so explicit usage of brackets.</span>
+<span class="sd">        Top down traversal constructing an arithmetic expression from the tree with this node as root.</span>
+
+<span class="sd">        Expression is in infix, so explicit usage of brackets.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">children</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">getChildren</span><span class="p">()</span>
         <span class="n">arity</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">getArity</span><span class="p">()</span>
@@ -206,7 +206,7 @@
 
 
     <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1">#despite docs, this isn&#39;t always the default implementation</span>
+        <span class="sd">&quot;&quot;&quot; despite docs, this isn&#39;t always the default implementation &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>

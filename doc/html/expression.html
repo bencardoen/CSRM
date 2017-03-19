@@ -56,7 +56,8 @@
 <dl class="attribute">
 <dt id="expression.constants.Constants.ARCHIVE_SELECTION_RATIO">
 <code class="descname">ARCHIVE_SELECTION_RATIO</code><em class="property"> = 4</em><a class="headerlink" href="#expression.constants.Constants.ARCHIVE_SELECTION_RATIO" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Given a data set of size N, ensure that K = int(SAMPLING_RATIO * N) samples are collected.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.BASE_LIMIT">
@@ -112,7 +113,8 @@
 <dl class="attribute">
 <dt id="expression.constants.Constants.MINFITNESS">
 <code class="descname">MINFITNESS</code><em class="property"> = inf</em><a class="headerlink" href="#expression.constants.Constants.MINFITNESS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Worst value of fitness in the scaled pearson r fitness function</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.MIN_COMPLEXITY">
@@ -121,14 +123,19 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="expression.constants.Constants.PEARSONMINFITNESS">
+<code class="descname">PEARSONMINFITNESS</code><em class="property"> = 1</em><a class="headerlink" href="#expression.constants.Constants.PEARSONMINFITNESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="expression.constants.Constants.POP_TO_ARCHIVERATIO">
-<code class="descname">POP_TO_ARCHIVERATIO</code><em class="property"> = 4</em><a class="headerlink" href="#expression.constants.Constants.POP_TO_ARCHIVERATIO" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POP_TO_ARCHIVERATIO</code><em class="property"> = 2</em><a class="headerlink" href="#expression.constants.Constants.POP_TO_ARCHIVERATIO" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ratio of archive to selection in reseeding/archiving values.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="expression.constants.Constants.SAMPLING_RATIO">
-<code class="descname">SAMPLING_RATIO</code><em class="property"> = 0.8</em><a class="headerlink" href="#expression.constants.Constants.SAMPLING_RATIO" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SAMPLING_RATIO</code><em class="property"> = 0.5</em><a class="headerlink" href="#expression.constants.Constants.SAMPLING_RATIO" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -504,9 +511,8 @@ constant multiplier. Arity of the function is assumed to be 1.</p>
 <dl class="staticmethod">
 <dt id="expression.node.Node.nodeToExpression">
 <em class="property">static </em><code class="descname">nodeToExpression</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/node.html#Node.nodeToExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.node.Node.nodeToExpression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Top down traversal constructing an arithmetic expression from the tree
-with this node as root.
-Expression is in infix, so explicit usage of brackets.</p>
+<dd><p>Top down traversal constructing an arithmetic expression from the tree with this node as root.</p>
+<p>Expression is in infix, so explicit usage of brackets.</p>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -969,6 +975,11 @@ Fuzz tests all conversion functions.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="expression.testtree.TreeTest.testStringCopy">
+<code class="descname">testStringCopy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testStringCopy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testStringCopy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.testtree.TreeTest.testSwapVariables">
 <code class="descname">testSwapVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testSwapVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testSwapVariables" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1029,7 +1040,7 @@ Fuzz tests all conversion functions.</p>
 <dl class="function">
 <dt id="expression.tools.approximateMultiple">
 <code class="descclassname">expression.tools.</code><code class="descname">approximateMultiple</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>epsilon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#approximateMultiple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.approximateMultiple" title="Permalink to this definition">¶</a></dt>
-<dd><p>let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True</p>
+<dd><p>Let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True</p>
 </dd></dl>
 
 <dl class="function">
@@ -1041,24 +1052,34 @@ Fuzz tests all conversion functions.</p>
 <dl class="function">
 <dt id="expression.tools.consume">
 <code class="descclassname">expression.tools.</code><code class="descname">consume</code><span class="sig-paren">(</span><em>lst: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#consume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.consume" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a generator to an element in the list.
-:param lst list: empties the list</p>
+<dd><p>Return a generator to an element in the list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>list</strong> (<em>lst</em>) &#8211; empties the list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.copyJSON">
 <code class="descclassname">expression.tools.</code><code class="descname">copyJSON</code><span class="sig-paren">(</span><em>o</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#copyJSON"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.copyJSON" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Use json to copy objects.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.copyObject">
 <code class="descclassname">expression.tools.</code><code class="descname">copyObject</code><span class="sig-paren">(</span><em>o</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#copyObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.copyObject" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Deep copies given object.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.generateSVG">
 <code class="descclassname">expression.tools.</code><code class="descname">generateSVG</code><span class="sig-paren">(</span><em>dotfile: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#generateSVG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.generateSVG" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Generate SVG from a given dot files, writes &lt;&gt;.dot to &lt;&gt;.svg</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.generateVariables">
@@ -1085,8 +1106,8 @@ Fuzz tests all conversion functions.</p>
 <dl class="function">
 <dt id="expression.tools.getKSamples">
 <code class="descclassname">expression.tools.</code><code class="descname">getKSamples</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>K</em>, <em>rng=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#getKSamples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.getKSamples" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a K-sample of X,Y.
-X is a 2 dimensional array with f=len(X) features, each having g=len(X[0]) entries. fxg
+<dd><p>Return a K-sample of X,Y.</p>
+<p>X is a 2 dimensional array with f=len(X) features, each having g=len(X[0]) entries. fxg
 Y is a 1 dimensional vector with g entries : 1xg</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1144,8 +1165,8 @@ The returned value is in the range [0, 1] with 0 optimal distance.</p>
 <dl class="function">
 <dt id="expression.tools.permutate">
 <code class="descclassname">expression.tools.</code><code class="descname">permutate</code><span class="sig-paren">(</span><em>lst</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#permutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.permutate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a generator to a random element in the list without repeating.
-When the generator halts, the list a random permumation (in place).</p>
+<dd><p>Return a generator to a random element in the list without repeating.</p>
+<p>When the generator halts, the list a random permumation (in place).</p>
 </dd></dl>
 
 <dl class="function">
@@ -1202,8 +1223,15 @@ When the generator halts, the list a random permumation (in place).</p>
 <dl class="function">
 <dt id="expression.tools.scaleTransformation">
 <code class="descclassname">expression.tools.</code><code class="descname">scaleTransformation</code><span class="sig-paren">(</span><em>elements</em>, <em>lower=-1</em>, <em>upper=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#scaleTransformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.scaleTransformation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scale iterable to fit within [lower, upper]
-Returns min, max of elements</p>
+<dd><p>Scale iterable to fit within [lower, upper].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">min, max of elements, modifies elements in place</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -1214,8 +1242,8 @@ Returns min, max of elements</p>
 <dl class="function">
 <dt id="expression.tools.traceFunction">
 <code class="descclassname">expression.tools.</code><code class="descname">traceFunction</code><span class="sig-paren">(</span><em>fn=None</em>, <em>logcall=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#traceFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.traceFunction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorator to log a function with an optional logger.
-Logs arguments and return value of the function object at debug level if no logger is given,
+<dd><p>Decorator to log a function with an optional logger.</p>
+<p>Logs arguments and return value of the function object at debug level if no logger is given,
 else uses the logcall object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1242,8 +1270,8 @@ else uses the logcall object.</p>
 <dt id="expression.tree.Tree">
 <em class="property">class </em><code class="descclassname">expression.tree.</code><code class="descname">Tree</code><a class="reference internal" href="_modules/expression/tree.html#Tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Expression tree. A binary tree stored as an ordered list.
-Internal nodes hold operators, terminal nodes either Variables or Constants.
+<p>Expression tree. A binary tree stored as an ordered list.</p>
+<p>Internal nodes hold operators, terminal nodes either Variables or Constants.
 Each node has an optional constant weight</p>
 <dl class="method">
 <dt id="expression.tree.Tree.__init__">
@@ -1264,23 +1292,22 @@ Each node has an optional constant weight</p>
 <dl class="staticmethod">
 <dt id="expression.tree.Tree.createTreeFromExpression">
 <em class="property">static </em><code class="descname">createTreeFromExpression</code><span class="sig-paren">(</span><em>expr: str</em>, <em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.createTreeFromExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.createTreeFromExpression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given an infix expression containing floats, operators, function defined in functions.functionset,
-create a corresponding expression tree.</p>
+<dd><p>Given an infix expression containing floats, operators, function defined in functions.functionset, create a corresponding expression tree.</p>
 <p>:attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) is allowed but not log(x) with implicit base e</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="expression.tree.Tree.evaluateAll">
 <code class="descname">evaluateAll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.evaluateAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.evaluateAll" title="Permalink to this definition">¶</a></dt>
-<dd><p>For each data point, evaluate this tree object.
-:returns list : list of evaluations</p>
+<dd><p>For each data point, evaluate this tree object.</p>
+<p>:returns list : list of evaluations</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="expression.tree.Tree.evaluateTree">
 <code class="descname">evaluateTree</code><span class="sig-paren">(</span><em>index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.evaluateTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.evaluateTree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluates tree if tree was modified, else returns a cached results.
-Updates depth if needed.</p>
+<dd><p>Evaluates tree if tree was modified, else returns a cached results.</p>
+<p>Updates depth if needed.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1292,8 +1319,8 @@ Updates depth if needed.</p>
 <dl class="method">
 <dt id="expression.tree.Tree.getConstants">
 <code class="descname">getConstants</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getConstants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getConstants" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an ordered array of constants for all nodes.
-Non initialized constants will have a value of None</p>
+<dd><p>Return an ordered array of constants for all nodes.</p>
+<p>Non initialized constants will have a value of None</p>
 </dd></dl>
 
 <dl class="method">
@@ -1304,8 +1331,8 @@ Non initialized constants will have a value of None</p>
 <dl class="method">
 <dt id="expression.tree.Tree.getDepth">
 <code class="descname">getDepth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getDepth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getDepth" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return depth of this tree.
-Returns a cached version or calculates a new one if needed.</p>
+<dd><p>Return depth of this tree.</p>
+<p>Returns a cached version or calculates a new one if needed.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1339,9 +1366,16 @@ Returns a cached version or calculates a new one if needed.</p>
 <dl class="method">
 <dt id="expression.tree.Tree.getRandomNode">
 <code class="descname">getRandomNode</code><span class="sig-paren">(</span><em>seed=None</em>, <em>depth=None</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getRandomNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getRandomNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a randomly selected node from this tree
-If parameter depth is set, select only nodes at that depth
-The returned node is never root.</p>
+<dd><p>Return a randomly selected node from this tree.</p>
+<p>If parameter depth is set, select only nodes at that depth</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a selected node, never root</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1352,8 +1386,8 @@ The returned node is never root.</p>
 <dl class="method">
 <dt id="expression.tree.Tree.getScaledComplexity">
 <code class="descname">getScaledComplexity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getScaledComplexity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getScaledComplexity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the functional complexity of this tree.
-This a a ratio in [0.0, 1.0] defining how complex the functions are used in this tree.</p>
+<dd><p>Return the functional complexity of this tree.</p>
+<p>This a a ratio in [0.0, 1.0] defining how complex the functions are used in this tree.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1404,8 +1438,8 @@ This a a ratio in [0.0, 1.0] defining how complex the functions are used in this
 <dl class="staticmethod">
 <dt id="expression.tree.Tree.makeRandomTree">
 <em class="property">static </em><code class="descname">makeRandomTree</code><span class="sig-paren">(</span><em>variables</em>, <em>depth: int</em>, <em>rng=None</em>, <em>tokenLeafs=False</em>, <em>limit=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.makeRandomTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.makeRandomTree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a random expression tree with a random selection of variables
-Topdown construction, there is no guarantee that this construction renders a semantically valid tree</p>
+<dd><p>Generate a random expression tree with a random selection of variables.</p>
+<p>Topdown construction, there is no guarantee that this construction renders a semantically valid tree</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1480,8 +1514,8 @@ Topdown construction, there is no guarantee that this construction renders a sem
 <dl class="staticmethod">
 <dt id="expression.tree.Tree.swapSubtrees">
 <em class="property">static </em><code class="descname">swapSubtrees</code><span class="sig-paren">(</span><em>left</em>, <em>right</em>, <em>depth=None</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.swapSubtrees"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.swapSubtrees" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given two trees, pick random subtree roots and swap them between the trees.
-Will swap out subtrees at equal depth.</p>
+<dd><p>Given two trees, pick random subtree roots and swap them between the trees.</p>
+<p>Will swap out subtrees at equal depth.</p>
 </dd></dl>
 
 <dl class="method">

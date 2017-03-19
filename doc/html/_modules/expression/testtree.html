@@ -648,7 +648,7 @@
         <span class="n">right</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">newtree</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">constructFromSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">newtree</span><span class="o">.</span><span class="n">evaluateTree</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mf">0.7656269169069502</span> <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mf">2.391726097252937</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TreeTest.testGrowTreeDeep"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testGrowTreeDeep">[docs]</a>    <span class="k">def</span> <span class="nf">testGrowTreeDeep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">([</span><span class="mi">10</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">3</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">9</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span><span class="p">)]</span>
@@ -657,7 +657,7 @@
         <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">growTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">t</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;t35Grown.dot&quot;</span><span class="p">)</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateTree</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mf">3108.4668090265263</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5015238990021315</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TreeTest.testGrowTree"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testGrowTree">[docs]</a>    <span class="k">def</span> <span class="nf">testGrowTree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -781,35 +781,46 @@
 
 
 <div class="viewcode-block" id="TreeTest.testDistanceFunctions"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testDistanceFunctions">[docs]</a>    <span class="k">def</span> <span class="nf">testDistanceFunctions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Staging test for distance functions: test for overflow/ div by zero</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">[:]</span>
-        <span class="n">rmse</span> <span class="o">=</span> <span class="n">rootmeansquare</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="n">nrmse</span> <span class="o">=</span> <span class="n">rootmeansquarenormalized</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rmse</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1">#         # Staging test for distance functions: test for overflow/ div by zero</span>
+<span class="c1">#         a = [1 for d in range(10)]</span>
+<span class="c1">#         b = a[:]</span>
+<span class="c1">#         rmse = rootmeansquare(a,b)</span>
+<span class="c1">#         nrmse = rootmeansquarenormalized(a,b)</span>
+<span class="c1">#         self.assertEqual(rmse, 0)</span>
+<span class="c1">#</span>
+<span class="c1">#         a = [1 for d in range(10)]</span>
+<span class="c1">#         b = a[:]</span>
+<span class="c1">#         rmse = rootmeansquare(a,b)</span>
+<span class="c1">#         nrmse = rootmeansquarenormalized(a,b)</span>
+<span class="c1">#         self.assertEqual(rmse, 0)</span>
+<span class="c1">#</span>
+<span class="c1">#         a = [1,3,4,4]</span>
+<span class="c1">#         b = [2,5,5,8]</span>
+<span class="c1">#         rmse = rootmeansquare(a,b)</span>
+<span class="c1">#         nrmse = rootmeansquarenormalized(a,b)</span>
+<span class="c1">#         p = pearson(a,b)</span>
+<span class="c1">#         _p = _pearson(a,b)</span>
+<span class="c1"># #        print(rmse, nrmse, p, _p)</span>
+<span class="c1">#</span>
+<span class="c1">#         a = [random.uniform(1,100) for d in range(100)]</span>
+<span class="c1">#         b = [50 for d in range(100)]</span>
+<span class="c1">#         rmse = rootmeansquare(a,b)</span>
+<span class="c1">#         nrmse = rootmeansquarenormalized(a,b)</span>
+<span class="c1">#         p = pearson(a,b)</span>
+<span class="c1">#         _p = _pearson(a,b)</span>
+<span class="c1">#</span>
+<span class="c1"># #        print(rmse, nrmse, p, _p)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0096416794856030164</span><span class="p">,</span> <span class="mf">0.0096416794856030164</span><span class="p">,</span> <span class="mf">0.0096416794856030164</span><span class="p">,</span> <span class="mf">0.26241624623590931</span><span class="p">,</span> <span class="mf">0.27751012100799344</span><span class="p">,</span> <span class="mf">0.29467203565038796</span><span class="p">,</span> <span class="mf">0.36028300074390873</span><span class="p">,</span> <span class="mf">0.36028300074390873</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.3901901995195628</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0093714999389968856</span><span class="p">,</span> <span class="mf">0.0093714999389968856</span><span class="p">,</span> <span class="mf">0.0093714999389968856</span><span class="p">,</span> <span class="mf">0.26110518104903135</span><span class="p">,</span> <span class="mf">0.27141310496620774</span><span class="p">,</span> <span class="mf">0.29636300309085484</span><span class="p">,</span> <span class="mf">0.30491503735452846</span><span class="p">,</span> <span class="mf">0.30491503735452846</span><span class="p">,</span> <span class="mf">0.30755147098842195</span><span class="p">,</span> <span class="mf">0.35777767106738589</span><span class="p">]</span>
+        <span class="n">fvalue</span> <span class="o">=</span> <span class="n">pearson</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">fvalue</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">[:]</span>
-        <span class="n">rmse</span> <span class="o">=</span> <span class="n">rootmeansquare</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="n">nrmse</span> <span class="o">=</span> <span class="n">rootmeansquarenormalized</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rmse</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>
-        <span class="n">rmse</span> <span class="o">=</span> <span class="n">rootmeansquare</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="n">nrmse</span> <span class="o">=</span> <span class="n">rootmeansquarenormalized</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">pearson</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="n">_p</span> <span class="o">=</span> <span class="n">_pearson</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="c1">#        print(rmse, nrmse, p, _p)</span>
-
-        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)]</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)]</span>
-        <span class="n">rmse</span> <span class="o">=</span> <span class="n">rootmeansquare</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="n">nrmse</span> <span class="o">=</span> <span class="n">rootmeansquarenormalized</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">pearson</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-        <span class="n">_p</span> <span class="o">=</span> <span class="n">_pearson</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span></div>
-
-<span class="c1">#        print(rmse, nrmse, p, _p)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+        <span class="n">fvalue</span> <span class="o">=</span> <span class="n">pearson</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">fvaluen</span> <span class="o">=</span> <span class="n">pearson</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">fvaluen</span> <span class="o">&gt;</span> <span class="n">fvalue</span><span class="p">)</span></div>
 
 
 
@@ -890,7 +901,16 @@
         <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
         <span class="n">X2</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
         <span class="n">trees</span> <span class="o">=</span> <span class="p">[</span><span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
-        <span class="n">copies</span> <span class="o">=</span> <span class="p">[</span><span class="n">copyObject</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trees</span><span class="p">]</span></div></div>
+        <span class="n">copies</span> <span class="o">=</span> <span class="p">[</span><span class="n">copyObject</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trees</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TreeTest.testStringCopy"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testStringCopy">[docs]</a>    <span class="k">def</span> <span class="nf">testStringCopy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vpoint</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">testfunctions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">X2</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">trees</span> <span class="o">=</span> <span class="p">[</span><span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+        <span class="n">copies</span> <span class="o">=</span> <span class="p">[</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">toExpression</span><span class="p">(),</span> <span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trees</span><span class="p">]</span></div></div>
 
 
 

@@ -51,8 +51,12 @@
         <span class="k">pass</span></div>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Minimum fitness value, lower is better, minimum in this sense means the worst possible value.</span>
+<span class="sd">    Note that the range of fitness values depends on the fitness function. A fitness value</span>
+<span class="sd">    of MINFITNESS indicates an invalid specimen (e.g y = x/0)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">MINFITNESS</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Worst value of fitness in the scaled pearson r fitness function&quot;&quot;&quot;</span>
+    <span class="n">PEARSONMINFITNESS</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">MAXFITNESS</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># Size limit for exponents</span>
     <span class="n">SIZE_LIMIT</span> <span class="o">=</span> <span class="mi">20</span>
@@ -88,13 +92,15 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Influences size of archive</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">POP_TO_ARCHIVERATIO</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">POP_TO_ARCHIVERATIO</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Ratio of archive to selection in reseeding/archiving values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ARCHIVE_SELECTION_RATIO</span> <span class="o">=</span> <span class="mi">4</span>
-
-    <span class="n">SAMPLING_RATIO</span><span class="o">=</span><span class="mf">0.8</span></div>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a data set of size N, ensure that K = int(SAMPLING_RATIO * N) samples are collected.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SAMPLING_RATIO</span><span class="o">=</span><span class="mf">0.5</span></div>
 </pre></div>
 
           </div>

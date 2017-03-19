@@ -58,7 +58,8 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -66,6 +67,7 @@
 <span class="kn">from</span> <span class="nn">scipy.stats.stats</span> <span class="k">import</span> <span class="n">pearsonr</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="msb"><a class="viewcode-back" href="../../expression.html#expression.tools.msb">[docs]</a><span class="k">def</span> <span class="nf">msb</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -77,6 +79,7 @@
         <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">i</span></div>
 
+
 <div class="viewcode-block" id="powerOf2"><a class="viewcode-back" href="../../expression.html#expression.tools.powerOf2">[docs]</a><span class="k">def</span> <span class="nf">powerOf2</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :returns: True if a is a power of 2</span>
@@ -84,13 +87,15 @@
     <span class="c1"># source https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2</span>
     <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">a</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
 
+
 <div class="viewcode-block" id="rmtocm"><a class="viewcode-back" href="../../expression.html#expression.tools.rmtocm">[docs]</a><span class="k">def</span> <span class="nf">rmtocm</span><span class="p">(</span><span class="n">lst</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return a column major equivalent of row major encoded lst</span>
+<span class="sd">    Return a column major equivalent of row major encoded lst</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
     <span class="n">cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">return</span> <span class="p">[</span> <span class="p">[</span><span class="n">lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">)]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="p">)]</span></div>
+
 
 <div class="viewcode-block" id="compareLists"><a class="viewcode-back" href="../../expression.html#expression.tools.compareLists">[docs]</a><span class="k">def</span> <span class="nf">compareLists</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -100,12 +105,14 @@
     <span class="n">righttrim</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">right</span> <span class="k">if</span> <span class="n">y</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">Counter</span><span class="p">(</span><span class="n">lefttrim</span><span class="p">)</span> <span class="o">==</span> <span class="n">Counter</span><span class="p">(</span><span class="n">righttrim</span><span class="p">)</span></div>
 
+
 <div class="viewcode-block" id="approximateMultiple"><a class="viewcode-back" href="../../expression.html#expression.tools.approximateMultiple">[docs]</a><span class="k">def</span> <span class="nf">approximateMultiple</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True</span>
+<span class="sd">    Let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">m</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">epsilon</span></div>
 
 
@@ -119,13 +126,19 @@
 
 
 <div class="viewcode-block" id="copyObject"><a class="viewcode-back" href="../../expression.html#expression.tools.copyObject">[docs]</a><span class="k">def</span> <span class="nf">copyObject</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Deep copies given object.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span></div>
 
+
 <div class="viewcode-block" id="copyJSON"><a class="viewcode-back" href="../../expression.html#expression.tools.copyJSON">[docs]</a><span class="k">def</span> <span class="nf">copyJSON</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Use json to copy objects.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">))</span></div>
 
+
 <div class="viewcode-block" id="generateSVG"><a class="viewcode-back" href="../../expression.html#expression.tools.generateSVG">[docs]</a><span class="k">def</span> <span class="nf">generateSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate SVG from a given dot files, writes &lt;&gt;.dot to &lt;&gt;.svg&quot;&quot;&quot;</span>
     <span class="n">call</span><span class="p">([</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span> <span class="s2">&quot;-o </span><span class="si">{}</span><span class="s2">.svg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dotfile</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">]),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dotfile</span><span class="p">)])</span></div>
+
 
 <div class="viewcode-block" id="showSVG"><a class="viewcode-back" href="../../expression.html#expression.tools.showSVG">[docs]</a><span class="k">def</span> <span class="nf">showSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">outfile</span> <span class="o">=</span> <span class="n">dotfile</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.svg&quot;</span>
@@ -158,6 +171,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
+
 <div class="viewcode-block" id="generateVariables"><a class="viewcode-back" href="../../expression.html#expression.tools.generateVariables">[docs]</a><span class="k">def</span> <span class="nf">generateVariables</span><span class="p">(</span><span class="n">varcount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">datacount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate a list of datapoints.</span>
@@ -175,9 +189,11 @@
             <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">result</span></div>
 
+
 <div class="viewcode-block" id="traceFunction"><a class="viewcode-back" href="../../expression.html#expression.tools.traceFunction">[docs]</a><span class="k">def</span> <span class="nf">traceFunction</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logcall</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator to log a function with an optional logger.</span>
+
 <span class="sd">    Logs arguments and return value of the function object at debug level if no logger is given,</span>
 <span class="sd">    else uses the logcall object.</span>
 
@@ -210,10 +226,12 @@
         <span class="k">return</span> <span class="n">_decorate</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_decorate</span></div>
 
+
 <div class="viewcode-block" id="scaleTransformation"><a class="viewcode-back" href="../../expression.html#expression.tools.scaleTransformation">[docs]</a><span class="k">def</span> <span class="nf">scaleTransformation</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Scale iterable to fit within [lower, upper]</span>
-<span class="sd">    Returns min, max of elements</span>
+<span class="sd">    Scale iterable to fit within [lower, upper].</span>
+
+<span class="sd">    :returns: min, max of elements, modifies elements in place</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">actuallow</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
     <span class="n">actualhigh</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
@@ -228,7 +246,6 @@
     <span class="n">requiredrange</span> <span class="o">=</span> <span class="n">upper</span><span class="o">-</span><span class="n">lower</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
-        <span class="n">e</span> <span class="o">=</span> <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">actuallow</span>
         <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">requiredrange</span><span class="o">/</span><span class="n">actualrange</span>
         <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lower</span>
@@ -246,6 +263,7 @@
     <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">))</span></div>
 
+
 <div class="viewcode-block" id="rootmeansquarenormalized"><a class="viewcode-back" href="../../expression.html#expression.tools.rootmeansquarenormalized">[docs]</a><span class="k">def</span> <span class="nf">rootmeansquarenormalized</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Normalized RMSE.</span>
@@ -256,6 +274,7 @@
     <span class="n">ma</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">)</span>
     <span class="n">nrmse</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">ma</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">nrmse</span></div>
+
 
 <div class="viewcode-block" id="pearson"><a class="viewcode-back" href="../../expression.html#expression.tools.pearson">[docs]</a><span class="k">def</span> <span class="nf">pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;</span>
@@ -280,14 +299,19 @@
     <span class="n">va</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">meana</span>
     <span class="n">vb</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">meanb</span>
     <span class="n">nom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">va</span><span class="o">*</span><span class="n">vb</span>  <span class="p">)</span>
-    <span class="n">denom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">va</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span> <span class="n">vb</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">denom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">va</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span> <span class="n">vb</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">FloatingPointError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">denom</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">denom</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">1</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span>
     <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># truncate rounding</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span>
     <span class="k">return</span> <span class="n">r</span></div>
+
 
 <span class="k">def</span> <span class="nf">_pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
     <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
@@ -317,9 +341,11 @@
         <span class="k">del</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">yield</span> <span class="n">item</span></div>
 
+
 <div class="viewcode-block" id="getKSamples"><a class="viewcode-back" href="../../expression.html#expression.tools.getKSamples">[docs]</a><span class="k">def</span> <span class="nf">getKSamples</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a K-sample of X,Y.</span>
+
 <span class="sd">    X is a 2 dimensional array with f=len(X) features, each having g=len(X[0]) entries. fxg</span>
 <span class="sd">    Y is a 1 dimensional vector with g entries : 1xg</span>
 
@@ -342,17 +368,18 @@
         <span class="n">Yk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">Xk</span><span class="p">,</span> <span class="n">Yk</span></div>
 
+
 <div class="viewcode-block" id="sampleExclusiveList"><a class="viewcode-back" href="../../expression.html#expression.tools.sampleExclusiveList">[docs]</a><span class="k">def</span> <span class="nf">sampleExclusiveList</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">exclude</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Consume a list, get k random distinct values, with *exclude*</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using non deterministic mode&quot;</span><span class="p">)</span>
         <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
         <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-    <span class="n">lsize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
     <span class="k">while</span> <span class="n">k</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
@@ -364,9 +391,11 @@
             <span class="n">k</span><span class="o">-=</span><span class="mi">1</span>
             <span class="k">yield</span> <span class="n">item</span></div>
 
+
 <div class="viewcode-block" id="consume"><a class="viewcode-back" href="../../expression.html#expression.tools.consume">[docs]</a><span class="k">def</span> <span class="nf">consume</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a generator to an element in the list.</span>
+
 <span class="sd">    :param lst list: empties the list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">listlength</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
@@ -377,10 +406,13 @@
 
 <div class="viewcode-block" id="permutate"><a class="viewcode-back" href="../../expression.html#expression.tools.permutate">[docs]</a><span class="k">def</span> <span class="nf">permutate</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return a generator to a random element in the list without repeating.</span>
-<span class="sd">        When the generator halts, the list a random permumation (in place).</span>
+<span class="sd">    Return a generator to a random element in the list without repeating.</span>
+
+<span class="sd">    When the generator halts, the list a random permumation (in place).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using non deterministic mode&quot;</span><span class="p">)</span>
     <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">lsize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
     <span class="n">limit</span> <span class="o">=</span> <span class="n">lsize</span><span class="o">-</span><span class="mi">1</span>
@@ -391,12 +423,6 @@
         <span class="n">lst</span><span class="p">[</span><span class="n">limit</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
         <span class="n">limit</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="k">yield</span> <span class="n">item</span></div>
-
-
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">lst</span>  <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]]</span>
-    <span class="n">clst</span> <span class="o">=</span> <span class="n">rmtocm</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">clst</span><span class="p">)</span>
 </pre></div>
 
           </div>
