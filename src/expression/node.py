@@ -11,7 +11,7 @@ import logging
 import random
 import expression.functions
 from expression.constants import Constants
-from expression.tools import traceFunction
+from expression.tools import traceFunction, getRandom
 
 logger = logging.getLogger('global')
 
@@ -36,8 +36,7 @@ class Node:
     @staticmethod
     def positionToDepth(pos):
         """
-        Use the structure of the binary tree and its list encoding to retrieve
-        depth in log(N) steps without relying on a parent pointer.
+        Use the structure of the binary tree and its list encoding to retrieve depth in log(N) steps without relying on a parent pointer.
         """
         i = 0
         while pos:
@@ -190,9 +189,7 @@ class Node:
 
 
 class Constant():
-    CONSTANTLOWER = 0
-    CONSTANTUPPER = 1
-    
+
     def __init__(self, value):
         self._value = value
 
@@ -211,10 +208,15 @@ class Constant():
     @staticmethod
     def generateConstant(seed=None, rng = None):
         """
-            Generate a Constant object with value [lower, upper) by randomgenerator
+        Generate a Constant object with value [lower, upper) by randomgenerator
         """
-        _rng = rng or random.Random()
-        if seed is not None: _rng.seed(seed)
+        _rng = rng
+        if rng is None:
+            _rng = getRandom()
+            if seed is None:
+                logger.warning("Non deterministic mode")
+        if seed is not None:
+            _rng.seed(seed)
         return Constant(Constants.CONSTANTS_LOWER + _rng.random()*(Constants.CONSTANTS_UPPER-Constants.CONSTANTS_LOWER))
 
 
@@ -222,15 +224,16 @@ class Variable():
     @staticmethod
     def toVariables(lst:list):
         """
-            Converts a twodimensional array where each row is a set of data points to a list of Variables.
+        Converts a twodimensional array where each row is a set of data points to a list of Variables.
         """
         return [Variable(entry, i) for i,entry in enumerate(lst)]
 
 
     def __init__(self, values, index):
         """
-            Values is a list of datapoints this feature has
-            Index is the name, or identifier of this feature. E.g "x_09" : index = 9
+        Values is a list of datapoints this feature has.
+
+        Index is the name, or identifier of this feature. E.g "x_09" : index = 9
         """
         self._values = values
         self._index = index
@@ -252,7 +255,7 @@ class Variable():
 
     def getIndex(self):
         """
-            Return the unique identifier of this feature, NOT the current datapoint
+        Return the unique identifier of this feature, NOT the current datapoint
         """
         return self._index
 
@@ -262,14 +265,15 @@ class Variable():
     def __repr__(self):
         return "x_{}={}".format(self.getIndex(),self.getValue())
 
+
 class VariableNode(Node):
     """
-        Represents a leaf or terminal node in the expression, holding a reference to a variable (x_i)
+    Represents a leaf or terminal node in the expression, holding a reference to a variable (x_i)
     """
+
     def __init__(self, pos, variable, constant=None):
         Node.__init__(self, None, pos, constant)
         self.variable = variable
-        # TODO set arity
 
     def getVariable(self):
         return self.variable
@@ -318,8 +322,9 @@ class VariableNode(Node):
 
 class ConstantNode(Node):
     """
-        Represents a leaf or terminal node in the expression, holding a constant
+    Represents a leaf or terminal node in the expression, holding a constant
     """
+
     def __init__(self, pos, constant):
         Node.__init__(self, None, pos, constant)
 

@@ -22,6 +22,7 @@ from gp.topology import RandomStaticTopology, TreeTopology, VonNeumannTopology, 
 from expression.tree import Tree
 from expression.node import Variable
 from expression.functions import testfunctions, pearsonfitness as _fit
+from expression.tools import getRandom
 from operator import neg
 from analysis.convergence import Convergence
 from gp.spreadpolicy import DistributeSpreadPolicy, CopySpreadPolicy
@@ -36,7 +37,9 @@ def generateForest(fsize=10, depth=4, seed=None):
     forest = []
     if seed is None:
         seed = 0
-    rng = random.Random()
+    rng = getRandom()
+    if seed is None:
+        logger.warning("Non deterministic mode")
     rng.seed(seed)
     for i in range(fsize):
         forest.append(Tree.makeRandomTree(variables, depth=depth, rng=rng))
@@ -96,8 +99,7 @@ class GPTest(unittest.TestCase):
         g.printForestToDot(outputfolder+"secondresult")
 
     def testBruteElitistExtended(self):
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         dpoint = 20
         vpoint = 3
         X = generateVariables(vpoint,dpoint,seed=0)
@@ -125,8 +127,6 @@ class GPTest(unittest.TestCase):
 # These two tests serve as a benchmark to verify cooling effect of mutation operator
     def testConvergence(self):
         expr = testfunctions[2]
-        rng = random.Random()
-        rng.seed(0)
         dpoint = 30
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
@@ -144,8 +144,6 @@ class GPTest(unittest.TestCase):
 
     def testCooling(self):
         expr = testfunctions[2]
-        rng = random.Random()
-        rng.seed(0)
         dpoint = 30
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
@@ -164,8 +162,6 @@ class GPTest(unittest.TestCase):
 
     def testTournament(self):
         expr = testfunctions[2]
-        rng = random.Random()
-        rng.seed(0)
         dpoint = 30
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
@@ -246,8 +242,7 @@ class TopologyTest(unittest.TestCase):
         for r in result:
             self.assertTrue(len(r) in (2, 4))
 
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         for s in range(10, 20):
             buffer = [x for x in range(s)]
             result = CopySpreadPolicy.spread(buffer, rng.randint(5,10))
@@ -259,8 +254,6 @@ class TopologyTest(unittest.TestCase):
 class PGPTest(unittest.TestCase):
     def testConstruct(self):
         expr = testfunctions[2]
-        rng = random.Random()
-        rng.seed(0)
         dpoint = 10
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
@@ -268,14 +261,13 @@ class PGPTest(unittest.TestCase):
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
         pcount = 4
-        algo = SequentialPGP(X, Y, pcount, 20, 7, fitnessfunction=_fit, seed=0, generations=15, phases=4, topo=None, splitData=False)
+        algo = SequentialPGP(X, Y, pcount, 20, 7, fitnessfunction=_fit, seed=0, generations=15, phases=4, topo=None)
         algo.executeAlgorithm()
         algo.reportOutput()
 
     def testAllTopologies(self):
         expr = testfunctions[2]
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         dpoint = 10
         vpoint = 5
         generations=10
@@ -288,11 +280,12 @@ class PGPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        topos = [RandomStaticTopology(pcount, rng=rng), RandomStaticTopology(pcount, rng=rng, links=3), TreeTopology(pcount), VonNeumannTopology(pcount+2), RandomDynamicTopology(pcount), RingTopology(pcount)]
+        assert(rng)
+        topos = [RandomStaticTopology(pcount, rng=rng), RandomStaticTopology(pcount, rng=rng, links=3), TreeTopology(pcount), VonNeumannTopology(pcount+2), RandomDynamicTopology(pcount, rng=rng), RingTopology(pcount)]
         for t in topos:
             t.toDot("../output/{}.dot".format(t.__class__.__name__))
             logger.info("Testing topology {} which is mapped as \n{}\n".format(type(t).__name__, t))
-            algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize)
+            algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize)
             algo.executeAlgorithm()
             algo.reportOutput()
 

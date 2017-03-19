@@ -51,7 +51,7 @@ class ToolTest(unittest.TestCase):
 
     def testGenerator(self):
         l = [1,2,3, 4]
-        for k in randomizedConsume(l):
+        for k in randomizedConsume(l, seed=0):
             assert(k not in l)
         assert(len(l) == 0)
 

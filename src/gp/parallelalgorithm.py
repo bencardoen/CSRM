@@ -11,7 +11,7 @@ import random
 from analysis.convergence import Convergence, SummarizedResults
 from math import sqrt
 from gp.algorithm import GPAlgorithm, BruteCoolingElitist
-from expression.tools import sampleExclusiveList, powerOf2, getKSamples
+from expression.tools import sampleExclusiveList, powerOf2, getKSamples, getRandom
 from expression.constants import Constants
 from gp.topology import Topology, RandomStaticTopology
 from gp.spreadpolicy import DistributeSpreadPolicy
@@ -254,7 +254,7 @@ class SequentialPGP():
     This is a driver class for the ParallelGP class, to be used when MPI is not active.
     """
 
-    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, splitData=False, archivesize=None, communicationsize=None):
+    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, archivesize=None, communicationsize=None):
         """
         Construct a SeqPGP instance, driving a set of GP instances.
 
@@ -268,13 +268,15 @@ class SequentialPGP():
         assert(processcount>1)
         self._processcount=processcount
         self._processes = []
-        self._topo = topo or RandomStaticTopology(processcount)
-        assert(self._topo is not None)
         self._phases = 1
         self._X = X
         self._Y = Y
         self._communicationsize = communicationsize or 2
-        rng = random.Random()
+        rng = getRandom()
+        assert(seed is not None)
+        rng.seed(seed)
+        self._topo = topo or RandomStaticTopology(processcount, rng=rng)
+        assert(self._topo is not None)
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         for i in range(processcount):
             xsample, ysample = getKSamples(X, Y, samplecount, rng=rng, seed=i)

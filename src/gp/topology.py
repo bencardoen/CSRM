@@ -8,10 +8,11 @@
 #      Author: Ben Cardoen
 import logging
 import random
-from expression.tools import powerOf2
+from expression.tools import powerOf2, getRandom
 from gp.spreadpolicy import DistributeSpreadPolicy, CopySpreadPolicy
 from math import sqrt
 logger = logging.getLogger('global')
+
 
 class Topology():
     def __init__(self, size:int, spreadpolicy = None):
@@ -56,12 +57,16 @@ class Topology():
 class RandomStaticTopology(Topology):
     def __init__(self, size:int, rng=None, seed=None, links=None):
         super().__init__(size)
-        self._rng = rng or random.Random()
-        seed = 0 if seed is None else seed
+        if rng is None:
+            self._rng = getRandom()
+            if seed is None:
+                logger.warning("Non deterministic mode")
+                raise ValueError
+        else:
+            self._rng = rng
+        if seed is not None:
+            self._rng.seed(seed)
         self._links = links or 1
-        if seed is None:
-            logger.warning("Seed is None for RS Topology, this breaks determinism")
-        self._rng.seed(seed)
         self.setMapping()
 
     @property
@@ -80,9 +85,9 @@ class RandomStaticTopology(Topology):
 
     def setMapping(self):
         """
-        Create a mapping where each node is not connected to itself, but to
-        *self._links* nodes. Where only one link is needed, ensure that each node
-        has both a source and target.
+        Create a mapping where each node is not connected to itself, but to *self._links* nodes.
+
+        Where only one link is needed, ensure that each node has both a source and target.
         """
         self._map = [[] for i in range(self.size)]
         indices = [x for x in range(self.size)]
@@ -118,12 +123,14 @@ class RandomStaticTopology(Topology):
 class TreeTopology(Topology):
     """
     Tree structure.
+
     Each node sends to its children. Leaves send to None.
     This is a full binary tree.
     For N nodes, the tree has (N-1) links, with no cycling dependencies.
     Communication overhead is minimized, while still allowing for diffusion.
     With each node generating independently, the pipeline effect is largely avoided.
     """
+
     def __init__(self, size:int):
         """
         :param int size: Number of nodes. Size+1 should be a power of 2
@@ -161,12 +168,14 @@ class TreeTopology(Topology):
     def __str__(self):
         return "TreeTopology " + super().__str__()
 
+
 class RandomDynamicTopology(RandomStaticTopology):
     """
     Variation on Static, on demand a new mapping is calculated.
     """
-    def __init__(self, size:int):
-        super().__init__(size)
+
+    def __init__(self, size:int, rng=None, seed=None):
+        super().__init__(size, rng=rng, seed=seed)
 
     def recalculate(self):
         self.setMapping()
@@ -179,6 +188,7 @@ class RingTopology(Topology):
     """
     Simple Ring Topology
     """
+
     def __init__(self, size:int):
         super().__init__(size)
 
@@ -191,12 +201,15 @@ class RingTopology(Topology):
     def __str__(self):
         return "RingTopology" + super().__str__()
 
+
 class VonNeumannTopology(Topology):
     """
     2D grid, with each node connected with 4 nodes.
+
     Edge nodes are connectect in a cyclic form. E.g. a square of 9 nodes (3x3),
     node 0 is connected to [8,1,6,3]
     """
+
     def __init__(self, size:int):
         """
         :param int size: an integer square
@@ -212,7 +225,7 @@ class VonNeumannTopology(Topology):
 
     def getTarget(self, source:int):
         size = self.size
-        return [(source-1)%size, (source+1)%size, (source+self.rt)%size, (source-self.rt)%size]
+        return [(source-1) % size, (source+1) % size, (source+self.rt) % size, (source-self.rt) % size]
 
     def __str__(self):
         return "VonNeumannTopology" + super().__str__()
