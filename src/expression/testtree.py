@@ -7,15 +7,15 @@
 #      Author: Ben Cardoen
 
 from expression.tree import Tree, Node, Constant, Variable, ConstantNode
-from expression.functions import *
-from expression.functions import testfunctions
-from math import sqrt
+from expression.functions import sine, plus, multiply, logarithm, power, tokenize, minus
+from expression.functions import testfunctions, minimum, maximum, infixToPostfix, exponential, infixToPrefix
+from math import sqrt, exp
 import unittest
 from copy import deepcopy
 import logging
 import time
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2, copyObject, copyJSON
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2, copyObject, copyJSON, getRandom
 import os
 import random
 from expression.operators import Mutate, Crossover
@@ -26,8 +26,8 @@ logger = logging.getLogger('global')
 
 outputfolder = "../output/"
 
-class TreeTest(unittest.TestCase):
 
+class TreeTest(unittest.TestCase):
 
     def testBasicFullExpression(self):
         """
@@ -89,7 +89,7 @@ class TreeTest(unittest.TestCase):
         """
         t = Tree()
         root = t.makeInternalNode(plus, None, None)
-        l = t.makeInternalNode(multiply,  root)
+        l = t.makeInternalNode(multiply, root)
         r = t.makeInternalNode(sine, root)
         t.makeConstant(Constant(3), l)
         t.makeConstant(Constant(4), l)
@@ -158,7 +158,7 @@ class TreeTest(unittest.TestCase):
             if i == 0:
                 ex = e
             else:
-                self.assertEqual(e,  ex)
+                self.assertEqual(e, ex)
 
 
     def testCollectNodes(self):
@@ -282,12 +282,12 @@ class TreeTest(unittest.TestCase):
         rng = random.Random()
         rng.seed(0)
         variables = [Variable([10, 11],0),Variable([3, 12],0),Variable([9, 12],0),Variable([8, 9],0)]
-        left = Tree.makeRandomTree(variables, depth=6)
+        left = Tree.makeRandomTree(variables, depth=6, rng=rng)
         left.printToDot(outputfolder+"t13LeftBefore.dot")
 
         ld = left.getDepth()
 
-        right = Tree.makeRandomTree(variables, depth=6)
+        right = Tree.makeRandomTree(variables, depth=6, rng=rng)
         right.printToDot(outputfolder+"t13RightBefore.dot")
 
         rd = right.getDepth()
@@ -350,7 +350,7 @@ class TreeTest(unittest.TestCase):
         expr = "1/2**3-4"
         expr = "(1 + 2) * (3 + 4)"
         tokenized = tokenize(expr)
-        postfix = infixToPostfix(tokenized)
+        infixToPostfix(tokenized)
         prefix = infixToPrefix(tokenized)
         self.assertEqual(len(prefix), 7)
 
@@ -380,6 +380,7 @@ class TreeTest(unittest.TestCase):
     def testFuzzCyclicConvert(self):
         """
         Generate a random tree x times, convert to expression, to tree and back and compare results.
+
         Fuzz tests all conversion functions.
         """
         for i in range(100):
@@ -426,7 +427,7 @@ class TreeTest(unittest.TestCase):
     def testUnaryExpressions(self):
         variables = [[ d for d in range(4)] for x in range(2,7)]
         expressions = ["-(5+3)","2**-((-2)+(-3))", "max(-9 , -7) + 3**-4", "5.41 + -4.9*9", "-5.41 + -4.9*9", "-(x2 ** -x3)"]
-        expected = [-8.0,32.0,  -6.987654320987654, -38.69, -49.510000000000005, -1.0]
+        expected = [-8.0,32.0, -6.987654320987654, -38.69, -49.510000000000005, -1.0]
         for i, expr in enumerate(expressions):
             t = Tree.createTreeFromExpression(expr, variables)
             v = t.evaluateTree()
@@ -465,7 +466,7 @@ class TreeTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, variables)
         e = t.evaluateTree()
         t.printToDot(outputfolder+"t30.dot")
-        self.assertAlmostEqual(e, 1-2*math.exp(-3*5))
+        self.assertAlmostEqual(e, 1-2*exp(-3*5))
 
     def testBenchmarkFunctions(self):
         funcs = len(testfunctions)
@@ -483,7 +484,6 @@ class TreeTest(unittest.TestCase):
                 results[i][j] = ev
                 t.printToDot(outputfolder+"t29Benchmark{}{}.dot".format(i,j))
         for index, res in enumerate(results):
-#            print("Comparing results of {} , {} !=? {}".format(testfunctions[index], res[0], res[1]))
             self.assertNotAlmostEqual(res[0], res[1])
 
     def testCaching(self):
@@ -658,12 +658,17 @@ class TreeTest(unittest.TestCase):
 
     def testRegression(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        rng = random.Random()
+        rng = getRandom()
         rng.seed(0)
-        t = Tree.growTree(variables, depth=10, rng=rng)
-        e = t.evaluateTree()
-        t = Tree.makeRandomTree(variables, depth=10, rng=rng)
-        e = t.evaluateTree()
+        testlimit = 10
+        v = [0 for _ in range(testlimit)]
+        for i in range(testlimit):
+            rng.seed(0)
+            t = Tree.growTree(variables, depth=10, rng=rng)
+            v[i] = t.evaluateTree()
+            if i:
+                self.assertEqual(v[i-1], v[i])
+
 
     def testComplexity(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
@@ -687,11 +692,9 @@ class TreeTest(unittest.TestCase):
         told = deepcopy(t)
         last = deepcopy(t)
         told.printToDot(outputfolder+"t40BeforeMutated.dot")
-        # Normal mutation, mutate an equal depth subexpression
         d = t.getDepth()
         rng = random.Random()
         rng.seed(0)
-#        vs = Variable.    def toVariables(lst:list):
         vs = Variable.toVariables(vs)
         Mutate.mutate(t, variables = vs,equaldepth=True, rng=rng)
         self.assertEqual(t.getDepth(), d)

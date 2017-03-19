@@ -7,7 +7,7 @@
 #      Author: Ben Cardoen
 
 
-from expression.tools import msb, compareLists, traceFunction, copyObject
+from expression.tools import msb, compareLists, traceFunction, copyObject, getRandom
 from expression.functions import functionset, getRandomFunction, tokenize, infixToPostfix, isFunction, isOperator, infixToPrefix, Constants
 from copy import deepcopy
 from .node import Node, Constant, ConstantNode, Variable, VariableNode
@@ -299,7 +299,8 @@ class Tree:
         dpoint = 0 if not variables else len(variables[0])
         _rng = rng
         if rng is None:
-            _rng = random.Random()
+            logger.warning("Using non deterministic mode")
+            _rng = getRandom()
         if depth == 0:
             t = Tree()
             if (_rng.randrange(0, 2) & 1) and variables:
@@ -367,7 +368,8 @@ class Tree:
         Grow a tree up to depth.
         """
         if rng is None:
-            rng = random.Random()
+            logger.warning("Using non deterministic mode")
+            rng = getRandom()
         if depth <= 1:
             return Tree.makeRandomTree(variables=variables, depth=depth, rng=rng)
         return Tree._growTree(variables=variables, depth=depth, rng=rng)
@@ -390,7 +392,7 @@ class Tree:
         Return a randomly selected node from this tree.
 
         If parameter depth is set, select only nodes at that depth
-        
+
         :returns: a selected node, never root
         """
         r = rng or random.Random()

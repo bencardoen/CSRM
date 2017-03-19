@@ -206,6 +206,11 @@ def scaleTransformation(elements, lower=-1, upper=1):
     return actuallow, actualhigh
 
 
+def getRandom(seed=None):
+    rng = random.Random()
+    if seed is not None:
+        rng.seed(seed)
+    return rng
 
 
 def rootmeansquare(actual, expected):
