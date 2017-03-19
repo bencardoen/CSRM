@@ -151,8 +151,7 @@ class TreeTest(unittest.TestCase):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         ex = None
         for i in range(10):
-            rng = random.Random()
-            rng.seed(14)
+            rng = getRandom(14)
             t = Tree.makeRandomTree(variables, depth=5, rng=rng)
             e = t.evaluateTree()
             if i == 0:
@@ -279,8 +278,7 @@ class TreeTest(unittest.TestCase):
         """
         Test subtree crossover operation with random trees.
         """
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         variables = [Variable([10, 11],0),Variable([3, 12],0),Variable([9, 12],0),Variable([8, 9],0)]
         left = Tree.makeRandomTree(variables, depth=6, rng=rng)
         left.printToDot(outputfolder+"t13LeftBefore.dot")
@@ -385,8 +383,7 @@ class TreeTest(unittest.TestCase):
         """
         for i in range(100):
             variables = []
-            rng = random.Random()
-            rng.seed(0)
+            rng = getRandom(0)
             t = Tree.makeRandomTree(variables, depth=6, rng=rng)
             t.printToDot(outputfolder+"t22randomtree.dot")
             expr = t.toExpression()
@@ -488,8 +485,7 @@ class TreeTest(unittest.TestCase):
 
     def testCaching(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        rng = random.Random()
-        rng.seed(9)
+        rng = getRandom(9)
         t = Tree.makeRandomTree(variables, 3, rng=rng)
         rng.seed(1)
         s = Tree.makeRandomTree(variables, 2, rng=rng)
@@ -498,7 +494,6 @@ class TreeTest(unittest.TestCase):
         e = t.evaluateTree()
         cached_e = t.evaluateTree()
         self.assertEqual(e, cached_e)
-        rng = random.Random()
         rng.seed(0)
         t.spliceSubTree(t.getRandomNode(rng), s.getNode(0))
 
@@ -518,7 +513,7 @@ class TreeTest(unittest.TestCase):
         variables = [Variable([10],0),Variable([3],1),Variable([9],2),Variable([8],3)]
         e = 1
         compnodes = None
-        rng = random.Random()
+        rng = getRandom(0)
         for i in range(100):
             rng.seed(0)
             t = Tree.makeRandomTree(variables, 5, rng=rng)
@@ -549,8 +544,7 @@ class TreeTest(unittest.TestCase):
         self.assertNotEqual(f, e)
 
     def testRange(self):
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         c = [rng.randint(-2, 8) for d in range(10) ]
         lower = -1
         upper = 1
@@ -564,8 +558,7 @@ class TreeTest(unittest.TestCase):
         variables = [[ d for d in range(2,6)] for x in range(4)]
         expression = "log(5, 4) + x3 ** 4 * x2"
         t = Tree.createTreeFromExpression(expression, variables)
-        rng = random.Random()
-        rng.seed(2)
+        rng = getRandom(2)
         Mutate.mutate(t, variables, rng=rng)
         t.printToDot(outputfolder+"t33.dot")
 
@@ -577,8 +570,7 @@ class TreeTest(unittest.TestCase):
         left.printToDot(outputfolder+"t34left.dot")
         right = Tree.createTreeFromExpression(expression, variables)
         right.printToDot(outputfolder+"t34right.dot")
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         Crossover.subtreecrossover(left, right, rng=rng)
         left.printToDot(outputfolder+"t34leftafter.dot")
         right.printToDot(outputfolder+"t34rightafter.dot")
@@ -589,15 +581,13 @@ class TreeTest(unittest.TestCase):
         expression = "min(5, 4) + x4 ** 4 * sin(x2)"
         left = Tree.createTreeFromExpression(expression, variables)
         right = Tree.createTreeFromExpression(expression, variables)
-        rng=random.Random()
-        rng.seed(0)
+        rng=getRandom(0)
         Crossover.subtreecrossover(left, right, depth=2, rng=rng)
         self.assertEqual(left.getDepth(), right.getDepth())
 
     def testBottomUpConstruction(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        rng = random.Random()
-        rng.seed(19)
+        rng = getRandom(19)
         left = Tree.makeRandomTree(variables, depth=1, rng=rng)
         right = Tree.makeRandomTree(variables, depth=1, rng=rng)
         newtree = Tree.constructFromSubtrees(left, right, rng=rng)
@@ -606,8 +596,7 @@ class TreeTest(unittest.TestCase):
 
     def testGrowTreeDeep(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         t = Tree.growTree(variables, depth=9, rng=rng)
         t.printToDot(outputfolder+"t35Grown.dot")
         e = t.evaluateTree()
@@ -616,8 +605,7 @@ class TreeTest(unittest.TestCase):
 
     def testGrowTree(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         t = Tree.growTree(variables, depth=3, rng=rng)
         t.printToDot(outputfolder+"t36Grown.dot")
         e = t.evaluateTree()
@@ -632,8 +620,7 @@ class TreeTest(unittest.TestCase):
             v = Variable(entry, i)
             assert(len(entry)==dpoint)
             variables.append(v)
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         t= Tree.makeRandomTree(variables, depth=4, rng=rng)
         self.assertEqual(t.getDataPointCount() , dpoint)
         actual = t.evaluateAll()
@@ -647,8 +634,7 @@ class TreeTest(unittest.TestCase):
         def passconstraint(actual, expected, tree):
             return rootmeansquare(actual, expected)
         vs = generateVariables(vcount, dpoint, seed=0)
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         e = [ rng.random() for i in range(dpoint)]
         for testf in testfunctions:
             t = Tree.createTreeFromExpression(testf, vs)
@@ -658,8 +644,7 @@ class TreeTest(unittest.TestCase):
 
     def testRegression(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        rng = getRandom()
-        rng.seed(0)
+        rng = getRandom(0)
         testlimit = 10
         v = [0 for _ in range(testlimit)]
         for i in range(testlimit):
@@ -672,8 +657,7 @@ class TreeTest(unittest.TestCase):
 
     def testComplexity(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         t = Tree.makeRandomTree(variables, depth=4, rng=rng)
         c = t.getComplexity()
         c2 = t.getScaledComplexity()
@@ -693,8 +677,7 @@ class TreeTest(unittest.TestCase):
         last = deepcopy(t)
         told.printToDot(outputfolder+"t40BeforeMutated.dot")
         d = t.getDepth()
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         vs = Variable.toVariables(vs)
         Mutate.mutate(t, variables = vs,equaldepth=True, rng=rng)
         self.assertEqual(t.getDepth(), d)
@@ -711,8 +694,7 @@ class TreeTest(unittest.TestCase):
 
         # Mutate with a limit set, without equaldepth, with a set depth to select
         d = told.getDepth()
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         Mutate.mutate(told, variables=vs, rng=rng, equaldepth=False, limitdepth=limit, selectiondepth=d)
         told.printToDot(outputfolder+"t40Mutated3.dot")
 
@@ -782,8 +764,7 @@ class TreeTest(unittest.TestCase):
     def testPickleCopyPerformance(self):
         vcount = 4
         dpoint = 1
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
         variables = Variable.toVariables(vs)
         trees = [Tree.makeRandomTree(variables, depth=6, rng=rng) for i in range(1000)]
@@ -804,8 +785,7 @@ class TreeTest(unittest.TestCase):
         vpoint = 5
         dpoint = 20
         K = 10
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
         Y = [rng.random() for x in range(dpoint)]
         Xk, Yk = getKSamples(X, Y, 10, rng=rng)
@@ -814,8 +794,7 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(len(Yk) , K)
 
     def testExclusiveList(self):
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         for i in range(10):
             l = [x for x in range(20)]
             slg = sampleExclusiveList(l, 3, 10, rng=rng, seed=None)
@@ -854,18 +833,17 @@ class TreeTest(unittest.TestCase):
         dpoint = 10
         expr = testfunctions[2]
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
-        X2 = generateVariables(vpoint, 1, seed=20, sort=True, lower=-10, upper=10)
         trees = [Tree.createTreeFromExpression(expr, X) for _ in range(1000)]
-        copies = [copyObject(t) for t in trees]
+        [copyObject(t) for t in trees]
 
     def testStringCopy(self):
         vpoint = 5
         dpoint = 10
         expr = testfunctions[2]
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
-        X2 = generateVariables(vpoint, 1, seed=20, sort=True, lower=-10, upper=10)
         trees = [Tree.createTreeFromExpression(expr, X) for _ in range(1000)]
-        copies = [ Tree.createTreeFromExpression(t.toExpression(), X) for t in trees]
+        [ Tree.createTreeFromExpression(t.toExpression(), X) for t in trees]
+
 
 
 
