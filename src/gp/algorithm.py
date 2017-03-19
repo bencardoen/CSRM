@@ -8,7 +8,7 @@
 
 from expression.tree import Tree
 from expression.operators import Mutate, Crossover
-from expression.tools import randomizedConsume, copyObject, consume, pearson as correlator
+from expression.tools import randomizedConsume, copyObject, consume, pearson as correlator, getRandom
 from expression.constants import Constants
 from gp.population import SetPopulation
 from expression.node import Variable
@@ -50,9 +50,11 @@ class GPAlgorithm():
         self._maxdepth = maxdepth
         self._popsize = popsize
         self._seed = seed
-        self._rng = random.Random()
+        self._rng = getRandom()
         if seed is not None:
             self._rng.seed(seed)
+        else:
+            logger.warning("Non deterministic mode.")
         self._trace = False
         """ Input data """
         self._X = X
@@ -450,7 +452,7 @@ class BruteElitist(GPAlgorithm):
     def evolve(self, selection):
         """
         Evolve the current generation into the next.
-        
+
         Apply mutation on each sample, replacing if fitter.
         Apply subtree crossover using random selection of pairs, replacing if fitter.
         """
@@ -580,7 +582,7 @@ class BruteCoolingElitist(BruteElitist):
         return probabilityMutate(generation, generations, ranking, population, rng=rng)
 
 
-def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=random.Random())->bool:
+def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=None)->bool:
     """
     Generate a probability to mutate based on 2 parameters : the current generation and the the ranking of the sample.
 
@@ -600,6 +602,9 @@ def probabilityMutate(generation:int, generations:int, ranking:int, population:i
 
     :returns bool: true if mutation is considered beneficial
     """
+    if rng is None:
+        logger.warning("Non deterministic mode")
+        rng = getRandom()
     q = (generation / generations) * 0.5
     w = (ranking / population) * 2
     r = rng.uniform(a=0,b=1)

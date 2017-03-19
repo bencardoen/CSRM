@@ -296,7 +296,9 @@ def randomizedConsume(lst, seed=None):
 
     :param list lst: modified in place, at the last call the list is empty.
     """
-    rng = random.Random()
+    rng = getRandom()
+    if seed is None:
+        logger.warning("Non deterministic mode")
     rng.seed(seed)
     lsize = len(lst)
     for i in range(lsize):
@@ -319,9 +321,13 @@ def getKSamples(X, Y, K, rng=None, seed=None):
     features = len(X)
     values = len(X[0])
     assert(K<= values)
-    _rng = rng or random.Random()
+    _rng = None
     if rng is None:
-        _rng.seed(seed or 0)
+        _rng = getRandom()
+        if seed is None:
+            logger.warning("Non deterministic mode")
+    else:
+        _rng = rng
     if seed is not None:
         _rng.seed(seed)
     indices = sorted(_rng.sample(range( values ), K))
@@ -339,9 +345,9 @@ def sampleExclusiveList(lst, exclude, k, rng = None, seed=None):
     Consume a list, get k random distinct values, with *exclude*
     """
     if rng is None:
-        logger.warning("Using non deterministic mode")
-        rng = random.Random()
-        rng.seed(seed)
+        rng = getRandom()
+        if seed is None:
+            logger.warning("Using non deterministic mode")
     else:
         if seed is not None:
             rng.seed(seed)

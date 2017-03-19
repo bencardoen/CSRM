@@ -15,11 +15,13 @@ from expression.tools import traceFunction
 
 logger = logging.getLogger('global')
 
+
 class Node:
     def __init__(self, fun, pos, constant=None):
         """
-        Create a node composed of a function object, position in (binary) tree and an optional
-        constant multiplier. Arity of the function is assumed to be 1.
+        Create a node composed of a function object, position in (binary) tree and an optional constant multiplier.
+
+        Arity of the function is assumed to be 1.
         """
         self.function = fun
         self.pos = pos
@@ -34,8 +36,8 @@ class Node:
     @staticmethod
     def positionToDepth(pos):
         """
-            Use the structure of the binary tree and its list encoding to retrieve
-            depth in log(N) steps without relying on a parent pointer.
+        Use the structure of the binary tree and its list encoding to retrieve
+        depth in log(N) steps without relying on a parent pointer.
         """
         i = 0
         while pos:
@@ -48,14 +50,10 @@ class Node:
     def getDepth(self):
         return self._depth
 
-    def nextValue(self):
-        pass
-
     def getNodeComplexity(self):
         if self.function:
             return expression.functions.getFunctionComplexity(self.function)
         return 0
-
 
     def evaluate(self, args=None, index:int=None):
         """
@@ -69,7 +67,7 @@ class Node:
 
     def finalized(self):
         """
-            Return true if this node can be evaluated (e.g. has enough children for its arity)
+        Return true if this node can be evaluated (e.g. has enough children for its arity)
         """
         return ( len(self.getChildren()) == self.getArity())
 
@@ -100,7 +98,7 @@ class Node:
     def __str__(self):
         output = "{}".format(expression.functions.functionset[self.function][0])
         if self.constant:
-            output =  "{}".format(self.constant.getValue()) + " * " + output
+            output = "{}".format(self.constant.getValue()) + " * " + output
         return output
 
     def __repr__(self):
@@ -111,8 +109,9 @@ class Node:
 
     def updatePosition(self):
         """
-            After operations on a tree, the position of this node can be invalidated.
-            After a valid call to setPosition(pos), update all children recursively to correct position.
+        After operations on a tree, the position of this node can be invalidated.
+
+        After a valid call to setPosition(pos), update all children recursively to correct position.
         """
         pos = self.getPosition()
         i = 1
@@ -160,7 +159,7 @@ class Node:
 
 
     def __hash__(self):
-        """ despite docs, this isn't always the default implementation """
+        """Despite docs, this isn't always the default implementation."""
         return id(self)
 
     def __eq__(self, other):
@@ -193,6 +192,7 @@ class Node:
 class Constant():
     CONSTANTLOWER = 0
     CONSTANTUPPER = 1
+    
     def __init__(self, value):
         self._value = value
 

@@ -346,7 +346,7 @@ class Tree:
         """
         if rng is None:
             logger.warning("Using non deterministic mode")
-            rng = random.Random()
+            rng = getRandom()
         while True:
             t = Tree.makeRandomTree(variables=None, depth=1, rng=rng, tokenLeafs=True)
             dl = left.getDataPointCount()
@@ -395,9 +395,13 @@ class Tree:
 
         :returns: a selected node, never root
         """
-        r = rng or random.Random()
+        r = rng
+        if rng is None:
+            r = getRandom()
         if seed is not None:
             r.seed(seed)
+        if seed is None and rng is None:
+            logger.warning("Non deterministic mode")
         lower = 1
         upper = len(self.nodes)
         if depth:
@@ -543,7 +547,7 @@ class Tree:
         righttreedepth = right.getDepth()
         if rng is None:
             logger.warning("Using non deterministic mode")
-            rng = random.Random()
+            rng = getRandom()
 
         if depth is None:
             depth = rng.randint(1, min(lefttreedepth, righttreedepth))
