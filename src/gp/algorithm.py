@@ -316,8 +316,7 @@ class GPAlgorithm():
 
     def restart(self):
         """
-        Called before a new phase runs, clear the last population and reseeds the new
-        using the archive.
+        Called before a new phase runs, clear the last population and reseeds the new using the archive.
         """
         self._currentgeneration = 0
         self._population.removeAll()
@@ -383,9 +382,7 @@ class GPAlgorithm():
         if sel is None:
             sel = self._population
         for t in sel:
-            oldfit = t.getFitness()
             t.scoreTree(self._Y, self._fitnessfunction)
-            newfit = t.getFitness()
 
     def evolve(self, selection):
         """
@@ -406,6 +403,7 @@ class GPAlgorithm():
     def update(self, modified):
         """
         Process the new generation.
+
         At the very least, adds modified back to population based on a condition.
         """
         assert(len(modified) == self._tournamentsize)
@@ -445,12 +443,15 @@ class BruteElitist(GPAlgorithm):
     Applies mutation and subtree crossover to entire population and aggresively
     replaces unfit samples.
     """
+
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize)
 
     def evolve(self, selection):
         """
-        Apply mutation on each sample, replacing if fitter
+        Evolve the current generation into the next.
+        
+        Apply mutation on each sample, replacing if fitter.
         Apply subtree crossover using random selection of pairs, replacing if fitter.
         """
         Y = self._Y

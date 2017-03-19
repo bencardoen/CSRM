@@ -38,10 +38,14 @@ def isMPI():
 class ParallelGP():
     """
     Parallel GP Algorithm.
+
     Executes a composite GP algorithm in parallel, adding communication and synchronization to the algorithm.
     """
+
     def __init__(self, algo:GPAlgorithm,X, Y, communicationsize:int=None, topo:Topology=None, pid = None, Communicator = None,):
         """
+        Construct a PGP instance using an existing GP algo.
+
         :param algo: Enclosed algorithm
         :param communicationsize: Nr of samples to request from the algorithm for distribution
         :param topo: topology to use in communications
@@ -90,13 +94,14 @@ class ParallelGP():
     def executePhase(self):
         """
         Run a single phase of the algorithm.
+
         This step executes a limited number of generations (depending on the algorithm)
         """
         if self.algorithm.phase >= self.algorithm.phases:
             logger.warning("Process {} :: Exceeding phase count".format(self.pid))
             return
         logger.info("Process {} :: --Phase-- {}".format(self.pid, self.algorithm.phase))
-        if self._ran == False:
+        if not self._ran:
             self.algorithm.phase = 0
             self._ran = True
         else:
@@ -119,6 +124,7 @@ class ParallelGP():
     def waitForSendRequests(self):
         """
         Before initiation a new send operation, ensure our last transmission was completed by checking the stored requests.
+
         After this method completes all sent buffers and requests are purged.
         """
         logger.debug("Process {} :: MPI, waiting for sendrequests to complete".format(self.pid))
@@ -135,7 +141,7 @@ class ParallelGP():
         Retrieve samples from the algorithm, lookup targets in the topology and send them.
         """
         targets = self.topo.getTarget(self._pid)
-        targetcount = len (targets)
+        targetcount = len(targets)
         selectedsamples, buf = [], []
         if targetcount:
             selectedsamples = self.algorithm.getArchived(self._communicationsize)
@@ -168,6 +174,7 @@ class ParallelGP():
     def collectSummaries(self):
         """
         If root process, get all summarized results from the other processes.
+
         If not root, send to root all results.
         :returns : None if not pid==0, else all collectResults
         """
@@ -199,6 +206,8 @@ class ParallelGP():
 
     def reportOutput(self, save=False, display=False, outputfolder=None):
         """
+        Report output either to file or browser.
+
         :param bool save: Save results to file
         :param bool display: Display results in browser (WARNING : CPU intensive for large sets)
         :param str outputfolder: modify output directory
@@ -237,13 +246,18 @@ class ParallelGP():
         logging.info("Results so far {}".format(results))
         return results
 
+
 class SequentialPGP():
     """
     Executes Parallel GP in sequential mode, controlling a set of processes.
+
     This is a driver class for the ParallelGP class, to be used when MPI is not active.
     """
+
     def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, splitData=False, archivesize=None, communicationsize=None):
         """
+        Construct a SeqPGP instance, driving a set of GP instances.
+
         :param X: Input data set, a set of points per feature.
         :param Y: Output data set to approximate
         :param processcount: Number of active processes
@@ -283,6 +297,8 @@ class SequentialPGP():
 
     def reportOutput(self, save=False, display=False, outputfolder=None):
         """
+        Report output of all processes.
+
         :param bool save: Save results to file
         :param bool display: Display results in browser (WARNING : CPU intensive for large sets)
         :param str outputfolder: modify output directory
