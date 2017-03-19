@@ -10,14 +10,14 @@ from sortedcontainers import SortedListWithKey, SortedDict, SortedSet
 import logging
 logger = logging.getLogger('global')
 
+
 class Population():
     """
-    Interface to a population structure. Sorts a population in order and provides iterators and if possible random access
-    and membership testing using hashes.
+    Interface to a population structure. Sorts a population in order and provides iterators and if possible random access and membership testing using hashes.
 
     The Base class is unusable, serves only as an interface.
-
     """
+
     def __init__(self, iterable=None, key=None):
         """
         Construct using iterable as initial data with given key.
@@ -113,6 +113,7 @@ class SLWKPopulation(Population):
     """
     Sorted List population.
     """
+
     def __init__(self, iterable=None, key=None):
         self._pop = SortedListWithKey(iterable=iterable, key=key)
 
@@ -129,8 +130,10 @@ class SLWKPopulation(Population):
 class OrderedPopulation(Population):
     """
     Prototype code for an ordered dict.
+
     @deprecated as it implies [item]=item
     """
+
     def __init__(self, iterable=None, key=None):
         if not key:
             key = id
@@ -152,8 +155,11 @@ class SetPopulation(Population):
 
     Duplicate items are allowed.
     """
+
     def __init__(self, iterable=None, key=None):
         """
+        Construct with iterable and key.
+
         :param iterator iterable: initial data
         :param function key: default to id function, else a user provided function that returns for a given item a sortable key object.
         """
@@ -209,4 +215,4 @@ class SetPopulation(Population):
         return kn
 
     def __str__(self):
-        return "".join(str(hex(id(d))) + " "   for d in self._pop)
+        return "".join(str(hex(id(d))) + " " for d in self._pop)

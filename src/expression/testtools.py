@@ -11,18 +11,21 @@ import unittest
 import logging
 import math
 
+# Configure the log subsystem
+FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('global')
 
 
-
-#Test functions
 @traceFunction
 def testFunction(a, b, operator=None):
     return a+b
 
+
 @traceFunction(logcall=logger.debug)
 def testFunctionE(a, b, operator=None):
     return a+b
+
 
 class ToolTest(unittest.TestCase):
     def testRMS(self):
@@ -54,7 +57,7 @@ class ToolTest(unittest.TestCase):
 
         l = [1,2,3,4]
         lold = l[:]
-        for k in permutate(l):
+        for k in permutate(l, seed=0):
             assert(k in l)
         assert(l != lold)
 

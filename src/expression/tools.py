@@ -225,8 +225,11 @@ def rootmeansquarenormalized(actual, expected):
     assert(len(actual) == len(expected))
     a = numpy.asarray(actual)
     b = numpy.asarray(expected)
-    ma = numpy.mean(a-b)
-    nrmse = numpy.sqrt(numpy.sum(numpy.square(a-b))/len(actual))/(1+ma)
+    ma = numpy.mean(a)
+    nom = numpy.sqrt( numpy.sum(numpy.square(a-b))/len(actual))
+    denom = ma
+    assert(denom > 0)
+    nrmse = nom/denom
     return nrmse
 
 
