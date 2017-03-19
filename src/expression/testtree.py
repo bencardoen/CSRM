@@ -602,7 +602,7 @@ class TreeTest(unittest.TestCase):
         right = Tree.makeRandomTree(variables, depth=1, rng=rng)
         newtree = Tree.constructFromSubtrees(left, right, rng=rng)
         e = newtree.evaluateTree()
-        self.assertEqual(e, 0.7656269169069502 )
+        self.assertEqual(e, 2.391726097252937)
 
     def testGrowTreeDeep(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
@@ -611,7 +611,7 @@ class TreeTest(unittest.TestCase):
         t = Tree.growTree(variables, depth=9, rng=rng)
         t.printToDot(outputfolder+"t35Grown.dot")
         e = t.evaluateTree()
-        self.assertEqual(e, 3108.4668090265263)
+        self.assertEqual(e, -0.5015238990021315)
 
 
     def testGrowTree(self):

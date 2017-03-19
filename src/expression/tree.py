@@ -9,7 +9,6 @@
 
 from expression.tools import msb, compareLists, traceFunction, copyObject
 from expression.functions import functionset, getRandomFunction, tokenize, infixToPostfix, isFunction, isOperator, infixToPrefix, Constants
-from random import  choice, random
 from copy import deepcopy
 from .node import Node, Constant, ConstantNode, Variable, VariableNode
 import logging
@@ -22,12 +21,15 @@ FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('global')
 
+
 class Tree:
     """
-        Expression tree. A binary tree stored as an ordered list.
-        Internal nodes hold operators, terminal nodes either Variables or Constants.
-        Each node has an optional constant weight
+    Expression tree. A binary tree stored as an ordered list.
+
+    Internal nodes hold operators, terminal nodes either Variables or Constants.
+    Each node has an optional constant weight
     """
+
     def __init__(self):
         # List of nodes in order of generation
         self.nodes = []
@@ -51,7 +53,7 @@ class Tree:
 
     def getFitness(self):
         """
-            Get this tree object's absolute fitness value (based on a distance measure)
+        Get this tree object's absolute fitness value (based on a distance measure)
         """
         return self.fitness
 
@@ -68,6 +70,7 @@ class Tree:
         Ensure the tree is still correct in structure
         """
         pass
+        # too expensive to run in benchmarks
         #left = self.getNodes()
         #right = self.nodes
         #middle = self._positionalNodes()
@@ -97,7 +100,6 @@ class Tree:
             raise ValueError("Node exists at {}".format(pos))
         else:
             self.nodes[pos] = node
-        # Update variable if needed
 
     def makeInternalNode(self, function, parent=None, constant=None):
         """
@@ -201,6 +203,7 @@ class Tree:
     def evaluateTree(self, index = None):
         """
         Evaluates tree if tree was modified, else returns a cached results.
+
         Updates depth if needed.
         """
         if self.modified or index is not None:
@@ -210,19 +213,20 @@ class Tree:
 
     def evaluateAll(self):
         """
-            For each data point, evaluate this tree object.
-            :returns list : list of evaluations
+        For each data point, evaluate this tree object.
+
+        :returns list : list of evaluations
         """
         dpoint = self.getDataPointCount()
         return [self.evaluateTree(index=i) for i in range(dpoint)]
 
     def scoreTree(self, expected, distancefunction):
         """
-            Evaluate a tree w.r.t a distancefucntion.
+        Evaluate a tree w.r.t a distancefucntion.
 
-            :param expected list: list A set of expected output values for each datapoint.
-            :param distancefunction: Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)
-            :returns float: A fitness value, with lower indicating better. Distancefunction determines the range and scale of the result.
+        :param expected list: list A set of expected output values for each datapoint.
+        :param distancefunction: Calculates a measure between the calculated and expected values, signature = f(actual, expected, tree)
+        :returns float: A fitness value, with lower indicating better. Distancefunction determines the range and scale of the result.
         """
         actual = self.evaluateAll()
         f = distancefunction(actual, expected, tree=self)
@@ -232,6 +236,7 @@ class Tree:
     def _evalTree(self, node: Node, index=None):
         """
         Recursively evaluate tree with node as root.
+
         Returns None if evaluation is not valid
         """
         children = node.children
@@ -240,7 +245,8 @@ class Tree:
             value = [None] * arity
             for i, child in enumerate(children):
                 v=self._evalTree(child, index)
-                if v is None: return None
+                if v is None:
+                    return None
                 value[i] = v
             return node.evaluate(value, index=index) # function or operator
         else:
@@ -265,6 +271,7 @@ class Tree:
     def getDepth(self):
         """
         Return depth of this tree.
+
         Returns a cached version or calculates a new one if needed.
         """
         if self.modifiedDepth:
@@ -274,13 +281,15 @@ class Tree:
 
     def calculateDepth(self):
         for n in reversed(self.nodes):
-            if n : return n.getDepth()
+            if n :
+                return n.getDepth()
         raise ValueError("No Nodes in tree")
 
     @staticmethod
     def makeRandomTree(variables, depth: int, rng=None, tokenLeafs=False, limit=None):
         """
-        Generate a random expression tree with a random selection of variables
+        Generate a random expression tree with a random selection of variables.
+
         Topdown construction, there is no guarantee that this construction renders a semantically valid tree
 
         :param bool tokenLeafs: if set, only use constants
@@ -332,13 +341,12 @@ class Tree:
     @staticmethod
     def constructFromSubtrees(left, right, rng=None):
         """
-            Construct a valid tree from left and right subtrees.
+        Construct a valid tree from left and right subtrees.
         """
         if rng is None:
+            logger.warning("Using non deterministic mode")
             rng = random.Random()
-        i = 0
         while True:
-            seed = rng.randint(0, 0xffffffff)
             t = Tree.makeRandomTree(variables=None, depth=1, rng=rng, tokenLeafs=True)
             dl = left.getDataPointCount()
             dr = right.getDataPointCount()
@@ -348,7 +356,7 @@ class Tree:
             else:
                 t.spliceSubTree(t.getNode(1), left.getRoot())
             e = t.evaluateTree()
-            if e is not  None:
+            if e is not None:
                 t.setDataPointCount(min(dl, dr))
                 return t
 
@@ -379,9 +387,11 @@ class Tree:
 
     def getRandomNode(self, seed = None, depth = None, rng=None):
         """
-        Return a randomly selected node from this tree
+        Return a randomly selected node from this tree.
+
         If parameter depth is set, select only nodes at that depth
-        The returned node is never root.
+        
+        :returns: a selected node, never root
         """
         r = rng or random.Random()
         if seed is not None:
@@ -409,9 +419,7 @@ class Tree:
         """
         Get parent of node
         """
-        # todo fix invariant
         pos = node.getPosition()
-        parentindex = 0
         if pos == 0:
             return None
         return self.getNode(pos//2) if pos & 1 else self.getNode(pos//2 -1)
@@ -422,6 +430,7 @@ class Tree:
     def _removeNode(self, node: Node, newnode: Node):
         """
         Remove node from tree, replace with newnode.
+
         First stage in splicing a subtree, subtree with root node is unlinked, newnode is placed in.
         """
         self.setModified(True)
@@ -436,9 +445,9 @@ class Tree:
         if parent:
             if npos & 1:
                 assert(parent.getChildren())
-                parent.getChildren()[0] = newnode #trace
+                parent.getChildren()[0] = newnode
             else:
-                parent.getChildren()[1] = newnode  #trace
+                parent.getChildren()[1] = newnode
         self.nodes[npos] = newnode
         if npos == 0:
             self.root=newnode
@@ -468,6 +477,7 @@ class Tree:
     def getConstants(self):
         """
         Return an ordered array of constants for all nodes.
+
         Non initialized constants will have a value of None
         """
         return [ c.getConstant() for c in self.nodes if c]
@@ -493,14 +503,15 @@ class Tree:
 
     def getComplexity(self):
         """
-            Complexity is defined by the weight of the functions used in the expression.
+        Complexity is defined by the weight of the functions used in the expression.
         """
         return sum(d.getNodeComplexity() for d in self.nodes if d is not None)
 
     def getScaledComplexity(self):
         """
-            Return the functional complexity of this tree.
-            This a a ratio in [0.0, 1.0] defining how complex the functions are used in this tree.
+        Return the functional complexity of this tree.
+
+        This a a ratio in [0.0, 1.0] defining how complex the functions are used in this tree.
         """
         c = self.getComplexity()
         d = self.getDepth()
@@ -523,35 +534,31 @@ class Tree:
     def swapSubtrees(left, right, depth = None, rng = None):
         """
         Given two trees, pick random subtree roots and swap them between the trees.
+
         Will swap out subtrees at equal depth.
         """
         lefttreedepth = left.getDepth()
         righttreedepth = right.getDepth()
         if rng is None:
+            logger.warning("Using non deterministic mode")
             rng = random.Random()
 
         if depth is None:
             depth = rng.randint(1, min(lefttreedepth, righttreedepth))
 
         leftsubroot = left.getRandomNode(seed=None, depth=depth, rng=rng)
-        leftv = leftsubroot.getVariables()
-
         rightsubroot = right.getRandomNode(seed=None, depth=depth, rng=rng)
-        rightv = rightsubroot.getVariables()
 
-        # We don't want aliasing effects, note that variable set is still aliased
         leftcopy = copyObject(leftsubroot)
         rightcopy = copyObject(rightsubroot)
 
         left.spliceSubTree(leftsubroot, rightcopy)
-
         right.spliceSubTree(rightsubroot, leftcopy)
 
     @staticmethod
     def createTreeFromExpression(expr: str, variables=None):
         """
-        Given an infix expression containing floats, operators, function defined in functions.functionset,
-        create a corresponding expression tree.
+        Given an infix expression containing floats, operators, function defined in functions.functionset, create a corresponding expression tree.
 
         :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) is allowed but not log(x) with implicit base e
         """
