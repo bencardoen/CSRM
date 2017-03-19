@@ -540,13 +540,13 @@ class TreeTest(unittest.TestCase):
         self.assertTrue(t.isModified())
         e =t.evaluateTree()
         self.assertFalse(t.isModified())
-        rng = random.Random()
-        rng.seed(2)
+        rng = getRandom(2)
         Mutate.mutate(t, variables=vs,rng=rng)
         self.assertTrue(t.isModified())
         t.getDepth()
-        t.evaluateTree()
+        f = t.evaluateTree()
         self.assertFalse(t.isModified())
+        self.assertNotEqual(f, e)
 
     def testRange(self):
         rng = random.Random()
@@ -725,48 +725,45 @@ class TreeTest(unittest.TestCase):
     def testAdvancedCrossover(self):
         vcount = 4
         dpoint = 1
-        rng = random.Random()
-        rng.seed(0)
+        rng = getRandom(0)
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
         variables = Variable.toVariables(vs)
         left = Tree.makeRandomTree(variables, depth=6, rng=rng)
         right = Tree.makeRandomTree(variables, depth=4, rng=rng)
         cl = deepcopy(left)
         cr = deepcopy(right)
+        self.assertNotEqual(cl.getDepth(), cr.getDepth())
         Crossover.subtreecrossover(left, right,rng=rng, depth=None)
         self.assertEqual(left.getDepth(), right.getDepth())
 
 
     def testDistanceFunctions(self):
-#         # Staging test for distance functions: test for overflow/ div by zero
-#         a = [1 for d in range(10)]
-#         b = a[:]
-#         rmse = rootmeansquare(a,b)
-#         nrmse = rootmeansquarenormalized(a,b)
-#         self.assertEqual(rmse, 0)
-#
-#         a = [1 for d in range(10)]
-#         b = a[:]
-#         rmse = rootmeansquare(a,b)
-#         nrmse = rootmeansquarenormalized(a,b)
-#         self.assertEqual(rmse, 0)
-#
-#         a = [1,3,4,4]
-#         b = [2,5,5,8]
-#         rmse = rootmeansquare(a,b)
-#         nrmse = rootmeansquarenormalized(a,b)
-#         p = pearson(a,b)
-#         _p = _pearson(a,b)
-# #        print(rmse, nrmse, p, _p)
-#
-#         a = [random.uniform(1,100) for d in range(100)]
-#         b = [50 for d in range(100)]
-#         rmse = rootmeansquare(a,b)
-#         nrmse = rootmeansquarenormalized(a,b)
-#         p = pearson(a,b)
-#         _p = _pearson(a,b)
-#
-# #        print(rmse, nrmse, p, _p)
+        # Staging test for distance functions: test for overflow/ div by zero
+        a = [1 for d in range(10)]
+        b = a[:]
+        rmse = rootmeansquare(a,b)
+        nrmse = rootmeansquarenormalized(a,b)
+        self.assertEqual(rmse, 0)
+        self.assertEqual(nrmse, 0)
+
+        a = [1 for d in range(10)]
+        b = a[:]
+        rmse = rootmeansquare(a,b)
+        nrmse = rootmeansquarenormalized(a,b)
+        self.assertEqual(rmse, 0)
+        self.assertEqual(nrmse, 0)
+
+        a = [random.uniform(1,100) for d in range(100)]
+        b = [50 for d in range(100)]
+        rmse = rootmeansquare(a,b)
+        nrmse = rootmeansquarenormalized(a,b)
+        self.assertTrue(nrmse <= 1)
+        p = pearson(a,b)
+        _p = _pearson(a,b)
+        self.assertTrue(p<=1)
+        self.assertTrue(_p<=1)
+
+#        print(rmse, nrmse, p, _p)
         a = [0.0096416794856030164, 0.0096416794856030164, 0.0096416794856030164, 0.26241624623590931, 0.27751012100799344, 0.29467203565038796, 0.36028300074390873, 0.36028300074390873, 1, 0.3901901995195628]
         b = [0.0093714999389968856, 0.0093714999389968856, 0.0093714999389968856, 0.26110518104903135, 0.27141310496620774, 0.29636300309085484, 0.30491503735452846, 0.30491503735452846, 0.30755147098842195, 0.35777767106738589]
         fvalue = pearson(a,b)
@@ -801,6 +798,7 @@ class TreeTest(unittest.TestCase):
             copies[i] = deepcopy(trees[i])
         t1 = time.time()
         total = t1-t0
+        self.assertTrue(total>0)
 
     def testSampling(self):
         vpoint = 5
@@ -829,7 +827,7 @@ class TreeTest(unittest.TestCase):
         for i in range(10):
             self.assertTrue( powerOf2(2**i) )
         for i in range(2,100):
-            if i%2 != 0:
+            if i % 2 != 0:
                 self.assertFalse( powerOf2(i))
 
 
@@ -840,7 +838,7 @@ class TreeTest(unittest.TestCase):
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
         X2 = generateVariables(vpoint, 1, seed=20, sort=True, lower=-10, upper=10)
         t = Tree.createTreeFromExpression(expr, X)
-        Y = t.evaluateAll()
+        t.evaluateAll()
         V = t.getRoot().getVariables()
         vmod = copyObject(V)
         t.updateVariables(X2)
