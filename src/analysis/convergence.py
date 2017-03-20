@@ -13,6 +13,7 @@ import json
 from expression.tools import copyObject
 logger = logging.getLogger('global')
 
+
 class Plotter:
     def __init__(self):
         self._plots = []
@@ -33,10 +34,12 @@ class Plotter:
     def getPlots(self):
         return self._plots
 
+
 class Convergence(Plotter):
     """
-        Utility class to parse and convert convergence statistics.
+    Utility class to parse and convert convergence statistics.
     """
+    
     def __init__(self, convergencestats):
         super().__init__()
         self._convergencestats = convergencestats
@@ -44,7 +47,7 @@ class Convergence(Plotter):
 
     def plotFitness(self):
         """
-            Plot fitness values over the generations
+        Plot fitness values over the generations
         """
         converted = []
         generations = 0
@@ -62,7 +65,7 @@ class Convergence(Plotter):
 
     def plotComplexity(self):
         """
-            Plot complexity values over the generations
+        Plot complexity values over the generations
         """
         converted = []
         generations = 0
@@ -80,7 +83,7 @@ class Convergence(Plotter):
 
     def plotOperators(self):
         """
-            Plot effective (i.e. rendering a fitter individual) modifications made by mutations and crossover
+        Plot effective (i.e. rendering a fitter individual) modifications made by mutations and crossover
         """
         converted = []
         generations = 0
@@ -98,7 +101,7 @@ class Convergence(Plotter):
 
     def plotPareto(self):
         """
-            Plot fitness values against complexity in a front
+        Plot fitness values against complexity in a front
         """
         run = self._convergencestats[-1]
         fitnessvalues = run[-1]['fitness']
@@ -120,7 +123,6 @@ class SummarizedResults(Plotter):
         self._results = results
 
     def plotFitness(self):
-        processes = len (self._results)
         fitness = rmtocm([r['fitness'] for r in self._results])
         #logger.info("Fitness values for plotting are {}".format(fitness))
         logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
@@ -129,7 +131,6 @@ class SummarizedResults(Plotter):
             self.addPlot(p)
 
     def plotPrediction(self):
-        processes = len (self._results)
         fitness = rmtocm([r['corr_fitness'] for r in self._results])
         #logger.info("Fitness values for plotting are {}".format(fitness))
         logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
@@ -137,7 +138,6 @@ class SummarizedResults(Plotter):
         self.addPlot(p)
 
     def plotDifference(self):
-        processes = len (self._results)
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
         #logger.info("Fitness values for plotting are {}".format(fitness))
         logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
@@ -145,6 +145,7 @@ class SummarizedResults(Plotter):
         self.addPlot(p)
 
     def plotComplexity(self):
+        logger.warning("Unused function")
         pass
 
     def saveData(self, filename, outputfolder=None):

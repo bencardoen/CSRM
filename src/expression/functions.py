@@ -24,11 +24,14 @@ logger = logging.getLogger('global')
 def plus(a, b):
     return a+b
 
+
 def minus(a, b):
     return plus(a, -b)
 
+
 def multiply(a, b):
     return a*b
+
 
 def power(a, b):
     if a < 0 or abs(b) > Constants.SIZE_LIMIT or abs(a) > Constants.BASE_LIMIT:
@@ -41,10 +44,12 @@ def power(a, b):
         logger.warning("Overflow with pow ( {} , {})".format(a, b))
         return None
 
+
 def division(a, b):
     if b == 0:
         return None
     return a/float(b)
+
 
 def modulo(a, b):
     b = int(b)
@@ -52,44 +57,56 @@ def modulo(a, b):
         return None
     return int(a) % b
 
+
 def logarithm(a, b):
     if a <= 0 or b <= 0 or b == 1 or abs(b)>Constants.SIZE_LIMIT:
         return None
     return log(a,b)
 
+
 def maximum(a, b):
     return max(a,b)
+
 
 def minimum(a,b):
     return min(a,b)
 
+
 def sine(a):
     return sin(a)
+
 
 def cosine(a):
     return cos(a)
 
+
 def absolute(a):
     return abs(a)
+
 
 def ln(a):
     return logarithm(a, math.e)
 
+
 def exponential(a):
     return power(math.e, a)
+
 
 def square_root(a):
     if a < 0:
         return None
     return math.sqrt(a)
 
+
 def tangent(a):
     if approximateMultiple(a, math.pi, epsilon=0.001):
         return None
     return math.tan(a)
 
+
 def tangenth(a):
     return math.tanh(a)
+
 
 def generateOrderedFunctionTable(fset):
     return sorted(fset.keys(), key= lambda i : i.__name__)
@@ -109,8 +126,7 @@ functionset = { plus:("+", 2, 2, 'L',1), minus:("-", 2, 2, 'L',1),
 functions = generateOrderedFunctionTable(functionset)
 
 # Testfunctions from M.F. Korns' paper "A baseline symbolic regression algorithm"
-testfunctions = [
-                    "1.57 + (24.3*x3)", "0.23+(14.2*((x3+x1)/(3.0*x4)))",
+testfunctions = [   "1.57 + (24.3*x3)", "0.23+(14.2*((x3+x1)/(3.0*x4)))",
                     "-5.41 + (4.9*(((x3-x0)+(x1/x4))/(3*x4)))", "-2.3 + (0.13*sin(x2))",
                     "3.0 + (2.13 * ln(x4))", "1.3 + (0.13*sqrt(x0))",
                     "213.80940889 - (213.80940889*exp(-0.54723748542*x0))",
@@ -119,8 +135,7 @@ testfunctions = [
                     "6.87+ 11* cos(7.23*x0**3)", "2.0 - 2.1 * cos(9.8*x0) * sin(1.3*x4)",
                     "32-3.0*( (tan(x0)/tan(x1) )*( tan(x2) / tan(x3) ))",
                     "22 - 4.2*((cos(x0)-tan(x1))*(tanh(x2)/sin(x3)))",
-                    "12.0 - 6.0* tan(x0)/exp(x1) * (ln(x2)-tan(x3) ) "
-                ]
+                    "12.0 - 6.0* tan(x0)/exp(x1) * (ln(x2)-tan(x3) ) " ]
 
 tokens = { value[0]: key for key, value in list(functionset.items())}
 braces = [',', '(',')']
@@ -134,8 +149,10 @@ def getRandomFunction(seed = None, rng=None):
         _rng.seed(seed)
     return _rng.choice(functions)
 
+
 def getFunctionComplexity(f):
     return functionset[f][4]
+
 
 def tokenize(expression, variables=None):
     """
@@ -211,7 +228,6 @@ def infixToPostfix(infix):
             result.append(token)
             logger.debug("appending v {}".format(token))
         elif token in functionset:
-            f = functionset[token]
             if isFunction(token):
                 stack.append(token)
             else:
@@ -238,6 +254,7 @@ def infixToPostfix(infix):
         result.append(stack.pop(-1))
     return result
 
+
 def infixToPrefix(infix):
     """
     Convert infix to prefix by way of postfix conversion.
@@ -254,6 +271,7 @@ def infixToPrefix(infix):
     result = [x for x in reversed(tmp)]
     return result
 
+
 def parseVariable(stream, variables, index):
     """
 
@@ -266,6 +284,7 @@ def parseVariable(stream, variables, index):
         return ( Variable(variables[vindex], vindex) , index)
     else:
         return (None, index)
+
 
 def handleUnaryMinus(expression, index, output, variables):
     f = matchFloat(expression[index:])
@@ -318,32 +337,38 @@ def parseFunction(expression: str, index: int, output: list):
         raise ValueError("Invalid chars {}".format(name))
     return expression, index, output
 
+
 def preParse(expression:str):
     """
-        Clean up expression before tokenizer operates on it.
+    Clean up expression before tokenizer operates on it.
     """
     expression = expression.replace(' ', '')
     expression = expression.replace("**", "^")
     return expression
 
+
 def rmsfitness(actual, expected, tree):
     return fitnessfunction(actual, expected, tree, distancefunction=rootmeansquare)
+
 
 def rmsnormfitness(actual, expected, tree):
     return fitnessfunction(actual, expected, tree, distancefunction=rootmeansquarenormalized)
 
+
 def pearsonfitness(actual, expected, tree):
     return fitnessfunction(actual, expected, tree, distancefunction=pearson)
 
+
 def fitnessfunction(actual, expected, tree, distancefunction=None):
     """
-        Fitness function based on a distance measure.
-        :param list actual: Y', actual approximated valus
-        :param list expected: Y, expected values
-        :param Tree tree: the instance to operate on
-        :param function distancefunction: function object that accepts actual, expected as parameters and returns a numerical distance. If None, rootmeansquare is used.
+    Fitness function based on a distance measure.
 
-        Returns d(Y', Y).
+    :param list actual: Y', actual approximated valus
+    :param list expected: Y, expected values
+    :param Tree tree: the instance to operate on
+    :param function distancefunction: function object that accepts actual, expected as parameters and returns a numerical distance. If None, rootmeansquare is used.
+
+    :returns: d(Y', Y).
     """
     if not actual:
         logger.debug("Tree instance has no datapoints : invalid")

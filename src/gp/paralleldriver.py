@@ -6,9 +6,6 @@
 #A full copy of the license is in COPYING.txt, or can be found at
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
-import logging
-logger = logging.getLogger('global')
-
 
 from expression.functions import testfunctions, pearsonfitness as _fit
 import random
@@ -20,6 +17,8 @@ from gp.parallelalgorithm import ParallelGP, SequentialPGP, isMPI
 from gp.algorithm import BruteCoolingElitist
 from expression.constants import Constants
 from expression.tools import getKSamples
+import logging
+logger = logging.getLogger('global')
 
 # Depending on system, mpi4py is either in mpich or global
 try:
@@ -112,7 +111,7 @@ if __name__ == "__main__":
         if outputfolder[-1] != '/':
             outputfolder += '/'
     displaystats = True if args.displaystats else False
-    generations =  args.generations
+    generations = args.generations
     population = args.population
     phases = args.phases
     logger.setLevel(logging.INFO)

@@ -1,3 +1,10 @@
+#This file is part of the CSRM project.
+#Copyright 2016 - 2017 University of Antwerp
+#https://www.uantwerpen.be/en/
+#Licensed under the EUPL V.1.1
+#A full copy of the license is in COPYING.txt, or can be found at
+#https://joinup.ec.europa.eu/community/eupl/og_page/eupl
+#      Author: Ben Cardoen
 
 
 class Constants():
@@ -15,6 +22,7 @@ class Constants():
     # Size limit for exponents
     SIZE_LIMIT = 20
     BASE_LIMIT = 1e10
+    LOWER_LIMIT = 1e-12
     # Legal range for constants
     # Setting this to high values leads to explosion in fitness values
     CONSTANTS_LOWER=0
