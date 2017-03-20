@@ -739,6 +739,8 @@ class TreeTest(unittest.TestCase):
         for i in range(TESTRANGE):
             Crossover.subtreecrossover(cl, cr, rng=rng, depth=None, symmetric=False, limitdepth=limdepth)
             self.assertTrue(max(cl.getDepth(), cr.getDepth())<=limdepth)
+            Crossover.subtreecrossover(cl, cr, rng=rng, depth=None, symmetric=True, limitdepth=limdepth)
+            self.assertTrue(max(cl.getDepth(), cr.getDepth())<=limdepth)
 
 
     def testDistanceFunctions(self):
