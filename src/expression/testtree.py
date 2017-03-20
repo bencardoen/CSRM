@@ -292,7 +292,7 @@ class TreeTest(unittest.TestCase):
 
         self.assertEqual(ld, rd)
 
-        Tree.swapSubtrees(left, right, depth=3, rng=rng)
+        Tree.swapSubtrees(left, right, depth=[3,3], rng=rng)
         left.printToDot(outputfolder+"t13LeftSwapped.dot")
         right.printToDot(outputfolder+"t13RightSwapped.dot")
 
@@ -591,7 +591,7 @@ class TreeTest(unittest.TestCase):
         left = Tree.createTreeFromExpression(expression, variables)
         right = Tree.createTreeFromExpression(expression, variables)
         rng=getRandom(0)
-        Crossover.subtreecrossover(left, right, depth=2, rng=rng)
+        Crossover.subtreecrossover(left, right, depth=[2,2], rng=rng)
         self.assertEqual(left.getDepth(), right.getDepth())
 
     def testBottomUpConstruction(self):
@@ -610,7 +610,6 @@ class TreeTest(unittest.TestCase):
         t.printToDot(outputfolder+"t35Grown.dot")
         e = t.evaluateTree()
         self.assertEqual(e, -0.5015238990021315)
-
 
     def testGrowTree(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
@@ -724,20 +723,22 @@ class TreeTest(unittest.TestCase):
             self.assertTrue(last.getDepth() == d)
         last.printToDot(outputfolder+"t40Mutated4.dot")
 
-
     def testAdvancedCrossover(self):
+        TESTRANGE = 10
         vcount = 4
         dpoint = 1
         rng = getRandom(0)
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
         variables = Variable.toVariables(vs)
-        left = Tree.makeRandomTree(variables, depth=6, rng=rng)
-        right = Tree.makeRandomTree(variables, depth=4, rng=rng)
+        left = Tree.makeRandomTree(variables, depth=4, rng=rng)
+        right = Tree.makeRandomTree(variables, depth=11, rng=rng)
         cl = deepcopy(left)
         cr = deepcopy(right)
-        self.assertNotEqual(cl.getDepth(), cr.getDepth())
-        Crossover.subtreecrossover(left, right,rng=rng, depth=None)
-        self.assertEqual(left.getDepth(), right.getDepth())
+        rng.seed(0)
+        limdepth = 11
+        for i in range(TESTRANGE):
+            Crossover.subtreecrossover(cl, cr, rng=rng, depth=None, symmetric=False, limitdepth=limdepth)
+            self.assertTrue(max(cl.getDepth(), cr.getDepth())<=limdepth)
 
 
     def testDistanceFunctions(self):
@@ -778,9 +779,6 @@ class TreeTest(unittest.TestCase):
         b[0] = 2
         fvaluen = pearson(a,b)
         self.assertTrue(fvaluen > fvalue)
-
-
-
 
     def testPickleCopyPerformance(self):
         vcount = 4

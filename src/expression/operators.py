@@ -81,7 +81,7 @@ class Crossover():
     """
 
     @staticmethod
-    def subtreecrossover(left, right, depth = None, rng = None, limitdepth=-1):
+    def subtreecrossover(left, right, depth = None, rng = None, limitdepth=-1, symmetric=True):
         """
         Perform a subtree crossover in place.
 
@@ -91,18 +91,35 @@ class Crossover():
         :param Tree right: tree to modify with left's subtree
         :param int seed: seed for PRNG (selection of subtree)
         :param int depth: if not None, forces subtree selection to pick subtrees at the given depth. Else the chosen depth is in [1, min(left.getDepth(), right.getDepth())]
-        :param int limitdepth: if not -1, restricts the depth of the operation.
+        :param int limitdepth: if not -1, restricts the depth of the operation. The resulting tree will not be larger than this value.
         :param Random rng: rng used in calls to select subtrees
         """
         ld = left.getDepth()
         rd = right.getDepth()
+        mindepth = min(ld, rd)
         if rng is None:
             logger.warning("Non deterministic mode")
             rng = getRandom()
         if depth is None:
-            mindepth = min(left.getDepth(), right.getDepth())
-            chosendepth = rng.randint(1, mindepth)
-            depth = chosendepth
+            if symmetric:
+                ldepth = rng.randint(1, mindepth)
+                rdepth = ldepth
+            else:
+                rdepth = rng.randint(1, rd)
+                ldepth = rng.randint(1, ld)
+            depth = [ldepth, rdepth]
+        else:
+            pass
         if limitdepth != -1:
-            depth = min(ld, rd, limitdepth, depth)
-        Tree.swapSubtrees(left, right, depth=depth, rng=rng)
+            maxleftsubtreedepth = (ld-depth[0])
+            maxrightsubtreedepth = (rd - depth[1])
+            leftsurplus = (maxleftsubtreedepth + depth[1]) - limitdepth
+            rightsurplus = (maxrightsubtreedepth + depth[0]) - limitdepth
+            if leftsurplus > 0:
+                depth[0] += leftsurplus
+            if rightsurplus > 0:
+                depth[1] += rightsurplus
+        Tree.swapSubtrees(left, right, depth=depth, rng=rng, symmetric=symmetric)
+        if (left.getDepth() > limitdepth or right.getDepth() > limitdepth) and limitdepth != -1:
+            logger.error("Left depth {} or right depth exceeds limit {}".format(left.getDepth(), right.getDepth(), limitdepth))
+            raise ValueError

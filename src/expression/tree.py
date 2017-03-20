@@ -395,24 +395,22 @@ class Tree:
 
         :returns: a selected node, never root
         """
-        r = rng
-        if rng is None:
-            r = getRandom()
+        if depth is not None:
+            assert(depth <= self.getDepth())
+        r = rng or getRandom()
         if seed is not None:
             r.seed(seed)
         if seed is None and rng is None:
             logger.warning("Non deterministic mode")
-        lower = 1
-        upper = len(self.nodes)
+        lower, upper = 1, len(self.nodes)
         if depth:
             # We know our repr is a binary tree, with depth slices equal in length to 2^k where k is depth
             assert(depth < math.log(len(self.nodes)+1, 2))
             lower = 2**depth-1
             upper = min(2**(depth+1)-1, len(self.nodes))
         node = None
-        while node is None:
-            i = r.randrange(max(lower,1), upper)
-            node = self.getNode(i)
+        while node is None: # a node can have a single leaf, not two, so in the list None entities will be present
+            node = self.getNode( r.randrange(max(lower,1), upper) )
         return node
 
     def setModified(self, v):
@@ -537,7 +535,7 @@ class Tree:
 
 
     @staticmethod
-    def swapSubtrees(left, right, depth = None, rng = None):
+    def swapSubtrees(left, right, depth = None, rng = None, symmetric=True):
         """
         Given two trees, pick random subtree roots and swap them between the trees.
 
@@ -550,10 +548,23 @@ class Tree:
             rng = getRandom()
 
         if depth is None:
-            depth = rng.randint(1, min(lefttreedepth, righttreedepth))
+            if symmetric:
+                depthleft = rng.randint(1, min(lefttreedepth, righttreedepth))
+                depthright = depthleft
+            else:
+                depthleft = rng.randint(1, lefttreedepth)
+                depthright = rng.randint(1, righttreedepth)
+        else:
+            if symmetric:
+                assert(depth[0]==depth[1])
+                depthleft = depth[0]
+                depthright = depth[1]
+            else:
+                depthleft = depth[0]
+                depthright = depth[1]
 
-        leftsubroot = left.getRandomNode(seed=None, depth=depth, rng=rng)
-        rightsubroot = right.getRandomNode(seed=None, depth=depth, rng=rng)
+        leftsubroot = left.getRandomNode(seed=None, depth=depthleft, rng=rng)
+        rightsubroot = right.getRandomNode(seed=None, depth=depthright, rng=rng)
 
         leftcopy = copyObject(leftsubroot)
         rightcopy = copyObject(rightsubroot)
