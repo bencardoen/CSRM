@@ -292,7 +292,6 @@ class SequentialPGP():
                 process.executePhase()
                 buf, targets = process.send()
                 if not targets:
-                    logger.warning("Nothing to send from {}".format(i))
                     continue
                 for index, target in enumerate(targets):
                     self._processes[target].receive(buf[index], i)

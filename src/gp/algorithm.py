@@ -28,7 +28,7 @@ class GPAlgorithm():
     In itself it will not evolve a solution.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed=None, archivesize=None, history=None, phases=None, tournamentsize=None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed=None, archivesize=None, history=None, phases=None, tournamentsize=None, initdepth=None):
         """
         Initializes a forest of trees randomly constructed.
 
@@ -47,6 +47,7 @@ class GPAlgorithm():
         self._datapointcount = len(X[0])
         """ Fitness function, passed to tree instance to score."""
         self._fitnessfunction = fitnessfunction
+        self._initialdepth = initdepth or maxdepth
         self._maxdepth = maxdepth
         self._popsize = popsize
         self._seed = seed
@@ -68,7 +69,7 @@ class GPAlgorithm():
         self._currentgeneration = 0
         """ Size of the archive : collection of (shared) samples between phases """
         self._archivesize = archivesize or max(self._popsize // Constants.POP_TO_ARCHIVERATIO, 1)
-        logger.debug("Archive is set at {} defined by {} max({}//{}, 1)".format(archivesize, self._archivesize, self._popsize, Constants.POP_TO_ARCHIVERATIO))
+        logger.info("Archive is set at {} defined by {} max({}//{}, 1)".format(archivesize, self._archivesize, self._popsize, Constants.POP_TO_ARCHIVERATIO))
         assert(self._archivesize > 0)
         # List of generation : tuple of stats
         self._convergencestats = []
@@ -82,7 +83,7 @@ class GPAlgorithm():
         self._tournamentsize = tournamentsize or popsize
         """ Number of samples to archive between phases. """
         self._archivephase = max(self._archivesize // Constants.ARCHIVE_SELECTION_RATIO, 1)
-        logger.debug("Archive sample per phases = {} defined by {} // max({}, 1)".format(self._archivephase, self._archivesize, Constants.ARCHIVE_SELECTION_RATIO))
+        logger.info("Archive sample per phases = {} defined by {} // max({}, 1)".format(self._archivephase, self._archivesize, Constants.ARCHIVE_SELECTION_RATIO))
         """ Number of samples to use as seed in next phase """
         self._archivephaseseed = max(self._archivesize // Constants.ARCHIVE_SELECTION_RATIO, 1)
         """
@@ -212,7 +213,7 @@ class GPAlgorithm():
 
         The generated tree is guaranteed to be viable (i.e. has a non inf fitness)
         """
-        t = Tree.growTree(self._variables, self._maxdepth, rng=self._rng)
+        t = Tree.growTree(self._variables, self._initialdepth, rng=self._rng)
         t.scoreTree(self._Y, self._fitnessfunction)
         i = 0
         rng = self._rng
