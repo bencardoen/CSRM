@@ -39,7 +39,7 @@ class Convergence(Plotter):
     """
     Utility class to parse and convert convergence statistics.
     """
-    
+
     def __init__(self, convergencestats):
         super().__init__()
         self._convergencestats = convergencestats
@@ -85,7 +85,6 @@ class Convergence(Plotter):
         """
         Plot effective (i.e. rendering a fitter individual) modifications made by mutations and crossover
         """
-        converted = []
         generations = 0
         cvalues = [[],[]]
         runs = len(self._convergencestats)

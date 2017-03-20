@@ -34,7 +34,7 @@ def multiply(a, b):
 
 
 def power(a, b):
-    if a < 0 or abs(b) > Constants.SIZE_LIMIT or abs(a) > Constants.BASE_LIMIT:
+    if a < 0 or abs(b) > Constants.EXPONENT_LIMIT or abs(a) > Constants.BASE_LIMIT or (abs(a) < Constants.LOWER_LIMIT and a != 0):
         return None
     if a == 0 and b<0:
         return None
@@ -59,7 +59,7 @@ def modulo(a, b):
 
 
 def logarithm(a, b):
-    if a <= 0 or b <= 0 or b == 1 or abs(b)>Constants.SIZE_LIMIT:
+    if a <= 0 or b <= 0 or b == 1 or abs(b)>Constants.EXPONENT_LIMIT:
         return None
     return log(a,b)
 

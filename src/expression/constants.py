@@ -20,8 +20,10 @@ class Constants():
     PEARSONMINFITNESS = 1
     MAXFITNESS = 0
     # Size limit for exponents
-    SIZE_LIMIT = 20
+    EXPONENT_LIMIT = 20
     BASE_LIMIT = 1e10
+    # ensure that a value isn't too small, it won't be representable in IEEE754, leading
+    # to overflow error
     LOWER_LIMIT = 1e-12
     # Legal range for constants
     # Setting this to high values leads to explosion in fitness values
