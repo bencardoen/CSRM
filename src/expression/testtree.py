@@ -667,7 +667,7 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(c2, (c-(d-1))/57)
 
     def testAdvancedMutate(self):
-        TESTRANGE = 100
+        TESTRANGE = 1000
         vcount = 4
         dpoint = 2
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
@@ -685,7 +685,7 @@ class TreeTest(unittest.TestCase):
             t = copyObject(t)
             Mutate.mutate(t, variables = vs,equaldepth=True, rng=rng)
             self.assertEqual(t.getDepth(), d)
-            t.printToDot(outputfolder+"t40Mutated1.dot")
+        t.printToDot(outputfolder+"t40Mutated1.dot")
 
         # Variable mutation, mutate with a set limit to the generated mutation
         d = t.getDepth()
@@ -696,20 +696,23 @@ class TreeTest(unittest.TestCase):
             Mutate.mutate(t, variables=vs, rng=rng, equaldepth=False, limitdepth=limit )
             logger.debug("New depth = {}".format(t.getDepth()))
             self.assertTrue(t.getDepth()<= max(d, limit))
-            t.printToDot(outputfolder+"t40Mutated2.dot")
+        t.printToDot(outputfolder+"t40Mutated2.dot")
 
         # Mutate with a limit set, without equaldepth, with a set depth to select
         d = told.getDepth()
         rng.seed(0)
-        Mutate.mutate(told, variables=vs, rng=rng, equaldepth=False, limitdepth=limit, selectiondepth=d)
-        self.assertTrue(told.getDepth() != d and told.getDepth() <= limit)
+        for _ in range(TESTRANGE):
+            told = copyObject(told)
+            Mutate.mutate(told, variables=vs, rng=rng, equaldepth=False, limitdepth=limit, selectiondepth=d)
+            self.assertTrue(told.getDepth() <= limit)
         told.printToDot(outputfolder+"t40Mutated3.dot")
 
         # Mutate with limit, depth maintaining, selectiondepth set
         d = last.getDepth()
         rng.seed(0)
-        Mutate.mutate(last, variables=vs,rng=rng, equaldepth=True, selectiondepth=d)
-        self.assertTrue(last.getDepth() == d)
+        for _ in range(TESTRANGE):
+            Mutate.mutate(last, variables=vs,rng=rng, equaldepth=True, selectiondepth=d)
+            self.assertTrue(last.getDepth() == d)
         last.printToDot(outputfolder+"t40Mutated4.dot")
 
 
