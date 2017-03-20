@@ -69,7 +69,7 @@ class GPAlgorithm():
         self._currentgeneration = 0
         """ Size of the archive : collection of (shared) samples between phases """
         self._archivesize = archivesize or max(self._popsize // Constants.POP_TO_ARCHIVERATIO, 1)
-        logger.info("Archive is set at {} defined by {} max({}//{}, 1)".format(archivesize, self._archivesize, self._popsize, Constants.POP_TO_ARCHIVERATIO))
+        logger.info("Archive is set at {} defined by {} OR max({}//{}, 1)".format(self._archivesize, archivesize, self._popsize, Constants.POP_TO_ARCHIVERATIO))
         assert(self._archivesize > 0)
         # List of generation : tuple of stats
         self._convergencestats = []
@@ -86,6 +86,7 @@ class GPAlgorithm():
         logger.info("Archive sample per phases = {} defined by {} // max({}, 1)".format(self._archivephase, self._archivesize, Constants.ARCHIVE_SELECTION_RATIO))
         """ Number of samples to use as seed in next phase """
         self._archivephaseseed = max(self._archivesize // Constants.ARCHIVE_SELECTION_RATIO, 1)
+        logger.info("Archive seed per phases = {} defined by max({} // {}, 1 ))".format(self._archivephaseseed, self._archivesize, Constants.ARCHIVE_SELECTION_RATIO, 1))
         """
         Randomizing the selection upon which crossover works can improve the quality of the converged results.
         Non random crossover (e.g. best mates with second best) will lead to faster convergence, albeit to a less optimal solution.

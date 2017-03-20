@@ -45,7 +45,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None, display=False
     pcount = comm.Get_size() if isMPI() else processcount
     population = population or 20
     commsize = 2
-    archivesize = pcount*2
+    archivesize = population
     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
     t = Tree.createTreeFromExpression(expr, X)
     Y = t.evaluateAll()
