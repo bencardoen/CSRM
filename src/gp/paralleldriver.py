@@ -63,7 +63,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None, display=False
         algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
         logger.info("Starting Sequential implementation")
-        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, splitData=False, archivesize=archivesize, communicationsize=commsize)
+        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize)
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)

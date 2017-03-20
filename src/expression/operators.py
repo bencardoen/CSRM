@@ -7,39 +7,43 @@
 #      Author: Ben Cardoen
 
 from expression.tree import Tree
-from expression.tools import traceFunction
+from expression.tools import traceFunction, getRandom
 import logging
 import random
 logger = logging.getLogger('global')
 
+
 class Mutate():
     """
-        Mutate a subexpression in the tree
+    Mutate a subexpression in the tree
     """
+
     @staticmethod
     def mutate(tr:Tree, variables, equaldepth=False, rng=None, limitdepth:int=0, selectiondepth:int=-1):
         """
-            Replace a random node with a new generated subexpression.
+        Replace a random node with a new generated subexpression.
 
-            If no variables are supplied, the existing set is reused.
+        If no variables are supplied, the existing set is reused.
 
-            This operator is capable of operating using 3 policies specified by its parameters.
+        This operator is capable of operating using 3 policies specified by its parameters.
 
-            With equaldepth set, the resulting mutation will always have the same depth as the original tree.
-            With limitdepth set, the resulting tree will have a depth <= limit
-            With selectiondepth set, the target depth for the mutation point can be specified.
+        With equaldepth set, the resulting mutation will always have the same depth as the original tree.
+        With limitdepth set, the resulting tree will have a depth <= limit
+        With selectiondepth set, the target depth for the mutation point can be specified.
 
-            For instance to create a mutation operator that mutates only leafs and replaces them with leafs:
-                equaldepth=True, limitdepth=0, selectiondepth=tr.getDepth()
+        For instance to create a mutation operator that mutates only leafs and replaces them with leafs:
+            equaldepth=True, limitdepth=0, selectiondepth=tr.getDepth()
 
-            :param Tree tr: Tree to modify in place
-            :param variables: set of variables
-            :param bool equaldepth: if set the generated subtree will have the same depth as the node removed, resulting in a mutation which conserves tree depth
-            :param int limitdepth: if not 0 prevent the mutation from growing a resulting tree with depth larger than limit
-            :param int selectiondepth: if not -1 specify at which depth the insertion point is chosen
-            :param Random rng: prng used to generate the new subtree and its attaching location
+        :param Tree tr: Tree to modify in place
+        :param variables: set of variables
+        :param bool equaldepth: if set the generated subtree will have the same depth as the node removed, resulting in a mutation which conserves tree depth
+        :param int limitdepth: if not 0 prevent the mutation from growing a resulting tree with depth larger than limit
+        :param int selectiondepth: if not -1 specify at which depth the insertion point is chosen
+        :param Random rng: prng used to generate the new subtree and its attaching location
         """
-        rng = rng or random.Random()
+        if rng is None:
+            rng = getRandom()
+            logger.warning("Non deterministic mode")
 
         d = tr.getDepth()
 
@@ -70,28 +74,31 @@ class Mutate():
         subtree = Tree.growTree(variables=variables, depth=targetdepth, rng=rng)
         tr.spliceSubTree(insertpoint, subtree.getRoot())
 
+
 class Crossover():
     """
-        Subtree crossover operator
+    Subtree crossover operator
     """
+
     @staticmethod
     def subtreecrossover(left, right, depth = None, rng = None, limitdepth=-1):
         """
-            Perform a subtree crossover in place.
+        Perform a subtree crossover in place.
 
-            A subtree from left and right are chosen (influenced by seed) and exchanged.
+        A subtree from left and right are chosen (influenced by seed) and exchanged.
 
-            :param Tree left: tree to modify with right's subtree
-            :param Tree right: tree to modify with left's subtree
-            :param int seed: seed for PRNG (selection of subtree)
-            :param int depth: if not None, forces subtree selection to pick subtrees at the given depth. Else the chosen depth is in [1, min(left.getDepth(), right.getDepth())]
-            :param int limitdepth: if not -1, restricts the depth of the operation.
-            :param Random rng: rng used in calls to select subtrees
+        :param Tree left: tree to modify with right's subtree
+        :param Tree right: tree to modify with left's subtree
+        :param int seed: seed for PRNG (selection of subtree)
+        :param int depth: if not None, forces subtree selection to pick subtrees at the given depth. Else the chosen depth is in [1, min(left.getDepth(), right.getDepth())]
+        :param int limitdepth: if not -1, restricts the depth of the operation.
+        :param Random rng: rng used in calls to select subtrees
         """
         ld = left.getDepth()
         rd = right.getDepth()
         if rng is None:
-            rng = random.Random()
+            logger.warning("Non deterministic mode")
+            rng = getRandom()
         if depth is None:
             mindepth = min(left.getDepth(), right.getDepth())
             chosendepth = rng.randint(1, mindepth)
