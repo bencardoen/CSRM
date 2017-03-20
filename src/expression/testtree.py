@@ -496,6 +496,8 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(e, cached_e)
         rng.seed(0)
         t.spliceSubTree(t.getRandomNode(rng), s.getNode(0))
+        en = t.evaluateTree()
+        self.assertNotEqual(en, e)
 
     def testDepth(self):
         expr = "( ( ( min( 5.0, 6.0 ) ) ** ( log( 0.6, 0.3 ) ) ) + ( 1.0 * 9.23 ) )"
@@ -517,7 +519,6 @@ class TreeTest(unittest.TestCase):
         for i in range(100):
             rng.seed(0)
             t = Tree.makeRandomTree(variables, 5, rng=rng)
-#            t.printToDot(outputfolder+"t32a.dot")
             e2 = t.evaluateTree()
             nodes = t.getNodes()
             if not compnodes:
@@ -528,7 +529,6 @@ class TreeTest(unittest.TestCase):
 
     def testCachingExt(self):
         variables = [[ d for d in range(2,6)] for x in range(5)]
-#            def toVariables(lst:list):
         vs = Variable.toVariables(variables)
         expression = "log(5, 4) + x3 ** 4 * x1 * x1"
         t = Tree.createTreeFromExpression(expression, variables)
@@ -559,21 +559,30 @@ class TreeTest(unittest.TestCase):
         expression = "log(5, 4) + x3 ** 4 * x2"
         t = Tree.createTreeFromExpression(expression, variables)
         rng = getRandom(2)
+        e = t.evaluateTree()
         Mutate.mutate(t, variables, rng=rng)
         t.printToDot(outputfolder+"t33.dot")
+        d = t.evaluateTree()
+        self.assertNotEqual(e,d)
 
     def testCrossoverOperator(self):
         variables = [[ d for d in range(2,6)] for x in range(5)]
-        expression = "log(5, 4) + x3 ** 4 * x1 * x1"
-        expression = "min(5, 4) + x4 ** 4 * sin(x2)"
-        left = Tree.createTreeFromExpression(expression, variables)
+        expressionl = "log(5, 4) + x3 ** 4 * x1 * x1"
+        expressionr = "min(5, 4) + x4 ** 4 * sin(x2)"
+        left = Tree.createTreeFromExpression(expressionl, variables)
+        lv = left.evaluateTree()
         left.printToDot(outputfolder+"t34left.dot")
-        right = Tree.createTreeFromExpression(expression, variables)
+        right = Tree.createTreeFromExpression(expressionr, variables)
         right.printToDot(outputfolder+"t34right.dot")
-        rng = getRandom(0)
+        rv = right.evaluateTree()
+        rng = getRandom(42)
         Crossover.subtreecrossover(left, right, rng=rng)
+
         left.printToDot(outputfolder+"t34leftafter.dot")
         right.printToDot(outputfolder+"t34rightafter.dot")
+        self.assertNotEqual(rv, lv)
+        self.assertNotEqual(left.evaluateTree(), lv) # does not have to hold, but in general will hold
+        self.assertNotEqual(right.evaluateTree(), rv)
 
     def testCrossoverOperatorDepthSensitive(self):
         variables = [[ d for d in range(2,6)] for x in range(5)]
