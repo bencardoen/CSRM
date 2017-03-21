@@ -24,7 +24,7 @@ from expression.node import Variable
 from expression.functions import testfunctions, pearsonfitness as _fit
 from expression.tools import getRandom
 from operator import neg
-from analysis.convergence import Convergence
+from analysis.convergence import Convergence, SummarizedResults
 from gp.spreadpolicy import DistributeSpreadPolicy, CopySpreadPolicy
 
 
@@ -143,7 +143,7 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=5)
+        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=5, fitnessfunction=_fit, seed=0, generations=60, phases=5)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
@@ -151,6 +151,17 @@ class GPTest(unittest.TestCase):
         c.plotComplexity()
         c.plotOperators()
         c.savePlots("output", title=expr+"_cooling")
+        c.displayPlots("output", title=expr+"_cooling")
+        sums = [g.summarizeSamplingResults(X, Y)]
+        s = SummarizedResults(sums)
+        s.plotFitness()
+        s.plotDifference()
+        s.plotPrediction()
+        title = "Collected results for all processes"
+        s.savePlots((outputfolder or "")+"collected", title=title)
+        s.saveData(title, "../output/")
+        s.displayPlots("summary", title=title)
+        # summarize Sampling results
 
     def testDeterminism(self):
         """

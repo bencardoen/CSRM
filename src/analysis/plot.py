@@ -24,7 +24,7 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
     labelx = labelx or "X"
     labely = labely or "Y"
     dlen = len(data)
-    logger.info("data length {} per row {}".format(dlen, len(data[0])))
+    #logger.info("data length {} per row {}".format(dlen, len(data[0])))
     p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely)
     if xcategorical:
         xranges = [str(x) for x in range(len(data[0]))]

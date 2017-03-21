@@ -124,9 +124,9 @@ class SummarizedResults(Plotter):
     def plotFitness(self):
         fitness = rmtocm([r['fitness'] for r in self._results])
         #logger.info("Fitness values for plotting are {}".format(fitness))
-        logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
+        #logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
         for i in range(1):
-            p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the test entire set (sample + test).")
+            p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the test entire set (sample + test).", xcategorical=True)
             self.addPlot(p)
 
     def plotPrediction(self):
@@ -147,7 +147,7 @@ class SummarizedResults(Plotter):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
         #logger.info("Fitness values for plotting are {}".format(fitness))
         logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
-        p = plotDotData(fitness, labelx="Process", labely="Difference", title="Difference between fitness on sample data and test data per phase best value")
+        p = plotDotData(fitness, labelx="Process", labely="Difference", title="Difference between fitness on sample data and test data per phase best value", xcategorical=True)
         self.addPlot(p)
 
     def plotComplexity(self):

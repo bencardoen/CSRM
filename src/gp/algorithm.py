@@ -77,7 +77,7 @@ class GPAlgorithm():
         """ Size of tournament, determines which samples compete. """
         self._tournamentsize = tournamentsize or popsize
         """ Number of samples to archive between phases. """
-        self._archivephase = 1
+        self._archivephase = 4
         """
         Randomizing the selection upon which crossover works can improve the quality of the converged results.
         Non random crossover (e.g. best mates with second best) will lead to faster convergence, albeit to a less optimal solution.
@@ -248,6 +248,7 @@ class GPAlgorithm():
             # difference in fitness for the last generation, last phase
             dfit = [abs(a-b) for a,b in zip(lastfit[-1], fit)]
             dmeanfit, dsdfit, dvfit = numpy.mean(dfit), numpy.std(dfit), numpy.var(dfit)
+            logger.info("Best fitness value for full data is {}".format(min(fit)))
 
         except FloatingPointError as e:
             logger.error("Floating point error on values fit {} ".format(fit))
@@ -464,7 +465,7 @@ class BruteElitist(GPAlgorithm):
             t = selection[i]
             if self.requireMutation(i):
                 candidate = copyObject(t)
-                Mutate.mutate(candidate, variables=variables, equaldepth=True, rng=rng)
+                Mutate.mutate(candidate, variables=variables, equaldepth=False, rng=rng, limitdepth=self._maxdepth)
                 candidate.scoreTree(Y, fit)
                 operationcount[0] += 1
                 operationcount[1] += 1

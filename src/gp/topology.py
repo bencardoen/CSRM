@@ -16,7 +16,6 @@ logger = logging.getLogger('global')
 
 class Topology():
     def __init__(self, size:int, spreadpolicy = None):
-        assert(size>1)
         self._size = size
         self._spreadpolicy = CopySpreadPolicy
 
@@ -52,6 +51,14 @@ class Topology():
                     handle.write( str(i) + " -> " + str(j) + "\n")
             handle.write("}\n")
 
+
+class NoneTopology(Topology):
+    """
+    Stub class for a sequential sinle instances process.
+    """
+    
+    def __init__(self, size):
+        super().__init__(size)
 
 
 class RandomStaticTopology(Topology):
