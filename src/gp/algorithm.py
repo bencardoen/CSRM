@@ -184,7 +184,7 @@ class GPAlgorithm():
         self._initializePopulation()
 
     def addTree(self, t):
-        logger.debug("Adding tree with id {:0x} to pop {}".format(id(t), self._population))
+        #logger.info("Adding tree with id {:0x} and repr {} to pop \{}".format(id(t), t.toExpression(), self._population))
         assert(t not in self._population)
         self._population.add(t)
 
@@ -216,14 +216,12 @@ class GPAlgorithm():
         """
         t = Tree.growTree(self._variables, self._initialdepth, rng=self._rng)
         t.scoreTree(self._Y, self._fitnessfunction)
-        i = 0
         rng = self._rng
-        while t.getFitness() == Constants.MINFITNESS:
+        while t.getFitness() == Constants.MINFITNESS or (t in self._population):
             assert(self._variables)
             t = Tree.growTree(self._variables, self._maxdepth, rng=rng)
             t.scoreTree(self._Y, self._fitnessfunction)
-            i += 1
-        logger.debug("Grown tree, adding with id {:0x}".format(id(t)))
+        #logger.info("Grown tree, adding with id {:0x}".format(id(t)))
         self.addTree(t)
 
     def testInvariant(self):
@@ -282,7 +280,7 @@ class GPAlgorithm():
         csd = numpy.std(comp)
         cv = numpy.var(comp)
         assert(isinstance(replacementcount, list))
-        logger.debug("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
+        #logger.debug("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
 
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
@@ -348,7 +346,7 @@ class GPAlgorithm():
             self.testInvariant()
             if self._trace:
                 self.printForestToDot(self._prefix + "generation_{}_".format(i))
-        logger.debug("\tArchival")
+        #logger.debug("\tArchival")
         self._phase += 1
         logger.info("Archiving last {} results".format(self._archivephase))
         self.archive(modified)
@@ -372,9 +370,9 @@ class GPAlgorithm():
         Select a subset of the current population to operate on.
         """
         assert(len(self._population))
-        logger.debug("Selecting {} from {}".format(self._tournamentsize, self._population))
+        #logger.debug("Selecting {} from {}".format(self._tournamentsize, self._population))
         sel = self._population.removeN(self._tournamentsize)
-        logger.debug("Selected {} ".format(sel))
+        #logger.debug("Selected {} ".format(sel))
         assert(len(sel) == self._tournamentsize)
         assert(len(self._population) == self._popsize - self._tournamentsize)
         return sel
@@ -414,7 +412,8 @@ class GPAlgorithm():
         assert(len(self._population) == self._popsize-self._tournamentsize)
         logger.debug("Adding {} to population {}".format(modified, self._population))
         for t in modified:
-            self.addTree(t)
+            if t not in self._population:
+                self.addTree(t)
         remcount = self._popsize - len(self._population)
         if remcount > 0:
             for _ in range(remcount):
@@ -509,7 +508,9 @@ class BruteElitist(GPAlgorithm):
         while selection:
             left = next(selector)
             right = next(selector)
-            assert(left != right)
+            if id(left) == id(right):
+                logger.warning("Left = {}\n Right = {}\n, Selection = {}".format(left, right, selection))
+            assert(id(left) != id(right))
             lc = copyObject(left)
             rc = copyObject(right)
             Crossover.subtreecrossover(lc, rc, depth=None, rng=rng, limitdepth=d)

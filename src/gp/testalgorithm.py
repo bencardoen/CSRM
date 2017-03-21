@@ -159,6 +159,31 @@ class GPTest(unittest.TestCase):
         c.plotOperators()
         c.savePlots("output", title=expr+"_cooling")
 
+    def testDeterminism(self):
+        """
+        Ensure that the algorithm runs deterministic if a seed is set.
+        """
+        TESTRANGE=10
+        SEEDS = [13, 7, 5]
+        DEPTHS = [3,5,7]
+        for d in DEPTHS:
+            for seed in SEEDS:
+                fstat = []
+                for i in range(TESTRANGE):
+                    print("SEED = {} Iteration {}".format(seed, i))
+                    expr = testfunctions[2]
+                    dpoint = 20
+                    vpoint = 5
+                    X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+                    t = Tree.createTreeFromExpression(expr, X)
+                    Y = t.evaluateAll()
+                    g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=d, fitnessfunction=_fit, seed=seed, generations=20, phases=10)
+                    g.executeAlgorithm()
+                    stats = g.getConvergenceStatistics()
+                    fstat.append(stats[-1][-1]['mean_fitness'])
+                    if i:
+                        self.assertEqual(fstat[i], fstat[i-1])
+
 
     def testTournament(self):
         expr = testfunctions[2]
@@ -293,7 +318,7 @@ class PGPTest(unittest.TestCase):
 
 
 if __name__=="__main__":
-    logger.setLevel(logging.WARNING)
+    logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
     print("Running")
     if not os.path.isdir(outputfolder):

@@ -45,6 +45,18 @@ class Tree:
     def setDataPointCount(self, v:int):
         self._datapointcount = v
 
+    # Equality of a tree is defined based on its fitness measure.
+    # This means that the optimization algorithm will (try) not to keep
+    # samples with identical fitness values. This isn't always avoidable
+    def __hash__(self):
+        return hash(self.fitness)
+
+    def __eq__(self, other):
+        return self.fitness == other.fitness
+
+    def __neq__(self, other):
+        return self != other
+
     def getDataPointCount(self):
         return self._datapointcount
 
