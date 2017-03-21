@@ -49,6 +49,7 @@ class GPAlgorithm():
         self._initialdepth = initdepth or maxdepth
         self._maxdepth = maxdepth
         self._popsize = popsize
+        logger.info("Using population {} maxdepth {} initdepth {}".format(self._popsize, self._maxdepth, self._initialdepth))
         self._seed = seed
         self._rng = getRandom()
         if seed is not None:

@@ -265,7 +265,6 @@ class SequentialPGP():
         :param maxdepth: Maximum depth of a tree
         :param communicationsize: Nr of samples sent per process
         """
-        assert(processcount>1)
         self._processcount=processcount
         self._processes = []
         self._phases = 1

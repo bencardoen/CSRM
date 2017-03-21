@@ -56,9 +56,15 @@ class NoneTopology(Topology):
     """
     Stub class for a sequential sinle instances process.
     """
-    
+
     def __init__(self, size):
         super().__init__(size)
+
+    def getTarget(self, source:int)->list:
+        return []
+
+    def getSource(self, target:int)->list:
+        return []
 
 
 class RandomStaticTopology(Topology):
@@ -238,4 +244,4 @@ class VonNeumannTopology(Topology):
         return "VonNeumannTopology" + super().__str__()
 
 
-topologies = {"grid":VonNeumannTopology, "randomstatic":RandomStaticTopology, "randomdynamic":RandomDynamicTopology, "tree":TreeTopology}
+topologies = {"grid":VonNeumannTopology, "randomstatic":RandomStaticTopology, "randomdynamic":RandomDynamicTopology, "tree":TreeTopology, "none":NoneTopology}
