@@ -54,14 +54,6 @@ class Constants():
     """
     HISTORY = 5
     """
-    Influences size of archive
+    Determines what ratio of a data set is used for training.
     """
-    POP_TO_ARCHIVERATIO = 2
-    """
-    Ratio of archive to selection in reseeding/archiving values.
-    """
-    ARCHIVE_SELECTION_RATIO = 4
-    """
-    Given a data set of size N, ensure that K = int(SAMPLING_RATIO * N) samples are collected.
-    """
-    SAMPLING_RATIO=0.5
+    SAMPLING_RATIO=0.8

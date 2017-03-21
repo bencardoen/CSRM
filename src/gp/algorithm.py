@@ -64,8 +64,7 @@ class GPAlgorithm():
         self._archive = SetPopulation(key=lambda _tree: _tree.getFitness())
         self._generations = generations
         self._currentgeneration = 0
-        self._archivesize = archivesize or max(self._popsize // Constants.POP_TO_ARCHIVERATIO, 1)
-        logger.info("Archive is set at {} defined by {} OR max({}//{}, 1)".format(self._archivesize, archivesize, self._popsize, Constants.POP_TO_ARCHIVERATIO))
+        self._archivesize = archivesize or generations
         assert(self._archivesize > 0)
         # List of generation : tuple of stats
         self._convergencestats = []
@@ -78,11 +77,7 @@ class GPAlgorithm():
         """ Size of tournament, determines which samples compete. """
         self._tournamentsize = tournamentsize or popsize
         """ Number of samples to archive between phases. """
-        self._archivephase = max(self._archivesize // Constants.ARCHIVE_SELECTION_RATIO, 1)
-        logger.info("Archive sample per phases = {} defined by {} // max({}, 1)".format(self._archivephase, self._archivesize, Constants.ARCHIVE_SELECTION_RATIO))
-        """ Number of samples to use as seed in next phase """
-        self._archivephaseseed = max(self._archivesize // Constants.ARCHIVE_SELECTION_RATIO, 1)
-        logger.info("Archive seed per phases = {} defined by max({} // {}, 1 ))".format(self._archivephaseseed, self._archivesize, Constants.ARCHIVE_SELECTION_RATIO, 1))
+        self._archivephase = 1
         """
         Randomizing the selection upon which crossover works can improve the quality of the converged results.
         Non random crossover (e.g. best mates with second best) will lead to faster convergence, albeit to a less optimal solution.
@@ -299,15 +294,13 @@ class GPAlgorithm():
         """
         After a run of x generations, reseed the population based on the archive
         """
-        # get a random sample from
         archived = self._archive.getAll()
-        #seed = self._rng.sample(archived, self._archivephaseseed)
-
         for a in archived:
             self.addTree(copyObject(a))
         # Retrim the current population by removing the least fit samples
         while len(self._population) > self._popsize:
             self._population.drop()
+        # If we have too few, refill with random samples
         diff = self._popsize - len(self._population)
         for _ in range(diff):
             self.addRandomTree()
@@ -344,7 +337,6 @@ class GPAlgorithm():
                 self.printForestToDot(self._prefix + "generation_{}_".format(i))
         #logger.debug("\tArchival")
         self._phase += 1
-        logger.info("Archiving last {} results".format(self._archivephase))
         self.archive(modified)
 
     def executeAlgorithm(self):
@@ -406,7 +398,6 @@ class GPAlgorithm():
         """
         assert(len(modified) == self._tournamentsize)
         assert(len(self._population) == self._popsize-self._tournamentsize)
-        logger.debug("Adding {} to population {}".format(modified, self._population))
         for t in modified:
             if t not in self._population:
                 self.addTree(t)
@@ -432,7 +423,6 @@ class GPAlgorithm():
         if t not in self._archive:
             self._archive.add(t)
             if len(self._archive) > self._archivesize:
-                logger.debug("Curtailing archive.")
                 self._archive.drop()
 
 
