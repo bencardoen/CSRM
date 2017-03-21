@@ -9,26 +9,30 @@ from bokeh.plotting import figure, output_file, show, gridplot, save
 from bokeh.palettes import magma, inferno, viridis
 import logging
 import math
-logger = logging.getLogger('global')
 import random
+logger = logging.getLogger('global')
 
 plotwidth = 200
 plotheigth = 200
 
-def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, cool=False):
+
+def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, cool=False, xcategorical=False):
     """
-        Plot data values over generations.
+    Plot data values over generations.
     """
     logger.debug("Got {} to plot".format(data))
     labelx = labelx or "X"
     labely = labely or "Y"
-    p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely)
-    x = [d for d in range(len(data[0]))]
     dlen = len(data)
-    ratio = 10/dlen
+    logger.info("data length {} per row {}".format(dlen, len(data[0])))
+    p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely)
+    if xcategorical:
+        xranges = [str(x) for x in range(len(data[0]))]
+        p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely, x_range=xranges)
+    x = [d+1 for d in range(len(data[0]))]
+    dlen = len(data)
     colors = ["navy" for _ in range(dlen)]
     if cool:
-        diff = 0
         if dlen <= 256:
             colors = viridis(dlen)
         else:
@@ -38,9 +42,10 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
         p.circle(x, d, size=4 if cool else 1, color=colors[dlen-i-1], alpha=0.5)
     return p
 
-def plotLineData(data,  mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, legend=None):
+
+def plotLineData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, legend=None):
     """
-        Plot data values over generations.
+    Plot data values over generations.
     """
     colors = ["blue", "green", "red"]
     logger.debug("Got {} to plot".format(data))
@@ -54,10 +59,12 @@ def plotLineData(data,  mean=None, std=None, var=None, generationstep=1, labelx=
         p.circle(x, d, line_width=1, line_color=colors[i], line_alpha=0.5, legend=legend[i])
     return p
 
+
 def plotFront(X, Y, labelx=None, labely=None, title=None):
     p = figure(title=title or "title", x_axis_label=labelx or "X", y_axis_label=labely or "Y")
     p.circle(X, Y, size=2, color="red", alpha=0.3)
     return p
+
 
 def displayPlot(plots, filename, title):
     output_file("{}.html".format(filename or "index"), title=title or "title")
@@ -68,6 +75,7 @@ def displayPlot(plots, filename, title):
     p = gridplot(*gplots)
     show(p)
 
+
 def savePlot(plots, filename, title):
     output_file("{}.html".format(filename or "index"), title=title or "title")
     gplots = []
@@ -76,9 +84,3 @@ def savePlot(plots, filename, title):
     gplots = [[plots[2*d], plots[2*d+1]] for d in range(len(plots)//2)]
     p = gridplot(*gplots)
     save(p)
-
-if __name__ == "__main__":
-    rng = random.Random()
-    fitness = [[random.random() for d in range(100)] for d in range(10)]
-    p = plotFitness(fitness)
-    show(p)

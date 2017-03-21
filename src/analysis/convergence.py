@@ -133,8 +133,15 @@ class SummarizedResults(Plotter):
         fitness = rmtocm([r['corr_fitness'] for r in self._results])
         #logger.info("Fitness values for plotting are {}".format(fitness))
         logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
-        p = plotDotData(fitness, labelx="Process", labely="Correlation (less is better)", title="Correlation between fitness on sample data and test data per phase best value", cool=True)
+        p = plotDotData(fitness, labelx="Process", labely="Correlation (less is better)", title="Correlation between fitness on sample data and test data per phase best value", cool=True, xcategorical=True)
         self.addPlot(p)
+        # results in indexed per process
+        # Want best fitness values of all processes
+
+        # Add a plot which gives rate of convergence of prediction value?
+
+    # add a plot which combines all results for all processes.
+
 
     def plotDifference(self):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
