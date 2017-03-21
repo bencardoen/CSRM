@@ -143,7 +143,7 @@ class GPAlgorithm():
 
         Each sample will have its variable set updated to match the rest of the population.
         """
-        logger.info("Adding {} to archive".format(len(lst)))
+        #logger.info("Adding {} to archive".format(len(lst)))
         for x in lst:
             x.updateVariables(self._X)
             self.addToArchive(x)

@@ -146,7 +146,7 @@ class ParallelGP():
         if targetcount:
             selectedsamples = self.algorithm.getArchived(self._communicationsize)
             buf = self.spreadpolicy.spread(selectedsamples, targetcount)
-        logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
+        #logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
         if self.communicator:
             self.waitForSendRequests()
             for index, target in enumerate(targets):
@@ -162,12 +162,12 @@ class ParallelGP():
         """
         # todo investigate if async calling helps
         senders = self.topo.getSource(self.pid)
-        logger.info("Process {} :: MPI, Expecting buffers from {}".format(self.pid, senders))
+        #logger.info("Process {} :: MPI, Expecting buffers from {}".format(self.pid, senders))
         received = []
         for sender in senders:
-            logger.debug("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
+            #logger.debug("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
             buf = self.communicator.recv(source=sender, tag=0) # todo extend tag usage
-            logger.info("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
+            #logger.info("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
             received += buf
         self.algorithm.archiveExternal(received)
 
@@ -199,7 +199,7 @@ class ParallelGP():
         """
         Receive from process *source* buffer
         """
-        logger.info("Process {} :: Receiving at {} from {} buffer length {} ".format(self.pid, self.pid, source, len(buffer)))
+        #logger.info("Process {} :: Receiving at {} from {} buffer length {} ".format(self.pid, self.pid, source, len(buffer)))
         assert(self._pid in self.topo.getTarget(source))
         self.algorithm.archiveExternal(buffer)
 
