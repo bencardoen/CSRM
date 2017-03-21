@@ -42,7 +42,9 @@ def generateForest(fsize=10, depth=4, seed=None):
         logger.warning("Non deterministic mode")
     rng.seed(seed)
     for i in range(fsize):
-        forest.append(Tree.makeRandomTree(variables, depth=depth, rng=rng))
+        t = Tree.makeRandomTree(variables, depth=depth, rng=rng)
+        t.setFitness(i)
+        forest.append(t)
     return forest
 
 
@@ -51,19 +53,23 @@ class GPTest(unittest.TestCase):
 
     def testInitialization(self):
         X = generateVariables(3,3,seed=0)
-        Y = [ 0 for d in range(3)]
+        Y = [ d for d in range(3)]
         g = GPAlgorithm(X, Y, popsize=10, maxdepth=4, fitnessfunction=_fit, seed=0)
         g.printForestToDot(outputfolder + "forest")
 
     def testPopulation(self):
         fs=10
         forest = generateForest(fsize=fs, depth=5, seed=11)
-        p = SetPopulation(key=lambda _tree : 0-_tree.getFitness())
+        p = SetPopulation(key=lambda _tree : _tree.getFitness())
         for t in forest:
             p.add(t)
+            self.assertTrue(t in p)
+        self.assertTrue(len(p) == len(forest))
+        forest = sorted(forest, key=lambda _tree: _tree.getFitness())
         for t in forest:
             self.assertTrue(t in p)
             p.remove(t)
+            self.assertFalse(t in p)
         self.assertTrue(len(p) == 0)
         for i, t in enumerate(forest):
             t.setFitness(10-i)
@@ -86,18 +92,6 @@ class GPTest(unittest.TestCase):
         self.assertEqual(len(rem) , len(p))
         self.assertEqual(len(rem), len(p.removeAll()))
 
-    def testBruteElitist(self):
-        X = generateVariables(3,3,seed=0)
-        Y = [ 0 for d in range(3)]
-        logger.debug("Y {} X {}".format(Y, X))
-        logger.info("Starting BE algorithm")
-        g = BruteElitist(X, Y, popsize=10, maxdepth=8, fitnessfunction=_fit, seed=0, generations=20)
-#        g.setTrace(True, outputfolder)
-        g.run()
-        g.printForestToDot(outputfolder+"firstresult")
-        g.run()
-        g.printForestToDot(outputfolder+"secondresult")
-
     def testBruteElitistExtended(self):
         rng = getRandom(0)
         dpoint = 20
@@ -109,7 +103,6 @@ class GPTest(unittest.TestCase):
         g = BruteElitist(X, Y, popsize=20, maxdepth=6, fitnessfunction=_fit, seed=0, generations=10)
         g.run()
         g.printForestToDot(outputfolder+"firstresult_extended")
-
 
     def testBmark(self):
         expr = testfunctions[1]
@@ -133,7 +126,7 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=40, maxdepth=5, fitnessfunction=_fit, seed=0, generations=75, phases=5)
+        g = BruteElitist(X, Y, popsize=20, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=5)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
@@ -150,7 +143,7 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=5, fitnessfunction=_fit, seed=0, generations=75, phases=5)
+        g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=5)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
@@ -163,9 +156,9 @@ class GPTest(unittest.TestCase):
         """
         Ensure that the algorithm runs deterministic if a seed is set.
         """
-        TESTRANGE=10
-        SEEDS = [13, 7, 5]
-        DEPTHS = [3,5,7]
+        TESTRANGE=3
+        SEEDS = [0,2,3,5]
+        DEPTHS = [3]
         for d in DEPTHS:
             for seed in SEEDS:
                 fstat = []

@@ -41,8 +41,7 @@ class GPAlgorithm():
         :param int archivesize: size of the archive used between phases to store best-of-generation samples, which are in turn reused in next phases
         :param int tournamentsize: size of subset taken from population (fittest first) to evolve.
         """
-        """ Sorted set of samples (best first)"""
-        self._population = SetPopulation(key=lambda _tree: (_tree.getFitness(), id(_tree)))
+        self._population = SetPopulation(key=lambda _tree: _tree.getFitness())
         """ Number of entries per feature. """
         self._datapointcount = len(X[0])
         """ Fitness function, passed to tree instance to score."""
@@ -62,12 +61,9 @@ class GPAlgorithm():
         """ Expected data """
         self._Y = Y
         self._initialize()
-        """ Archive : stores best of phase samples. """
-        self._archive = SetPopulation(key=lambda _tree: (_tree.getFitness(), id(_tree)))
-        """ Generations per phase. The algorithm will execute no more than self._phases * self._generations"""
+        self._archive = SetPopulation(key=lambda _tree: _tree.getFitness())
         self._generations = generations
         self._currentgeneration = 0
-        """ Size of the archive : collection of (shared) samples between phases """
         self._archivesize = archivesize or max(self._popsize // Constants.POP_TO_ARCHIVERATIO, 1)
         logger.info("Archive is set at {} defined by {} OR max({}//{}, 1)".format(self._archivesize, archivesize, self._popsize, Constants.POP_TO_ARCHIVERATIO))
         assert(self._archivesize > 0)
@@ -214,9 +210,9 @@ class GPAlgorithm():
 
         The generated tree is guaranteed to be viable (i.e. has a non inf fitness)
         """
-        t = Tree.growTree(self._variables, self._initialdepth, rng=self._rng)
-        t.scoreTree(self._Y, self._fitnessfunction)
         rng = self._rng
+        t = Tree.growTree(self._variables, self._initialdepth, rng=rng)
+        t.scoreTree(self._Y, self._fitnessfunction)
         while t.getFitness() == Constants.MINFITNESS or (t in self._population):
             assert(self._variables)
             t = Tree.growTree(self._variables, self._maxdepth, rng=rng)
@@ -305,9 +301,9 @@ class GPAlgorithm():
         """
         # get a random sample from
         archived = self._archive.getAll()
-        seed = self._rng.sample(archived, self._archivephaseseed)
+        #seed = self._rng.sample(archived, self._archivephaseseed)
 
-        for a in seed:
+        for a in archived:
             self.addTree(copyObject(a))
         # Retrim the current population by removing the least fit samples
         while len(self._population) > self._popsize:
@@ -433,10 +429,11 @@ class GPAlgorithm():
         """
         Add t to the archive and truncate worst if necessary.
         """
-        self._archive.add(t)
-        if len(self._archive) > self._archivesize:
-            logger.debug("Curtailing archive.")
-            self._archive.drop()
+        if t not in self._archive:
+            self._archive.add(t)
+            if len(self._archive) > self._archivesize:
+                logger.debug("Curtailing archive.")
+                self._archive.drop()
 
 
 class BruteElitist(GPAlgorithm):
