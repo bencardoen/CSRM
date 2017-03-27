@@ -41,16 +41,17 @@ class GPAlgorithm():
         :param int archivesize: size of the archive used between phases to store best-of-generation samples, which are in turn reused in next phases
         :param int tournamentsize: size of subset taken from population (fittest first) to evolve.
         """
+        self.pid = None
         self._population = SetPopulation(key=lambda _tree: _tree.getFitness())
         """ Number of entries per feature. """
         self._datapointcount = len(X[0])
         """ Fitness function, passed to tree instance to score."""
         self._fitnessfunction = fitnessfunction
         self._initialdepth = initialdepth or maxdepth
-        logger.info("initialdepth = {}".format(initialdepth))
+        #logger.info("initialdepth = {}".format(initialdepth))
         self._maxdepth = maxdepth
         self._popsize = popsize
-        logger.info("Using population {} maxdepth {} initdepth {}".format(self._popsize, self._maxdepth, self._initialdepth))
+        #logger.info("Using population {} maxdepth {} initdepth {}".format(self._popsize, self._maxdepth, self._initialdepth))
         self._seed = seed
         self._rng = getRandom()
         if seed is not None:
@@ -146,8 +147,10 @@ class GPAlgorithm():
         """
         #logger.info("Adding {} to archive".format(len(lst)))
         for x in lst:
-            x.updateVariables(self._X)
-            self.addToArchive(x)
+            expr = x.toExpression()
+            logger.info("Received {}".format(expr))
+            x2 = Tree.createTreeFromExpression(expr, variables=self._X)
+            self.addToArchive(x2)
 
     def addConvergenceStat(self, generation, stat, phase):
         if len(self._convergencestats) <= phase:
@@ -300,15 +303,19 @@ class GPAlgorithm():
         After a run of x generations, reseed the population based on the archive
         """
         archived = self._archive.getAll()
+        logger.info("Adding {}".format([a.toExpression() for a in archived]))
         for a in archived:
             self.addTree(copyObject(a))
         # Retrim the current population by removing the least fit samples
         while len(self._population) > self._popsize:
+            logger.info("Dropping pop")
             self._population.drop()
         # If we have too few, refill with random samples
         diff = self._popsize - len(self._population)
         for _ in range(diff):
+            logger.info("Using random samples to complete pop.")
             self.addRandomTree()
+        logger.info("\n\n Pop is now \n {} \n".format([x.toExpression() for x in self._population]))
 
     def restart(self):
         """
@@ -339,7 +346,7 @@ class GPAlgorithm():
                 break
             self.testInvariant()
             if self._trace:
-                self.printForestToDot(self._prefix + "generation_{}_".format(i))
+                self.printForestToDot("process_{}_phase_{}_generation_{}".format(self.pid, self._phase, i))
         #logger.debug("\tArchival")
         self._phase += 1
         self.archive(modified)

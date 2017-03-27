@@ -37,7 +37,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None, display=False
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     expr = testfunctions[2]
-    dpoint = 20
+    dpoint = 4
     vpoint = 5
     generations= generations or 20
     depth= maxdepth or 7
@@ -54,18 +54,25 @@ def runBenchmark(topo=None, processcount = None, outfolder = None, display=False
         logger.info("Topology is None, using RStatic")
         topo = RandomStaticTopology
     algo = None
-    t = topo(pcount)
+    t = None
+    if topo == RandomStaticTopology:
+        t = topo(pcount, seed=pid)
+    else:
+        t = topo(pcount)
+    samplecount = int(Constants.SAMPLING_RATIO * len(Y))
     if isMPI():
+        logger.info("Sample count = {}".format(samplecount))
         logger.info("Starting MPI Parallel implementation")
-        samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
+        logger.info("X, Y for seed = {} are {} {}".format(pid, Xk, Yk))
         g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
+        g.pid = pid
         algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
         logger.info("Starting Sequential implementation")
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth)
     algo.executeAlgorithm()
-    logger.info("Writing output to folder {}".format(outfolder))
+    logger.debug("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)
     logger.info("Benchmark complete for {}".format(pid))
 

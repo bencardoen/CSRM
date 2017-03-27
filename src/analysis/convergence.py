@@ -147,7 +147,7 @@ class SummarizedResults(Plotter):
 
     def plotPrediction(self):
         fitness = rmtocm([r['corr_fitness'] for r in self._results])
-        logger.debug("{} rows {} cols".format(len(fitness), len(fitness[0])) )
+        logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
         p = plotDotData(fitness, labelx="Process", labely="Correlation (less is better)", title="Correlation between fitness on sample data and test data per phase best value", cool=True, xcategorical=True)
         self.addPlot(p)
 

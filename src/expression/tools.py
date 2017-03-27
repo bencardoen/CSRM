@@ -333,6 +333,7 @@ def getKSamples(X, Y, K, rng=None, seed=None):
     else:
         _rng = rng
     if seed is not None:
+        logger.info("using seed {}".format(seed))
         _rng.seed(seed)
     indices = sorted(_rng.sample(range( values ), K))
     Xk = [[] for _ in range(features)]

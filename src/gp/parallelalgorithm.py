@@ -98,6 +98,7 @@ class ParallelGP():
         This step executes a limited number of generations (depending on the algorithm)
         """
         if self.algorithm.phase >= self.algorithm.phases:
+            raise ValueError
             logger.warning("Process {} :: Exceeding phase count".format(self.pid))
             return
         logger.info("Process {} :: --Phase-- {}".format(self.pid, self.algorithm.phase))
@@ -115,6 +116,7 @@ class ParallelGP():
         for i in range(self.phases):
             logging.info("Process {} :: Parallel executing Phase {}".format(self.pid, i))
             self.executePhase()
+            self.algorithm.printForestToDot("Process_{}_phase_{}".format(self.pid, i))
             logging.info("Process {} :: Parallel sending in  Phase {}".format(self.pid, i))
             self.send()
             logging.info("Process {} :: Parallel receiving in  Phase {}".format(self.pid, i))
@@ -145,13 +147,14 @@ class ParallelGP():
         selectedsamples, buf = [], []
         if targetcount:
             selectedsamples = self.algorithm.getArchived(self._communicationsize)
+            logger.info("Process {} :: Got from algorithm {} ".format(self.pid, [s.toExpression() for s in selectedsamples] ))
             buf = self.spreadpolicy.spread(selectedsamples, targetcount)
         #logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
         if self.communicator:
             self.waitForSendRequests()
             for index, target in enumerate(targets):
                 self._sendbuffer[target] = buf[index]
-                logger.debug("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), target))
+                logger.info("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), target))
                 self._waits[target] = self.communicator.isend(buf[index], dest=target, tag=0)
         else:
             return buf, targets
@@ -167,7 +170,9 @@ class ParallelGP():
         for sender in senders:
             logger.debug("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
             buf = self.communicator.recv(source=sender, tag=0) # todo extend tag usage
-            #logger.info("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
+            logger.debug("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
+            for b in received:
+                logger.info("Process {} :: MPI received {}".format(b))
             received += buf
         self.algorithm.archiveExternal(received)
 
@@ -191,10 +196,10 @@ class ParallelGP():
                 logger.info("Process {} :: Collected results from {}".format(self.pid, processid))
             return collected
         else:
-            logger.info("Process {} :: Sending results from {}".format(self.pid, self.pid))
+            logger.debug("Process {} :: Sending results from {}".format(self.pid, self.pid))
             self.communicator.send(results, dest=0, tag=0)
-            logger.info("Process {} :: Sending results is done {}".format(self.pid, self.pid))
-            logger.info("Process {} :: still have wait requests ?".format(len(self._waits)))
+            logger.debug("Process {} :: Sending results is done {}".format(self.pid, self.pid))
+            logger.debug("Process {} :: still have wait requests ?".format(len(self._waits)))
             self.waitForSendRequests()
             return None
 
@@ -216,6 +221,7 @@ class ParallelGP():
         :param str outputfolder: modify output directory
         """
         stats = self.algorithm.getConvergenceStatistics()
+        logger.info("\n\nConvergence statistics are for process {} \n{}\n\n".format(self._pid, stats[-1][-1]['fitness']))
         c = Convergence(stats)
         c.plotFitness()
         c.plotComplexity()
@@ -248,7 +254,6 @@ class ParallelGP():
         After the algorithm has completed, collect results on the entire data set (ict samples)
         """
         results = self.algorithm.summarizeSamplingResults(X, Y)
-        logging.info("Results so far {}".format(results))
         return results
 
 
@@ -284,17 +289,22 @@ class SequentialPGP():
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         for i in range(processcount):
             xsample, ysample = getKSamples(X, Y, samplecount, rng=rng, seed=i)
+            # TODO DEBUG
+            #xsample, ysample = X, Y
+            #logger.info("X, Y for seed {} are {} and {}".format(i, xsample, ysample))
             g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=maxdepth, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
+            g.pid = i
             pgp = ParallelGP(g, X, Y, communicationsize=self._communicationsize, topo=self._topo, pid=i)
             self._processes.append(pgp)
             self._phases = pgp.phases
         logger.info("Topology = \n{}".format(self._topo))
 
     def executeAlgorithm(self):
-        for _ in range(self._phases):
+        for j in range(self._phases):
             for i, process in enumerate(self._processes):
                 process.executePhase()
                 buf, targets = process.send()
+                process.algorithm.printForestToDot("Process_{}_phase_{}".format(i, j))
                 if not targets:
                     continue
                 for index, target in enumerate(targets):
@@ -310,6 +320,7 @@ class SequentialPGP():
         """
         for i, process in enumerate(self._processes):
             stats = process.algorithm.getConvergenceStatistics()
+            logger.info("\n\nConvergence statistics are for process {} \n{}\n\n".format(i, stats[-1][-1]['fitness']))
             c = Convergence(stats)
             c.plotFitness()
             c.plotComplexity()
