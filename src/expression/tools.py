@@ -10,6 +10,7 @@ from collections import Counter
 from subprocess import call
 import webbrowser
 import re
+import subprocess
 import logging
 import random
 import inspect
@@ -91,7 +92,10 @@ def copyJSON(o):
 
 def generateSVG(dotfile: str):
     """Generate SVG from a given dot files, writes <>.dot to <>.svg"""
-    call(["dot", "-o {}.svg".format(dotfile[-4]), "{}".format(dotfile)])
+    outputfile = dotfile[:-4] + ".svg"
+    cmd = ["dot", "-T", "svg", "-o{}".format(outputfile), dotfile]
+    p = subprocess.Popen(cmd)
+    p.wait()
 
 
 def showSVG(dotfile: str):
