@@ -431,6 +431,7 @@ class Tree:
             #logger.info("Lower {}, max(l, 1) {}, upper {} value = {}".format(lower, max(lower,1), upper, rv))
             node = self.getNode( rv )
         #logger.info("Chosen node with depth {}".format(node.getDepth()))
+        assert(self.root != node)
         return node
 
     def setModified(self, v):

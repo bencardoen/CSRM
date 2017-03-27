@@ -675,7 +675,7 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(c2, (c-(d-1))/57)
 
     def testAdvancedMutate(self):
-        TESTRANGE = 10
+        TESTRANGE = 100
         vcount = 4
         dpoint = 2
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
@@ -729,7 +729,7 @@ class TreeTest(unittest.TestCase):
         rng = getRandom(0)
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
         variables = Variable.toVariables(vs)
-        last = Tree.makeRandomTree(variables, depth=10, rng=rng)
+        last = Tree.makeRandomTree(variables, depth=14, rng=rng)
         d = last.getDepth()
         rng.seed(0)
         for _ in range(TESTRANGE):
