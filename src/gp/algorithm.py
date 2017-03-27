@@ -570,8 +570,13 @@ class BruteCoolingElitist(BruteElitist):
     The cooling schedule 'predicts' efficiency of the operators.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None,depthcooling=False):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
+        self._depthcooling = depthcooling
+
+    @property
+    def depthcooling(self):
+        return self._depthcooling
 
     def requireMutation(self, popindex:int)->bool:
         generation = self._currentgeneration
@@ -582,7 +587,10 @@ class BruteCoolingElitist(BruteElitist):
         return probabilityMutate(generation, generations, ranking, population, rng=rng)
 
     def minDepthRatio(self, popindex):
-        return coolingMinDepthRatio(self._currentgeneration, self._generations, popindex, self._popsize, rng=self._rng)
+        if self.depthcooling:
+            return coolingMinDepthRatio(self._currentgeneration, self._generations, popindex, self._popsize, rng=self._rng)
+        else:
+            return 0
 
 
 def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=None)->bool:
