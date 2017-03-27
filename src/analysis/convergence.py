@@ -68,7 +68,7 @@ class Convergence(Plotter):
         self.plotPopulationOverGenerations(keyword='fitness')
 
     def plotDepth(self):
-        self.plotPopulationOverGenerations(keyword='depth', cool=False, xcategorical=True, ycategorical=False, groupsimilar=True)
+        self.plotPopulationOverGenerations(keyword='depth', cool=False, xcategorical=True, ycategorical=True, groupsimilar=True)
 
     def plotComplexity(self):
         """
@@ -130,8 +130,6 @@ class SummarizedResults(Plotter):
 
     def plotFitness(self):
         fitness = rmtocm([r['fitness'] for r in self._results])
-        #logger.info("Fitness values for plotting are {}".format(fitness))
-        #logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
         for i in range(1):
             p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the test entire set (sample + test).", xcategorical=True)
             self.addPlot(p)

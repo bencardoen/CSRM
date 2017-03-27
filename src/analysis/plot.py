@@ -45,7 +45,7 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
     labely = labely or "Y"
     dlen = len(data)
     xranges = [str(x) for x in range(len(data[0]))] if xcategorical else None
-    yranges = [[str(x) for x in range(len(data))]] if ycategorical else None
+    yranges = [str(x) for x in range(1, max( [ max(v) for v in data]) +1)] if ycategorical else None
     p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely, x_range=xranges, y_range=yranges)
     x = [d+1 for d in range(len(data[0]))]
     dlen = len(data)
