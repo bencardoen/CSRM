@@ -165,7 +165,7 @@ class ParallelGP():
         #logger.info("Process {} :: MPI, Expecting buffers from {}".format(self.pid, senders))
         received = []
         for sender in senders:
-            #logger.debug("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
+            logger.debug("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
             buf = self.communicator.recv(source=sender, tag=0) # todo extend tag usage
             #logger.info("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
             received += buf
@@ -193,6 +193,9 @@ class ParallelGP():
         else:
             logger.info("Process {} :: Sending results from {}".format(self.pid, self.pid))
             self.communicator.send(results, dest=0, tag=0)
+            logger.info("Process {} :: Sending results is done {}".format(self.pid, self.pid))
+            logger.info("Process {} :: still have wait requests ?".format(len(self._waits)))
+            self.waitForSendRequests()
             return None
 
     def receive(self, buffer, source:int):

@@ -67,7 +67,7 @@ def runBenchmark(topo=None, processcount = None, outfolder = None, display=False
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)
-    logger.info("Benchmark complete")
+    logger.info("Benchmark complete for {}".format(pid))
 
     # if MPI, merge all results and print
 
