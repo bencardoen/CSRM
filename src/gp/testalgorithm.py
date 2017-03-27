@@ -186,6 +186,7 @@ class GPTest(unittest.TestCase):
         s.plotFitness()
         s.plotDifference()
         s.plotPrediction()
+        s.plotDepth()
         title = "Collected results for all processes"
         s.savePlots((outputfolder or "")+"collected", title=title)
         s.saveData(title, "../output/")
