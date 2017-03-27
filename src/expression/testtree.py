@@ -675,7 +675,7 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(c2, (c-(d-1))/57)
 
     def testAdvancedMutate(self):
-        TESTRANGE = 1000
+        TESTRANGE = 10
         vcount = 4
         dpoint = 2
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
@@ -722,6 +722,22 @@ class TreeTest(unittest.TestCase):
             Mutate.mutate(last, variables=vs,rng=rng, equaldepth=True, selectiondepth=d)
             self.assertTrue(last.getDepth() == d)
         last.printToDot(outputfolder+"t40Mutated4.dot")
+
+
+        vcount = 4
+        dpoint = 3
+        rng = getRandom(0)
+        vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
+        variables = Variable.toVariables(vs)
+        last = Tree.makeRandomTree(variables, depth=10, rng=rng)
+        d = last.getDepth()
+        rng.seed(0)
+        for _ in range(TESTRANGE):
+            mrat = rng.uniform(0,1)
+            Mutate.mutate(last, variables=variables,rng=rng, mindepthratio=mrat, limitdepth=d)
+            logger.debug("depth = {} mrat = {} formula = {}".format(last.getDepth(), mrat, min(max(int(mrat*d), 1), d-1)))
+            self.assertTrue(last.getDepth() <= d)
+        last.printToDot(outputfolder+"t40Mutated5.dot")
 
     def testAdvancedCrossover(self):
         TESTRANGE = 10

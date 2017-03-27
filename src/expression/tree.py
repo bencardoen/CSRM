@@ -399,7 +399,7 @@ class Tree:
         root = Tree.constructFromSubtrees(left, right, rng=rng)
         return root
 
-    def getRandomNode(self, seed = None, depth = None, rng=None):
+    def getRandomNode(self, seed = None, depth = None, rng=None, mindepth=None):
         """
         Return a randomly selected node from this tree.
 
@@ -414,7 +414,12 @@ class Tree:
             r.seed(seed)
         if seed is None and rng is None:
             logger.warning("Non deterministic mode")
-        lower, upper = 1, len(self.nodes)
+        lowerrange = 1
+        if mindepth is not None:
+            lowerrange=(2**mindepth) - 1
+            #logger.info("Using mindepth {}".format(mindepth))
+            assert(depth is None)
+        lower, upper = lowerrange, len(self.nodes)
         if depth:
             # We know our repr is a binary tree, with depth slices equal in length to 2^k where k is depth
             assert(depth < math.log(len(self.nodes)+1, 2))
@@ -422,7 +427,10 @@ class Tree:
             upper = min(2**(depth+1)-1, len(self.nodes))
         node = None
         while node is None: # a node can have a single leaf, not two, so in the list None entities will be present
-            node = self.getNode( r.randrange(max(lower,1), upper) )
+            rv = r.randrange(max(lower,1), upper)
+            #logger.info("Lower {}, max(l, 1) {}, upper {} value = {}".format(lower, max(lower,1), upper, rv))
+            node = self.getNode( rv )
+        #logger.info("Chosen node with depth {}".format(node.getDepth()))
         return node
 
     def setModified(self, v):

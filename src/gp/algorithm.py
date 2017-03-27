@@ -395,6 +395,9 @@ class GPAlgorithm():
         """
         return True
 
+    def minDepthRatio(self, popindex:int):
+        return 0
+
     def update(self, modified):
         """
         Process the new generation.
@@ -469,7 +472,8 @@ class BruteElitist(GPAlgorithm):
             t = selection[i]
             if self.requireMutation(i):
                 candidate = copyObject(t)
-                Mutate.mutate(candidate, variables=variables, equaldepth=False, rng=rng, limitdepth=d)
+                mdr = self.minDepthRatio(i)
+                Mutate.mutate(candidate, variables=variables, equaldepth=False, rng=rng, limitdepth=d, mindepthratio=mdr)
                 candidate.scoreTree(Y, fit)
                 operationcount[0] += 1
                 operationcount[1] += 1
@@ -576,6 +580,9 @@ class BruteCoolingElitist(BruteElitist):
         rng = self._rng
         return probabilityMutate(generation, generations, ranking, population, rng=rng)
 
+    def minDepthRatio(self, popindex):
+        return coolingMinDepthRatio(self._currentgeneration, self._generations, popindex, self._popsize, rng=self._rng)
+
 
 def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=None)->bool:
     """
@@ -605,3 +612,7 @@ def probabilityMutate(generation:int, generations:int, ranking:int, population:i
     r = rng.uniform(a=0,b=1)
     s = rng.uniform(a=0, b=1)
     return r > q and s < w
+
+
+def coolingMinDepthRatio(generation:int, generations:int, ranking:int, population:int, rng: random.Random=None):
+    return generation / generations

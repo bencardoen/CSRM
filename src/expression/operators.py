@@ -54,9 +54,21 @@ class Mutate():
             logger.debug("Selection depth set with treedepth {} and chosen depth {}".format(d, selectdepth))
             assert(d>=selectdepth)
 
-        insertpoint = tr.getRandomNode(rng=rng, depth=selectdepth)
+        mindepth = None
+        if mindepthratio is not None:
+            if d > 1:
+                assert(mindepthratio >= 0 and mindepthratio <=1)
+                mindepth = min(max(int( mindepthratio * d ),1), d-1)
+                assert(mindepth < d and mindepth > 0)
+            else:
+                logger.warning("Ignoring mutation with mindepthratio on tree with depth 1")
+
+        insertpoint = tr.getRandomNode(rng=rng, depth=selectdepth, mindepth=mindepth)
         depth_at_i = insertpoint.getDepth()
-        logger.debug("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
+        #logger.info("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
+
+        if mindepth is not None :
+            assert(depth_at_i >= mindepth)
 
         targetdepth = 0
         if not equaldepth:
@@ -66,10 +78,6 @@ class Mutate():
                 limit = limitdepth - depth_at_i
                 logger.debug("Depth is limited by {} to {}".format(limitdepth, limit))
             # Insert here
-            if mindepthratio is not None:
-                assert(mindepthratio >= 0 && mindepthratio <=1)
-                mindepth = int( mindepthratio * d )
-                logger.info("minimum depth to pick is {}".format(mindepth))
             targetdepth = rng.randint(0, limit)
             logger.debug("Picking a random depth {} for mutation".format(targetdepth))
         else:
