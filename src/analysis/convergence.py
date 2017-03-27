@@ -68,7 +68,7 @@ class Convergence(Plotter):
         self.plotPopulationOverGenerations(keyword='fitness')
 
     def plotDepth(self):
-        self.plotPopulationOverGenerations(keyword='depth', cool=False, xcategorical=True, ycategorical=True, groupsimilar=True)
+        self.plotPopulationOverGenerations(keyword='depth', cool=False, xcategorical=False, ycategorical=True, groupsimilar=True)
 
     def plotComplexity(self):
         """
