@@ -28,7 +28,7 @@ class GPAlgorithm():
     In itself it will not evolve a solution.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed=None, archivesize=None, history=None, phases=None, tournamentsize=None, initdepth=None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed=None, archivesize=None, history=None, phases=None, tournamentsize=None, initialdepth=None):
         """
         Initializes a forest of trees randomly constructed.
 
@@ -46,7 +46,8 @@ class GPAlgorithm():
         self._datapointcount = len(X[0])
         """ Fitness function, passed to tree instance to score."""
         self._fitnessfunction = fitnessfunction
-        self._initialdepth = initdepth or maxdepth
+        self._initialdepth = initialdepth or maxdepth
+        logger.info("initialdepth = {}".format(initialdepth))
         self._maxdepth = maxdepth
         self._popsize = popsize
         logger.info("Using population {} maxdepth {} initdepth {}".format(self._popsize, self._maxdepth, self._initialdepth))
@@ -211,7 +212,7 @@ class GPAlgorithm():
         t.scoreTree(self._Y, self._fitnessfunction)
         while t.getFitness() == Constants.MINFITNESS or (t in self._population):
             assert(self._variables)
-            t = Tree.growTree(self._variables, self._maxdepth, rng=rng)
+            t = Tree.growTree(self._variables, self._initialdepth, rng=rng)
             t.scoreTree(self._Y, self._fitnessfunction)
         #logger.info("Grown tree, adding with id {:0x}".format(id(t)))
         self.addTree(t)
@@ -239,6 +240,7 @@ class GPAlgorithm():
         try:
             # fitness values on full data set
             fit = [d.getFitness() if d.getFitness()!= Constants.MINFITNESS else Constants.PEARSONMINFITNESS for d in self._population]
+            depths = [d.getDepth() for d in self._population]
             comp = [d.getScaledComplexity() for d in self._population]
             mean, sd, v= numpy.mean(fit), numpy.std(fit), numpy.var(fit)
             cmean, csd, cv = numpy.mean(comp), numpy.std(comp), numpy.var(comp)
@@ -255,7 +257,7 @@ class GPAlgorithm():
             logger.error("Floating point error on values fit {} ".format(fit))
             raise e
 
-        return {"fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
+        return {"fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                 "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
                 "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
                 "diff_fitness":dfit}
@@ -265,6 +267,7 @@ class GPAlgorithm():
         Compute fitness statistics for the current generation and record them
         """
         fit = [d.getFitness() for d in self._population]
+        depths = [d.getDepth() for d in self._population]
         comp = [d.getScaledComplexity() for d in self._population]
         mean= numpy.mean(fit)
         sd = numpy.std(fit)
@@ -275,7 +278,7 @@ class GPAlgorithm():
         assert(isinstance(replacementcount, list))
         #logger.debug("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
 
-        self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v,
+        self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
                                                  "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, phase)
 
@@ -436,8 +439,8 @@ class BruteElitist(GPAlgorithm):
     replaces unfit samples.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize)
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
 
     def evolve(self, selection):
         """
@@ -466,7 +469,7 @@ class BruteElitist(GPAlgorithm):
             t = selection[i]
             if self.requireMutation(i):
                 candidate = copyObject(t)
-                Mutate.mutate(candidate, variables=variables, equaldepth=False, rng=rng, limitdepth=self._maxdepth)
+                Mutate.mutate(candidate, variables=variables, equaldepth=False, rng=rng, limitdepth=d)
                 candidate.scoreTree(Y, fit)
                 operationcount[0] += 1
                 operationcount[1] += 1
@@ -562,8 +565,8 @@ class BruteCoolingElitist(BruteElitist):
     The cooling schedule 'predicts' efficiency of the operators.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize)
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
 
     def requireMutation(self, popindex:int)->bool:
         generation = self._currentgeneration

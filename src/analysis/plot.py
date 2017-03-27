@@ -10,13 +10,33 @@ from bokeh.palettes import magma, inferno, viridis
 import logging
 import math
 import random
+from expression.constants import Constants
 logger = logging.getLogger('global')
 
 plotwidth = 200
 plotheigth = 200
 
 
-def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, cool=False, xcategorical=False):
+def groupData(data, scale=1):
+    """
+    Given a linear array of data values, sort them by value, count each instance.
+
+    Return a dictionary where each value points to the relative frequency multiplied by scale.
+    E.g. [1,2,2], scale=2 -> {1:2/3, 2:4/3}
+    """
+    dlen = len(data)
+    collected = {}
+    for x in data:
+        if x in collected:
+            collected[x] += 1
+        else:
+            collected[x] = 1
+    for k, v in collected.items():
+        collected[k] = (v / dlen) * scale
+    return collected
+
+
+def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, cool=False, xcategorical=False, ycategorical=False, groupsimilar=False, scalesimilar=1):
     """
     Plot data values over generations.
     """
@@ -24,22 +44,27 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
     labelx = labelx or "X"
     labely = labely or "Y"
     dlen = len(data)
-    #logger.info("data length {} per row {}".format(dlen, len(data[0])))
-    p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely)
-    if xcategorical:
-        xranges = [str(x) for x in range(len(data[0]))]
-        p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely, x_range=xranges)
+    xranges = [str(x) for x in range(len(data[0]))] if xcategorical else None
+    yranges = [[str(x) for x in range(len(data))]] if ycategorical else None
+    p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely, x_range=xranges, y_range=yranges)
     x = [d+1 for d in range(len(data[0]))]
     dlen = len(data)
     colors = ["navy" for _ in range(dlen)]
+    # todo constants
+    size = Constants.PLOT_SIZE_DEFAULT
+    alpha=Constants.PLOT_ALPHA_DEFAULT
     if cool:
+        size = Constants.PLOT_SIZE_COOL
         if dlen <= 256:
             colors = viridis(dlen)
         else:
             colors = viridis(256)
             colors += [colors[-1] for _ in range(dlen-256)]
+    if groupsimilar:
+        size = Constants.PLOT_SIZE_DEPTH
+        alpha = Constants.PLOT_ALPHA_DEPTH
     for i,d in enumerate(data):
-        p.circle(x, d, size=4 if cool else 1, color=colors[dlen-i-1], alpha=0.5)
+        p.circle(x, d, size=size, color=colors[dlen-i-1], alpha=alpha)
     return p
 
 

@@ -45,7 +45,7 @@ class Convergence(Plotter):
         self._convergencestats = convergencestats
         self._runs = len(self._convergencestats)
 
-    def plotFitness(self):
+    def plotPopulationOverGenerations(self, keyword="fitness", cool=False, xcategorical=False, ycategorical=False, groupsimilar=False):
         """
         Plot fitness values over the generations
         """
@@ -57,11 +57,18 @@ class Convergence(Plotter):
         for i, run in enumerate(self._convergencestats):
             if i == 0:
                 generations = len(run[0])
-            fitnessvalues += [gen['fitness'] for gen in run]
+            fitnessvalues += [gen[keyword] for gen in run]
         converted = rmtocm(fitnessvalues)
         logger.debug("{} rows {} cols".format(len(converted), len(converted[0])) )
-        p = plotDotData(converted, labelx="Generation", labely="Fitness", title="Fitness")
+        ystr = "".join((c.upper() if i ==0 else c for i, c in enumerate(keyword)))
+        p = plotDotData(converted, labelx="Generation", labely=ystr, title=ystr,cool=cool, xcategorical=xcategorical, ycategorical=ycategorical, groupsimilar=groupsimilar)
         self.addPlot(p)
+
+    def plotFitness(self):
+        self.plotPopulationOverGenerations(keyword='fitness')
+
+    def plotDepth(self):
+        self.plotPopulationOverGenerations(keyword='depth', cool=False, xcategorical=True, ycategorical=False, groupsimilar=True)
 
     def plotComplexity(self):
         """
@@ -131,22 +138,14 @@ class SummarizedResults(Plotter):
 
     def plotPrediction(self):
         fitness = rmtocm([r['corr_fitness'] for r in self._results])
-        #logger.info("Fitness values for plotting are {}".format(fitness))
-        logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
+        logger.debug("{} rows {} cols".format(len(fitness), len(fitness[0])) )
         p = plotDotData(fitness, labelx="Process", labely="Correlation (less is better)", title="Correlation between fitness on sample data and test data per phase best value", cool=True, xcategorical=True)
         self.addPlot(p)
-        # results in indexed per process
-        # Want best fitness values of all processes
-
-        # Add a plot which gives rate of convergence of prediction value?
-
-    # add a plot which combines all results for all processes.
 
 
     def plotDifference(self):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
-        #logger.info("Fitness values for plotting are {}".format(fitness))
-        logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
+        logger.debug("{} rows {} cols".format(len(fitness), len(fitness[0])) )
         p = plotDotData(fitness, labelx="Process", labely="Difference", title="Difference between fitness on sample data and test data per phase best value", xcategorical=True)
         self.addPlot(p)
 

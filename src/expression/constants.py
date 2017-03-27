@@ -57,3 +57,9 @@ class Constants():
     Determines what ratio of a data set is used for training.
     """
     SAMPLING_RATIO=0.8
+
+    PLOT_SIZE_DEFAULT=1
+    PLOT_SIZE_COOL=4
+    PLOT_SIZE_DEPTH=4
+    PLOT_ALPHA_DEFAULT=0.5
+    PLOT_ALPHA_DEPTH=0.2

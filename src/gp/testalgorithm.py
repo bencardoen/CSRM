@@ -163,6 +163,34 @@ class GPTest(unittest.TestCase):
         s.displayPlots("summary", title=title)
         # summarize Sampling results
 
+    def testVariableDepth(self):
+        expr = testfunctions[2]
+        dpoint = 30
+        vpoint = 5
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
+        logger.debug("Y {} X {}".format(Y, X))
+        g = BruteCoolingElitist(X, Y, popsize=20, initialdepth=3, maxdepth=8, fitnessfunction=_fit, seed=0, generations=5, phases=4)
+        g.executeAlgorithm()
+        stats = g.getConvergenceStatistics()
+        c = Convergence(stats)
+        c.plotFitness()
+        c.plotComplexity()
+        c.plotOperators()
+        c.plotDepth()
+        c.savePlots("output", title=expr+"_cooling")
+        c.displayPlots("output", title=expr+"_cooling")
+        sums = [g.summarizeSamplingResults(X, Y)]
+        s = SummarizedResults(sums)
+        s.plotFitness()
+        s.plotDifference()
+        s.plotPrediction()
+        title = "Collected results for all processes"
+        s.savePlots((outputfolder or "")+"collected", title=title)
+        s.saveData(title, "../output/")
+        s.displayPlots("summary", title=title)
+
     def testDeterminism(self):
         """
         Ensure that the algorithm runs deterministic if a seed is set.

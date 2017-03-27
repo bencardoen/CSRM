@@ -15,6 +15,7 @@ from gp.algorithm import BruteElitist, BruteCoolingElitist
 import logging
 logger = logging.getLogger('global')
 
+
 def runBenchmarks():
     for i, expr in enumerate(testfunctions):
         print("Testing {}".format(expr))
