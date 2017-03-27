@@ -148,7 +148,6 @@ class GPAlgorithm():
         #logger.info("Adding {} to archive".format(len(lst)))
         for x in lst:
             expr = x.toExpression()
-            logger.info("Received {}".format(expr))
             x2 = Tree.createTreeFromExpression(expr, variables=self._X)
             self.addToArchive(x2)
 
@@ -303,19 +302,15 @@ class GPAlgorithm():
         After a run of x generations, reseed the population based on the archive
         """
         archived = self._archive.getAll()
-        logger.info("Adding {}".format([a.toExpression() for a in archived]))
         for a in archived:
             self.addTree(copyObject(a))
         # Retrim the current population by removing the least fit samples
         while len(self._population) > self._popsize:
-            logger.info("Dropping pop")
             self._population.drop()
         # If we have too few, refill with random samples
         diff = self._popsize - len(self._population)
         for _ in range(diff):
-            logger.info("Using random samples to complete pop.")
             self.addRandomTree()
-        logger.info("\n\n Pop is now \n {} \n".format([x.toExpression() for x in self._population]))
 
     def restart(self):
         """

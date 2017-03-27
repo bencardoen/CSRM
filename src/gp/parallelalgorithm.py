@@ -147,14 +147,14 @@ class ParallelGP():
         selectedsamples, buf = [], []
         if targetcount:
             selectedsamples = self.algorithm.getArchived(self._communicationsize)
-            logger.info("Process {} :: Got from algorithm {} ".format(self.pid, [s.toExpression() for s in selectedsamples] ))
+            #logger.info("Process {} :: Got from algorithm {} ".format(self.pid, [s.toExpression() for s in selectedsamples] ))
             buf = self.spreadpolicy.spread(selectedsamples, targetcount)
         #logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
         if self.communicator:
             self.waitForSendRequests()
             for index, target in enumerate(targets):
                 self._sendbuffer[target] = buf[index]
-                logger.info("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), target))
+                #logger.info("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), target))
                 self._waits[target] = self.communicator.isend(buf[index], dest=target, tag=0)
         else:
             return buf, targets
@@ -189,17 +189,12 @@ class ParallelGP():
         results = self.summarizeResults(self._X, self._Y)
         if self.pid == 0:
             collected = [results]
-            logger.info("Process {} :: Collecting results as root ".format(self.pid))
             for processid in range(1,self._communicator.Get_size()):
                 resi = self.communicator.recv(source=processid, tag=0)
                 collected.append(resi)
-                logger.info("Process {} :: Collected results from {}".format(self.pid, processid))
             return collected
         else:
-            logger.debug("Process {} :: Sending results from {}".format(self.pid, self.pid))
             self.communicator.send(results, dest=0, tag=0)
-            logger.debug("Process {} :: Sending results is done {}".format(self.pid, self.pid))
-            logger.debug("Process {} :: still have wait requests ?".format(len(self._waits)))
             self.waitForSendRequests()
             return None
 
@@ -221,7 +216,6 @@ class ParallelGP():
         :param str outputfolder: modify output directory
         """
         stats = self.algorithm.getConvergenceStatistics()
-        logger.info("\n\nConvergence statistics are for process {} \n{}\n\n".format(self._pid, stats[-1][-1]['fitness']))
         c = Convergence(stats)
         c.plotFitness()
         c.plotComplexity()
@@ -320,7 +314,6 @@ class SequentialPGP():
         """
         for i, process in enumerate(self._processes):
             stats = process.algorithm.getConvergenceStatistics()
-            logger.info("\n\nConvergence statistics are for process {} \n{}\n\n".format(i, stats[-1][-1]['fitness']))
             c = Convergence(stats)
             c.plotFitness()
             c.plotComplexity()

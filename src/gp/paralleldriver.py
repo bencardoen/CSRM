@@ -61,10 +61,8 @@ def runBenchmark(topo=None, processcount = None, outfolder = None, display=False
         t = topo(pcount)
     samplecount = int(Constants.SAMPLING_RATIO * len(Y))
     if isMPI():
-        logger.info("Sample count = {}".format(samplecount))
         logger.info("Starting MPI Parallel implementation")
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
-        logger.info("X, Y for seed = {} are {} {}".format(pid, Xk, Yk))
         g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
         g.pid = pid
         algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)

@@ -53,13 +53,11 @@ class Convergence(Plotter):
         generations = 0
         fitnessvalues = []
         runs = len(self._convergencestats)
-        logger.debug("Have {} runs and {} generations".format(runs, generations))
         for i, run in enumerate(self._convergencestats):
             if i == 0:
                 generations = len(run[0])
             fitnessvalues += [gen[keyword] for gen in run]
         converted = rmtocm(fitnessvalues)
-        logger.debug("{} rows {} cols".format(len(converted), len(converted[0])) )
         ystr = "".join((c.upper() if i ==0 else c for i, c in enumerate(keyword)))
         p = plotDotData(converted, labelx="Generation", labely=ystr, title=ystr,cool=cool, xcategorical=xcategorical, ycategorical=ycategorical, groupsimilar=groupsimilar)
         self.addPlot(p)
@@ -112,7 +110,6 @@ class Convergence(Plotter):
         run = self._convergencestats[-1]
         fitnessvalues = run[-1]['fitness']
         complexity = run[-1]['complexity']
-        logger.debug("Plotting fitness {} against complexity {}".format(fitnessvalues, complexity))
         p = plotFront(X=fitnessvalues, Y=complexity, labelx="Fitness", labely="complexity", title="Front")
         self.addPlot(p)
 
@@ -123,7 +120,6 @@ class Convergence(Plotter):
         self.plotDepth()
 
     def saveData(self, filename, outputfolder=None):
-        logger.info("writing to output {} in folder {}".format(filename, outputfolder))
         outputfolder = outputfolder or ""
         with open(outputfolder+filename, 'w') as filename:
             json.dump(self._convergencestats, filename, indent=4)
@@ -147,7 +143,6 @@ class SummarizedResults(Plotter):
 
     def plotPrediction(self):
         fitness = rmtocm([r['corr_fitness'] for r in self._results])
-        logger.info("{} rows {} cols".format(len(fitness), len(fitness[0])) )
         p = plotDotData(fitness, labelx="Process", labely="Correlation (less is better)", title="Correlation between fitness on sample data and test data per phase best value", cool=True, xcategorical=True)
         self.addPlot(p)
 
@@ -160,7 +155,6 @@ class SummarizedResults(Plotter):
 
     def plotDifference(self):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
-        logger.debug("{} rows {} cols".format(len(fitness), len(fitness[0])) )
         p = plotDotData(fitness, labelx="Process", labely="Difference", title="Difference between fitness on sample data and test data per phase best value", xcategorical=True)
         self.addPlot(p)
 
@@ -169,7 +163,6 @@ class SummarizedResults(Plotter):
         pass
 
     def saveData(self, filename, outputfolder=None):
-        logger.info("writing to output {} in folder {}".format(filename, outputfolder))
         outputfolder = outputfolder or ""
         with open(outputfolder+filename, 'w') as filename:
             json.dump(self._results, filename, indent=4)
