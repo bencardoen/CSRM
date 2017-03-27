@@ -478,7 +478,7 @@ class BruteElitist(GPAlgorithm):
                 operationcount[0] += 1
                 operationcount[1] += 1
 
-                if candidate.getMultiObjectiveFitness() < t.getMultiObjectiveFitness():
+                if candidate.getFitness() < t.getFitness():
                     assert(candidate.getDepth() <= d)
                     selection[i] = candidate
                     replacementcount[0] += 1
@@ -509,13 +509,14 @@ class BruteElitist(GPAlgorithm):
             assert(id(left) != id(right))
             lc = copyObject(left)
             rc = copyObject(right)
-            Crossover.subtreecrossover(lc, rc, depth=None, rng=rng, limitdepth=d)
+            mdr = self.minDepthRatio(i)
+            Crossover.subtreecrossover(lc, rc, depth=None, rng=rng, limitdepth=d, mindepthratio=mdr)
             operationcount[0] += 2
             operationcount[2] += 2
             lc.scoreTree(Y, fit)
             rc.scoreTree(Y, fit)
             scores = [left, right, lc, rc]
-            best = sorted(scores, key = lambda t:t.getMultiObjectiveFitness())[0:2]
+            best = sorted(scores, key = lambda t:t.getFitness())[0:2]
             if lc in best:
                 replacementcount[0] += 1
                 replacementcount[2] += 1

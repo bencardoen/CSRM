@@ -116,6 +116,12 @@ class Convergence(Plotter):
         p = plotFront(X=fitnessvalues, Y=complexity, labelx="Fitness", labely="complexity", title="Front")
         self.addPlot(p)
 
+    def plotAll(self):
+        self.plotFitness()
+        self.plotComplexity()
+        self.plotOperators()
+        self.plotDepth()
+
     def saveData(self, filename, outputfolder=None):
         logger.info("writing to output {} in folder {}".format(filename, outputfolder))
         outputfolder = outputfolder or ""
@@ -144,6 +150,12 @@ class SummarizedResults(Plotter):
         logger.debug("{} rows {} cols".format(len(fitness), len(fitness[0])) )
         p = plotDotData(fitness, labelx="Process", labely="Correlation (less is better)", title="Correlation between fitness on sample data and test data per phase best value", cool=True, xcategorical=True)
         self.addPlot(p)
+
+    def plotAll(self):
+        self.plotFitness()
+        self.plotDifference()
+        self.plotPrediction()
+        self.plotDepth()
 
 
     def plotDifference(self):

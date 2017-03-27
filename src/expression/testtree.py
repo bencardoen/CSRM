@@ -740,7 +740,7 @@ class TreeTest(unittest.TestCase):
         last.printToDot(outputfolder+"t40Mutated5.dot")
 
     def testAdvancedCrossover(self):
-        TESTRANGE = 10
+        TESTRANGE = 100
         vcount = 4
         dpoint = 1
         rng = getRandom(0)
@@ -757,6 +757,10 @@ class TreeTest(unittest.TestCase):
             self.assertTrue(max(cl.getDepth(), cr.getDepth())<=limdepth)
             Crossover.subtreecrossover(cl, cr, rng=rng, depth=None, symmetric=True, limitdepth=limdepth)
             self.assertTrue(max(cl.getDepth(), cr.getDepth())<=limdepth)
+            mrat = rng.uniform(0,1)
+            Crossover.subtreecrossover(cl, cr, rng=rng, depth=None, symmetric=True, limitdepth=limdepth, mindepthratio=mrat)
+            self.assertTrue(max(cl.getDepth(), cr.getDepth())<=limdepth)
+
 
 
     def testDistanceFunctions(self):

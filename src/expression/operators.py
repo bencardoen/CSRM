@@ -95,7 +95,7 @@ class Crossover():
     """
 
     @staticmethod
-    def subtreecrossover(left, right, depth = None, rng = None, limitdepth=-1, symmetric=True):
+    def subtreecrossover(left, right, depth = None, rng = None, limitdepth=-1, symmetric=True, mindepthratio=None):
         """
         Perform a subtree crossover in place.
 
@@ -107,20 +107,28 @@ class Crossover():
         :param int depth: if not None, forces subtree selection to pick subtrees at the given depth. Else the chosen depth is in [1, min(left.getDepth(), right.getDepth())]
         :param int limitdepth: if not -1, restricts the depth of the operation. The resulting tree will not be larger than this value.
         :param Random rng: rng used in calls to select subtrees
+        :param float mindepthratio: determines lower bracket of range to select depth in.
         """
         ld = left.getDepth()
         rd = right.getDepth()
-        mindepth = min(ld, rd)
+        lmindepth = 1
+        rmindepth = 1
+        minmaxdepth = min(ld, rd)
+        # if mindepthratio is set, pick a lower bracket value based by that ratio per tree
+        if mindepthratio is not None: # can be zero, don't use if mindepthratio
+            lmindepth = min( max( int(mindepthratio * ld), 1) , ld-1)
+            rmindepth = min( max( int(mindepthratio * rd), 1) , rd-1)
+            #logger.info("Setting lmin {} rmin {} in trees ld {} rd {} based on {}".format(lmindepth, rmindepth, ld, rd, mindepthratio))
         if rng is None:
             logger.warning("Non deterministic mode")
             rng = getRandom()
         if depth is None:
             if symmetric:
-                ldepth = rng.randint(1, mindepth)
+                ldepth = rng.randint(min(lmindepth,rmindepth), minmaxdepth)
                 rdepth = ldepth
             else:
-                rdepth = rng.randint(1, rd)
-                ldepth = rng.randint(1, ld)
+                rdepth = rng.randint(lmindepth, rd)
+                ldepth = rng.randint(rmindepth, ld)
             depth = [ldepth, rdepth]
         else:
             pass
