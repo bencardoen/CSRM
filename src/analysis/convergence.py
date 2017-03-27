@@ -130,9 +130,8 @@ class SummarizedResults(Plotter):
 
     def plotFitness(self):
         fitness = rmtocm([r['fitness'] for r in self._results])
-        for i in range(1):
-            p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the test entire set (sample + test).", xcategorical=True)
-            self.addPlot(p)
+        p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the test entire set (sample + test).", xcategorical=True, groupsimilar=True)
+        self.addPlot(p)
 
     def plotDepth(self):
         fitness = rmtocm([r['depth'] for r in self._results])

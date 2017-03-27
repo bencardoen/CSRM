@@ -33,14 +33,15 @@ except ImportError as e:
         exit(0)
 
 
-def runBenchmark(topo=None, processcount = None, outfolder = None, display=False, generations=None, population=None, phases=None):
+def runBenchmark(topo=None, processcount = None, outfolder = None, display=False, generations=None, population=None, phases=None, maxdepth=None, initialdepth=None):
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     expr = testfunctions[2]
-    dpoint = 30
+    dpoint = 10
     vpoint = 5
     generations= generations or 20
-    depth=5
+    depth= maxdepth or 7
+    initialdepth= initialdepth or 4
     phases= phases or 1
     pcount = comm.Get_size() if isMPI() else processcount
     population = population or 20
@@ -58,11 +59,11 @@ def runBenchmark(topo=None, processcount = None, outfolder = None, display=False
         logger.info("Starting MPI Parallel implementation")
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
-        g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize)
+        g = BruteCoolingElitist(Xk, Yk, popsize=population, depth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
         algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
         logger.info("Starting Sequential implementation")
-        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize)
+        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth)
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)
@@ -80,8 +81,10 @@ if __name__ == "__main__":
     parser.add_argument('-g', '--generations', type=int, help='Number of generations')
     parser.add_argument('-f', '--phases', type=int, help='Number of phases')
     parser.add_argument('-o', '--outputfolder', help="Folder to write data to")
-    parser.add_argument('-d', '--displaystats', action='store_true', help="Wether to dispay convergence statistics for each process")
+    parser.add_argument('-v', '--displaystats', action='store_true', help="Wether to dispay convergence statistics for each process")
     parser.add_argument('-p', '--population', type=int, help="Population per instance")
+    parser.add_argument('-d', '--maxdepth', type=int, help="Max depth of any tree")
+    parser.add_argument('-i', '--initialdepth', type=int, help="initialdepth depth of any tree")
     args = parser.parse_args()
     print(args)
     topo = None
@@ -114,6 +117,8 @@ if __name__ == "__main__":
     generations = args.generations
     population = args.population
     phases = args.phases
+    maxdepth = args.maxdepth
+    initialdepth = args.initialdepth
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
-    runBenchmark(topo, processcount, outfolder=outputfolder, display=displaystats, generations=generations, population=population, phases=phases)
+    runBenchmark(topo, processcount, outfolder=outputfolder, display=displaystats, generations=generations, population=population, phases=phases, maxdepth=maxdepth, initialdepth=initialdepth)

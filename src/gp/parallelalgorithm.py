@@ -217,6 +217,7 @@ class ParallelGP():
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
+        c.plotDepth()
         title="Parallel GP for process {}".format(self.pid)
         if save:
             c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
@@ -230,6 +231,7 @@ class ParallelGP():
             s.plotFitness()
             s.plotDifference()
             s.plotPrediction()
+            s.plotDepth()
             title = "Collected results for all processes"
             if save:
                 s.savePlots((outputfolder or "")+"collected", title=title)
@@ -254,7 +256,7 @@ class SequentialPGP():
     This is a driver class for the ParallelGP class, to be used when MPI is not active.
     """
 
-    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, archivesize=None, communicationsize=None):
+    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, archivesize=None, communicationsize=None, initialdepth=None):
         """
         Construct a SeqPGP instance, driving a set of GP instances.
 
@@ -279,7 +281,7 @@ class SequentialPGP():
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         for i in range(processcount):
             xsample, ysample = getKSamples(X, Y, samplecount, rng=rng, seed=i)
-            g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=maxdepth, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize)
+            g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=maxdepth, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
             pgp = ParallelGP(g, X, Y, communicationsize=self._communicationsize, topo=self._topo, pid=i)
             self._processes.append(pgp)
             self._phases = pgp.phases
@@ -309,6 +311,7 @@ class SequentialPGP():
             c.plotFitness()
             c.plotComplexity()
             c.plotOperators()
+            c.plotDepth()
             title="Sequential Parallel GP for process {}".format(i)
             if save:
                 c.savePlots((outputfolder or "")+"output_{}".format(i), title)
@@ -320,6 +323,7 @@ class SequentialPGP():
         s.plotFitness()
         s.plotDifference()
         s.plotPrediction()
+        s.plotDepth()
         title = "Collected results for all processes"
         if save:
             s.savePlots((outputfolder or "")+"collected", title=title)

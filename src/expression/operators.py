@@ -19,7 +19,7 @@ class Mutate():
     """
 
     @staticmethod
-    def mutate(tr:Tree, variables, equaldepth=False, rng=None, limitdepth:int=0, selectiondepth:int=-1):
+    def mutate(tr:Tree, variables, equaldepth=False, rng=None, limitdepth:int=0, selectiondepth:int=-1, mindepthratio=None):
         """
         Replace a random node with a new generated subexpression.
 
@@ -30,6 +30,7 @@ class Mutate():
         With equaldepth set, the resulting mutation will always have the same depth as the original tree.
         With limitdepth set, the resulting tree will have a depth <= limit
         With selectiondepth set, the target depth for the mutation point can be specified.
+        With mindepthratio set, the
 
         For instance to create a mutation operator that mutates only leafs and replaces them with leafs:
             equaldepth=True, limitdepth=0, selectiondepth=tr.getDepth()
@@ -64,6 +65,11 @@ class Mutate():
                 # Have an existing tree with depth d.
                 limit = limitdepth - depth_at_i
                 logger.debug("Depth is limited by {} to {}".format(limitdepth, limit))
+            # Insert here
+            if mindepthratio is not None:
+                assert(mindepthratio >= 0 && mindepthratio <=1)
+                mindepth = int( mindepthratio * d )
+                logger.info("minimum depth to pick is {}".format(mindepth))
             targetdepth = rng.randint(0, limit)
             logger.debug("Picking a random depth {} for mutation".format(targetdepth))
         else:
