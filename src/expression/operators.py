@@ -51,17 +51,13 @@ class Mutate():
         selectdepth = None
         if selectiondepth != -1:
             selectdepth = selectiondepth
-            logger.debug("Selection depth set with treedepth {} and chosen depth {}".format(d, selectdepth))
+            #logger.debug("Selection depth set with treedepth {} and chosen depth {}".format(d, selectdepth))
             assert(d>=selectdepth)
 
         mindepth = None
         if mindepthratio is not None:
-            if d > 1:
-                assert(mindepthratio >= 0 and mindepthratio <=1)
-                mindepth = min(max(int( mindepthratio * d ),1), d-1)
-                assert(mindepth < d and mindepth > 0)
-            else:
-                logger.warning("Ignoring mutation with mindepthratio on tree with depth 1")
+            assert(mindepthratio >= 0 and mindepthratio <=1)
+            mindepth = min(max(int( mindepthratio * d ),1), d-1)
 
         insertpoint = tr.getRandomNode(rng=rng, depth=selectdepth, mindepth=mindepth)
         depth_at_i = insertpoint.getDepth()
