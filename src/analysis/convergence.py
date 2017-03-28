@@ -44,18 +44,15 @@ class Convergence(Plotter):
         super().__init__()
         self._convergencestats = convergencestats
         self._runs = len(self._convergencestats)
+        self.plotAll()
 
     def plotPopulationOverGenerations(self, keyword="fitness", cool=False, xcategorical=False, ycategorical=False, groupsimilar=False):
         """
         Plot fitness values over the generations
         """
         converted = []
-        generations = 0
         fitnessvalues = []
-        runs = len(self._convergencestats)
         for i, run in enumerate(self._convergencestats):
-            if i == 0:
-                generations = len(run[0])
             fitnessvalues += [gen[keyword] for gen in run]
         converted = rmtocm(fitnessvalues)
         ystr = "".join((c.upper() if i ==0 else c for i, c in enumerate(keyword)))
@@ -129,6 +126,7 @@ class SummarizedResults(Plotter):
     def __init__(self, results):
         super().__init__()
         self._results = results
+        self.plotAll()
 
     def plotFitness(self):
         fitness = rmtocm([r['fitness'] for r in self._results])
@@ -151,7 +149,6 @@ class SummarizedResults(Plotter):
         self.plotDifference()
         self.plotPrediction()
         self.plotDepth()
-
 
     def plotDifference(self):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])

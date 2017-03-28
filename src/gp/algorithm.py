@@ -212,16 +212,15 @@ class GPAlgorithm():
         rng = self._rng
         t = Tree.growTree(self._variables, self._initialdepth, rng=rng)
         t.scoreTree(self._Y, self._fitnessfunction)
-        while t.getFitness() == Constants.MINFITNESS or (t in self._population) or (t.getVariables() is None):
+        while t.getFitness() == Constants.MINFITNESS or (t in self._population) or (t.isConstantExpressionLazy()):
             assert(self._variables)
             tn = Tree.growTree(self._variables, self._initialdepth, rng=rng)
-            if tn.getVariables():
+            if not tn.isConstantExpressionLazy():
                 tn.scoreTree(self._Y, self._fitnessfunction)
                 t = tn
-            else:
-                logger.warning("Discarding constant expression")
-        assert(t.getVariables() is not None)
-        #logger.info("Grown tree, adding with id {:0x}".format(id(t)))
+                # todo INSERT POINT here for ctexprs.
+
+        assert(not t.isConstantExpressionLazy())
         self.addTree(t)
 
     def testInvariant(self):
@@ -245,21 +244,16 @@ class GPAlgorithm():
         assert(len(X[0]) == len(Y))
         for t in self._population:
             t.updateVariables(X)
-            #logger.info("Old fitness = {}".format(t.getFitness()))
             t.scoreTree(Y, self._fitnessfunction)
-            #logger.info("New fitness = {}".format(t.getFitness()))
         try:
-            # fitness values on full data set
             fit = [d.getFitness() if d.getFitness()!= Constants.MINFITNESS else Constants.PEARSONMINFITNESS for d in self._population]
             depths = [d.getDepth() for d in self._population]
             comp = [d.getScaledComplexity() for d in self._population]
             mean, sd, v= numpy.mean(fit), numpy.std(fit), numpy.var(fit)
             cmean, csd, cv = numpy.mean(comp), numpy.std(comp), numpy.var(comp)
-            # fitness values for entire pop for all phases
             lastfit = [self.getConvergenceStat(-1, phase)['fitness'] for phase in range(self.phases)]
             cfit = [correlator(fit, best) for best in lastfit]
             assert(len(cfit) == self.phases)
-            # difference in fitness for the last generation, last phase
             dfit = [abs(a-b) for a,b in zip(lastfit[-1], fit)]
             dmeanfit, dsdfit, dvfit = numpy.mean(dfit), numpy.std(dfit), numpy.var(dfit)
             logger.info("Best fitness value for full data is {}".format(min(fit)))

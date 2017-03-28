@@ -398,20 +398,16 @@ class Tree:
         lowerrange = 1
         if mindepth is not None:
             lowerrange=(2**mindepth) - 1
-            #logger.info("Using mindepth {}".format(mindepth))
             assert(depth is None)
         lower, upper = lowerrange, len(self.nodes)
         if depth:
-            # We know our repr is a binary tree, with depth slices equal in length to 2^k where k is depth
             assert(depth < math.log(len(self.nodes)+1, 2))
             lower = 2**depth-1
             upper = min(2**(depth+1)-1, len(self.nodes))
         node = None
-        while node is None: # a node can have a single leaf, not two, so in the list None entities will be present
+        while node is None:
             rv = r.randrange(max(lower,1), upper)
-            #logger.info("Lower {}, max(l, 1) {}, upper {} value = {}".format(lower, max(lower,1), upper, rv))
             node = self.getNode( rv )
-        #logger.info("Chosen node with depth {}".format(node.getDepth()))
         assert(self.root != node)
         return node
 
@@ -616,6 +612,9 @@ class Tree:
         """
         assert(self.root)
         return self.root.isConstantExpression()
+
+    def isConstantExpressionLazy(self):
+        return self.root.isConstantExpressionLazy()
 
     def toExpression(self):
         """

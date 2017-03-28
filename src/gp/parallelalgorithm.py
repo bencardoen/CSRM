@@ -163,16 +163,14 @@ class ParallelGP():
         """
         Receive incoming samples (blocking) and update the algorithm
         """
-        # todo investigate if async calling helps
         senders = self.topo.getSource(self.pid)
-        #logger.info("Process {} :: MPI, Expecting buffers from {}".format(self.pid, senders))
         received = []
         for sender in senders:
-            logger.debug("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
+            #logger.debug("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
             buf = self.communicator.recv(source=sender, tag=0) # todo extend tag usage
-            logger.debug("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
-            for b in received:
-                logger.info("Process {} :: MPI received {}".format(b))
+            #logger.debug("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
+            # for b in received:
+            #     logger.info("Process {} :: MPI received {}".format(b))
             received += buf
         self.algorithm.archiveExternal(received)
 
@@ -184,7 +182,6 @@ class ParallelGP():
         :returns : None if not pid==0, else all collectResults
         """
         assert(isMPI())
-        logger.info("Process {} :: Collecting results ".format(self.pid))
 
         results = self.summarizeResults(self._X, self._Y)
         if self.pid == 0:
@@ -215,34 +212,7 @@ class ParallelGP():
         :param bool display: Display results in browser (WARNING : CPU intensive for large sets)
         :param str outputfolder: modify output directory
         """
-        stats = self.algorithm.getConvergenceStatistics()
-        c = Convergence(stats)
-        logger.info("Stats for process {} are {}".format(self.pid, stats[-1][-1]['fitness']))
-        c.plotFitness()
-        c.plotComplexity()
-        c.plotOperators()
-        c.plotDepth()
-        title="Parallel GP for process {}".format(self.pid)
-        if save:
-            c.savePlots((outputfolder or "")+"output_{}".format(self.pid), title=title)
-            c.saveData(title, outputfolder)
-        if display:
-            if not isMPI():
-                c.displayPlots("output_{}".format(self.pid), title=title)
-        sums = self.collectSummaries()
-        if sums is not None:
-            s = SummarizedResults(sums)
-            s.plotFitness()
-            s.plotDifference()
-            s.plotPrediction()
-            s.plotDepth()
-            title = "Collected results for all processes"
-            if save:
-                s.savePlots((outputfolder or "")+"collected", title=title)
-                s.saveData(title, outputfolder)
-            if display:
-                s.displayPlots("summary", title=title)
-
+        reportOutput([self], X=self._X, Y=self._Y, save=save, display=display, outputfolder=outputfolder, pid=self.pid)
 
     def summarizeResults(self, X, Y):
         """
@@ -310,33 +280,7 @@ class SequentialPGP():
         :param bool display: Display results in browser (WARNING : CPU intensive for large sets)
         :param str outputfolder: modify output directory
         """
-        for i, process in enumerate(self._processes):
-            stats = process.algorithm.getConvergenceStatistics()
-            c = Convergence(stats)
-            logger.info("Stats for process {} are {}".format(i, stats[-1][-1]['fitness']))
-            logger.info("Stats for process {} Best fitness = {}".format(i, min(stats[-1][-1]['fitness'])))
-            c.plotFitness()
-            c.plotComplexity()
-            c.plotOperators()
-            c.plotDepth()
-            title="Sequential Parallel GP for process {}".format(i)
-            if save:
-                c.savePlots((outputfolder or "")+"output_{}".format(i), title)
-                c.saveData(title, outputfolder)
-            if display:
-                c.displayPlots("output_{}".format(i), title)
-        sums = self.collectSummaries()
-        s = SummarizedResults(sums)
-        s.plotFitness()
-        s.plotDifference()
-        s.plotPrediction()
-        s.plotDepth()
-        title = "Collected results for all processes"
-        if save:
-            s.savePlots((outputfolder or "")+"collected", title=title)
-            s.saveData(title, outputfolder)
-        if display:
-            s.displayPlots("summary", title=title)
+        reportOutput(self._processes, X=self._X, Y=self._Y, save=save, display=display, outputfolder=outputfolder, pid=None)
 
 
     def collectSummaries(self):
@@ -344,3 +288,39 @@ class SequentialPGP():
         From all processes, get summarized results.
         """
         return [p.summarizeResults(self._X, self._Y) for p in self._processes]
+
+
+def reportOutput(processes, X, Y, save=False, display=False, outputfolder=None, pid=None,):
+    """
+    Report output of all processes.
+
+    :param bool save: Save results to file
+    :param bool display: Display results in browser (WARNING : CPU intensive for large sets)
+    :param str outputfolder: modify output directory
+    """
+    for i, process in enumerate(processes):
+        processid = i if pid is None else pid
+        stats = process.algorithm.getConvergenceStatistics()
+        c = Convergence(stats)
+        logger.info("Stats for process {} Best fitness = {}".format(processid, min(stats[-1][-1]['fitness'])))
+        title="Sequential Parallel GP for process {}".format(processid)
+        if save:
+            c.savePlots((outputfolder or "")+"output_{}".format(processid), title)
+            c.saveData(title, outputfolder)
+        if display:
+            if not isMPI():
+                c.displayPlots("output_{}".format(processid), title)
+    sums = None
+    if pid is None:
+        sums = [p.summarizeResults(X, Y) for p in processes]
+    else:
+        sums = processes[0].collectSummaries()
+    # in MPI mode, sums will be None for any except root
+    if sums:
+        s = SummarizedResults(sums)
+        title = "Collected results for all processes"
+        if save:
+            s.savePlots((outputfolder or "")+"collected", title=title)
+            s.saveData(title, outputfolder)
+        if display:
+            s.displayPlots("summary", title=title)
