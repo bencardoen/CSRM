@@ -36,6 +36,26 @@ class Node:
         self.ctexpr = None
 
     @staticmethod
+    def evaluateAsTree(node, index=None):
+        """
+        Recursively evaluate tree with node as root.
+
+        Returns None if evaluation is not valid
+        """
+        children = node.children
+        if children:
+            arity = node.arity
+            value = [None] * arity
+            for i, child in enumerate(children):
+                v=Node.evaluateAsTree(child, index)
+                if v is None:
+                    return None
+                value[i] = v
+            return node.evaluate(value, index=index) # function or operator
+        else:
+            return node.evaluate(index=index) # leaf
+
+    @staticmethod
     def positionToDepth(pos):
         """
         Use the structure of the binary tree and its list encoding to retrieve depth in log(N) steps without relying on a parent pointer.

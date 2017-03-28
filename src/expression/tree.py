@@ -215,7 +215,7 @@ class Tree:
         Updates depth if needed.
         """
         if self.modified or index is not None:
-            self.evaluated = self._evalTree(self.root, index)
+            self.evaluated = Node.evaluateAsTree(self.root, index)
             self.modified = False
         return self.evaluated
 
@@ -229,6 +229,7 @@ class Tree:
         if dpoint != 0:
             return [self.evaluateTree(index=i) for i in range(dpoint)]
         else:
+            # TODO use as ctexpr detection
             #logger.info(" Constant Tree is {}".format(self.toExpression()))
             return [self.evaluateTree(index=None)]
 
@@ -247,27 +248,6 @@ class Tree:
         f = distancefunction(actual, expected, tree=self)
         self.setFitness(f)
         return f
-
-    # TODO make static or move to Node
-    def _evalTree(self, node: Node, index=None):
-        """
-        Recursively evaluate tree with node as root.
-
-        Returns None if evaluation is not valid
-        """
-        children = node.children
-        if children:
-            arity = node.arity
-            value = [None] * arity
-            for i, child in enumerate(children):
-                v=self._evalTree(child, index)
-                if v is None:
-                    return None
-                value[i] = v
-            return node.evaluate(value, index=index) # function or operator
-        else:
-            return node.evaluate(index=index) # leaf
-
 
     def printToDot(self, name = None):
         filename = name or "output.dot"
