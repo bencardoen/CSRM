@@ -283,9 +283,6 @@ class SequentialPGP():
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         for i in range(processcount):
             xsample, ysample = getKSamples(X, Y, samplecount, rng=rng, seed=i)
-            # TODO DEBUG
-            #xsample, ysample = X, Y
-            #logger.info("X, Y for seed {} are {} and {}".format(i, xsample, ysample))
             g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=maxdepth, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
             g.pid = i
             pgp = ParallelGP(g, X, Y, communicationsize=self._communicationsize, topo=self._topo, pid=i)
