@@ -248,6 +248,7 @@ class Tree:
         self.setFitness(f)
         return f
 
+    # TODO make static or move to Node
     def _evalTree(self, node: Node, index=None):
         """
         Recursively evaluate tree with node as root.
@@ -605,7 +606,6 @@ class Tree:
 
         :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) is allowed but not log(x) with implicit base e
         """
-        dpoint = 0
         pfix = infixToPrefix(tokenize(expr, variables))
         result = Tree()
         lastnode = None
@@ -641,6 +641,23 @@ class Tree:
         """
         return Node.nodeToExpression(self.root)
 
-    @staticmethod
-    def doConstantFolding(tr):
+    def doConstantFolding(self):
+        rootctexpr = self.root.isConstantExpression()
+        if rootctexpr:
+            logger.info("Root is ctexpr")
+            pass
+        else:
+            subtrees = self.root.getConstantSubtrees()
+            subtrees = [x for x in subtrees if x is not None]
+            #def _evalTree(self, node: Node, index=None):
+            values = [x.evaluate() for x in subtrees]
+            logger.info("Subtrees are {}".format(subtrees))
+            logger.info("Subtrees are {}".format(values))
+            pass
+
+        # detect all constant expression subtrees, in _1_ pass, so bottom up
+        # then for each subtree, replace with a constant node representing the value. (aka evaluate the tree)
+        # get leaves
+        # if ctexpr and not leaf is base case
+        # do a single pass on the tree, the recursive calls establish which nodes are ctexprs and which not
         pass

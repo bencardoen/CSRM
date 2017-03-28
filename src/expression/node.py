@@ -33,6 +33,7 @@ class Node:
         else:
             self.arity = 0
         self._depth = Node.positionToDepth(pos)
+        self.ctexpr = None
 
     @staticmethod
     def positionToDepth(pos):
@@ -50,8 +51,38 @@ class Node:
     def getDepth(self):
         return self._depth
 
+    def getConstantSubtrees(self):
+        # if we're not ctexpr, return each child that is (and isn't a leaf)
+        # else None
+        logger.info("ct subtrees for {}".format(self))
+        if not self.isLeaf():
+            assert(self.ctexpr is not None)
+        # base case is ctexpr node
+        # if true, return self
+        # else, not ctexpr, return recursively on children
+        if self.ctexpr:
+            return self
+        else:
+            if self.children:
+                return [c.getConstantSubtrees() for c in self.children]
+            else:
+                return None
+
     def isConstantExpression(self):
-        return reduce( lambda c, d: c.isConstantExpression() and d.isConstantExpression(), self.children )
+        logger.info("CTEXPR test for {}".format(self))
+        if self.ctexpr is None:
+            logger.info("ctexpr is None, checking {}".format(self))
+            result = True
+            if self.children:
+                for c in self.children:
+                    if not c.isConstantExpression():
+                        result = False
+            else:
+                assert(False)
+            self.ctexpr = result
+            #self.ctexpr = reduce( lambda c, d: c.isConstantExpression() and d.isConstantExpression(), self.children )
+            assert(self.ctexpr is not None)
+        return self.ctexpr
 
     def getNodeComplexity(self):
         if self.function:
@@ -88,6 +119,9 @@ class Node:
 
     def getChildren(self):
         return self.children
+
+    def isLeaf(self):
+        return False
 
     def getConstant(self):
         return self.constant
@@ -290,7 +324,11 @@ class VariableNode(Node):
         else:
             return v
 
+    def isLeaf(self):
+        return True
+
     def isConstantExpression(self):
+        logger.info("Ctexpr checking {}".format(self))
         return False
 
     def getArity(self):
@@ -342,6 +380,10 @@ class ConstantNode(Node):
         return 0
 
     def isConstantExpression(self):
+        logger.info("Ctexpr checking {}".format(self))
+        return True
+
+    def isLeaf(self):
         return True
 
     def __str__(self):
