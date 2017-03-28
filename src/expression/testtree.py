@@ -634,6 +634,20 @@ class TreeTest(unittest.TestCase):
         actual = t.evaluateAll()
         self.assertEqual(len(actual), dpoint)
 
+    def testConstantFolding(self):
+        dpoint = 5
+        vcount = 5
+        vs = generateVariables(vcount, dpoint, seed=0)
+        falseexprs = ["x1 + 4 * log (2, 4)", "x2 + x3 - sin(4)", "x2/x4"]
+        trueexprs = ["2+3", "4 % (17 + sin(4) - 42 ** 7)", "sin(cos(4))"]
+        for f in falseexprs:
+            t = Tree.createTreeFromExpression(f, vs)
+            self.assertFalse(t.isConstantExpression())
+        for tr in trueexprs:
+            t = Tree.createTreeFromExpression(tr, vs)
+            self.assertTrue(t.isConstantExpression())
+
+
     def testBenchmarks(self):
         dpoint = 5
         vcount = 5

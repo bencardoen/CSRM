@@ -628,8 +628,19 @@ class Tree:
         result.testInvariant()
         return result
 
+    def isConstantExpression(self):
+        """
+        Check if this tree represents a constant expression.
+        """
+        assert(self.root)
+        return self.root.isConstantExpression()
+
     def toExpression(self):
         """
         Print the tree to an infix expression.
         """
         return Node.nodeToExpression(self.root)
+
+    @staticmethod
+    def doConstantFolding(tr):
+        pass

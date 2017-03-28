@@ -9,6 +9,7 @@
 
 import logging
 import random
+from functools import reduce
 import expression.functions
 from expression.constants import Constants
 from expression.tools import traceFunction, getRandom
@@ -48,6 +49,9 @@ class Node:
 
     def getDepth(self):
         return self._depth
+
+    def isConstantExpression(self):
+        return reduce( lambda c, d: c.isConstantExpression() and d.isConstantExpression(), self.children )
 
     def getNodeComplexity(self):
         if self.function:
@@ -286,6 +290,9 @@ class VariableNode(Node):
         else:
             return v
 
+    def isConstantExpression(self):
+        return False
+
     def getArity(self):
         return 0
 
@@ -333,6 +340,9 @@ class ConstantNode(Node):
 
     def getArity(self):
         return 0
+
+    def isConstantExpression(self):
+        return True
 
     def __str__(self):
         return "{}".format(self.getConstant().getValue())
