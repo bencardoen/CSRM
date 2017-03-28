@@ -7,7 +7,7 @@
 #      Author: Ben Cardoen
 
 
-from expression.tools import msb, compareLists, traceFunction, copyObject, getRandom
+from expression.tools import msb, compareLists, traceFunction, copyObject, getRandom, flatten
 from expression.functions import functionset, getRandomFunction, tokenize, infixToPostfix, isFunction, isOperator, infixToPrefix, Constants
 from copy import deepcopy
 from .node import Node, Constant, ConstantNode, Variable, VariableNode
@@ -478,6 +478,7 @@ class Tree:
                 newnodes += c.getChildren()[:]
                 self._addNode(c, c.getPosition())
             nodes = newnodes
+        self.root.clearConstExprCache()
         self.setDataPointCount()
         self.testInvariant()
 
@@ -585,6 +586,7 @@ class Tree:
         Given an infix expression containing floats, operators, function defined in functions.functionset, create a corresponding expression tree.
 
         :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) is allowed but not log(x) with implicit base e
+        :bug : 2 * log(3 , 4) is parsed incorrectly
         """
         pfix = infixToPrefix(tokenize(expr, variables))
         result = Tree()
@@ -624,20 +626,16 @@ class Tree:
     def doConstantFolding(self):
         rootctexpr = self.root.isConstantExpression()
         if rootctexpr:
-            logger.info("Root is ctexpr")
-            pass
+            value = Node.evaluateAsTree(self.root)
+            newroot = ConstantNode(0, Constant(value))
+            self.root=newroot
+            self.modified = True
+            self.modifiedDepth = True
+            self.nodes = [newroot]
         else:
-            subtrees = self.root.getConstantSubtrees()
+            subtrees = flatten(self.root.getConstantSubtrees())
             subtrees = [x for x in subtrees if x is not None]
-            #def _evalTree(self, node: Node, index=None):
-            values = [x.evaluate() for x in subtrees]
-            logger.info("Subtrees are {}".format(subtrees))
-            logger.info("Subtrees are {}".format(values))
-            pass
-
-        # detect all constant expression subtrees, in _1_ pass, so bottom up
-        # then for each subtree, replace with a constant node representing the value. (aka evaluate the tree)
-        # get leaves
-        # if ctexpr and not leaf is base case
-        # do a single pass on the tree, the recursive calls establish which nodes are ctexprs and which not
-        pass
+            values = [Node.evaluateAsTree(x) for x in subtrees]
+            for subtreeroot, value in zip(subtrees, values):
+                newroot = ConstantNode(subtreeroot.getPosition(), Constant(value))
+                self.spliceSubTree(subtreeroot, newroot)

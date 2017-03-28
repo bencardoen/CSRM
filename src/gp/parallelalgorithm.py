@@ -116,7 +116,7 @@ class ParallelGP():
         for i in range(self.phases):
             logging.info("Process {} :: Parallel executing Phase {}".format(self.pid, i))
             self.executePhase()
-            self.algorithm.printForestToDot("Process_{}_phase_{}".format(self.pid, i))
+            #self.algorithm.printForestToDot("Process_{}_phase_{}".format(self.pid, i))
             logging.info("Process {} :: Parallel sending in  Phase {}".format(self.pid, i))
             self.send()
             logging.info("Process {} :: Parallel receiving in  Phase {}".format(self.pid, i))
@@ -296,7 +296,7 @@ class SequentialPGP():
             for i, process in enumerate(self._processes):
                 process.executePhase()
                 buf, targets = process.send()
-                process.algorithm.printForestToDot("Process_{}_phase_{}".format(i, j))
+                #process.algorithm.printForestToDot("Process_{}_phase_{}".format(i, j))
                 if not targets:
                     continue
                 for index, target in enumerate(targets):

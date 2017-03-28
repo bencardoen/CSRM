@@ -639,24 +639,61 @@ class TreeTest(unittest.TestCase):
         dpoint = 5
         vcount = 5
         vs = generateVariables(vcount, dpoint, seed=0)
-        # falseexprs = ["x1 + 4 * log (2, 4)", "x2 + x3 - sin(4)", "x2/x4"]
-        # trueexprs = ["2+3", "4 % (17 + sin(4) - 42 ** 7)", "sin(cos(4))"]
-        # for f in falseexprs:
-        #     t = Tree.createTreeFromExpression(f, vs)
-        #     self.assertFalse(t.isConstantExpression())
-        # for tr in trueexprs:
-        #     t = Tree.createTreeFromExpression(tr, vs)
-        #     self.assertTrue(t.isConstantExpression())
-        # testfoldexpr = ["x3 + (3/4)"]
-        # vs = generateVariables(vcount, dpoint, seed=0)
-        # for f in testfoldexpr:
-        #     t = Tree.createTreeFromExpression(f, vs)
-        #     v = t.root.isConstantExpression()
-        #     self.assertFalse(v)
-        #     subtrees = t.doConstantFolding()
-        #     logger.info("Subtrees are {}".format(subtrees))
-
-
+        falseexprs = ["x1 + 4 * (log (2, 4))", "x2 + x3 - sin(4)", "x2/x4"]
+        trueexprs = ["2+3", "4 % (17 + sin(4) - 42 ** 7)", "sin(cos(4))"]
+        for f in falseexprs:
+            t = Tree.createTreeFromExpression(f, vs)
+            self.assertFalse(t.isConstantExpression())
+        for tr in trueexprs:
+            t = Tree.createTreeFromExpression(tr, vs)
+            self.assertTrue(t.root.isConstantExpressionLazy())
+            self.assertTrue(t.isConstantExpression())
+        testfoldexprpositives = ["x3 + (3/4)", "sin(2+3)", "1 + 2","(1*7+x3)*(18-cos(22))"]
+        vs = generateVariables(vcount, dpoint, seed=0)
+        for f in testfoldexprpositives:
+            t = Tree.createTreeFromExpression(f, vs)
+            Y = t.evaluateAll()
+            oldd = t.getDepth()
+            t.doConstantFolding()
+            newd = t.getDepth()
+            Ymod = t.evaluateAll()
+            self.assertEqual(Y, Ymod)
+            self.assertNotEqual(oldd, newd)
+            self.assertTrue(oldd > newd)
+        falseexprs = ["x1 + 4 * (log(2, x1))", "x2 + x3 - sin(4*x1)", "x2/x4"]
+        for f in falseexprs:
+            t = Tree.createTreeFromExpression(f, vs)
+            Y = t.evaluateAll()
+            oldd = t.getDepth()
+            t.doConstantFolding()
+            newd = t.getDepth()
+            Ymod = t.evaluateAll()
+            self.assertEqual(oldd, newd)
+            self.assertFalse(oldd > newd)
+            self.assertEqual(Y, Ymod)
+        TESTRANGE = 10
+        depth = 10
+        rng = getRandom(0)
+        for i in range(TESTRANGE):
+            vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
+            variables = Variable.toVariables(vs)
+            t = Tree.makeRandomTree(variables, depth=depth, rng=rng)
+            t.printToDot(outputfolder+ "Folding_{}_before.dot".format(i))
+            olddepth = t.getDepth()
+            self.assertEqual(olddepth, depth)
+            Y = t.evaluateAll()
+            dp = t.getDataPointCount()
+            ctexpr = t.isConstantExpression()
+            t.doConstantFolding()
+            t.printToDot(outputfolder+ "Folding_{}_after.dot".format(i))
+            Ym = t.evaluateAll()
+            nd = t.getDepth()
+            ndp = t.getDataPointCount()
+            self.assertEqual(Y, Ym)
+            self.assertTrue(olddepth >= nd)
+            if ctexpr:
+                self.assertTrue(nd == 0)
+            self.assertEqual(ndp, dp)
 
     def testBenchmarks(self):
         dpoint = 5

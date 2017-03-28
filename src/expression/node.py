@@ -35,6 +35,11 @@ class Node:
         self._depth = Node.positionToDepth(pos)
         self.ctexpr = None
 
+    def clearConstExprCache(self):
+        self.ctexpr = None
+        for c in self.children:
+            c.clearConstExprCache()
+
     @staticmethod
     def evaluateAsTree(node, index=None):
         """
@@ -72,14 +77,13 @@ class Node:
         return self._depth
 
     def getConstantSubtrees(self):
-        # if we're not ctexpr, return each child that is (and isn't a leaf)
-        # else None
-        logger.info("ct subtrees for {}".format(self))
+        """
+        Returns the roots of all subtrees that represent a constant expression.
+
+        Requires that isConstantExpression has been called on the tree at least once.
+        """
         if not self.isLeaf():
             assert(self.ctexpr is not None)
-        # base case is ctexpr node
-        # if true, return self
-        # else, not ctexpr, return recursively on children
         if self.ctexpr:
             return self
         else:
@@ -89,19 +93,41 @@ class Node:
                 return None
 
     def isConstantExpression(self):
-        logger.info("CTEXPR test for {}".format(self))
+        """
+        Determine if the expression tree with this node as root forms a constant expression.
+
+        Traverses entire tree and sets the attribute ctexpr with the result of this function. This allows for caching, at a cost for large non const expr trees.
+        E.g. x2 / (3 + 4) is not constexpr, but to later on efficiently extract subtrees we need full traversal.
+        """
         if self.ctexpr is None:
-            logger.info("ctexpr is None, checking {}".format(self))
             result = True
             if self.children:
                 for c in self.children:
                     if not c.isConstantExpression():
                         result = False
+                        # do not break, need full traversal
             else:
                 assert(False)
             self.ctexpr = result
-            #self.ctexpr = reduce( lambda c, d: c.isConstantExpression() and d.isConstantExpression(), self.children )
-            assert(self.ctexpr is not None)
+        return self.ctexpr
+
+    def isConstantExpressionLazy(self):
+        """
+        Lazy version of isConstantExpression, without full traversal.
+
+        For a large non const tree, and without the need for further traversal (e.g. subtrees) this can be far more efficiently.
+        E.g. x2 * (some huge const expr tree) returns False with 1 recursive call.
+        """
+        if self.ctexpr is None:
+            result = True
+            if self.children:
+                for c in self.children:
+                    if not c.isConstantExpression():
+                        result = False
+                        break
+            else:
+                assert(False)
+            self.ctexpr = result
         return self.ctexpr
 
     def getNodeComplexity(self):
@@ -348,7 +374,6 @@ class VariableNode(Node):
         return True
 
     def isConstantExpression(self):
-        logger.info("Ctexpr checking {}".format(self))
         return False
 
     def getArity(self):
@@ -400,7 +425,6 @@ class ConstantNode(Node):
         return 0
 
     def isConstantExpression(self):
-        logger.info("Ctexpr checking {}".format(self))
         return True
 
     def isLeaf(self):

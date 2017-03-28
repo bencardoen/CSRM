@@ -409,3 +409,13 @@ def permutate(lst, seed=None):
         lst[limit] = item
         limit -= 1
         yield item
+
+
+def flatten(nestedlist):
+    result = []
+    for x in nestedlist:
+        if isinstance(x, list):
+            result += flatten(x)
+        else:
+            result.append(x)
+    return result

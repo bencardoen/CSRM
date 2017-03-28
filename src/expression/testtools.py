@@ -6,7 +6,7 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-from expression.tools import rootmeansquare, pearson, rootmeansquarenormalized, traceFunction, approximateMultiple, randomizedConsume, permutate
+from expression.tools import rootmeansquare, pearson, rootmeansquarenormalized, traceFunction, approximateMultiple, randomizedConsume, permutate, flatten
 import unittest
 import logging
 import math
@@ -60,6 +60,13 @@ class ToolTest(unittest.TestCase):
         for k in permutate(l, seed=0):
             assert(k in l)
         assert(l != lold)
+
+    def testFlatten(self):
+        a = [1,2, [1,2], [2,3,[5]]]
+        b = flatten(a)
+        for x in b:
+            self.assertFalse(isinstance(x, list))
+        self.assertEqual(b, [1,2,1,2,2,3,5])
 
 
 if __name__=="__main__":
