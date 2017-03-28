@@ -88,6 +88,7 @@ class Tree:
         """
         Ensure the tree is still correct in structure
         """
+        self.setDataPointCount()
         V = self.getVariables()
         for v in V:
             assert(len(v.getValues()) == self.getDataPointCount())
