@@ -48,8 +48,10 @@ def runBenchmark(topo=None, processcount = None, outfolder = None, display=False
     commsize = 2
     archivesize = population
     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
-    t = Tree.createTreeFromExpression(expr, X)
-    Y = t.evaluateAll()
+    assert(len(X) == vpoint and len(X[0]) == dpoint)
+    tr = Tree.createTreeFromExpression(expr, X)
+    Y = tr.evaluateAll()
+    assert(len(Y) == dpoint)
     if topo is None:
         logger.info("Topology is None, using RStatic")
         topo = RandomStaticTopology

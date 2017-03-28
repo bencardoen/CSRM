@@ -321,7 +321,7 @@ def getKSamples(X, Y, K, rng=None, seed=None):
     Y is a 1 dimensional vector with g entries : 1xg
 
     :returns: X', Y' of dimensions (fxk, 1xk) respectively
-    """
+    """    
     features = len(X)
     values = len(X[0])
     assert(K<= values)
@@ -333,7 +333,6 @@ def getKSamples(X, Y, K, rng=None, seed=None):
     else:
         _rng = rng
     if seed is not None:
-        logger.info("using seed {}".format(seed))
         _rng.seed(seed)
     indices = sorted(_rng.sample(range( values ), K))
     Xk = [[] for _ in range(features)]
@@ -342,6 +341,9 @@ def getKSamples(X, Y, K, rng=None, seed=None):
         for f in range(features):
             Xk[f].append(X[f][i])
         Yk.append(Y[i])
+    assert(len(Yk) == K)
+    for x in Xk:
+        assert(len(x) == K)
     return Xk, Yk
 
 

@@ -217,6 +217,7 @@ class ParallelGP():
         """
         stats = self.algorithm.getConvergenceStatistics()
         c = Convergence(stats)
+        logger.info("Stats for process {} are {}".format(self.pid, stats[-1][-1]['fitness']))
         c.plotFitness()
         c.plotComplexity()
         c.plotOperators()
@@ -312,6 +313,7 @@ class SequentialPGP():
         for i, process in enumerate(self._processes):
             stats = process.algorithm.getConvergenceStatistics()
             c = Convergence(stats)
+            logger.info("Stats for process {} are {}".format(i, stats[-1][-1]['fitness']))
             c.plotFitness()
             c.plotComplexity()
             c.plotOperators()

@@ -236,9 +236,10 @@ class GPAlgorithm():
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
     def summarizeSamplingResults(self, X, Y):
+        assert(len(X[0]) == len(Y))
         for t in self._population:
             t.updateVariables(X)
-            t.scoreTree(self._Y, self._fitnessfunction)
+            t.scoreTree(Y, self._fitnessfunction)
         try:
             # fitness values on full data set
             fit = [d.getFitness() if d.getFitness()!= Constants.MINFITNESS else Constants.PEARSONMINFITNESS for d in self._population]
