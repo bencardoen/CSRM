@@ -371,10 +371,10 @@ def fitnessfunction(actual, expected, tree, distancefunction=None):
     :returns: d(Y', Y).
     """
     if not actual:
-        logger.debug("Tree instance has no datapoints : invalid")
+        raise ValueError("No valid datapoints {}".format(actual, expected))
         return Constants.MINFITNESS
     if len(actual) != len(expected):
-        logger.debug("Tree instance has no matching datapoints : invalid")
+        raise ValueError("Cannot measure distance between non equal lenght arrays actual {} expected {}".format(actual, expected))
         return Constants.MINFITNESS
 
     for j, i in enumerate(actual):
@@ -384,6 +384,7 @@ def fitnessfunction(actual, expected, tree, distancefunction=None):
 
     distance = float('inf')
     if distancefunction is None:
+        logger.warning("Using default RMS distance")
         distance = rootmeansquare(actual, expected)
     else:
         distance = distancefunction(actual, expected)

@@ -212,10 +212,15 @@ class GPAlgorithm():
         rng = self._rng
         t = Tree.growTree(self._variables, self._initialdepth, rng=rng)
         t.scoreTree(self._Y, self._fitnessfunction)
-        while t.getFitness() == Constants.MINFITNESS or (t in self._population):
+        while t.getFitness() == Constants.MINFITNESS or (t in self._population) or (t.getVariables() is None):
             assert(self._variables)
-            t = Tree.growTree(self._variables, self._initialdepth, rng=rng)
-            t.scoreTree(self._Y, self._fitnessfunction)
+            tn = Tree.growTree(self._variables, self._initialdepth, rng=rng)
+            if tn.getVariables():
+                tn.scoreTree(self._Y, self._fitnessfunction)
+                t = tn
+            else:
+                logger.warning("Discarding constant expression")
+        assert(t.getVariables() is not None)
         #logger.info("Grown tree, adding with id {:0x}".format(id(t)))
         self.addTree(t)
 
@@ -236,10 +241,13 @@ class GPAlgorithm():
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
     def summarizeSamplingResults(self, X, Y):
+        # todo debug
         assert(len(X[0]) == len(Y))
         for t in self._population:
             t.updateVariables(X)
+            #logger.info("Old fitness = {}".format(t.getFitness()))
             t.scoreTree(Y, self._fitnessfunction)
+            #logger.info("New fitness = {}".format(t.getFitness()))
         try:
             # fitness values on full data set
             fit = [d.getFitness() if d.getFitness()!= Constants.MINFITNESS else Constants.PEARSONMINFITNESS for d in self._population]

@@ -314,6 +314,7 @@ class SequentialPGP():
             stats = process.algorithm.getConvergenceStatistics()
             c = Convergence(stats)
             logger.info("Stats for process {} are {}".format(i, stats[-1][-1]['fitness']))
+            logger.info("Stats for process {} Best fitness = {}".format(i, min(stats[-1][-1]['fitness'])))
             c.plotFitness()
             c.plotComplexity()
             c.plotOperators()

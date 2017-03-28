@@ -272,12 +272,20 @@ def pearson(actual, expected):
     try:
         denom = numpy.sqrt( numpy.sum( numpy.square(va) ) * numpy.sum( numpy.square( vb ) ) )
     except FloatingPointError as e:
+        logger.warning("Distance is {} due to FP Error".format(e))
+        raise e
         denom = 0
+    p = None
     if denom == 0:
-        return 1
-    p = nom/denom
-    if p > 1:
-        p = 1 # truncate rounding
+        # if denom is zero, there is no measurable difference between the values and their mean.
+        # this will hold for the nom as well, resulting in a score of 1 (without division)
+        # p = 1 gives too much of an advantage
+        # TODO ask prof Broeckhove
+        p = 0
+    else:
+        p = nom/denom
+        if p > 1:
+            p = 1 # truncate rounding
     r = (1 - p)/2.0
     return r
 
@@ -321,7 +329,7 @@ def getKSamples(X, Y, K, rng=None, seed=None):
     Y is a 1 dimensional vector with g entries : 1xg
 
     :returns: X', Y' of dimensions (fxk, 1xk) respectively
-    """    
+    """
     features = len(X)
     values = len(X[0])
     assert(K<= values)

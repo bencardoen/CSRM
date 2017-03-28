@@ -41,9 +41,14 @@ class Tree:
         self.depth = None
         self.fitness = Constants.MINFITNESS
         self.fitnessfunction = None
+        self._datapointcount = None
 
-    def setDataPointCount(self, v:int):
-        self._datapointcount = v
+    def setDataPointCount(self):
+        v = self.getVariables()
+        if v is None or len(v) == 0:
+            self._datapointcount = 0
+            return
+        self._datapointcount = len(v[0])
 
     # Equality of a tree is defined based on its fitness measure.
     # This means that the optimization algorithm will (try) not to keep
@@ -58,6 +63,8 @@ class Tree:
         return self != other
 
     def getDataPointCount(self):
+        if self._datapointcount is None:
+            raise ValueError("Invalid datapointcount state !!, Tree must be configured with variables first")
         return self._datapointcount
 
     def getNode(self, pos: int):
@@ -81,21 +88,9 @@ class Tree:
         """
         Ensure the tree is still correct in structure
         """
-        pass
-        # too expensive to run in benchmarks
-        #left = self.getNodes()
-        #right = self.nodes
-        #middle = self._positionalNodes()
-        #if not (compareLists(left, right) and compareLists(left, middle)) :
-        #    logger.error("Invariant failed")
-        #    logger.error("getNodes() {}".format(left))
-        #    logger.error("self.nodes {}".format(right))
-        #    raise ValueError("Mismatched lists")
-        #else:
-        #    for n in left:
-        #        if not n.finalized():
-        #            logger.error("Node {} has invalid set of children".format(n))
-        #            raise ValueError("Invalid tree state")
+        V = self.getVariables()
+        for v in V:
+            assert(len(v.getValues()) == self.getDataPointCount())
 
     def _addNode(self, node: Node, pos: int):
         """
@@ -230,7 +225,11 @@ class Tree:
         :returns list : list of evaluations
         """
         dpoint = self.getDataPointCount()
-        return [self.evaluateTree(index=i) for i in range(dpoint)]
+        if dpoint != 0:
+            return [self.evaluateTree(index=i) for i in range(dpoint)]
+        else:
+            #logger.info(" Constant Tree is {}".format(self.toExpression()))
+            return [self.evaluateTree(index=None)]
 
     def scoreTree(self, expected, distancefunction):
         """
@@ -241,6 +240,9 @@ class Tree:
         :returns float: A fitness value, with lower indicating better. Distancefunction determines the range and scale of the result.
         """
         actual = self.evaluateAll()
+        if self.getDataPointCount() == 0:
+            #logger.warning("Constant expression, repeating results")
+            actual = [actual[0] for _ in range(len(expected))]
         f = distancefunction(actual, expected, tree=self)
         self.setFitness(f)
         return f
@@ -308,7 +310,6 @@ class Tree:
         :param int limit: raises Exception if no valid tree can be found in at least limit tries
         :returns expression.tree.Tree: A randomized tree.
         """
-        dpoint = 0 if not variables else len(variables[0])
         _rng = rng
         if rng is None:
             logger.warning("Using non deterministic mode")
@@ -348,7 +349,7 @@ class Tree:
                     if cnt >= limit:
                         raise ValueError("Invalid iteration count")
             else:
-                t.setDataPointCount(dpoint)
+                t.setDataPointCount()
                 return t
 
     @staticmethod
@@ -361,8 +362,6 @@ class Tree:
             rng = getRandom()
         while True:
             t = Tree.makeRandomTree(variables=None, depth=1, rng=rng, tokenLeafs=True)
-            dl = left.getDataPointCount()
-            dr = right.getDataPointCount()
             if t.getRoot().getArity() == 2:
                 t.spliceSubTree(t.getNode(1), left.getRoot())
                 t.spliceSubTree(t.getNode(2), right.getRoot())
@@ -370,7 +369,7 @@ class Tree:
                 t.spliceSubTree(t.getNode(1), left.getRoot())
             e = t.evaluateTree()
             if e is not None:
-                t.setDataPointCount(min(dl, dr))
+                t.setDataPointCount()
                 return t
 
 
@@ -497,6 +496,7 @@ class Tree:
                 newnodes += c.getChildren()[:]
                 self._addNode(c, c.getPosition())
             nodes = newnodes
+        self.setDataPointCount()
         self.testInvariant()
 
     def getConstants(self):
@@ -511,9 +511,13 @@ class Tree:
         return self.getRoot().getVariables()
 
     def updateVariables(self, newdataset):
+        assert(len(newdataset) and len(newdataset[0]))
         V = self.getVariables()
         for v in V:
             v.setValues(newdataset[v.getIndex()])
+        self.setDataPointCount()
+        for x in newdataset:
+            assert(len(x) == self.getDataPointCount() or self.getDataPointCount() == 0)
 
     def printNodes(self):
         """
@@ -601,8 +605,6 @@ class Tree:
         :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) is allowed but not log(x) with implicit base e
         """
         dpoint = 0
-        if variables:
-            dpoint = len(variables[0])
         pfix = infixToPrefix(tokenize(expr, variables))
         result = Tree()
         lastnode = None
@@ -621,8 +623,8 @@ class Tree:
                     lastnode = parent
                 else:
                     break
+        result.setDataPointCount()
         result.testInvariant()
-        result.setDataPointCount(dpoint)
         return result
 
     def toExpression(self):
