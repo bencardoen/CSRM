@@ -134,9 +134,9 @@ class SummarizedResults(Plotter):
         self.addPlot(p)
 
     def plotDepth(self):
-        fitness = rmtocm([r['depth'] for r in self._results])
+        depth = rmtocm([r['depth'] for r in self._results])
         for i in range(1):
-            p = plotDotData(fitness, labelx="Process", labely="Depth", title="Depth of the last generation", xcategorical=True, groupsimilar=True, ycategorical=True)
+            p = plotDotData(depth, labelx="Process", labely="Depth", title="Depth of the last generation", xcategorical=True, groupsimilar=True, ycategorical=True)
             self.addPlot(p)
 
     def plotPrediction(self):
@@ -146,6 +146,7 @@ class SummarizedResults(Plotter):
 
     def plotAll(self):
         self.plotFitness()
+        self.plotTrainedFitness()
         self.plotDifference()
         self.plotPrediction()
         self.plotDepth()
@@ -154,6 +155,12 @@ class SummarizedResults(Plotter):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
         p = plotDotData(fitness, labelx="Process", labely="Difference", title="Difference between fitness on sample data and test data per phase best value", xcategorical=True)
         self.addPlot(p)
+
+    def plotTrainedFitness(self):
+        fitness = rmtocm([r['last_fitness'] for r in self._results])
+        p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the training set (sample + test).", xcategorical=True, groupsimilar=True)
+        self.addPlot(p)
+
 
     def plotComplexity(self):
         logger.warning("Unused function")

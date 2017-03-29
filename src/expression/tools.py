@@ -419,3 +419,13 @@ def flatten(nestedlist):
         else:
             result.append(x)
     return result
+
+def frequencyTable(nestedvalues):
+    f = {}
+    nv = flatten(nestedvalues)
+    for v in nv:
+        if v in f:
+            f[v] += 1
+        else:
+            f[v] = 1
+    return f

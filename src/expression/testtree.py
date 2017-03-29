@@ -723,7 +723,6 @@ class TreeTest(unittest.TestCase):
             if i:
                 self.assertEqual(v[i-1], v[i])
 
-
     def testComplexity(self):
         variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
         rng = getRandom(0)
@@ -946,7 +945,20 @@ class TreeTest(unittest.TestCase):
         trees = [Tree.createTreeFromExpression(expr, X) for _ in range(1000)]
         [ Tree.createTreeFromExpression(t.toExpression(), X) for t in trees]
 
-
+    def testFeatureCount(self):
+        vcount = 10
+        dpoint = 2
+        vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
+        expr = "ln(x1) * sin(x2) - x3 + 7 / 17.32"
+        t = Tree.createTreeFromExpression(expr, variables=vs)
+        self.assertEqual(t.getFeatures(), [1,2,3])
+        expr = "1+17"
+        t = Tree.createTreeFromExpression(expr, variables=vs)
+        self.assertEqual(t.getFeatures(), [])
+        expr = "x0 + ln(x3) * sin(x3) + x_4"
+        t = Tree.createTreeFromExpression(expr, variables=vs)
+        self.assertEqual(t.getFeatures(), [0,3,3,4])
+        self.assertEqual(t.getFeatures(unique=True), [0,3,4])
 
 
 if __name__=="__main__":

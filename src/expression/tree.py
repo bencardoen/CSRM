@@ -613,6 +613,18 @@ class Tree:
         assert(self.root)
         return self.root.isConstantExpression()
 
+    def getFeatures(self, unique=False):
+        """
+        Return a sorted integer list of feature indices used in this tree.
+
+        :param bool unique: return unique set. If False, for an expression of the form sin(x3) + cos(x3) will return [3,3], else [3]
+        """
+        vs = self.getVariables()
+        vlist = [v.getIndex() for v in vs]
+        if unique:
+            vlist = list(set(vlist))
+        return sorted(vlist)
+
     def isConstantExpressionLazy(self):
         return self.root.isConstantExpressionLazy()
 

@@ -256,6 +256,7 @@ class GPAlgorithm():
             t.scoreTree(Y, self._fitnessfunction)
         try:
             fit = [d.getFitness() if d.getFitness()!= Constants.MINFITNESS else Constants.PEARSONMINFITNESS for d in self._population]
+            features = [d.getFeatures() for d in self._population]
             depths = [d.getDepth() for d in self._population]
             comp = [d.getScaledComplexity() for d in self._population]
             mean, sd, v= numpy.mean(fit), numpy.std(fit), numpy.var(fit)
@@ -274,7 +275,7 @@ class GPAlgorithm():
         return {"fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                 "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
                 "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
-                "diff_fitness":dfit}
+                "diff_fitness":dfit, "features":features, "last_fitness":lastfit[-1]}
 
     def summarizeGeneration(self, replacementcount:list, generation:int, phase:int):
         """
