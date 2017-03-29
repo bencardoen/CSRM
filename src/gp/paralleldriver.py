@@ -13,6 +13,7 @@ from expression.tree import Tree
 from expression.tools import generateVariables
 import argparse
 from gp.topology import RandomStaticTopology, topologies
+from gp.config import Config
 from gp.parallelalgorithm import ParallelGP, SequentialPGP, isMPI
 from gp.algorithm import BruteCoolingElitist
 from expression.constants import Constants
@@ -33,19 +34,21 @@ except ImportError as e:
         exit(0)
 
 
-def runBenchmark(topo=None, processcount = None, outfolder = None, display=False, generations=None, population=None, phases=None, maxdepth=None, initialdepth=None):
+def runBenchmark(config, topo=None, processcount = None, outfolder = None):
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     expr = testfunctions[2]
-    dpoint = 20
+    # todo define defaults
+    dpoint = config.datapointcount or 20
     vpoint = 5
-    generations= generations or 20
-    depth= maxdepth or 7
-    initialdepth= initialdepth or 4
-    phases= phases or 1
+    generations= config.generations or 20
+    display = config.display or False
+    depth= config.maxdepth or 7
+    initialdepth= config.initialdepth or 4
+    phases= config.phases or 1
     pcount = comm.Get_size() if isMPI() else processcount
-    population = population or 20
-    commsize = 2
+    population = config.population or 20
+    commsize = config.communicationsize or 2
     archivesize = population
     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
     assert(len(X) == vpoint and len(X[0]) == dpoint)
@@ -92,7 +95,7 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--population', type=int, help="Population per instance")
     parser.add_argument('-m', '--maxdepth', type=int, help="Max depth of any tree")
     parser.add_argument('-i', '--initialdepth', type=int, help="initialdepth depth of any tree")
-    parser.add_argument('-d', '--datapoint', type=int, help="Number of datapoints to operate on. ")
+    parser.add_argument('-d', '--datapointcount', type=int, help="Number of datapoints to operate on. ")
     parser.add_argument('-s', '--communicationsize', type=int, help="Nr of samples requested from an instance to distribute.")
     args = parser.parse_args()
     print(args)
@@ -122,15 +125,15 @@ if __name__ == "__main__":
         outputfolder = args.outputfolder
         if outputfolder[-1] != '/':
             outputfolder += '/'
-    displaystats = True if args.displaystats else False
-    generations = args.generations
-    population = args.population
-    phases = args.phases
-    maxdepth = args.maxdepth
-    initialdepth = args.initialdepth
-    # TODO pass by config object
-    datapointcount = args.datapointcount
-    commsize = args.communicationsize
+    c = Config
+    c.display = True if args.displaystats else False
+    c.generations = args.generations
+    c.population = args.population
+    c.phases = args.phases
+    c.maxdepth = args.maxdepth
+    c.initialdepth = args.initialdepth
+    c.datapointcount = args.datapointcount
+    c.communicationsize = args.communicationsize
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
-    runBenchmark(topo, processcount, outfolder=outputfolder, display=displaystats, generations=generations, population=population, phases=phases, maxdepth=maxdepth, initialdepth=initialdepth)
+    runBenchmark(c, topo, processcount, outfolder=outputfolder)
