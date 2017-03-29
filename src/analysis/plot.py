@@ -68,20 +68,32 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
     return p
 
 
-def plotLineData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, legend=None):
+def plotLineData(data, mean=None, std=None, var=None, generationstep=1, labelx=None, labely=None, title=None, legend=None, xcategorical=False, ycategorical=False, dot=False):
     """
     Plot data values over generations.
     """
-    colors = ["blue", "green", "red"]
+    dlen = len(data)
+    colors = None
+    if dlen <= 256:
+        colors = inferno(dlen+1)[:-1]
+    else:
+        colors = inferno(256)
+        colors += [colors[-1] for _ in range(dlen-256)]
     logger.debug("Got {} to plot".format(data))
     labelx = labelx or "X"
     labely = labely or "Y"
+    #xranges = [str(x) for x in range(0, dlen)] if xcategorical else None
+    xranges = None
+    yranges = [str(x) for x in range(1, max( [ max(v) for v in data]) +1)] if ycategorical else None
     if legend is None:
         legend = [d for d in range(len(data))]
-    p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely)
+    p = figure(title=title or "title", x_axis_label=labelx, y_axis_label=labely, x_range=xranges, y_range=yranges)
     for i,d in enumerate(data):
         x = [d for d in range(len(data[0]))]
-        p.circle(x, d, line_width=1, line_color=colors[i], line_alpha=0.5, legend=legend[i])
+        if dot:
+            p.circle(x, d, line_width=1, line_color=colors[i], line_alpha=0.5, legend=legend[i])
+        else:
+            p.line(x, d, line_width=2, line_color=colors[i], line_alpha=1, legend=legend[i])
     return p
 
 

@@ -10,6 +10,7 @@ from analysis.plot import plotDotData, displayPlot, plotFront, plotLineData, sav
 from expression.tools import rmtocm
 import logging
 import json
+import numpy
 from expression.tools import copyObject
 logger = logging.getLogger('global')
 
@@ -97,7 +98,7 @@ class Convergence(Plotter):
 #            cvalues[0] += [gen['replacements'] for gen in run]
             cvalues[0] += [gen['mutations'] for gen in run]
             cvalues[1] += [gen['crossovers'] for gen in run]
-        p = plotLineData(cvalues, labelx="Generation", labely="Succes ratio of operator", title="Modifications", legend=["Mutations","Crossovers"])
+        p = plotLineData(cvalues, labelx="Generation", labely="Succes ratio of operator", title="Modifications", legend=["Mutations","Crossovers"], dot=True)
         self.addPlot(p)
 
     def plotPareto(self):
@@ -140,8 +141,29 @@ class SummarizedResults(Plotter):
             self.addPlot(p)
 
     def plotPrediction(self):
-        fitness = rmtocm([r['corr_fitness'] for r in self._results])
-        p = plotDotData(fitness, labelx="Process", labely="Correlation (less is better)", title="Correlation between fitness on sample data and test data per phase best value", cool=True, xcategorical=True)
+        fitness = [r['corr_fitness'] for r in self._results]
+        processcount = len(fitness)
+        legend = ["Process {}".format(i) for i in range(processcount)]
+        p = plotLineData(fitness, labelx="Phase", labely="Correlation (less is better)", title="Correlation between end of phase fitness values on training data and fitness value on full data.", legend=legend, xcategorical=True)
+        p.legend.border_line_alpha=0
+        self.addPlot(p)
+
+    def plotPredictionTrend(self):
+        fitness = [r['corr_fitness'] for r in self._results]
+        processcount = len(fitness)
+        legend = ["Process {}".format(i) for i in range(processcount)]
+
+        polys = []
+        datalength = len(fitness[0])
+        for series in fitness:
+            x = [i for i in range(len(series))]
+            z = numpy.polyfit(x, series, 1)
+            polys.append(numpy.poly1d(z))
+        trends = []
+        for p in polys:
+            trends.append([p(x) for x in range(datalength)])
+        p = plotLineData(trends, labelx="Phase", labely="Correlation (less is better)", title="Correlation trend between end of phase fitness values on training data and fitness value on full data.", legend=legend, xcategorical=True)
+        p.legend.border_line_alpha=0
         self.addPlot(p)
 
     def plotAll(self):
@@ -149,11 +171,12 @@ class SummarizedResults(Plotter):
         self.plotTrainedFitness()
         self.plotDifference()
         self.plotPrediction()
-        self.plotDepth()
+        self.plotPredictionTrend()
+        # self.plotDepth()
 
     def plotDifference(self):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
-        p = plotDotData(fitness, labelx="Process", labely="Difference", title="Difference between fitness on sample data and test data per phase best value", xcategorical=True)
+        p = plotDotData(fitness, labelx="Process", labely="Difference", title="Difference between fitness on sample data and test data per phase best value", groupsimilar=True, xcategorical=True)
         self.addPlot(p)
 
     def plotTrainedFitness(self):
