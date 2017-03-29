@@ -105,7 +105,6 @@ class GPTest(unittest.TestCase):
         g.printForestToDot(outputfolder+"firstresult_extended")
 
     def testBmark(self):
-        expr = testfunctions[1]
         for expr in testfunctions:
             dpoint = 10
             vpoint = 5
@@ -130,9 +129,6 @@ class GPTest(unittest.TestCase):
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
-        c.plotFitness()
-        c.plotComplexity()
-        c.plotOperators()
         c.savePlots("output", title=expr)
 
     def testCooling(self):
@@ -151,7 +147,7 @@ class GPTest(unittest.TestCase):
         c.plotComplexity()
         c.plotOperators()
         c.savePlots("output", title=expr+"_cooling")
-        c.displayPlots("output", title=expr+"_cooling")
+        #c.displayPlots("output", title=expr+"_cooling")
         sums = [g.summarizeSamplingResults(X, Y)]
         s = SummarizedResults(sums)
         s.plotFitness()
@@ -160,7 +156,7 @@ class GPTest(unittest.TestCase):
         title = "Collected results for all processes"
         s.savePlots((outputfolder or "")+"collected", title=title)
         s.saveData(title, "../output/")
-        s.displayPlots("summary", title=title)
+        #s.displayPlots("summary", title=title)
         # summarize Sampling results
 
     def testVariableDepth(self):
@@ -175,22 +171,14 @@ class GPTest(unittest.TestCase):
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
-        c.plotFitness()
-        c.plotComplexity()
-        c.plotOperators()
-        c.plotDepth()
         c.savePlots("output", title=expr+"_cooling")
-        c.displayPlots("output", title=expr+"_cooling")
+        #c.displayPlots("output", title=expr+"_cooling")
         sums = [g.summarizeSamplingResults(X, Y)]
         s = SummarizedResults(sums)
-        s.plotFitness()
-        s.plotDifference()
-        s.plotPrediction()
-        s.plotDepth()
         title = "Collected results for all processes"
         s.savePlots((outputfolder or "")+"collected", title=title)
         s.saveData(title, "../output/")
-        s.displayPlots("summary", title=title)
+        #s.displayPlots("summary", title=title)
 
     def testDeterminism(self):
         """
@@ -198,19 +186,18 @@ class GPTest(unittest.TestCase):
         """
         TESTRANGE=3
         SEEDS = [0,2,3,5]
-        DEPTHS = [3]
+        DEPTHS = [5]
         for d in DEPTHS:
             for seed in SEEDS:
                 fstat = []
                 for i in range(TESTRANGE):
-                    print("SEED = {} Iteration {}".format(seed, i))
                     expr = testfunctions[2]
-                    dpoint = 20
+                    dpoint = 10
                     vpoint = 5
                     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
                     t = Tree.createTreeFromExpression(expr, X)
                     Y = t.evaluateAll()
-                    g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=d, fitnessfunction=_fit, seed=seed, generations=20, phases=10)
+                    g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=d, fitnessfunction=_fit, seed=seed, generations=20, phases=10, initialdepth=2)
                     g.executeAlgorithm()
                     stats = g.getConvergenceStatistics()
                     fstat.append(stats[-1][-1]['mean_fitness'])
@@ -232,9 +219,6 @@ class GPTest(unittest.TestCase):
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
-        c.plotFitness()
-        c.plotComplexity()
-        c.plotOperators()
         c.savePlots("output", title=expr+"_tournament")
 
 
@@ -324,7 +308,7 @@ class PGPTest(unittest.TestCase):
         pcount = 4
         algo = SequentialPGP(X, Y, pcount, popcount, depth, fitnessfunction=_fit, seed=0, generations=15, phases=4, topo=None, initialdepth=initialdepth)
         algo.executeAlgorithm()
-        algo.reportOutput(display=True)
+        algo.reportOutput()
 
     def testAllTopologies(self):
         expr = testfunctions[2]

@@ -90,8 +90,10 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--outputfolder', help="Folder to write data to")
     parser.add_argument('-v', '--displaystats', action='store_true', help="Wether to dispay convergence statistics for each process")
     parser.add_argument('-p', '--population', type=int, help="Population per instance")
-    parser.add_argument('-d', '--maxdepth', type=int, help="Max depth of any tree")
+    parser.add_argument('-m', '--maxdepth', type=int, help="Max depth of any tree")
     parser.add_argument('-i', '--initialdepth', type=int, help="initialdepth depth of any tree")
+    parser.add_argument('-d', '--datapoint', type=int, help="Number of datapoints to operate on. ")
+    parser.add_argument('-s', '--communicationsize', type=int, help="Nr of samples requested from an instance to distribute.")
     args = parser.parse_args()
     print(args)
     topo = None
@@ -126,6 +128,9 @@ if __name__ == "__main__":
     phases = args.phases
     maxdepth = args.maxdepth
     initialdepth = args.initialdepth
+    # TODO pass by config object
+    datapointcount = args.datapointcount
+    commsize = args.communicationsize
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
     runBenchmark(topo, processcount, outfolder=outputfolder, display=displaystats, generations=generations, population=population, phases=phases, maxdepth=maxdepth, initialdepth=initialdepth)

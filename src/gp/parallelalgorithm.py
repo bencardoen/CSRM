@@ -98,9 +98,8 @@ class ParallelGP():
         This step executes a limited number of generations (depending on the algorithm)
         """
         if self.algorithm.phase >= self.algorithm.phases:
-            raise ValueError
             logger.warning("Process {} :: Exceeding phase count".format(self.pid))
-            return
+            raise ValueError
         logger.info("Process {} :: --Phase-- {}".format(self.pid, self.algorithm.phase))
         if not self._ran:
             self.algorithm.phase = 0
@@ -117,9 +116,9 @@ class ParallelGP():
             logging.info("Process {} :: Parallel executing Phase {}".format(self.pid, i))
             self.executePhase()
             #self.algorithm.printForestToDot("Process_{}_phase_{}".format(self.pid, i))
-            logging.info("Process {} :: Parallel sending in  Phase {}".format(self.pid, i))
+            #logging.info("Process {} :: Parallel sending in  Phase {}".format(self.pid, i))
             self.send()
-            logging.info("Process {} :: Parallel receiving in  Phase {}".format(self.pid, i))
+            #logging.info("Process {} :: Parallel receiving in  Phase {}".format(self.pid, i))
             self.receiveCommunications()
 
 
@@ -129,11 +128,11 @@ class ParallelGP():
 
         After this method completes all sent buffers and requests are purged.
         """
-        logger.debug("Process {} :: MPI, waiting for sendrequests to complete".format(self.pid))
+        #logger.debug("Process {} :: MPI, waiting for sendrequests to complete".format(self.pid))
         for k,v in self._waits.items():
-            logger.debug("Process {} :: MPI, waiting for send to {}".format(self.pid, k))
+            #logger.debug("Process {} :: MPI, waiting for send to {}".format(self.pid, k))
             v.wait()
-        logger.debug("Process {} :: MPI, waiting complete, clearing requests".format(self.pid))
+        #logger.debug("Process {} :: MPI, waiting complete, clearing requests".format(self.pid))
         self._sendbuffer.clear()
         self._waits.clear()
 
@@ -246,7 +245,7 @@ class SequentialPGP():
         self._X = X
         self._Y = Y
         self._communicationsize = communicationsize or 2
-        rng = getRandom()
+        rng = getRandom(0)
         assert(seed is not None)
         rng.seed(seed)
         self._topo = topo or RandomStaticTopology(processcount, rng=rng)

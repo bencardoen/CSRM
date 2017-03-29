@@ -228,6 +228,7 @@ class VonNeumannTopology(Topology):
         :param int size: an integer square
         """
         r = sqrt(size)
+        assert(size >= 4)
         assert(int(r)**2 == size)
         super().__init__(size)
         self.rt = int(sqrt(size))
@@ -237,8 +238,14 @@ class VonNeumannTopology(Topology):
         return self.getTarget(target)
 
     def getTarget(self, source:int):
+        """
+        For a small grid, duplicates are possible.
+        """
         size = self.size
-        return [(source-1) % size, (source+1) % size, (source+self.rt) % size, (source-self.rt) % size]
+        targets = [(source-1) % size, (source+1) % size, (source+self.rt) % size, (source-self.rt) % size]
+        if self.size == 4:
+            return list(set(targets))
+        return targets
 
     def __str__(self):
         return "VonNeumannTopology" + super().__str__()
