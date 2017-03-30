@@ -13,8 +13,8 @@ import random
 from expression.constants import Constants
 logger = logging.getLogger('global')
 
-plotwidth = 200
-plotheigth = 200
+plotwidth = 100
+plotheigth = 150
 
 
 def groupData(data, scale=1):

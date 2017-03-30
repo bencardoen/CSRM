@@ -157,12 +157,12 @@ class SummarizedResults(Plotter):
         datalength = len(fitness[0])
         for series in fitness:
             x = [i for i in range(len(series))]
-            z = numpy.polyfit(x, series, 1)
+            z = numpy.polyfit(x, series, 2)
             polys.append(numpy.poly1d(z))
         trends = []
         for p in polys:
             trends.append([p(x) for x in range(datalength)])
-        p = plotLineData(trends, labelx="Phase", labely="Correlation (less is better)", title="Correlation trend between end of phase fitness values on training data and fitness value on full data.", legend=legend, xcategorical=True)
+        p = plotLineData(trends, labelx="Phase", labely="Correlation (less is better)", title="Correlation trend (Quadratic fit) between end of phase fitness values on training data and fitness value on full data.", legend=legend, xcategorical=True)
         p.legend.border_line_alpha=0
         self.addPlot(p)
 
