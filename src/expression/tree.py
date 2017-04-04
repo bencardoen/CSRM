@@ -264,6 +264,10 @@ class Tree:
         handle.write("}\n")
         handle.close()
 
+    @property
+    def nodecount(self):
+        len(list(filter(lambda x: x is not None, self._nodes)))
+
     def getDepth(self):
         """
         Return depth of this tree.
