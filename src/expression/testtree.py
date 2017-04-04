@@ -495,7 +495,7 @@ class TreeTest(unittest.TestCase):
         cached_e = t.evaluateTree()
         self.assertEqual(e, cached_e)
         rng.seed(0)
-        t.spliceSubTree(t.getRandomNode(rng), s.getNode(0))
+        t.spliceSubTree(t.getRandomNode(rng=rng), s.getNode(0))
         en = t.evaluateTree()
         self.assertNotEqual(en, e)
 
@@ -892,17 +892,6 @@ class TreeTest(unittest.TestCase):
         t1 = time.time()
         total = t1-t0
         self.assertTrue(total>0)
-
-    def testNodeCount(self):
-        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
-        rng = getRandom(0)
-        d = 10
-        for i in range(10):
-            t = Tree.makeRandomTree(variables, depth=10, rng=rng)
-            self.assertTrue(t.nodecount <= 2**d-1)
-            filtered = filter(lambda x : x, t.nodes)
-            self.assertEqual(len(list(filtered)), t.nodecount)
-
 
     def testSampling(self):
         vpoint = 5

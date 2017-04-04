@@ -15,6 +15,7 @@ import logging
 import random
 import math
 from itertools import islice
+from sortedcontainers import SortedDict
 
 # Configure the log subsystem
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -32,7 +33,7 @@ class Tree:
 
     def __init__(self):
         # List of nodes in order of generation
-        self.nodes = []
+        self.nodes = SortedDict()
         self.root = None
         # Cached evaluation
         self.evaluated = 0
@@ -68,7 +69,10 @@ class Tree:
         return self._datapointcount
 
     def getNode(self, pos: int):
-        return self.nodes[pos]
+        if pos in self.nodes:
+            return self.nodes[pos]
+        else:
+            return None
 
     def getFitness(self):
         """
@@ -101,13 +105,16 @@ class Tree:
         self.modifiedDepth=True
         if pos == 0:
             self.root = node
-        curlen = len(self.nodes)
-        if pos >= curlen:
-            self.nodes.extend([None] * (pos-curlen + 1))
-        if self.nodes[pos]:
+        # curlen = len(self.nodes)
+        # if pos >= curlen:
+        #     self.nodes.extend([None] * (pos-curlen + 1))
+        # if self.nodes[pos]:
+        #     raise ValueError("Node exists at {}".format(pos))
+        # else:
+        #     self.nodes[pos] = node
+        if pos in self.nodes:
             raise ValueError("Node exists at {}".format(pos))
-        else:
-            self.nodes[pos] = node
+        self.nodes[pos] = node
 
     def makeInternalNode(self, function, parent=None, constant=None):
         """
@@ -131,7 +138,8 @@ class Tree:
     def getNodes(self):
         #return [self.root] + self.root.getAllChildren()
         # TODO switch to generator
-        return [n for n in self.nodes if n]
+        #return [n for n in self.nodes if n]
+        return list(self.nodes.values())
 
     def isLeaf(self, position: int):
         """
@@ -390,8 +398,10 @@ class Tree:
 
         :returns: a selected node, never root
         """
+        assert(isinstance(seed, int) or seed is None)
+        #logger.info("RNG = {} SEED = {}".format(rng, seed))
         ln = self.lastposition
-        #logger.info("LSN = {} LASTPOS = {}".format(lsn, ln))
+        #logger.info("LSN = {} ".format(ln))
         if depth is not None:
             assert(depth <= self.getDepth())
         r = rng or getRandom()
@@ -409,6 +419,7 @@ class Tree:
             lower = 2**depth-1
             upper = min(2**(depth+1)-1, ln+1)
         node = None
+        # to pick from known positions
         while node is None:
             rv = r.randrange(max(lower,1), upper)
             node = self.getNode( rv )
@@ -434,7 +445,7 @@ class Tree:
         logger.debug("Current state = rnodes {}\n lnodes = {}".format(self.getNodes(), self.nodes))
 
     def _deleteNode(self, pos):
-        self.nodes[pos] = None
+        del self.nodes[pos]
 
     def _removeNode(self, node: Node, newnode: Node):
         """
@@ -463,7 +474,8 @@ class Tree:
         # Unlink all children
         cdrn = node.getAllChildren()
         for c in cdrn:
-            self.nodes[c.getPosition()]=None
+            self._deleteNode(c.getPosition())
+            #self.nodes[c.getPosition()]=None
 
 
     def spliceSubTree(self, node: Node, newnode: Node):
@@ -649,7 +661,8 @@ class Tree:
             self.root=newroot
             self.modified = True
             self.modifiedDepth = True
-            self.nodes = [newroot]
+            self.nodes = SortedDict()
+            self.nodes[0] = newroot
         else:
             subtrees = flatten(self.root.getConstantSubtrees())
             subtrees = [x for x in subtrees if x is not None]
