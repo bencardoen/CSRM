@@ -92,7 +92,6 @@ class Convergence(Plotter):
 
     def plotSeries(self, keys, labels, title, legend):
         cvalues = [[] for _ in range(len(keys))]
-        logger.info("Keys {}".format(keys))
         for i, run in enumerate(self._convergencestats):
             for j in range(len(keys)):
                 cvalues[j] += [gen[keys[j]] for gen in run]
@@ -169,9 +168,8 @@ class SummarizedResults(Plotter):
 
     def plotDepth(self):
         depth = rmtocm([r['depth'] for r in self._results])
-        for i in range(1):
-            p = plotDotData(depth, labelx="Process", labely="Depth", title="Depth of the last generation", xcategorical=True, groupsimilar=True, ycategorical=True)
-            self.addPlot(p)
+        p = plotDotData(depth, labelx="Process", labely="Depth", title="Depth of the last generation", xcategorical=True, groupsimilar=True, ycategorical=True)
+        self.addPlot(p)
 
     def plotPrediction(self):
         fitness = [r['corr_fitness'] for r in self._results]
@@ -206,6 +204,7 @@ class SummarizedResults(Plotter):
         self.plotPrediction()
         self.plotPredictionTrend()
         self.plotDepth()
+        self.plotFeatures()
 
     def plotDifference(self):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
@@ -215,6 +214,22 @@ class SummarizedResults(Plotter):
     def plotTrainedFitness(self):
         fitness = rmtocm([r['last_fitness'] for r in self._results])
         p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the training set (sample + test).", xcategorical=True, groupsimilar=True)
+        self.addPlot(p)
+
+    def plotFeatures(self):
+        featurespre = [list(set(r['features'][0])) for r in self._results]
+        featurespre = list(map(lambda x : [y+1 for y in x], featurespre))
+        mlen = max( [len(x) for x in featurespre])
+        #logger.info("Features are {}".format(featurespre))
+        for i in range(len(featurespre)):
+            x = featurespre[i]
+            first = x[0]
+            lx = len(x)
+            x += [first for _ in range(mlen-lx)]
+        features = rmtocm(featurespre)
+
+        #logger.info("Features are {}".format(features))
+        p = plotDotData(features, labelx="Process", labely="Features", title="Features used in the best solution.", xcategorical=True, groupsimilar=True, ycategorical=True)
         self.addPlot(p)
 
 

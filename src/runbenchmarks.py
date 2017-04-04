@@ -33,14 +33,14 @@ def runBenchmarks():
         Y = t.evaluateAll()
 
         # Configure the algorithm
-        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=4, fitnessfunction=_fit,seed=0, generations=20, phases=5)
+        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=10, initialdepth=4, fitnessfunction=_fit,seed=0, generations=20, phases=5)
         g.executeAlgorithm()
 
         # Plot results
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
-        c.savePlots("output_{}".format(i), title=expr)
-        c.displayPlots("output_{}".format(i), title=expr)
+        # c.savePlots("output_{}".format(i), title=expr)
+        # c.displayPlots("output_{}".format(i), title=expr)
 
 
 if __name__=="__main__":
