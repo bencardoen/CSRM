@@ -85,22 +85,18 @@ class Convergence(Plotter):
 
 
     def plotOperators(self):
-        """
-        Plot effective (i.e. rendering a fitter individual) modifications made by mutations and crossover
-        """
-        cvalues = [[],[]]
-        for i, run in enumerate(self._convergencestats):
-            cvalues[0] += [gen['mutations'] for gen in run]
-            cvalues[1] += [gen['crossovers'] for gen in run]
-        p = plotLineData(cvalues, labelx="Generation", labely="Succes ratio of operator", title="Modifications", legend=["Mutations","Crossovers"], dot=True)
-        self.addPlot(p)
+        self.plotSeries(keys = ['mutations','crossovers'], labels=["Generation","Succes ratio of operator"], title="Modfications", legend=["Mutations","Crossovers"])
 
     def plotOperatorsImpact(self):
-        cvalues = [[],[]]
+        self.plotSeries(keys = ['mutate_gain','crossover_gain'], labels=["Generation","Mean gain of operator"], title="Impact of operator", legend=["Mutations","Crossovers"])
+
+    def plotSeries(self, keys, labels, title, legend):
+        cvalues = [[] for _ in range(len(keys))]
+        logger.info("Keys {}".format(keys))
         for i, run in enumerate(self._convergencestats):
-            cvalues[0] += [gen['mutate_gain'] for gen in run]
-            cvalues[1] += [gen['crossover_gain'] for gen in run]
-        p = plotLineData(cvalues, labelx="Generation", labely="Mean gain of operator", title="Impact of operator", legend=["Mutations","Crossovers"], dot=True)
+            for j in range(len(keys)):
+                cvalues[j] += [gen[keys[j]] for gen in run]
+        p = plotLineData(cvalues, labelx=labels[0], labely=labels[1], title=title, legend=legend, dot=True)
         self.addPlot(p)
 
     def plotTrend(self, keyvalues, axislabels, legend, title):
@@ -127,6 +123,13 @@ class Convergence(Plotter):
     def plotOperatorImpactTrend(self):
         self.plotTrend(keyvalues=["mutate_gain", "crossover_gain"], axislabels=["Generation","Mean gain by operator"], legend = ["Mutations","Crossovers"], title="Operator gain in fitness.")
 
+    def plotAlgorithmCost(self):
+        cvalues = [[]]
+        for i, run in enumerate(self._convergencestats):
+            cvalues[0] += [numpy.mean(gen['mean_evaluations']) for gen in run]
+        p = plotLineData(cvalues, labelx="Generation", labely="Mean cost of generation", title="Computational cost of algorithm", legend=["Mean Cost"], dot=True)
+        self.addPlot(p)
+
     def plotPareto(self):
         """
         Plot fitness values against complexity in a front
@@ -145,6 +148,7 @@ class Convergence(Plotter):
         self.plotOperatorsImpact()
         self.plotOperatorImpactTrend()
         self.plotDepth()
+        self.plotAlgorithmCost()
 
     def saveData(self, filename, outputfolder=None):
         outputfolder = outputfolder or ""

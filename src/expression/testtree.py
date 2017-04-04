@@ -803,6 +803,7 @@ class TreeTest(unittest.TestCase):
             Mutate.mutate(last, variables=variables,rng=rng, mindepthratio=mrat, limitdepth=d)
             logger.debug("depth = {} mrat = {} formula = {}".format(last.getDepth(), mrat, min(max(int(mrat*d), 1), d-1)))
             self.assertTrue(last.getDepth() <= d)
+            self.assertEqual(last.calculateDepth(), last.getDepth())
         last.printToDot(outputfolder+"t40Mutated5.dot")
 
     def testAdvancedCrossover(self):
@@ -826,6 +827,9 @@ class TreeTest(unittest.TestCase):
             mrat = rng.uniform(0,1)
             Crossover.subtreecrossover(cl, cr, rng=rng, depth=None, symmetric=True, limitdepth=limdepth, mindepthratio=mrat)
             self.assertTrue(max(cl.getDepth(), cr.getDepth())<=limdepth)
+            self.assertEqual(cl.calculateDepth(), cl.getDepth())
+            self.assertEqual(cr.calculateDepth(), cr.getDepth())
+
 
 
 
@@ -887,6 +891,17 @@ class TreeTest(unittest.TestCase):
         t1 = time.time()
         total = t1-t0
         self.assertTrue(total>0)
+
+    def testNodeCount(self):
+        variables = [Variable([10],0),Variable([3],0),Variable([9],0),Variable([8],0)]
+        rng = getRandom(0)
+        d = 10
+        for i in range(10):
+            t = Tree.makeRandomTree(variables, depth=10, rng=rng)
+            self.assertTrue(t.nodecount <= 2**d-1)
+            filtered = filter(lambda x : x, t.nodes)
+            self.assertEqual(len(list(filtered)), t.nodecount)
+
 
     def testSampling(self):
         vpoint = 5

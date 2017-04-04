@@ -277,7 +277,7 @@ class GPAlgorithm():
                 "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
                 "diff_fitness":dfit, "features":features, "last_fitness":lastfit[-1]}
 
-    def summarizeGeneration(self, replacementcount:list, mutategain:list, crossovergain:list, generation:int, phase:int):
+    def summarizeGeneration(self, replacementcount:list, mutategain:list, crossovergain:list, evaluations:list, generation:int, phase:int):
         """
         Compute fitness statistics for the current generation and record them
         """
@@ -299,13 +299,15 @@ class GPAlgorithm():
         if cg:
             mcg = numpy.mean(cg)
 
+        meaneval = numpy.mean(evaluations)
+
         assert(isinstance(replacementcount, list))
         #logger.debug("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
 
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
                                                  "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
-                                                 "mutate_gain":mmg, "crossover_gain":mcg}, phase)
+                                                 "mutate_gain":mmg, "crossover_gain":mcg, "mean_evaluations":meaneval}, phase)
 
     def setTrace(self, v, prefix):
         """
@@ -354,11 +356,11 @@ class GPAlgorithm():
         r = self._phase
         for i in range(self._generations):
             selected = self.select()
-            modified, count, gm, gc = self.evolve(selected)
+            modified, count, gm, gc, evaluations = self.evolve(selected)
             self.update(modified)
             assert(isinstance(count, list))
             self._currentgeneration = i
-            self.summarizeGeneration(count, gm, gc, generation=i, phase=r)
+            self.summarizeGeneration(count, gm, gc, evaluations, generation=i, phase=r)
             if self.stopCondition():
                 logger.info("Stop condition triggered")
                 break
@@ -412,7 +414,7 @@ class GPAlgorithm():
         :return tuple modified: a tuple of modified samples based on selection, and changes made
         """
         self.evaluate(selection)
-        return selection, [0,0,0], [], []
+        return selection, [0,0,0], [], [], []
 
     def requireMutation(self, popindex:int)->bool:
         """
@@ -494,6 +496,7 @@ class BruteElitist(GPAlgorithm):
         # Replacement is done based on comparison t, t'. It's possible in highly varied populations that this strategy
         # is not ideal.
         gainsmutate = []
+        evaluations = []
         for i in range(0, selcount):
             t = selection[i]
             if self.requireMutation(i):
@@ -503,6 +506,7 @@ class BruteElitist(GPAlgorithm):
                 candidate.scoreTree(Y, fit)
                 operationcount[0] += 1
                 operationcount[1] += 1
+                evaluations.append(candidate.evaluationcost)
                 of = min( t.getFitness(), Constants.PEARSONMINFITNESS) # in parallel, it's possible a sample has infinite fitness
                 nf = min(candidate.getFitness(), Constants.PEARSONMINFITNESS)
                 gain = of - nf
@@ -544,6 +548,8 @@ class BruteElitist(GPAlgorithm):
             operationcount[0] += 2
             operationcount[2] += 2
             lc.scoreTree(Y, fit)
+            evaluations.append(lc.evaluationcost)
+            evaluations.append(rc.evaluationcost)
             rc.scoreTree(Y, fit)
             scores = [left, right, lc, rc]
             best = sorted(scores, key = lambda t:t.getFitness())[0:2]
@@ -561,7 +567,7 @@ class BruteElitist(GPAlgorithm):
             gainscrossover.append(gain)
         assert(len(newgen) == selcount)
         replacementratio = [x/y if y!=0 else 0 for x, y in zip(replacementcount, operationcount)]
-        return newgen, replacementratio, gainsmutate, gainscrossover
+        return newgen, replacementratio, gainsmutate, gainscrossover, evaluations
 
     def stopCondition(self):
         """

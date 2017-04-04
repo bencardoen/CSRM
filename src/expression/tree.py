@@ -266,7 +266,12 @@ class Tree:
 
     @property
     def nodecount(self):
-        len(list(filter(lambda x: x is not None, self._nodes)))
+        return len(list(filter(lambda x: x is not None, self.nodes)))
+
+
+    @property
+    def evaluationcost(self):
+        return self.getComplexity()
 
     def getDepth(self):
         """
