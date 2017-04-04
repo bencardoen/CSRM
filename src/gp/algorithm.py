@@ -277,7 +277,7 @@ class GPAlgorithm():
                 "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
                 "diff_fitness":dfit, "features":features, "last_fitness":lastfit[-1]}
 
-    def summarizeGeneration(self, replacementcount:list, generation:int, phase:int):
+    def summarizeGeneration(self, replacementcount:list, mutategain:list, crossovergain:list, generation:int, phase:int):
         """
         Compute fitness statistics for the current generation and record them
         """
@@ -290,12 +290,22 @@ class GPAlgorithm():
         cmean = numpy.mean(comp)
         csd = numpy.std(comp)
         cv = numpy.var(comp)
+        mg = list(filter(lambda x : x > 0, mutategain))
+        mmg = 0
+        if mg:
+            mmg = numpy.mean(mg)
+        cg = list(filter(lambda x : x > 0, crossovergain))
+        mcg = 0
+        if cg:
+            mcg = numpy.mean(cg)
+
         assert(isinstance(replacementcount, list))
         #logger.debug("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
 
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
-                                                 "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp}, phase)
+                                                 "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
+                                                 "mutate_gain":mmg, "crossover_gain":mcg}, phase)
 
     def setTrace(self, v, prefix):
         """
@@ -344,11 +354,11 @@ class GPAlgorithm():
         r = self._phase
         for i in range(self._generations):
             selected = self.select()
-            modified, count = self.evolve(selected)
+            modified, count, gm, gc = self.evolve(selected)
             self.update(modified)
             assert(isinstance(count, list))
             self._currentgeneration = i
-            self.summarizeGeneration(count, generation=i, phase=r)
+            self.summarizeGeneration(count, gm, gc, generation=i, phase=r)
             if self.stopCondition():
                 logger.info("Stop condition triggered")
                 break
@@ -402,7 +412,7 @@ class GPAlgorithm():
         :return tuple modified: a tuple of modified samples based on selection, and changes made
         """
         self.evaluate(selection)
-        return selection, [0,0,0]
+        return selection, [0,0,0], [], []
 
     def requireMutation(self, popindex:int)->bool:
         """
@@ -483,6 +493,7 @@ class BruteElitist(GPAlgorithm):
         # Mutate on entire population, with regard to (scaled) fitness
         # Replacement is done based on comparison t, t'. It's possible in highly varied populations that this strategy
         # is not ideal.
+        gainsmutate = []
         for i in range(0, selcount):
             t = selection[i]
             if self.requireMutation(i):
@@ -492,8 +503,11 @@ class BruteElitist(GPAlgorithm):
                 candidate.scoreTree(Y, fit)
                 operationcount[0] += 1
                 operationcount[1] += 1
-
-                if candidate.getFitness() < t.getFitness():
+                of = t.getFitness()
+                nf = candidate.getFitness()
+                gain = of - nf
+                gainsmutate.append(gain)
+                if gain > 0:
                     assert(candidate.getDepth() <= d)
                     selection[i] = candidate
                     replacementcount[0] += 1
@@ -504,6 +518,7 @@ class BruteElitist(GPAlgorithm):
         # Crossover disseminates potentially 'good' subtrees, at the cost of diversity
         # Experiments with only applying it to the best specimens increase mean fitness
         # Both fit and unfit individuals benefit from crossbreeding.
+        gainscrossover = []
         newgen = []
         if selcount % 2:
             newgen.append(selection[0])
@@ -538,10 +553,15 @@ class BruteElitist(GPAlgorithm):
             if rc in best:
                 replacementcount[0] += 1
                 replacementcount[2] += 1
+
+            oldfit = left.getFitness() + right.getFitness()
+            nextfit = sum([x.getFitness() if x.getFitness() != Constants.MINFITNESS else Constants.PEARSONMINFITNESS for x in best])
+            gain = oldfit - nextfit
             newgen += best
+            gainscrossover.append(gain)
         assert(len(newgen) == selcount)
         replacementratio = [x/y if y!=0 else 0 for x, y in zip(replacementcount, operationcount)]
-        return newgen, replacementratio
+        return newgen, replacementratio, gainsmutate, gainscrossover
 
     def stopCondition(self):
         """

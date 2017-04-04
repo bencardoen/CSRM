@@ -79,7 +79,6 @@ def plotLineData(data, mean=None, std=None, var=None, generationstep=1, labelx=N
     else:
         colors = inferno(256)
         colors += [colors[-1] for _ in range(dlen-256)]
-    logger.debug("Got {} to plot".format(data))
     labelx = labelx or "X"
     labely = labely or "Y"
     #xranges = [str(x) for x in range(0, dlen)] if xcategorical else None
@@ -91,9 +90,9 @@ def plotLineData(data, mean=None, std=None, var=None, generationstep=1, labelx=N
     for i,d in enumerate(data):
         x = [d for d in range(len(data[0]))]
         if dot:
-            p.circle(x, d, line_width=1, line_color=colors[i], line_alpha=0.5, legend=legend[i])
+            p.circle(x, d, line_width=1, line_color=colors[i], fill_color=colors[i], line_alpha=0.5, legend=legend[i])
         else:
-            p.line(x, d, line_width=2, line_color=colors[i], line_alpha=1, legend=legend[i])
+            p.line(x, d, line_width=2, line_color=colors[i], fill_color=colors[i], line_alpha=1, legend=legend[i])
     return p
 
 
@@ -103,21 +102,25 @@ def plotFront(X, Y, labelx=None, labely=None, title=None):
     return p
 
 
-def displayPlot(plots, filename, title):
+def displayPlot(plots, filename, title, square=False):
     output_file("{}.html".format(filename or "index"), title=title or "title")
-    gplots = []
-    if len(plots) % 2:
-        plots.append(None)
-    gplots = [[plots[2*d], plots[2*d+1]] for d in range(len(plots)//2)]
-    p = gridplot(*gplots)
+    gplots = plots
+    if square:
+        gplots = []
+        if len(plots) % 2:
+            plots.append(None)
+        gplots = [[plots[2*d], plots[2*d+1]] for d in range(len(plots)//2)]
+    p = gridplot(*gplots, ncols=3, plot_width=500, plot_height=500)
     show(p)
 
 
-def savePlot(plots, filename, title):
+def savePlot(plots, filename, title, square=False):
     output_file("{}.html".format(filename or "index"), title=title or "title")
-    gplots = []
-    if len(plots) % 2:
-        plots.append(None)
-    gplots = [[plots[2*d], plots[2*d+1]] for d in range(len(plots)//2)]
-    p = gridplot(*gplots)
+    gplots = plots
+    if square:
+        gplots = []
+        if len(plots) % 2:
+            plots.append(None)
+        gplots = [[plots[2*d], plots[2*d+1]] for d in range(len(plots)//2)]
+    p = gridplot(*gplots, ncols = 4)
     save(p)

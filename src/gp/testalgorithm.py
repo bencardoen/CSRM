@@ -119,17 +119,18 @@ class GPTest(unittest.TestCase):
 # These two tests serve as a benchmark to verify cooling effect of mutation operator
     def testConvergence(self):
         expr = testfunctions[2]
-        dpoint = 30
+        dpoint = 20
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=20, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=5)
+        g = BruteElitist(X, Y, popsize=30, maxdepth=5, fitnessfunction=_fit, seed=0, generations=30, phases=3)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
         c.savePlots("output", title=expr)
+        c.displayPlots("output", title=expr)
 
     def testCooling(self):
         expr = testfunctions[2]

@@ -39,12 +39,8 @@ def runBenchmarks():
         # Plot results
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
-        c.plotFitness()
-        c.plotComplexity()
-        c.plotOperators()
-        c.plotPareto()
         c.savePlots("output_{}".format(i), title=expr)
-        #c.displayPlots("output_{}".format(i), title=expr)
+        c.displayPlots("output_{}".format(i), title=expr)
 
 
 if __name__=="__main__":

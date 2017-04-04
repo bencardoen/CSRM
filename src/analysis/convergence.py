@@ -101,6 +101,20 @@ class Convergence(Plotter):
         p = plotLineData(cvalues, labelx="Generation", labely="Succes ratio of operator", title="Modifications", legend=["Mutations","Crossovers"], dot=True)
         self.addPlot(p)
 
+    def plotOperatorsImpact(self):
+        generations = 0
+        cvalues = [[],[]]
+        runs = len(self._convergencestats)
+        logger.debug("Have {} runs and {} generations".format(runs, generations))
+        for i, run in enumerate(self._convergencestats):
+            if i == 0:
+                generations = len(run[0])
+#            cvalues[0] += [gen['replacements'] for gen in run]
+            cvalues[0] += [gen['mutate_gain'] for gen in run]
+            cvalues[1] += [gen['crossover_gain'] for gen in run]
+        p = plotLineData(cvalues, labelx="Generation", labely="Gains of operator", title="Impact of operator", legend=["Mutations","Crossovers"], dot=True)
+        self.addPlot(p)
+
     def plotPareto(self):
         """
         Plot fitness values against complexity in a front
@@ -115,6 +129,7 @@ class Convergence(Plotter):
         self.plotFitness()
         self.plotComplexity()
         self.plotOperators()
+        self.plotOperatorsImpact()
         self.plotDepth()
 
     def saveData(self, filename, outputfolder=None):
