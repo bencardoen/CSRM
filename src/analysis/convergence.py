@@ -103,12 +103,11 @@ class Convergence(Plotter):
         p = plotLineData(cvalues, labelx="Generation", labely="Mean gain of operator", title="Impact of operator", legend=["Mutations","Crossovers"], dot=True)
         self.addPlot(p)
 
-    def plotOperatorSuccessTrend(self):
-        legend = ["Mutations","Crossovers"]
+    def plotTrend(self, keyvalues, axislabels, legend, title):
         cvalues = [[],[]]
         for i, run in enumerate(self._convergencestats):
-            cvalues[0] += [gen['mutations'] for gen in run]
-            cvalues[1] += [gen['crossovers'] for gen in run]
+            cvalues[0] += [gen[keyvalues[0]] for gen in run]
+            cvalues[1] += [gen[keyvalues[1]] for gen in run]
         polys = []
         datalength = len(cvalues[0])
         for series in cvalues:
@@ -118,29 +117,15 @@ class Convergence(Plotter):
         trends = []
         for p in polys:
             trends.append([p(x) for x in range(datalength)])
-        p = plotLineData(trends, labelx="Generation", labely="Success rate trend", title="Operator success rate.", legend=legend, xcategorical=True)
+        p = plotLineData(trends, labelx=axislabels[0], labely=axislabels[1], title=title, legend=legend, xcategorical=True)
         p.legend.border_line_alpha=0
         self.addPlot(p)
+
+    def plotOperatorSuccessTrend(self):
+        self.plotTrend(keyvalues=["mutations", "crossovers"], axislabels=["Generation","Success rate trend"], legend = ["Mutations","Crossovers"], title="Operator success rate.")
 
     def plotOperatorImpactTrend(self):
-        legend = ["Mutations","Crossovers"]
-        cvalues = [[],[]]
-        for i, run in enumerate(self._convergencestats):
-            cvalues[0] += [gen['mutate_gain'] for gen in run]
-            cvalues[1] += [gen['crossover_gain'] for gen in run]
-
-        polys = []
-        datalength = len(cvalues[0])
-        for series in cvalues:
-            x = [i for i in range(len(series))]
-            z = numpy.polyfit(x, series, 3)
-            polys.append(numpy.poly1d(z))
-        trends = []
-        for p in polys:
-            trends.append([p(x) for x in range(datalength)])
-        p = plotLineData(trends, labelx="Generation", labely="Mean gain by operator", title="Operator gain in fitness.", legend=legend, xcategorical=True)
-        p.legend.border_line_alpha=0
-        self.addPlot(p)
+        self.plotTrend(keyvalues=["mutate_gain", "crossover_gain"], axislabels=["Generation","Mean gain by operator"], legend = ["Mutations","Crossovers"], title="Operator gain in fitness.")
 
     def plotPareto(self):
         """
