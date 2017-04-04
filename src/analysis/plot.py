@@ -92,7 +92,7 @@ def plotLineData(data, mean=None, std=None, var=None, generationstep=1, labelx=N
         if dot:
             p.circle(x, d, line_width=1, line_color=colors[i], fill_color=colors[i], line_alpha=0.5, legend=legend[i])
         else:
-            p.line(x, d, line_width=2, line_color=colors[i], fill_color=colors[i], line_alpha=1, legend=legend[i])
+            p.line(x, d, line_width=2, line_color=colors[i], line_alpha=1, legend=legend[i])
     return p
 
 

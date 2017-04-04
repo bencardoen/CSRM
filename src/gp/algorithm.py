@@ -503,8 +503,8 @@ class BruteElitist(GPAlgorithm):
                 candidate.scoreTree(Y, fit)
                 operationcount[0] += 1
                 operationcount[1] += 1
-                of = t.getFitness()
-                nf = candidate.getFitness()
+                of = min( t.getFitness(), Constants.PEARSONMINFITNESS) # in parallel, it's possible a sample has infinite fitness
+                nf = min(candidate.getFitness(), Constants.PEARSONMINFITNESS)
                 gain = of - nf
                 gainsmutate.append(gain)
                 if gain > 0:
@@ -554,7 +554,7 @@ class BruteElitist(GPAlgorithm):
                 replacementcount[0] += 1
                 replacementcount[2] += 1
 
-            oldfit = left.getFitness() + right.getFitness()
+            oldfit = min(left.getFitness(), Constants.PEARSONMINFITNESS) + min(right.getFitness(), Constants.PEARSONMINFITNESS)
             nextfit = sum([x.getFitness() if x.getFitness() != Constants.MINFITNESS else Constants.PEARSONMINFITNESS for x in best])
             gain = oldfit - nextfit
             newgen += best

@@ -88,31 +88,58 @@ class Convergence(Plotter):
         """
         Plot effective (i.e. rendering a fitter individual) modifications made by mutations and crossover
         """
-        generations = 0
         cvalues = [[],[]]
-        runs = len(self._convergencestats)
-        logger.debug("Have {} runs and {} generations".format(runs, generations))
         for i, run in enumerate(self._convergencestats):
-            if i == 0:
-                generations = len(run[0])
-#            cvalues[0] += [gen['replacements'] for gen in run]
             cvalues[0] += [gen['mutations'] for gen in run]
             cvalues[1] += [gen['crossovers'] for gen in run]
         p = plotLineData(cvalues, labelx="Generation", labely="Succes ratio of operator", title="Modifications", legend=["Mutations","Crossovers"], dot=True)
         self.addPlot(p)
 
     def plotOperatorsImpact(self):
-        generations = 0
         cvalues = [[],[]]
-        runs = len(self._convergencestats)
-        logger.debug("Have {} runs and {} generations".format(runs, generations))
         for i, run in enumerate(self._convergencestats):
-            if i == 0:
-                generations = len(run[0])
-#            cvalues[0] += [gen['replacements'] for gen in run]
             cvalues[0] += [gen['mutate_gain'] for gen in run]
             cvalues[1] += [gen['crossover_gain'] for gen in run]
-        p = plotLineData(cvalues, labelx="Generation", labely="Gains of operator", title="Impact of operator", legend=["Mutations","Crossovers"], dot=True)
+        p = plotLineData(cvalues, labelx="Generation", labely="Mean gain of operator", title="Impact of operator", legend=["Mutations","Crossovers"], dot=True)
+        self.addPlot(p)
+
+    def plotOperatorSuccessTrend(self):
+        legend = ["Mutations","Crossovers"]
+        cvalues = [[],[]]
+        for i, run in enumerate(self._convergencestats):
+            cvalues[0] += [gen['mutations'] for gen in run]
+            cvalues[1] += [gen['crossovers'] for gen in run]
+        polys = []
+        datalength = len(cvalues[0])
+        for series in cvalues:
+            x = [i for i in range(len(series))]
+            z = numpy.polyfit(x, series, 3)
+            polys.append(numpy.poly1d(z))
+        trends = []
+        for p in polys:
+            trends.append([p(x) for x in range(datalength)])
+        p = plotLineData(trends, labelx="Generation", labely="Success rate trend", title="Operator success rate.", legend=legend, xcategorical=True)
+        p.legend.border_line_alpha=0
+        self.addPlot(p)
+
+    def plotOperatorImpactTrend(self):
+        legend = ["Mutations","Crossovers"]
+        cvalues = [[],[]]
+        for i, run in enumerate(self._convergencestats):
+            cvalues[0] += [gen['mutate_gain'] for gen in run]
+            cvalues[1] += [gen['crossover_gain'] for gen in run]
+
+        polys = []
+        datalength = len(cvalues[0])
+        for series in cvalues:
+            x = [i for i in range(len(series))]
+            z = numpy.polyfit(x, series, 3)
+            polys.append(numpy.poly1d(z))
+        trends = []
+        for p in polys:
+            trends.append([p(x) for x in range(datalength)])
+        p = plotLineData(trends, labelx="Generation", labely="Mean gain by operator", title="Operator gain in fitness.", legend=legend, xcategorical=True)
+        p.legend.border_line_alpha=0
         self.addPlot(p)
 
     def plotPareto(self):
@@ -129,7 +156,9 @@ class Convergence(Plotter):
         self.plotFitness()
         self.plotComplexity()
         self.plotOperators()
+        self.plotOperatorSuccessTrend()
         self.plotOperatorsImpact()
+        self.plotOperatorImpactTrend()
         self.plotDepth()
 
     def saveData(self, filename, outputfolder=None):
@@ -177,7 +206,7 @@ class SummarizedResults(Plotter):
         trends = []
         for p in polys:
             trends.append([p(x) for x in range(datalength)])
-        p = plotLineData(trends, labelx="Phase", labely="Correlation (less is better)", title="Correlation trend (Quadratic fit) between end of phase fitness values on training data and fitness value on full data.", legend=legend, xcategorical=True)
+        p = plotLineData(trends, labelx="Phase", labely="Correlation (less is better)", title="Correlation trend between end of phase fitness values on training data and fitness value on full data.", legend=legend, xcategorical=True)
         p.legend.border_line_alpha=0
         self.addPlot(p)
 
@@ -187,7 +216,7 @@ class SummarizedResults(Plotter):
         self.plotDifference()
         self.plotPrediction()
         self.plotPredictionTrend()
-        # self.plotDepth()
+        self.plotDepth()
 
     def plotDifference(self):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
