@@ -510,6 +510,7 @@ class TreeTest(unittest.TestCase):
             n = t.getNode(k)
             self.assertEqual(v, n.getDepth())
         self.assertEqual(3, t.getDepth())
+        self.assertEqual(3, t.root.recursiveDepth())
 
 
     def testRandom(self):
@@ -980,6 +981,7 @@ class TreeTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, variables=vs)
         self.assertEqual(t.getFeatures(), [0,3,3,4])
         self.assertEqual(t.getFeatures(unique=True), [0,3,4])
+
 
 
 if __name__=="__main__":

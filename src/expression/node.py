@@ -158,6 +158,12 @@ class Node:
         self.pos = newpos
         self._depth = Node.positionToDepth(self.pos)
 
+    def recursiveDepth(self):
+        if self.children:
+            return 1 + max([node.recursiveDepth() for node in self.children])
+        else:
+            return 0
+
     def addChild(self, node):
         if self.arity <= len(self.children):
             raise ValueError("Arity = {} for children {}".format(self.arity, self.children))
