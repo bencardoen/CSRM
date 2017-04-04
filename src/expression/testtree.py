@@ -577,7 +577,7 @@ class TreeTest(unittest.TestCase):
         right = Tree.createTreeFromExpression(expressionr, variables)
         right.printToDot(outputfolder+"t34right.dot")
         rv = right.evaluateTree()
-        rng = getRandom(42)
+        rng = getRandom(1)
         Crossover.subtreecrossover(left, right, rng=rng)
 
         left.printToDot(outputfolder+"t34leftafter.dot")

@@ -262,12 +262,11 @@ class Tree:
 
     @property
     def nodecount(self):
-        return len(list(filter(lambda x: x is not None, self.nodes)))
+        return len(self.nodes)
 
     @property
     def lastposition(self):
-        # todo optimize
-        return self.getNodes()[-1].getPosition()
+        return self.nodes.peekitem()[0]
 
     @property
     def evaluationcost(self):
@@ -285,11 +284,7 @@ class Tree:
         return self.depth
 
     def calculateDepth(self):
-        return self.getNodes()[-1].getDepth()
-        # for n in reversed(self.nodes):
-        #     if n :
-        #         return n.getDepth()
-        # raise ValueError("No Nodes in tree")
+        return self.nodes.peekitem()[1].getDepth()
 
     @staticmethod
     def makeRandomTree(variables, depth: int, rng=None, tokenLeafs=False, limit=None):
@@ -305,7 +300,7 @@ class Tree:
         _rng = rng
         if rng is None:
             logger.warning("Using non deterministic mode")
-            _rng = getRandom()
+            _rng = getRandom(0)
         if depth == 0:
             t = Tree()
             if (_rng.randrange(0, 2) & 1) and variables:
@@ -418,11 +413,13 @@ class Tree:
             assert(depth < math.log(ln+2, 2))
             lower = 2**depth-1
             upper = min(2**(depth+1)-1, ln+1)
-        node = None
-        # to pick from known positions
-        while node is None:
-            rv = r.randrange(max(lower,1), upper)
-            node = self.getNode( rv )
+
+        lowerkey = max(lower, 1)
+        upperkey = upper
+        irange = self.nodes.irange(lowerkey, upperkey, inclusive=(True,False))
+        nodekey = r.choice(list(irange))
+        node = self.getNode(nodekey)
+        assert(node is not None)
         assert(self.root != node)
         return node
 
@@ -455,7 +452,7 @@ class Tree:
         """
         self.setModified(True)
         self.modifiedDepth=True
-        self.testInvariant()
+        #self.testInvariant()
         # Unlink the current node
         npos = node.getPosition()
         self._deleteNode(npos)
@@ -495,7 +492,7 @@ class Tree:
             nodes = newnodes
         self.root.clearConstExprCache()
         self.setDataPointCount()
-        self.testInvariant()
+        #self.testInvariant()
 
     def getConstants(self):
         """
@@ -622,7 +619,7 @@ class Tree:
                 else:
                     break
         result.setDataPointCount()
-        result.testInvariant()
+        #result.testInvariant()
         return result
 
     def isConstantExpression(self):
