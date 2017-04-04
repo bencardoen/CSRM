@@ -390,7 +390,8 @@ class Tree:
 
         :returns: a selected node, never root
         """
-        lsn = len(self.nodes)
+        ln = self.lastposition
+        #logger.info("LSN = {} LASTPOS = {}".format(lsn, ln))
         if depth is not None:
             assert(depth <= self.getDepth())
         r = rng or getRandom()
@@ -402,11 +403,11 @@ class Tree:
         if mindepth is not None:
             lowerrange=(2**mindepth) - 1
             assert(depth is None)
-        lower, upper = lowerrange, lsn
+        lower, upper = lowerrange, ln+1
         if depth:
-            assert(depth < math.log(lsn+1, 2))
+            assert(depth < math.log(ln+2, 2))
             lower = 2**depth-1
-            upper = min(2**(depth+1)-1, lsn)
+            upper = min(2**(depth+1)-1, ln+1)
         node = None
         while node is None:
             rv = r.randrange(max(lower,1), upper)
