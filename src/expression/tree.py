@@ -129,29 +129,16 @@ class Tree:
         assert(False)
 
     def getNodes(self):
-        """
-        Recursively retrieve all nodes
-        """
-        return [self.root] + self.root.getAllChildren()
-
-    def _positionalNodes(self):
-        """
-        Get all sorted nodes
-        """
-        return [d for d in self.nodes if d]
+        #return [self.root] + self.root.getAllChildren()
+        # TODO switch to generator
+        return [n for n in self.nodes if n]
 
     def isLeaf(self, position: int):
         """
         Return true if node at position is a terminal/leaf node.
         """
-        l = 2*position + 1
-        r = 2*position + 2
-        if r < len(self.nodes):
-            return not (self.nodes[l] or self.nodes[r])
-        elif l < len(self.nodes):
-            return not self.nodes[l]
-        else:
-            return True
+        node = self.getNode(position)
+        return node.isLeaf()
 
     def makeLeaf(self, variable, parent: Node, constant = None):
         """
@@ -253,11 +240,12 @@ class Tree:
         filename = name or "output.dot"
         handle = open(filename, 'w')
         handle.write("digraph BST{\n")
-        for c in self.nodes:
+        nodes = self.getNodes()
+        for c in nodes:
             if c:
                 logging.debug("Writing {} to dot".format(c))
                 handle.write( str( id(c) ) + "[label = \"" + str(c) + "\"]" "\n")
-        for n in self.nodes:
+        for n in nodes:
             if n:
                 for c in n.getChildren():
                     handle.write(str(id(n)) + " -> " + str(id(c)) + ";\n")
@@ -268,6 +256,10 @@ class Tree:
     def nodecount(self):
         return len(list(filter(lambda x: x is not None, self.nodes)))
 
+    @property
+    def lastposition(self):
+        # todo optimize
+        return self.getNodes()[-1].getPosition()
 
     @property
     def evaluationcost(self):
@@ -285,10 +277,11 @@ class Tree:
         return self.depth
 
     def calculateDepth(self):
-        for n in reversed(self.nodes):
-            if n :
-                return n.getDepth()
-        raise ValueError("No Nodes in tree")
+        return self.getNodes()[-1].getDepth()
+        # for n in reversed(self.nodes):
+        #     if n :
+        #         return n.getDepth()
+        # raise ValueError("No Nodes in tree")
 
     @staticmethod
     def makeRandomTree(variables, depth: int, rng=None, tokenLeafs=False, limit=None):
@@ -397,6 +390,7 @@ class Tree:
 
         :returns: a selected node, never root
         """
+        lsn = len(self.nodes)
         if depth is not None:
             assert(depth <= self.getDepth())
         r = rng or getRandom()
@@ -408,11 +402,11 @@ class Tree:
         if mindepth is not None:
             lowerrange=(2**mindepth) - 1
             assert(depth is None)
-        lower, upper = lowerrange, len(self.nodes)
+        lower, upper = lowerrange, lsn
         if depth:
-            assert(depth < math.log(len(self.nodes)+1, 2))
+            assert(depth < math.log(lsn+1, 2))
             lower = 2**depth-1
-            upper = min(2**(depth+1)-1, len(self.nodes))
+            upper = min(2**(depth+1)-1, lsn)
         node = None
         while node is None:
             rv = r.randrange(max(lower,1), upper)
@@ -438,6 +432,9 @@ class Tree:
     def logState(self):
         logger.debug("Current state = rnodes {}\n lnodes = {}".format(self.getNodes(), self.nodes))
 
+    def _deleteNode(self, pos):
+        self.nodes[pos] = None
+
     def _removeNode(self, node: Node, newnode: Node):
         """
         Remove node from tree, replace with newnode.
@@ -449,7 +446,7 @@ class Tree:
         self.testInvariant()
         # Unlink the current node
         npos = node.getPosition()
-        self.nodes[npos] = None
+        self._deleteNode(npos)
         parent = self.getParent(node)
         newnode.setPosition(npos)
         # Replace current node with new node
@@ -493,7 +490,7 @@ class Tree:
 
         Non initialized constants will have a value of None
         """
-        return [ c.getConstant() for c in self.nodes if c]
+        return [ c.getConstant() for c in self.getNodes()]
 
     def getVariables(self):
         return self.getRoot().getVariables()
@@ -522,7 +519,7 @@ class Tree:
         """
         Complexity is defined by the weight of the functions used in the expression.
         """
-        return sum(d.getNodeComplexity() for d in self.nodes if d is not None)
+        return sum(d.getNodeComplexity() for d in self.getNodes())
 
     def getScaledComplexity(self):
         """
