@@ -289,6 +289,14 @@ class Constant():
     def setValue(self, nvalue):
         self._value = nvalue
 
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, v):
+        self._value = v
+
     def __str__(self):
         return "Constant c = {}".format(self._value)
 

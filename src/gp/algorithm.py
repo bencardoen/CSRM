@@ -28,7 +28,7 @@ class GPAlgorithm():
     In itself it will not evolve a solution.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed=None, archivesize=None, history=None, phases=None, tournamentsize=None, initialdepth=None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed=None, archivesize=None, history=None, phases=None, tournamentsize=None, initialdepth=None, skipconstantexpressions=False):
         """
         Initializes a forest of trees randomly constructed.
 
@@ -63,6 +63,7 @@ class GPAlgorithm():
         self._X = X
         """ Expected data """
         self._Y = Y
+        self._skipconstantexpressions = skipconstantexpressions
         self._initialize()
         self._archive = SetPopulation(key=lambda _tree: _tree.getFitness())
         self._generations = generations
@@ -119,7 +120,7 @@ class GPAlgorithm():
 
     @property
     def skipconstantexpressions(self):
-        return False
+        return self._skipconstantexpressions
 
     def getSeed(self):
         """
@@ -475,8 +476,8 @@ class BruteElitist(GPAlgorithm):
     replaces unfit samples.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None, skipconstantexpressions=False):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions)
 
     def evolve(self, selection):
         """
@@ -619,16 +620,11 @@ class BruteCoolingElitist(BruteElitist):
 
     def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None,depthcooling=False, skipconstantexpressions=True):
         self._depthcooling = depthcooling
-        self._skipconstantexpressions = skipconstantexpressions
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions)
 
     @property
     def depthcooling(self):
         return self._depthcooling
-
-    @property
-    def skipconstantexpressions(self):
-        return self._skipconstantexpressions
 
     def requireMutation(self, popindex:int)->bool:
         generation = self._currentgeneration
@@ -651,6 +647,7 @@ class BruteCoolingElitist(BruteElitist):
             g = t.doConstantFolding()
             gain[i] = g
         logger.info("Ctopt gain is {}".format(gain))
+        # do optimizer pass
         return gain
 
 

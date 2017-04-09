@@ -976,6 +976,22 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(t.getFeatures(unique=True), [0,3,4])
 
 
+    def testConstants(self):
+        dpoint = 5
+        vcount = 5
+        vs = generateVariables(vcount, dpoint, seed=0)
+        expr = "x4 + 19 - ln(7 + 8)"
+        t = Tree.createTreeFromExpression(expr, vs)
+        Y = t.evaluateAll()
+        ct = [c for c in t.getConstants() if c]
+        for c in ct:
+            c.value += 1
+        Ym = t.evaluateAll()
+        self.assertNotEqual(Y, Ym)
+
+
+
+
 
 if __name__=="__main__":
     logger.setLevel(logging.INFO)
