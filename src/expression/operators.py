@@ -51,7 +51,7 @@ class Mutate():
         d = tr.getDepth()
 
         if d == 0:
-            logger.info("Not operating on constant tree.")
+            #logger.info("Not operating on constant tree.")
             return
 
         selectdepth = None
@@ -114,7 +114,7 @@ class Crossover():
         rd = right.getDepth()
 
         if ld == 0 or rd == 0:
-            logger.info("Not operating on constant tree")
+            #logger.info("Not operating on constant tree")
             return
 
         lmindepth = 1

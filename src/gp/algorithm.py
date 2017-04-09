@@ -301,6 +301,7 @@ class GPAlgorithm():
         fsavings = optimizergains["foldingsavings"]
         nc = optimizergains["nodecount"]
         constantfoldingsavings = fsavings/nc * 100
+        fitnessgains = optimizergains["fitnessgains"]
 
         assert(isinstance(replacementcount, list))
         #logger.debug("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
@@ -308,7 +309,7 @@ class GPAlgorithm():
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
                                                  "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
-                                                 "mutate_gain":mmg, "crossover_gain":mcg, "mean_evaluations":meaneval, "foldingsavings":constantfoldingsavings}, phase)
+                                                 "mutate_gain":mmg, "crossover_gain":mcg, "mean_evaluations":meaneval, "foldingsavings":constantfoldingsavings, "fitnessgains":fitnessgains}, phase)
 
     def setTrace(self, v, prefix):
         """
@@ -650,8 +651,12 @@ class BruteCoolingElitist(BruteElitist):
         g = 0
         for i, t in enumerate(selected):
             g += t.doConstantFolding()
+            # optimize
+            # scoreTree
+            gain["optimizer"][i] = t.getFitness()
         gain["foldingsavings"] = g
-        logger.info("Ctopt gain is {}".format(gain))
+        gain["fitnessgains"] = [t.getFitness() for t in selected]
+        #logger.info("Ctopt gain is {}".format(gain))
         return gain
 
 

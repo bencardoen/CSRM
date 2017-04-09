@@ -75,19 +75,12 @@ class Convergence(Plotter):
         """
         Plot complexity values over the generations
         """
-        converted = []
-        generations = 0
-        cvalues = []
-        runs = len(self._convergencestats)
-        for i, run in enumerate(self._convergencestats):
-            if i == 0:
-                generations = len(run[0])
-            cvalues += [gen['complexity'] for gen in run]
-        converted = rmtocm(cvalues)
-        logger.debug("Have {} runs and {} generations".format(runs, generations))
-        p = plotDotData(converted, labelx="Generation", labely="Complexity", title="Complexity")
-        self.addPlot(p)
+        self.plotPopulationOverGenerations(keyword='complexity')
 
+    def plotOptimizerGains(self):
+        self.plotPopulationOverGenerations(keyword = "fitnessgains")
+
+    # TODO add mean, cost
 
     def plotOperators(self):
         self.plotSeries(keys = ['mutations','crossovers'], labels=["Generation","Succes ratio of operator"], title="Modfications", legend=["Mutations","Crossovers"])
@@ -122,11 +115,10 @@ class Convergence(Plotter):
         self.plotTrend(keyvalues=["mutate_gain", "crossover_gain"], axislabels=["Generation","Mean gain by operator"], legend = ["Mutations","Crossovers"], title="Operator gain in fitness.")
 
     def plotAlgorithmCost(self):
-        cvalues = [[]]
-        for i, run in enumerate(self._convergencestats):
-            cvalues[0] += [numpy.mean(gen['mean_evaluations']) for gen in run]
-        p = plotLineData(cvalues, labelx="Generation", labely="Mean cost of generation", title="Computational cost of algorithm", legend=["Mean Cost"], dot=True)
-        self.addPlot(p)
+        self.plotSeries(keys=["mean_evaluations"], labels=["Generation","Mean cost of generation."], title="Cost of algorithm (in evaluations)", legend=["Evaluations"])
+
+    def plotAlgorithmCostTrend(self):
+        self.plotTrend(keyvalues = ["mean_evaluations"], axislabels = ["Generation","Mean cost of generation"], title="Computational cost of algorithm", legend=["Mean Cost"])
 
     def plotPareto(self):
         """
@@ -147,8 +139,10 @@ class Convergence(Plotter):
         self.plotOperatorImpactTrend()
         self.plotDepth()
         self.plotAlgorithmCost()
+        self.plotAlgorithmCostTrend()
         self.plotFoldingGains()
         self.plotFoldingGainsTrend()
+        self.plotOptimizerGains()
 
     def saveData(self, filename, outputfolder=None):
         outputfolder = outputfolder or ""
