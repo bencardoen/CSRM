@@ -618,7 +618,7 @@ class BruteCoolingElitist(BruteElitist):
     The cooling schedule 'predicts' efficiency of the operators.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None,depthcooling=False, skipconstantexpressions=True):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None,depthcooling=False, skipconstantexpressions=False):
         self._depthcooling = depthcooling
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions)
 

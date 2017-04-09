@@ -741,9 +741,9 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(c2, (c-(d-1))/57)
 
     def testAdvancedMutate(self):
-        TESTRANGE = 20
+        TESTRANGE = 100
         vcount = 4
-        dpoint = 2
+        dpoint = 4
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
         expr = "ln(x1) * sin(x2) - x3 + 7 / 17.32"
         t = Tree.createTreeFromExpression(expr, variables=vs)
@@ -774,7 +774,7 @@ class TreeTest(unittest.TestCase):
             self.assertEqual(t.calculateDepth(), t.getDepth())
 
         t.printToDot(outputfolder+"t40Mutated2.dot")
-
+        #
         # Mutate with a limit set, without equaldepth, with a set depth to select
         d = told.getDepth()
         rng.seed(0)
@@ -784,7 +784,7 @@ class TreeTest(unittest.TestCase):
             self.assertTrue(told.getDepth() <= limit)
             self.assertEqual(told.calculateDepth(), told.getDepth())
         told.printToDot(outputfolder+"t40Mutated3.dot")
-
+        #
         # Mutate with limit, depth maintaining, selectiondepth set
         d = last.getDepth()
         rng.seed(0)
@@ -793,14 +793,14 @@ class TreeTest(unittest.TestCase):
             self.assertTrue(last.getDepth() == d)
             self.assertEqual(last.calculateDepth(), last.getDepth())
         last.printToDot(outputfolder+"t40Mutated4.dot")
-
-
+        #
+        #
         vcount = 4
-        dpoint = 3
+        dpoint = 20
         rng = getRandom(0)
-        vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
+        vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-10, upper=10)
         variables = Variable.toVariables(vs)
-        last = Tree.makeRandomTree(variables, depth=14, rng=rng)
+        last = Tree.makeRandomTree(variables, depth=11, rng=rng)
         d = last.getDepth()
         rng.seed(0)
         for _ in range(TESTRANGE):
@@ -814,7 +814,7 @@ class TreeTest(unittest.TestCase):
     def testAdvancedCrossover(self):
         TESTRANGE = 100
         vcount = 4
-        dpoint = 1
+        dpoint = 2
         rng = getRandom(0)
         vs = generateVariables(vcount, dpoint, seed=0, sort=True, lower=-100, upper=100)
         variables = Variable.toVariables(vs)
