@@ -42,11 +42,17 @@ class Mutate():
         :param int selectiondepth: if not -1 specify at which depth the insertion point is chosen
         :param Random rng: prng used to generate the new subtree and its attaching location
         """
+        #logger.info("Tree is {}".format(tr))
+        #logger.info("Arguments for mutation = limdepth = {}, selectiondepth = {}, mindepthratio = {}, d = {}".format(limitdepth, selectiondepth, mindepthratio, tr.getDepth()))
         if rng is None:
             rng = getRandom()
             logger.warning("Non deterministic mode")
 
         d = tr.getDepth()
+
+        if d == 0:
+            logger.info("Not operating on constant tree.")
+            return
 
         selectdepth = None
         if selectiondepth != -1:
@@ -58,7 +64,6 @@ class Mutate():
         if mindepthratio is not None:
             assert(mindepthratio >= 0 and mindepthratio <=1)
             mindepth = min(max(int( mindepthratio * d ),1), d-1)
-
         insertpoint = tr.getRandomNode(rng=rng, depth=selectdepth, mindepth=mindepth)
         depth_at_i = insertpoint.getDepth()
         #logger.info("Insertion point = {} at depth {}".format(insertpoint, depth_at_i))
@@ -107,6 +112,11 @@ class Crossover():
         """
         ld = left.getDepth()
         rd = right.getDepth()
+
+        if ld == 0 or rd == 0:
+            logger.info("Not operating on constant tree")
+            return
+
         lmindepth = 1
         rmindepth = 1
         minmaxdepth = min(ld, rd)

@@ -417,7 +417,9 @@ class Tree:
         lowerkey = max(lower, 1)
         upperkey = upper
         irange = self.nodes.irange(lowerkey, upperkey, inclusive=(True,False))
-        nodekey = r.choice(list(irange))
+        choices = list(irange)
+        assert(choices)
+        nodekey = r.choice(choices)
         node = self.getNode(nodekey)
         assert(node is not None)
         assert(self.root != node)
@@ -626,8 +628,10 @@ class Tree:
         """
         Check if this tree represents a constant expression.
         """
+        #logger.info("Checking ctexpr for {}".format(self))
         assert(self.root)
-        return self.root.isConstantExpression()
+        r = self.root.isConstantExpression()
+        return r
 
     def getFeatures(self, unique=False):
         """

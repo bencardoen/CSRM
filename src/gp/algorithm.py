@@ -277,7 +277,7 @@ class GPAlgorithm():
                 "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
                 "diff_fitness":dfit, "features":features, "last_fitness":lastfit[-1]}
 
-    def summarizeGeneration(self, replacementcount:list, mutategain:list, crossovergain:list, evaluations:list, generation:int, phase:int):
+    def summarizeGeneration(self, replacementcount:list, mutategain:list, crossovergain:list, evaluations:list, gains:dict, generation:int, phase:int):
         """
         Compute fitness statistics for the current generation and record them
         """
@@ -307,7 +307,7 @@ class GPAlgorithm():
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
                                                  "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
-                                                 "mutate_gain":mmg, "crossover_gain":mcg, "mean_evaluations":meaneval}, phase)
+                                                 "mutate_gain":mmg, "crossover_gain":mcg, "mean_evaluations":meaneval, "gains":gains}, phase)
 
     def setTrace(self, v, prefix):
         """
@@ -345,6 +345,9 @@ class GPAlgorithm():
         self._population.removeAll()
         self.reseed()
 
+    def optimize(self, selected):
+        return {}
+
     def run(self):
         """
         Main algorithm loop. Evolve population through generations.
@@ -357,10 +360,11 @@ class GPAlgorithm():
         for i in range(self._generations):
             selected = self.select()
             modified, count, gm, gc, evaluations = self.evolve(selected)
+            gains = self.optimize(modified)
             self.update(modified)
             assert(isinstance(count, list))
             self._currentgeneration = i
-            self.summarizeGeneration(count, gm, gc, evaluations, generation=i, phase=r)
+            self.summarizeGeneration(count, gm, gc, evaluations, gains,generation=i, phase=r)
             if self.stopCondition():
                 logger.info("Stop condition triggered")
                 break
@@ -632,6 +636,16 @@ class BruteCoolingElitist(BruteElitist):
             return coolingMinDepthRatio(self._currentgeneration, self._generations, popindex, self._popsize, rng=self._rng)
         else:
             return 0
+
+    def optimize(self, selected):
+        logger.info("Optimize called with {}".format(selected))
+        gain = {}
+        for i, t in enumerate(selected):
+            t.isConstantExpression()
+            g = t.doConstantFolding()
+            gain[i] = g
+        logger.info("Ctopt gain is {}".format(gain))
+        return gain
 
 
 def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=None)->bool:

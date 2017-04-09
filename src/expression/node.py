@@ -83,6 +83,8 @@ class Node:
         Requires that isConstantExpression has been called on the tree at least once.
         """
         if not self.isLeaf():
+            if self.ctexpr is None:
+                logger.info("ctexpr is None for {}".format(self))
             assert(self.ctexpr is not None)
         if self.ctexpr:
             return self
@@ -109,6 +111,7 @@ class Node:
             else:
                 assert(False)
             self.ctexpr = result
+        assert(self.ctexpr is not None)
         return self.ctexpr
 
     def isConstantExpressionLazy(self):
@@ -117,18 +120,15 @@ class Node:
 
         For a large non const tree, and without the need for further traversal (e.g. subtrees) this can be far more efficiently.
         E.g. x2 * (some huge const expr tree) returns False with 1 recursive call.
+        Does not cache result to avoid clashes with getConstantSubtrees
         """
-        if self.ctexpr is None:
-            result = True
-            if self.children:
-                for c in self.children:
-                    if not c.isConstantExpression():
-                        result = False
-                        break
-            else:
-                assert(False)
-            self.ctexpr = result
-        return self.ctexpr
+        if self.children:
+            for c in self.children:
+                if not c.isConstantExpression():
+                    return False
+        else:
+            assert(False)
+        return True
 
     def getNodeComplexity(self):
         if self.function:

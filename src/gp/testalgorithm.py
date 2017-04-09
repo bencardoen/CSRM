@@ -223,6 +223,22 @@ class GPTest(unittest.TestCase):
         c.savePlots("output", title=expr+"_tournament")
 
 
+    def testFolding(self):
+        expr = testfunctions[2]
+        dpoint = 30
+        vpoint = 5
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
+        logger.debug("Y {} X {}".format(Y, X))
+        g = BruteCoolingElitist(X, Y, popsize=2, initialdepth=5, maxdepth=8, fitnessfunction=_fit, seed=0, generations=10, phases=1)
+
+        g.executeAlgorithm()
+        stats = g.getConvergenceStatistics()
+        c = Convergence(stats)
+        c.savePlots("output", title=expr+"_tournament")
+
+
 class TopologyTest(unittest.TestCase):
     def testInverse(self):
         size = 4
