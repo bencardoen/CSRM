@@ -66,6 +66,11 @@ class Convergence(Plotter):
     def plotFoldingGains(self):
         self.plotSeries(keys = ['foldingsavings'], labels=["Generation","Reduction % of nodes. (more is better)"], title="Constant Folding effectiveness", legend=["Constant folding."])
 
+    def plotFoldingGainsTrend(self):
+        #self.plotTrend(keys=["mutate_gain", "crossover_gain"], axislabels=["Generation","Mean gain by operator"], legend = ["Mutations","Crossovers"], title="Operator gain in fitness.")
+        self.plotTrend(keyvalues = ['foldingsavings'], axislabels=["Generation","Reduction % of nodes. (more is better)"], title="Constant Folding effectiveness", legend=["Constant folding."])
+
+
     def plotComplexity(self):
         """
         Plot complexity values over the generations
@@ -99,19 +104,13 @@ class Convergence(Plotter):
         self.addPlot(p)
 
     def plotTrend(self, keyvalues, axislabels, legend, title):
-        cvalues = [[],[]]
+        cvalues = [[] for _ in range(len(keyvalues))]
         for i, run in enumerate(self._convergencestats):
-            cvalues[0] += [gen[keyvalues[0]] for gen in run]
-            cvalues[1] += [gen[keyvalues[1]] for gen in run]
-        polys = []
+            for i in range(len(keyvalues)):
+                cvalues[i] += [gen[keyvalues[i]] for gen in run]
         datalength = len(cvalues[0])
-        for series in cvalues:
-            x = [i for i in range(len(series))]
-            z = numpy.polyfit(x, series, 3)
-            polys.append(numpy.poly1d(z))
-        trends = []
-        for p in polys:
-            trends.append([p(x) for x in range(datalength)])
+        polys = [ numpy.poly1d( numpy.polyfit([i for i in range(len(series))], series, 3) ) for series in cvalues ]
+        trends = [[p(x) for x in range(datalength)] for p in polys]
         p = plotLineData(trends, labelx=axislabels[0], labely=axislabels[1], title=title, legend=legend, xcategorical=True)
         p.legend.border_line_alpha=0
         self.addPlot(p)
@@ -149,6 +148,7 @@ class Convergence(Plotter):
         self.plotDepth()
         self.plotAlgorithmCost()
         self.plotFoldingGains()
+        self.plotFoldingGainsTrend()
 
     def saveData(self, filename, outputfolder=None):
         outputfolder = outputfolder or ""
