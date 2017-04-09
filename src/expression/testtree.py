@@ -689,6 +689,7 @@ class TreeTest(unittest.TestCase):
             dp = t.getDataPointCount()
             ctexpr = t.isConstantExpression()
             g = t.doConstantFolding()
+            self.assertTrue(g >= 0)
             #logger.info("Gain is {}".format(g))
             #t.printToDot(outputfolder+ "Folding_{}_after.dot".format(i))
             Ym = t.evaluateAll()

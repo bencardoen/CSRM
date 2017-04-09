@@ -628,7 +628,6 @@ class Tree:
         """
         Check if this tree represents a constant expression.
         """
-        #logger.info("Checking ctexpr for {}".format(self))
         assert(self.root)
         r = self.root.isConstantExpression()
         return r
