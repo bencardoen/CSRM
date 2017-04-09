@@ -280,19 +280,15 @@ class GPAlgorithm():
                 "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
                 "diff_fitness":dfit, "features":features, "last_fitness":lastfit[-1]}
 
-    def summarizeGeneration(self, replacementcount:list, mutategain:list, crossovergain:list, evaluations:list, gains:dict, generation:int, phase:int):
+    def summarizeGeneration(self, replacementcount:list, mutategain:list, crossovergain:list, evaluations:list, optimizergains:dict, generation:int, phase:int):
         """
         Compute fitness statistics for the current generation and record them
         """
         fit = [d.getFitness() for d in self._population]
         depths = [d.getDepth() for d in self._population]
         comp = [d.getScaledComplexity() for d in self._population]
-        mean= numpy.mean(fit)
-        sd = numpy.std(fit)
-        v = numpy.var(fit)
-        cmean = numpy.mean(comp)
-        csd = numpy.std(comp)
-        cv = numpy.var(comp)
+        mean, sd, v= numpy.mean(fit), numpy.std(fit), numpy.var(fit)
+        cmean, csd, cv = numpy.mean(comp),numpy.std(comp), numpy.var(comp)
         mg = list(filter(lambda x : x > 0, mutategain))
         mmg = 0
         if mg:
@@ -301,8 +297,10 @@ class GPAlgorithm():
         mcg = 0
         if cg:
             mcg = numpy.mean(cg)
-
         meaneval = numpy.mean(evaluations)
+        fsavings = optimizergains["foldingsavings"]
+        nc = optimizergains["nodecount"]
+        constantfoldingsavings = fsavings/nc * 100
 
         assert(isinstance(replacementcount, list))
         #logger.debug("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
@@ -310,7 +308,7 @@ class GPAlgorithm():
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
                                                  "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
-                                                 "mutate_gain":mmg, "crossover_gain":mcg, "mean_evaluations":meaneval, "gains":gains}, phase)
+                                                 "mutate_gain":mmg, "crossover_gain":mcg, "mean_evaluations":meaneval, "foldingsavings":constantfoldingsavings}, phase)
 
     def setTrace(self, v, prefix):
         """
@@ -641,13 +639,19 @@ class BruteCoolingElitist(BruteElitist):
             return 0
 
     def optimize(self, selected):
-        gain = {}
+        """
+        Apply a metaheuristic to the selection (in place).
+
+        Will apply constant folding to make the optimizing step more efficient.
+        :returns gain: statistics object recording gains.
+        """
+        totalnodes = sum([t.nodecount for t in selected])
+        gain = {"optimizer":{}, "nodecount":totalnodes}
+        g = 0
         for i, t in enumerate(selected):
-            #t.isConstantExpression()
-            g = t.doConstantFolding()
-            gain[i] = g
+            g += t.doConstantFolding()
+        gain["foldingsavings"] = g
         logger.info("Ctopt gain is {}".format(gain))
-        # do optimizer pass
         return gain
 
 

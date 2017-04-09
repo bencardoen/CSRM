@@ -48,9 +48,6 @@ class Convergence(Plotter):
         self.plotAll()
 
     def plotPopulationOverGenerations(self, keyword="fitness", cool=False, xcategorical=False, ycategorical=False, groupsimilar=False):
-        """
-        Plot fitness values over the generations
-        """
         converted = []
         fitnessvalues = []
         for i, run in enumerate(self._convergencestats):
@@ -65,6 +62,9 @@ class Convergence(Plotter):
 
     def plotDepth(self):
         self.plotPopulationOverGenerations(keyword='depth', cool=False, xcategorical=False, ycategorical=True, groupsimilar=True)
+
+    def plotFoldingGains(self):
+        self.plotSeries(keys = ['foldingsavings'], labels=["Generation","Reduction % of nodes. (more is better)"], title="Constant Folding effectiveness", legend=["Constant folding."])
 
     def plotComplexity(self):
         """
@@ -148,6 +148,7 @@ class Convergence(Plotter):
         self.plotOperatorImpactTrend()
         self.plotDepth()
         self.plotAlgorithmCost()
+        self.plotFoldingGains()
 
     def saveData(self, filename, outputfolder=None):
         outputfolder = outputfolder or ""
