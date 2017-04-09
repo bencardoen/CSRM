@@ -19,6 +19,8 @@ from gp.algorithm import BruteCoolingElitist
 from expression.constants import Constants
 from expression.tools import getKSamples
 import logging
+import webbrowser
+import os
 logger = logging.getLogger('global')
 
 # Depending on system, mpi4py is either in mpich or global
@@ -80,6 +82,12 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
     logger.info("Benchmark complete for {}".format(pid))
 
     # if MPI, merge all results and print
+    if isMPI():
+        if pid == 0:
+            logger.info("Opening results for proces {}".format(pid))
+            for i in range(processcount):
+                webbrowser.open('file://' + os.path.realpath(outputfolder+"output_{}.html".format(i)))
+
 
 
 
