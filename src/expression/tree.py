@@ -651,6 +651,7 @@ class Tree:
         return Node.nodeToExpression(self.root)
 
     def doConstantFolding(self):
+        oc = self.nodecount
         rootctexpr = self.root.isConstantExpression()
         if rootctexpr:
             value = Node.evaluateAsTree(self.root)
@@ -667,3 +668,5 @@ class Tree:
             for subtreeroot, value in zip(subtrees, values):
                 newroot = ConstantNode(subtreeroot.getPosition(), Constant(value))
                 self.spliceSubTree(subtreeroot, newroot)
+        nc = self.nodecount
+        return oc - nc
