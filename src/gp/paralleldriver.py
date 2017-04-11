@@ -39,24 +39,23 @@ except ImportError as e:
 def runBenchmark(config, topo=None, processcount = None, outfolder = None):
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
-    expr = testfunctions[2]
-    # todo define defaults
-    dpoint = config.datapointcount or 20
-    vpoint = 5
-    generations= config.generations or 20
-    display = config.display or False
-    depth= config.maxdepth or 7
-    initialdepth= config.initialdepth or 4
-    phases= config.phases or 1
+    config.pid = pid
+    generations= config.generations
+    display = config.display
+    expr = testfunctions[config.expr]
+    depth= config.maxdepth
+    initialdepth= config.initialdepth
+    phases= config.phases
     pcount = comm.Get_size() if isMPI() else processcount
-    population = config.population or 20
-    commsize = config.communicationsize or 2
+    population = config.population
+    commsize = config.communicationsize
     archivesize = population
-    X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
-    assert(len(X) == vpoint and len(X[0]) == dpoint)
+    logger.info("Configuration is {}".format(config))
+    X = generateVariables(config.variablepoint, config.datapointcount, seed=config.seed, sort=True, lower=config.datapointrange[0], upper=config.datapointrange[1])
+    assert(len(X) == config.variablepoint and len(X[0]) == config.datapointcount)
     tr = Tree.createTreeFromExpression(expr, X)
     Y = tr.evaluateAll()
-    assert(len(Y) == dpoint)
+    assert(len(Y) ==config.datapointcount)
     if topo is None:
         logger.info("Topology is None, using RStatic")
         topo = RandomStaticTopology
@@ -93,6 +92,8 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
 
 
 if __name__ == "__main__":
+    logger.setLevel(logging.INFO)
+    logging.disable(logging.DEBUG)
     parser = argparse.ArgumentParser(description='Start/Stop AWS EC2 instances')
     parser.add_argument('-t', '--topology', help='space separated ids of instances')
     parser.add_argument('-c', '--processcount', type=int, help='Number of processes for sequential run')
@@ -105,8 +106,8 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--initialdepth', type=int, help="initialdepth depth of any tree")
     parser.add_argument('-d', '--datapointcount', type=int, help="Number of datapoints to operate on. ")
     parser.add_argument('-s', '--communicationsize', type=int, help="Nr of samples requested from an instance to distribute.")
+    parser.add_argument('-e', '--expressionid', type=int, help="Nr of expression to test")
     args = parser.parse_args()
-    print(args)
     topo = None
     if args.topology is not None:
         toponame = args.topology
@@ -133,15 +134,31 @@ if __name__ == "__main__":
         outputfolder = args.outputfolder
         if outputfolder[-1] != '/':
             outputfolder += '/'
-    c = Config
+    c = Config()
+    c.topo = topo
     c.display = True if args.displaystats else False
-    c.generations = args.generations
-    c.population = args.population
-    c.phases = args.phases
-    c.maxdepth = args.maxdepth
-    c.initialdepth = args.initialdepth
-    c.datapointcount = args.datapointcount
-    c.communicationsize = args.communicationsize
-    logger.setLevel(logging.INFO)
-    logging.disable(logging.DEBUG)
-    runBenchmark(c, topo, processcount, outfolder=outputfolder)
+    if args.generations:
+        c.generations = args.generations
+    if args.population:
+        c.population = args.population
+    if args.expressionid:
+        if args.expressionid in testfunctions:
+            c.expr = args.expressionid
+        else:
+            logger.error("No such expression!")
+            raise ValueError
+    if args.phases:
+        c.phases = args.phases
+    if args.maxdepth:
+        c.maxdepth = args.maxdepth
+    if args.initialdepth:
+        c.initialdepth = args.initialdepth
+    if args.datapointcount:
+        c.datapointcount = args.datapointcount
+    if args.communicationsize:
+        c.communicationsize = args.communicationsize
+    logger.info("Config is {} ".format(c.__dict__.items()))
+    logger.info("Config is {} ".format(c.concatValues()))
+    outputfolder += c.concatValues() + "/"
+    os.makedirs(outputfolder, exist_ok=True)
+    #runBenchmark(c, topo, processcount, outfolder=outputfolder)

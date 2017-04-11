@@ -227,7 +227,7 @@ class VonNeumannTopology(Topology):
         """
         :param int size: an integer square
         """
-        assert(size >= 4)
+        assert(size >= 3)
         super().__init__(size)
         self.rt = (ceil(sqrt(size)))
         self.rem = size % self.rt
