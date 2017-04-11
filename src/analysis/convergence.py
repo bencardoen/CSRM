@@ -115,7 +115,7 @@ class Convergence(Plotter):
         self.plotTrend(keyvalues=["mutate_gain", "crossover_gain"], axislabels=["Generation","Mean gain by operator"], legend = ["Mutations","Crossovers"], title="Operator gain in fitness.")
 
     def plotAlgorithmCost(self):
-        self.plotSeries(keys=["mean_evaluations"], labels=["Generation","Mean cost of generation."], title="Cost of algorithm (in evaluations)", legend=["Evaluations"])
+        self.plotSeries(keys=["mean_evaluations"], labels=["Generation","Mean cost of generation."], title="Cost of algorithm (function evaluations weighted by complexity)", legend=["Evaluations"])
 
     def plotAlgorithmCostTrend(self):
         self.plotTrend(keyvalues = ["mean_evaluations"], axislabels = ["Generation","Mean cost of generation"], title="Computational cost of algorithm", legend=["Mean Cost"])
