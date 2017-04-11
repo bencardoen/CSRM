@@ -106,13 +106,23 @@ class GPTest(unittest.TestCase):
 
     def testBmark(self):
         for expr in testfunctions:
+            logger.info("Testing {}".format(expr))
             dpoint = 10
             vpoint = 5
-            X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
-            t = Tree.createTreeFromExpression(expr, X)
-            Y = t.evaluateAll()
-            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=10)
+            X = None
+            Y = None
+            seed = 0
+            while True:
+                X = generateVariables(vpoint, dpoint, seed=seed, sort=True, lower=1, upper=10)
+                t = Tree.createTreeFromExpression(expr, X)
+                Y = t.evaluateAll()
+                if None not in Y:
+                    break
+            g = BruteCoolingElitist(X, Y, popsize=10, initialdepth=4, maxdepth=5, fitnessfunction=_fit, seed=0, generations=10)
             g.run()
+            stats = g.getConvergenceStatistics()
+            c = Convergence(stats)
+            c.savePlots("output", title=expr)
 
 
 # These two tests serve as a benchmark to verify cooling effect of mutation operator

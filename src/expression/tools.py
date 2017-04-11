@@ -261,6 +261,7 @@ def pearson(actual, expected):
     :returns float: (1 - r)/2
 
     """
+    #logger.info("Pearson for input actual {} expected {}".format(actual, expected))
     a = numpy.asarray(actual)
     b = numpy.asarray(expected)
     meana = a.mean()
@@ -419,7 +420,7 @@ def flatten(nestedlist):
         else:
             result.append(x)
     return result
-    
+
 
 def frequencyTable(nestedvalues):
     f = {}
