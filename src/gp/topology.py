@@ -160,13 +160,13 @@ class TreeTopology(Topology):
     def getSource(self, target:int):
         assert(target < self.size)
         v = [] if target == 0 else [(target - 1) // 2]
-        logger.debug("getSource called with {} ->{}".format(target, v))
+        #logger.debug("getSource called with {} ->{}".format(target, v))
         return v
 
     def getTarget(self, source:int):
         assert(source < self.size)
         v = [] if self.isLeaf(source) else [2*source + 1, 2*source+2]
-        logger.debug("getTarget called with {} ->{}".format(source, v))
+        #logger.debug("getTarget called with {} ->{}".format(source, v))
         return v
 
     def isLeaf(self, node:int)->bool:
@@ -234,7 +234,7 @@ class VonNeumannTopology(Topology):
         self.rowcount = int((size - self.rem) / self.rt)
         if self.rem:
             self.rowcount += 1
-        logger.info("RT = {} Diff = {} Rows = {}".format(self.rt, self.rem, self.rowcount))
+        #logger.info("RT = {} Diff = {} Rows = {}".format(self.rt, self.rem, self.rowcount))
 
     def getSource(self, target:int):
         # Symmetric relationship

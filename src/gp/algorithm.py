@@ -252,7 +252,6 @@ class GPAlgorithm():
             t.printToDot((prefix if prefix else "")+str(i)+".dot")
 
     def summarizeSamplingResults(self, X, Y):
-        # todo debug
         assert(len(X[0]) == len(Y))
         for t in self._population:
             t.updateVariables(X)
@@ -269,7 +268,7 @@ class GPAlgorithm():
             assert(len(cfit) == self.phases)
             dfit = [abs(a-b) for a,b in zip(lastfit[-1], fit)]
             dmeanfit, dsdfit, dvfit = numpy.mean(dfit), numpy.std(dfit), numpy.var(dfit)
-            logger.info("Best fitness value for full data is {}".format(min(fit)))
+            logger.info("Best fitness value for full data is {} mean {} sd {} var {}".format(min(fit), mean, sd, v))
 
         except FloatingPointError as e:
             logger.error("Floating point error on values fit {} ".format(fit))

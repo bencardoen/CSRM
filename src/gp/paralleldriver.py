@@ -50,7 +50,7 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
     population = config.population
     commsize = config.communicationsize
     archivesize = population
-    logger.info("Configuration is {}".format(config))
+    #logger.info("Configuration is {}".format(config))
     X = generateVariables(config.variablepoint, config.datapointcount, seed=config.seed, sort=True, lower=config.datapointrange[0], upper=config.datapointrange[1])
     assert(len(X) == config.variablepoint and len(X[0]) == config.datapointcount)
     tr = Tree.createTreeFromExpression(expr, X)
@@ -86,9 +86,6 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
             logger.info("Opening results for proces {}".format(pid))
             for i in range(processcount):
                 webbrowser.open('file://' + os.path.realpath(outputfolder+"output_{}.html".format(i)))
-
-
-
 
 
 if __name__ == "__main__":
@@ -158,7 +155,6 @@ if __name__ == "__main__":
     if args.communicationsize:
         c.communicationsize = args.communicationsize
     logger.info("Config is {} ".format(c.__dict__.items()))
-    logger.info("Config is {} ".format(c.concatValues()))
     outputfolder += c.concatValues() + "/"
     os.makedirs(outputfolder, exist_ok=True)
-    #runBenchmark(c, topo, processcount, outfolder=outputfolder)
+    runBenchmark(c, topo, processcount, outfolder=outputfolder)

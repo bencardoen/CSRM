@@ -200,15 +200,22 @@ class SummarizedResults(Plotter):
         self.plotPredictionTrend()
         self.plotDepth()
         self.plotFeatures()
+        self.plotVariance()
 
     def plotDifference(self):
         fitness = rmtocm([r['diff_fitness'] for r in self._results])
         p = plotDotData(fitness, labelx="Process", labely="Difference", title="Difference between fitness on sample data and test data per phase best value", groupsimilar=True, xcategorical=True)
         self.addPlot(p)
 
+    def plotVariance(self):
+        fitness = ([[r['variance_fitness'] for r in self._results]])
+        #logger.info("Variances are {}".format(fitness))
+        p = plotDotData(fitness, labelx="Process", labely="Variance", title="Variance Fitness of the last generation calculated on the full data set (sample + test).", xcategorical=True, groupsimilar=True)
+        self.addPlot(p)
+
     def plotTrainedFitness(self):
         fitness = rmtocm([r['last_fitness'] for r in self._results])
-        p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the training set (sample + test).", xcategorical=True, groupsimilar=True)
+        p = plotDotData(fitness, labelx="Process", labely="Fitness", title="Fitness of the last generation calculated on the training set.", xcategorical=True, groupsimilar=True)
         self.addPlot(p)
 
     def plotFeatures(self):
