@@ -282,6 +282,19 @@ class TopologyTest(unittest.TestCase):
             self.assertTrue(r.getTarget(j) != [])
         self.assertEqual(r.getSource(0) , [])
 
+    def testVNTopology(self):
+        size = 6
+        r = VonNeumannTopology(size)
+        logger.info("Topo is {}".format(r))
+        for i in range(size):
+            #logger.info(VonNeumannTopology.lintormcm(i, 3))
+            targetsi = r.getTarget(i)
+            #logger.info("Targets for {} are {}".format(i, targetsi))
+            sourcesi = r.getSource(i)
+            #logger.info("Sources for {} are {}".format(i, sourcesi))
+            self.assertEqual(targetsi, sourcesi)
+
+
     def testSpreadPolicy(self):
         buffer = [x for x in range(12)]
         result = DistributeSpreadPolicy.spread(buffer, 4)

@@ -10,7 +10,7 @@ import logging
 import random
 from expression.tools import powerOf2, getRandom
 from gp.spreadpolicy import DistributeSpreadPolicy, CopySpreadPolicy
-from math import sqrt
+from math import sqrt, ceil
 logger = logging.getLogger('global')
 
 
@@ -227,25 +227,39 @@ class VonNeumannTopology(Topology):
         """
         :param int size: an integer square
         """
-        r = sqrt(size)
         assert(size >= 4)
-        assert(int(r)**2 == size)
         super().__init__(size)
-        self.rt = int(sqrt(size))
+        self.rt = (ceil(sqrt(size)))
+        self.rem = size % self.rt
+        self.rowcount = int((size - self.rem) / self.rt)
+        if self.rem:
+            self.rowcount += 1
+        logger.info("RT = {} Diff = {} Rows = {}".format(self.rt, self.rem, self.rowcount))
 
     def getSource(self, target:int):
         # Symmetric relationship
         return self.getTarget(target)
+
+    def lintormcm(index, rowsize):
+        colindex = index % rowsize
+        rowindex = int((index-colindex) / rowsize)
+        return rowindex, colindex
+
+    def rmcmtolin(rowindex, colindex, rowsize):
+        return rowindex * rowsize + colindex
 
     def getTarget(self, source:int):
         """
         For a small grid, duplicates are possible.
         """
         size = self.size
-        targets = [(source-1) % size, (source+1) % size, (source+self.rt) % size, (source-self.rt) % size]
-        if self.size == 4:
-            return list(set(targets))
-        return targets
+        left = (source - 1) % size
+        right = (source + 1) % size
+        r, c = VonNeumannTopology.lintormcm(source, self.rt)
+        down = min(VonNeumannTopology.rmcmtolin((r+1) % self.rowcount, c, self.rt), self.size-1)
+        up = min(VonNeumannTopology.rmcmtolin((r-1) % self.rowcount, c, self.rt), self.size-1)
+        targets = [left, right, up, down]
+        return list(set(targets))
 
     def __str__(self):
         return "VonNeumannTopology" + super().__str__()
