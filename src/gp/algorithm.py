@@ -284,11 +284,16 @@ class GPAlgorithm():
         """
         Compute fitness statistics for the current generation and record them
         """
-        fit = [d.getFitness() for d in self._population]
+        fit = [min(d.getFitness(),Constants.PEARSONMINFITNESS) for d in self._population ]
         depths = [d.getDepth() for d in self._population]
         comp = [d.getScaledComplexity() for d in self._population]
-        mean, sd, v= numpy.mean(fit), numpy.std(fit), numpy.var(fit)
-        cmean, csd, cv = numpy.mean(comp),numpy.std(comp), numpy.var(comp)
+        mean, sd, v= 0,0,0
+        cmean, csd, cv = 0,0,0
+        try:
+            mean, sd, v= numpy.mean(fit), numpy.std(fit), numpy.var(fit)
+            cmean, csd, cv = numpy.mean(comp),numpy.std(comp), numpy.var(comp)
+        except FloatingPointError as e:
+            logger.error("FPE {} for {}".format(e,fit))
         mg = list(filter(lambda x : x > 0, mutategain))
         mmg = 0
         if mg:
@@ -346,9 +351,6 @@ class GPAlgorithm():
         self._currentgeneration = 0
         self._population.removeAll()
         self.reseed()
-
-    def optimize(self, selected):
-        return {}
 
     def run(self):
         """
@@ -430,6 +432,26 @@ class GPAlgorithm():
 
     def minDepthRatio(self, popindex:int):
         return 0
+
+    def optimize(self, selected):
+        """
+        Apply a metaheuristic to the selection (in place).
+
+        Will apply constant folding to make the optimizing step more efficient.
+        :returns gain: statistics object recording gains.
+        """
+        totalnodes = sum([t.nodecount for t in selected])
+        gain = {"optimizer":{}, "nodecount":totalnodes}
+        g = 0
+        for i, t in enumerate(selected):
+            g += t.doConstantFolding()
+            # optimize
+            # scoreTree
+            gain["optimizer"][i] = t.getFitness()
+        gain["foldingsavings"] = g
+        gain["fitnessgains"] = [t.getFitness() for t in selected]
+        #logger.info("Ctopt gain is {}".format(gain))
+        return gain
 
     def update(self, modified):
         """
@@ -638,26 +660,6 @@ class BruteCoolingElitist(BruteElitist):
             return coolingMinDepthRatio(self._currentgeneration, self._generations, popindex, self._popsize, rng=self._rng)
         else:
             return 0
-
-    def optimize(self, selected):
-        """
-        Apply a metaheuristic to the selection (in place).
-
-        Will apply constant folding to make the optimizing step more efficient.
-        :returns gain: statistics object recording gains.
-        """
-        totalnodes = sum([t.nodecount for t in selected])
-        gain = {"optimizer":{}, "nodecount":totalnodes}
-        g = 0
-        for i, t in enumerate(selected):
-            g += t.doConstantFolding()
-            # optimize
-            # scoreTree
-            gain["optimizer"][i] = t.getFitness()
-        gain["foldingsavings"] = g
-        gain["fitnessgains"] = [t.getFitness() for t in selected]
-        #logger.info("Ctopt gain is {}".format(gain))
-        return gain
 
 
 def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=None)->bool:

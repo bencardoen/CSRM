@@ -108,12 +108,11 @@ class GPTest(unittest.TestCase):
         for expr in testfunctions:
             dpoint = 10
             vpoint = 5
-            X = generateVariables(vpoint, dpoint, seed=0, sort=True)
+            X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
             t = Tree.createTreeFromExpression(expr, X)
             Y = t.evaluateAll()
-            g = BruteElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=10)
+            g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=10)
             g.run()
-        g.printForestToDot(outputfolder+"bmark")
 
 
 # These two tests serve as a benchmark to verify cooling effect of mutation operator
@@ -125,12 +124,12 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteElitist(X, Y, popsize=30, maxdepth=5, fitnessfunction=_fit, seed=0, generations=30, phases=3)
+        g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=5, initialdepth=3)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
         c.savePlots("output", title=expr)
-        c.displayPlots("output", title=expr)
+        #c.displayPlots("output", title=expr)
 
     def testCooling(self):
         expr = testfunctions[2]
@@ -140,7 +139,7 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=10, fitnessfunction=_fit, seed=0, generations=40, phases=5, initialdepth=3)
+        g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=5, initialdepth=3)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
@@ -162,13 +161,13 @@ class GPTest(unittest.TestCase):
 
     def testVariableDepth(self):
         expr = testfunctions[2]
-        dpoint = 30
+        dpoint = 20
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=40, initialdepth=4, maxdepth=10, fitnessfunction=_fit, seed=0, generations=40, phases=5)
+        g = BruteCoolingElitist(X, Y, popsize=20, initialdepth=4, maxdepth=8, fitnessfunction=_fit, seed=0, generations=20, phases=5)
         g.executeAlgorithm()
         stats = g.getConvergenceStatistics()
         c = Convergence(stats)
@@ -185,8 +184,8 @@ class GPTest(unittest.TestCase):
         """
         Ensure that the algorithm runs deterministic if a seed is set.
         """
-        TESTRANGE=3
-        SEEDS = [0,2,3,5]
+        TESTRANGE=2
+        SEEDS = [0,3,5]
         DEPTHS = [5]
         for d in DEPTHS:
             for seed in SEEDS:
@@ -198,7 +197,7 @@ class GPTest(unittest.TestCase):
                     X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
                     t = Tree.createTreeFromExpression(expr, X)
                     Y = t.evaluateAll()
-                    g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=d, fitnessfunction=_fit, seed=seed, generations=20, phases=10, initialdepth=2)
+                    g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=d, fitnessfunction=_fit, seed=seed, generations=20, phases=4, initialdepth=2)
                     g.executeAlgorithm()
                     stats = g.getConvergenceStatistics()
                     fstat.append(stats[-1][-1]['mean_fitness'])
@@ -214,7 +213,7 @@ class GPTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, X)
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
-        g = BruteCoolingElitist(X, Y, popsize=40, maxdepth=7, fitnessfunction=_fit, seed=0, generations=30, phases=8)
+        g = BruteCoolingElitist(X, Y, popsize=20, maxdepth=7, fitnessfunction=_fit, seed=0, generations=20, phases=4)
         g.tournamentsize = 4
 
         g.executeAlgorithm()
@@ -225,7 +224,7 @@ class GPTest(unittest.TestCase):
 
     def testFolding(self):
         expr = testfunctions[2]
-        dpoint = 30
+        dpoint = 20
         vpoint = 5
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
         t = Tree.createTreeFromExpression(expr, X)
@@ -315,7 +314,7 @@ class PGPTest(unittest.TestCase):
         expr = testfunctions[2]
         dpoint = 10
         vpoint = 5
-        depth = 7
+        depth = 5
         popcount = 20
         initialdepth = 4
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
@@ -323,19 +322,19 @@ class PGPTest(unittest.TestCase):
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
         pcount = 4
-        algo = SequentialPGP(X, Y, pcount, popcount, depth, fitnessfunction=_fit, seed=0, generations=15, phases=4, topo=None, initialdepth=initialdepth)
+        algo = SequentialPGP(X, Y, pcount, popcount, maxdepth=depth, fitnessfunction=_fit, seed=0, generations=15, phases=4, topo=None, initialdepth=initialdepth)
         algo.executeAlgorithm()
         algo.reportOutput()
 
     def testAllTopologies(self):
         expr = testfunctions[2]
         rng = getRandom(0)
-        dpoint = 10
+        dpoint = 5
         vpoint = 5
         generations=10
-        depth=7
+        depth=6
         phases=2
-        pcount = 7
+        pcount = 3
         population = 10
         archivesize = pcount*2
         X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
@@ -343,11 +342,11 @@ class PGPTest(unittest.TestCase):
         Y = t.evaluateAll()
         logger.debug("Y {} X {}".format(Y, X))
         assert(rng)
-        topos = [RandomStaticTopology(pcount, rng=rng), RandomStaticTopology(pcount, rng=rng, links=3), TreeTopology(pcount), VonNeumannTopology(pcount+2), RandomDynamicTopology(pcount, rng=rng), RingTopology(pcount)]
+        topos = [RandomStaticTopology(pcount, rng=rng), RandomStaticTopology(pcount, rng=rng, links=pcount-1), TreeTopology(pcount), VonNeumannTopology(pcount+1), RandomDynamicTopology(pcount, rng=rng), RingTopology(pcount)]
         for t in topos:
             t.toDot("../output/{}.dot".format(t.__class__.__name__))
             logger.info("Testing topology {} which is mapped as \n{}\n".format(type(t).__name__, t))
-            algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize)
+            algo = SequentialPGP(X, Y, t.size, population, initialdepth=4, maxdepth=depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize)
             algo.executeAlgorithm()
             algo.reportOutput()
 
