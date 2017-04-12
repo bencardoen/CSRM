@@ -31,9 +31,13 @@ class Instance:
         self.tree.scoreTree(self.expected, self.distancefunction)
         newf = self.tree.getFitness()
         oldf = self.fitness
+        #logger.info("Fitness comparison : old {} v new {}".format(oldf, newf))
         if newf < oldf:
-            self.best = self.current
+            #logger.info("Found a better value, updating best set")
+            self.best = self.current[:]
         self.fitness = newf
+        #logger.info("Fitness is now {} with best {} and current {}".format(self.fitness, self.best, self.current))
+        assert(self.tree.getFitness() == self.fitness)
 
     def update(self):
         self.updateValues()
@@ -58,7 +62,7 @@ class Particle(Instance):
 
     def initializePosition(self, rng):
         self.current = [c * rng.random() for c in self.current]
-        self.best = self.current
+        self.best = self.current[:]
         #logger.info("Setting current position to {}".format(self.current))
 
     def updateVelocity(self, c1, c2, r1, r2, g):
@@ -99,20 +103,15 @@ class PSO:
     def rone(self):
         return self.rng.random()
 
-    @property
-    def optimalsolution(self):
-        i = self.bestparticle[0]
-        return self.particles[i]
-
     def getBest(self):
         ob1 = self.bestparticle
         ob2 = self.globalbest
         nb = self.getBestIndex()
         if ob1 is None or nb[1] < ob1[1]:
-            self.bestparticle = nb
-            self.globalbest = self.particles[self.bestparticle[0]].best
-        logger.info("Old best is {} with {}".format(ob1, ob2))
-        logger.info("New best is {} with {}".format(self.bestparticle, self.globalbest))
+            self.bestparticle = nb[:]
+            self.globalbest = self.particles[self.bestparticle[0]].best[:]
+        #logger.info("Old best is {} with {}".format(ob1, ob2))
+        #logger.info("New best is {} with {}".format(self.bestparticle, self.globalbest))
 
     def getBestIndex(self):
         return min([(index, p.fitness) for index, p in enumerate(self.particles)], key=lambda x: x[1])
@@ -126,7 +125,6 @@ class PSO:
         for p in self.particles:
             p.updateVelocity(self.c1, self.c2, self.rone, self.rtwo, self.globalbest)
             p.updatePosition()
-            p.updateFitness()
             p.update()
         self.getBest()
         #self.report()

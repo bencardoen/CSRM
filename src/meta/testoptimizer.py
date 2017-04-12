@@ -18,14 +18,17 @@ class OptimizerTest(unittest.TestCase):
         expr = "1 + x1 * sin(5+x2) * x0 + (17 + sin(233+9))"
         t = Tree.createTreeFromExpression(expr, vs)
         Y = t.evaluateAll()
-        gain = t.doConstantFolding()
-        logger.info("gain is {}".format(gain))
+        t.doConstantFolding()
         t.scoreTree(Y, _fit)
-        f = t.getFitness()
-        logger.info("Fitness is {}".format(f))
-        p = PSO(particlecount = 50, particle=t, distancefunction=_fit, expected=Y, seed=0)
-        #p.report()
+        p = PSO(particlecount = 50, particle=t, distancefunction=_fit, expected=Y, seed=0, iterations=20)
         p.run()
+        tm = copyObject(t)
+        c = [ct for ct in tm.getConstants() if ct]
+        b = p.globalbest
+        for const, b in zip(c,b):
+            const.setValue(b)
+        tm.scoreTree(Y, _fit)
+        self.assertAlmostEqual(tm.getFitness() , second=t.getFitness(), places=6)
 
 
 if __name__=="__main__":
