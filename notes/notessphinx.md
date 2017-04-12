@@ -13,3 +13,8 @@ def <name>(arg1:int, arg2:list):
     """
     return 0
 ```
+
+Adding new modules (e.g. rst files)
+```Bash
+$sphinx-apidoc -o ./doc ./src
+```

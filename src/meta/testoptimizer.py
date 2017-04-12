@@ -1,3 +1,11 @@
+#This file is part of the CMSR project.
+#Copyright 2016 - 2017 University of Antwerp
+#https://www.uantwerpen.be/en/
+#Licensed under the EUPL V.1.1
+#A full copy of the license is in COPYING.txt, or can be found at
+#https://joinup.ec.europa.eu/community/eupl/og_page/eupl
+#      Author: Ben Cardoen
+
 from expression.tree import Tree
 import logging
 from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2, copyObject, copyJSON, getRandom
@@ -7,8 +15,6 @@ import random
 import pickle
 from meta.pso import PSO, Instance
 import unittest
-
-
 logger = logging.getLogger('global')
 
 
