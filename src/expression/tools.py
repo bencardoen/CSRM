@@ -245,6 +245,23 @@ def rootmeansquarenormalized(actual, expected):
     return nrmse
 
 
+def equality(actual, expected):
+    for a, b in zip(actual, expected):
+        if abs(a-b) > 0.000001:
+            return False
+    return True
+
+
+def placeholder(actual, expected):
+    # if equality(actual, expected):
+    #     return 1
+    if numpy.std(actual) == 0 or numpy.std(expected) == 0:
+            return 1
+    #logger.info("Pearsonr for {} and {}".format(actual, expected))
+    r = pearsonr(actual, expected)
+    return 1 - abs(r[0])
+
+
 def pearson(actual, expected):
     r"""
     Return Pearson correlation coefficient.
@@ -258,10 +275,12 @@ def pearson(actual, expected):
 
     :param actual: Actual values returned by evaluating a single approximation
     :param expected: Desired values
-    :returns float: (1 - r)/2
+    :returns float: [0-1] with 0 best correlation, 1 worst
 
     """
     #logger.info("Pearson for input actual {} expected {}".format(actual, expected))
+    if numpy.std(actual) == 0 or numpy.std(expected) == 0:
+        return 1
     a = numpy.asarray(actual)
     b = numpy.asarray(expected)
     meana = a.mean()
@@ -286,10 +305,12 @@ def pearson(actual, expected):
         p = 0
     else:
         p = nom/denom
-        if p > 1:
-            p = 1 # truncate rounding
-    r = (1 - p)/2.0
-    return r
+    p = abs(p)
+    if p > 1:
+        p = 1 # truncate rounding
+    return 1 - abs(p)
+    #r = (1 - p)/2.0
+    #return r
 
 
 def _pearson(actual, expected):

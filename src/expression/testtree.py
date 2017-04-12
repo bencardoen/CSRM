@@ -15,10 +15,11 @@ from copy import deepcopy
 import logging
 import time
 import re
-from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2, copyObject, copyJSON, getRandom
+from expression.tools import compareLists, matchFloat, matchVariable, generateVariables, msb, traceFunction, rootmeansquare, rootmeansquarenormalized, placeholder, pearson, _pearson, scaleTransformation, getKSamples, sampleExclusiveList, powerOf2, copyObject, copyJSON, getRandom
 import os
 import random
 from expression.operators import Mutate, Crossover
+from expression.functions import pearsonfitness as _fit
 import pickle
 
 
@@ -855,6 +856,7 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(nrmse, 0)
 
         a = [random.uniform(1,100) for d in range(100)]
+        c = [random.uniform(1,100) for d in range(100)]
         b = [50 for d in range(100)]
         rmse = rootmeansquare(a,b)
         nrmse = rootmeansquarenormalized(a,b)
@@ -863,6 +865,17 @@ class TreeTest(unittest.TestCase):
         _p = _pearson(a,b)
         self.assertTrue(p<=1)
         self.assertTrue(_p<=1)
+
+        # f = placeholder(b,b)
+        # print(f)
+        f = placeholder(a,a)
+        self.assertTrue(f == pearson(a,a))
+        f = placeholder(b,b)
+        self.assertTrue(f == pearson(b,b))
+        f = placeholder(a,c)
+        self.assertTrue(f == pearson(a,c))
+        self.assertTrue(f > 0.7)
+
 
 #        print(rmse, nrmse, p, _p)
         a = [0.0096416794856030164, 0.0096416794856030164, 0.0096416794856030164, 0.26241624623590931, 0.27751012100799344, 0.29467203565038796, 0.36028300074390873, 0.36028300074390873, 1, 0.3901901995195628]

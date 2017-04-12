@@ -4,10 +4,11 @@ Convergence in Distributed Symbolic Regression.
 ~ What we have
 ~ What we need
 ~ How this work goes from want to need
-~ Topologies
 ~ Convergence is still an open issue
-~ Sampling technique
+    ~ Use distribution to increase coverage of search space
+    ~ Use communication to share resultst
 ~ Topologies
+~ Sampling technique : k fold crossover with shared samples.
 ~ Tree topology as a new hybrid between random, grid
 
 Symbolic regression (SR) fits symbolic expression to a dataset of expected values.
