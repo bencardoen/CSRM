@@ -291,6 +291,23 @@
     <span class="k">return</span> <span class="n">nrmse</span></div>
 
 
+<div class="viewcode-block" id="equality"><a class="viewcode-back" href="../../expression.html#expression.tools.equality">[docs]</a><span class="k">def</span> <span class="nf">equality</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.000001</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="placeholder"><a class="viewcode-back" href="../../expression.html#expression.tools.placeholder">[docs]</a><span class="k">def</span> <span class="nf">placeholder</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="c1"># if equality(actual, expected):</span>
+    <span class="c1">#     return 1</span>
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+    <span class="c1">#logger.info(&quot;Pearsonr for {} and {}&quot;.format(actual, expected))</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
 <div class="viewcode-block" id="pearson"><a class="viewcode-back" href="../../expression.html#expression.tools.pearson">[docs]</a><span class="k">def</span> <span class="nf">pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;</span>
 <span class="sd">    Return Pearson correlation coefficient.</span>
@@ -304,10 +321,12 @@
 
 <span class="sd">    :param actual: Actual values returned by evaluating a single approximation</span>
 <span class="sd">    :param expected: Desired values</span>
-<span class="sd">    :returns float: (1 - r)/2</span>
+<span class="sd">    :returns float: [0-1] with 0 best correlation, 1 worst</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#logger.info(&quot;Pearson for input actual {} expected {}&quot;.format(actual, expected))</span>
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
     <span class="n">meana</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -332,10 +351,12 @@
         <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span>
-        <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># truncate rounding</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span>
-    <span class="k">return</span> <span class="n">r</span></div>
+    <span class="n">p</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># truncate rounding</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
+    <span class="c1">#r = (1 - p)/2.0</span>
+    <span class="c1">#return r</span>
 
 
 <span class="k">def</span> <span class="nf">_pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
