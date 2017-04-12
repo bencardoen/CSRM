@@ -14,8 +14,8 @@ logger = logging.getLogger('global')
 
 class OptimizerTest(unittest.TestCase):
     def testPSO(self):
-        vs = generateVariables(3, 10, seed=0, lower=0, upper=10)
-        expr = "1 + x1 * sin(5+3) * 17 + 233"
+        vs = generateVariables(3, 100, seed=0, lower=0, upper=10)
+        expr = "1 + x1 * sin(5+x2) * x0 + (17 + sin(233+9))"
         t = Tree.createTreeFromExpression(expr, vs)
         Y = t.evaluateAll()
         gain = t.doConstantFolding()

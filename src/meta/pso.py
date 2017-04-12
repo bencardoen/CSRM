@@ -43,21 +43,28 @@ class Instance:
 class Particle(Instance):
     def __init__(self, objectinstance, rng, Y, distancefunction):
             super().__init__(objectinstance, Y, distancefunction)
-            self.velocity = [0.5 for _ in range(len(self.current))]
+            self.velocity = [0.01 for _ in range(len(self.current))]
             self.rng = rng
             self.initializePosition(rng=self.rng)
+            self.iteration = 0
             self.update()
-            logger.info("Fitness value = {}".format(self.fitness))
+            #logger.info("Fitness value = {}".format(self.fitness))
+
+    def inertiaweight(self):
+        return self.randominertiaweight()
+
+    def randominertiaweight(self):
+        return 0.5 + self.rng.random()/2
 
     def initializePosition(self, rng):
         self.current = [c * rng.random() for c in self.current]
         self.best = self.current
-        logger.info("Setting current position to {}".format(self.current))
+        #logger.info("Setting current position to {}".format(self.current))
 
     def updateVelocity(self, c1, c2, r1, r2, g):
         for i in range(len(self.current)):
             vi = self.velocity[i]
-            self.velocity[i] = vi + c1 * (self.best[i] - self.current[i]) * r1 + c2 * (g[i]- self.current[i]) * r2
+            self.velocity[i] = self.inertiaweight()*vi + c1 * (self.best[i] - self.current[i]) * r1 + c2 * (g[i]- self.current[i]) * r2
 
 
     def updatePosition(self):
@@ -100,8 +107,10 @@ class PSO:
     def getBest(self):
         ob1 = self.bestparticle
         ob2 = self.globalbest
-        self.bestparticle = self.getBestIndex()
-        self.globalbest = self.particles[self.bestparticle[0]].best
+        nb = self.getBestIndex()
+        if ob1 is None or nb[1] > ob1[1]:
+            self.bestparticle = nb
+            self.globalbest = self.particles[self.bestparticle[0]].best
         logger.info("Old best is {} with {}".format(ob1, ob2))
         logger.info("New best is {} with {}".format(self.bestparticle, self.globalbest))
 

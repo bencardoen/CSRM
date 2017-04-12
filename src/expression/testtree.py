@@ -638,7 +638,6 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(len(actual), dpoint)
 
     def testConstantFolding(self):
-        # test detection
         dpoint = 5
         vcount = 5
         vs = generateVariables(vcount, dpoint, seed=0)
@@ -855,8 +854,10 @@ class TreeTest(unittest.TestCase):
         self.assertEqual(rmse, 0)
         self.assertEqual(nrmse, 0)
 
-        a = [random.uniform(1,100) for d in range(100)]
-        c = [random.uniform(1,100) for d in range(100)]
+        rng = random.Random()
+        rng.seed(0)
+        a = [rng.uniform(1,100) for d in range(100)]
+        c = [rng.uniform(1,100) for d in range(100)]
         b = [50 for d in range(100)]
         rmse = rootmeansquare(a,b)
         nrmse = rootmeansquarenormalized(a,b)
@@ -874,7 +875,7 @@ class TreeTest(unittest.TestCase):
         self.assertTrue(f == pearson(b,b))
         f = placeholder(a,c)
         self.assertTrue(f == pearson(a,c))
-        self.assertTrue(f > 0.7)
+        self.assertTrue(f > 0.95)
 
 
 #        print(rmse, nrmse, p, _p)
