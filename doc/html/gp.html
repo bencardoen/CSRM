@@ -51,13 +51,23 @@
 <span id="gp-algorithm-module"></span><h2>gp.algorithm module<a class="headerlink" href="#module-gp.algorithm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="gp.algorithm.BruteCoolingElitist">
-<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">BruteCoolingElitist</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em>, <em>archivesize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteCoolingElitist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteCoolingElitist" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">BruteCoolingElitist</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em>, <em>archivesize=None</em>, <em>initialdepth=None</em>, <em>depthcooling=False</em>, <em>skipconstantexpressions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteCoolingElitist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteCoolingElitist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gp.algorithm.BruteElitist" title="gp.algorithm.BruteElitist"><code class="xref py py-class docutils literal"><span class="pre">gp.algorithm.BruteElitist</span></code></a></p>
 <p>Uses a cooling strategy to apply operators, maximizing gain in the initial process but reducing cost when gain is no longer possible.</p>
 <p>The cooling schedule &#8216;predicts&#8217; efficiency of the operators.</p>
 <dl class="method">
 <dt id="gp.algorithm.BruteCoolingElitist.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em>, <em>archivesize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteCoolingElitist.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteCoolingElitist.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em>, <em>archivesize=None</em>, <em>initialdepth=None</em>, <em>depthcooling=False</em>, <em>skipconstantexpressions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteCoolingElitist.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteCoolingElitist.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gp.algorithm.BruteCoolingElitist.depthcooling">
+<code class="descname">depthcooling</code><a class="headerlink" href="#gp.algorithm.BruteCoolingElitist.depthcooling" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.BruteCoolingElitist.minDepthRatio">
+<code class="descname">minDepthRatio</code><span class="sig-paren">(</span><em>popindex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteCoolingElitist.minDepthRatio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteCoolingElitist.minDepthRatio" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -69,14 +79,14 @@
 
 <dl class="class">
 <dt id="gp.algorithm.BruteElitist">
-<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">BruteElitist</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em>, <em>archivesize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">BruteElitist</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em>, <em>archivesize=None</em>, <em>initialdepth=None</em>, <em>skipconstantexpressions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gp.algorithm.GPAlgorithm" title="gp.algorithm.GPAlgorithm"><code class="xref py py-class docutils literal"><span class="pre">gp.algorithm.GPAlgorithm</span></code></a></p>
 <p>Brute force Elitist GP Variant.</p>
 <p>Applies mutation and subtree crossover to entire population and aggresively
 replaces unfit samples.</p>
 <dl class="method">
 <dt id="gp.algorithm.BruteElitist.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em>, <em>archivesize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations</em>, <em>seed=None</em>, <em>phases=None</em>, <em>archivesize=None</em>, <em>initialdepth=None</em>, <em>skipconstantexpressions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#BruteElitist.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteElitist.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -107,14 +117,14 @@ a single fitter sample, then obviously fitness will not improve any further.
 
 <dl class="class">
 <dt id="gp.algorithm.GPAlgorithm">
-<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">GPAlgorithm</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em>, <em>history=None</em>, <em>phases=None</em>, <em>tournamentsize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.algorithm.</code><code class="descname">GPAlgorithm</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em>, <em>history=None</em>, <em>phases=None</em>, <em>tournamentsize=None</em>, <em>initialdepth=None</em>, <em>skipconstantexpressions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>A base class representing a Genetic Programming Algorithm instance.</p>
 <p>The base class is responsible for data structures, configuration and control flow.</p>
 <p>In itself it will not evolve a solution.</p>
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em>, <em>history=None</em>, <em>phases=None</em>, <em>tournamentsize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>popsize</em>, <em>maxdepth</em>, <em>fitnessfunction</em>, <em>generations=1</em>, <em>seed=None</em>, <em>archivesize=None</em>, <em>history=None</em>, <em>phases=None</em>, <em>tournamentsize=None</em>, <em>initialdepth=None</em>, <em>skipconstantexpressions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a forest of trees randomly constructed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -145,7 +155,8 @@ a single fitter sample, then obviously fitness will not improve any further.
 <dt id="gp.algorithm.GPAlgorithm.addRandomTree">
 <code class="descname">addRandomTree</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.addRandomTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.addRandomTree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a random tree using this algorithm&#8217;s configuration.</p>
-<p>The generated tree is guaranteed to be viable (i.e. has a non inf fitness)</p>
+<p>The generated tree is guaranteed to be viable (i.e. has a non inf fitness)
+The generation process will skip constant expressions.</p>
 </dd></dl>
 
 <dl class="method">
@@ -242,6 +253,19 @@ Each sublist is indiced by generation and holds a dict:&#8221;fitness&#8221;, &#
 <code class="descname">getVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.getVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.getVariables" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.minDepthRatio">
+<code class="descname">minDepthRatio</code><span class="sig-paren">(</span><em>popindex: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.minDepthRatio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.minDepthRatio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.algorithm.GPAlgorithm.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>selected</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a metaheuristic to the selection (in place).</p>
+<p>Will apply constant folding to make the optimizing step more efficient.
+:returns gain: statistics object recording gains.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="gp.algorithm.GPAlgorithm.phase">
 <code class="descname">phase</code><a class="headerlink" href="#gp.algorithm.GPAlgorithm.phase" title="Permalink to this definition">¶</a></dt>
@@ -312,6 +336,11 @@ called methods to alter behavior</p>
 <dd><p>Enables generation per generation tracing (e.g. writing to dot)</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="gp.algorithm.GPAlgorithm.skipconstantexpressions">
+<code class="descname">skipconstantexpressions</code><a class="headerlink" href="#gp.algorithm.GPAlgorithm.skipconstantexpressions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.stopCondition">
 <code class="descname">stopCondition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.stopCondition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.stopCondition" title="Permalink to this definition">¶</a></dt>
@@ -320,7 +349,7 @@ called methods to alter behavior</p>
 
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.summarizeGeneration">
-<code class="descname">summarizeGeneration</code><span class="sig-paren">(</span><em>replacementcount: list</em>, <em>generation: int</em>, <em>phase: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.summarizeGeneration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.summarizeGeneration" title="Permalink to this definition">¶</a></dt>
+<code class="descname">summarizeGeneration</code><span class="sig-paren">(</span><em>replacementcount: list</em>, <em>mutategain: list</em>, <em>crossovergain: list</em>, <em>evaluations: list</em>, <em>optimizergains: dict</em>, <em>generation: int</em>, <em>phase: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.summarizeGeneration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.summarizeGeneration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute fitness statistics for the current generation and record them</p>
 </dd></dl>
 
@@ -349,8 +378,13 @@ called methods to alter behavior</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="gp.algorithm.coolingMinDepthRatio">
+<code class="descclassname">gp.algorithm.</code><code class="descname">coolingMinDepthRatio</code><span class="sig-paren">(</span><em>generation: int</em>, <em>generations: int</em>, <em>ranking: int</em>, <em>population: int</em>, <em>rng: random.Random = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#coolingMinDepthRatio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.coolingMinDepthRatio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="gp.algorithm.probabilityMutate">
-<code class="descclassname">gp.algorithm.</code><code class="descname">probabilityMutate</code><span class="sig-paren">(</span><em>generation: int</em>, <em>generations: int</em>, <em>ranking: int</em>, <em>population: int</em>, <em>rng: random.Random = &lt;random.Random object&gt;</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/gp/algorithm.html#probabilityMutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.probabilityMutate" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">gp.algorithm.</code><code class="descname">probabilityMutate</code><span class="sig-paren">(</span><em>generation: int</em>, <em>generations: int</em>, <em>ranking: int</em>, <em>population: int</em>, <em>rng: random.Random = None</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/gp/algorithm.html#probabilityMutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.probabilityMutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a probability to mutate based on 2 parameters : the current generation and the the ranking of the sample.</p>
 <p>A fitter sample (either by age (generation) or rank) is less likely to gain from mutation, and will even lose fitness.
 The probability that random information introduced by mutation leads to a better result compared with evolved information decreases.
@@ -510,13 +544,13 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 
 <dl class="class">
 <dt id="gp.parallelalgorithm.SequentialPGP">
-<em class="property">class </em><code class="descclassname">gp.parallelalgorithm.</code><code class="descname">SequentialPGP</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>splitData=False</em>, <em>archivesize=None</em>, <em>communicationsize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.parallelalgorithm.</code><code class="descname">SequentialPGP</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>archivesize=None</em>, <em>communicationsize=None</em>, <em>initialdepth=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Executes Parallel GP in sequential mode, controlling a set of processes.</p>
 <p>This is a driver class for the ParallelGP class, to be used when MPI is not active.</p>
 <dl class="method">
 <dt id="gp.parallelalgorithm.SequentialPGP.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>splitData=False</em>, <em>archivesize=None</em>, <em>communicationsize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>archivesize=None</em>, <em>communicationsize=None</em>, <em>initialdepth=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a SeqPGP instance, driving a set of GP instances.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -573,17 +607,58 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 <code class="descclassname">gp.parallelalgorithm.</code><code class="descname">isMPI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#isMPI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.isMPI" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="function">
+<dt id="gp.parallelalgorithm.reportOutput">
+<code class="descclassname">gp.parallelalgorithm.</code><code class="descname">reportOutput</code><span class="sig-paren">(</span><em>processes</em>, <em>X</em>, <em>Y</em>, <em>save=False</em>, <em>display=False</em>, <em>outputfolder=None</em>, <em>pid=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#reportOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.reportOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report output of all processes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>save</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Save results to file</li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Display results in browser (WARNING : CPU intensive for large sets)</li>
+<li><strong>outputfolder</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; modify output directory</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-gp.topology">
 <span id="gp-topology-module"></span><h2>gp.topology module<a class="headerlink" href="#module-gp.topology" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="gp.topology.NoneTopology">
+<em class="property">class </em><code class="descclassname">gp.topology.</code><code class="descname">NoneTopology</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#NoneTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gp.topology.Topology" title="gp.topology.Topology"><code class="xref py py-class docutils literal"><span class="pre">gp.topology.Topology</span></code></a></p>
+<p>Stub class for a sequential sinle instances process.</p>
+<dl class="method">
+<dt id="gp.topology.NoneTopology.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#NoneTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.topology.NoneTopology.getSource">
+<code class="descname">getSource</code><span class="sig-paren">(</span><em>target: int</em><span class="sig-paren">)</span> &rarr; list<a class="reference internal" href="_modules/gp/topology.html#NoneTopology.getSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology.getSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.topology.NoneTopology.getTarget">
+<code class="descname">getTarget</code><span class="sig-paren">(</span><em>source: int</em><span class="sig-paren">)</span> &rarr; list<a class="reference internal" href="_modules/gp/topology.html#NoneTopology.getTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology.getTarget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="gp.topology.RandomDynamicTopology">
-<em class="property">class </em><code class="descclassname">gp.topology.</code><code class="descname">RandomDynamicTopology</code><span class="sig-paren">(</span><em>size: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#RandomDynamicTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.RandomDynamicTopology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">gp.topology.</code><code class="descname">RandomDynamicTopology</code><span class="sig-paren">(</span><em>size: int</em>, <em>rng=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#RandomDynamicTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.RandomDynamicTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gp.topology.RandomStaticTopology" title="gp.topology.RandomStaticTopology"><code class="xref py py-class docutils literal"><span class="pre">gp.topology.RandomStaticTopology</span></code></a></p>
 <p>Variation on Static, on demand a new mapping is calculated.</p>
 <dl class="method">
 <dt id="gp.topology.RandomDynamicTopology.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>size: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#RandomDynamicTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.RandomDynamicTopology.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>size: int</em>, <em>rng=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#RandomDynamicTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.RandomDynamicTopology.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -620,9 +695,8 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 <dl class="method">
 <dt id="gp.topology.RandomStaticTopology.setMapping">
 <code class="descname">setMapping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#RandomStaticTopology.setMapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.RandomStaticTopology.setMapping" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a mapping where each node is not connected to itself, but to
-<em>self._links</em> nodes. Where only one link is needed, ensure that each node
-has both a source and target.</p>
+<dd><p>Create a mapping where each node is not connected to itself, but to <em>self._links</em> nodes.</p>
+<p>Where only one link is needed, ensure that each node has both a source and target.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -694,8 +768,8 @@ has both a source and target.</p>
 <dt id="gp.topology.TreeTopology">
 <em class="property">class </em><code class="descclassname">gp.topology.</code><code class="descname">TreeTopology</code><span class="sig-paren">(</span><em>size: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#TreeTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.TreeTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gp.topology.Topology" title="gp.topology.Topology"><code class="xref py py-class docutils literal"><span class="pre">gp.topology.Topology</span></code></a></p>
-<p>Tree structure.
-Each node sends to its children. Leaves send to None.
+<p>Tree structure.</p>
+<p>Each node sends to its children. Leaves send to None.
 This is a full binary tree.
 For N nodes, the tree has (N-1) links, with no cycling dependencies.
 Communication overhead is minimized, while still allowing for diffusion.
@@ -740,8 +814,8 @@ With each node generating independently, the pipeline effect is largely avoided.
 <dt id="gp.topology.VonNeumannTopology">
 <em class="property">class </em><code class="descclassname">gp.topology.</code><code class="descname">VonNeumannTopology</code><span class="sig-paren">(</span><em>size: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#VonNeumannTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.VonNeumannTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gp.topology.Topology" title="gp.topology.Topology"><code class="xref py py-class docutils literal"><span class="pre">gp.topology.Topology</span></code></a></p>
-<p>2D grid, with each node connected with 4 nodes.
-Edge nodes are connectect in a cyclic form. E.g. a square of 9 nodes (3x3),
+<p>2D grid, with each node connected with 4 nodes.</p>
+<p>Edge nodes are connectect in a cyclic form. E.g. a square of 9 nodes (3x3),
 node 0 is connected to [8,1,6,3]</p>
 <dl class="method">
 <dt id="gp.topology.VonNeumannTopology.__init__">
@@ -764,6 +838,17 @@ node 0 is connected to [8,1,6,3]</p>
 <dl class="method">
 <dt id="gp.topology.VonNeumannTopology.getTarget">
 <code class="descname">getTarget</code><span class="sig-paren">(</span><em>source: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#VonNeumannTopology.getTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.VonNeumannTopology.getTarget" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a small grid, duplicates are possible.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.topology.VonNeumannTopology.lintormcm">
+<code class="descname">lintormcm</code><span class="sig-paren">(</span><em>index</em>, <em>rowsize</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#VonNeumannTopology.lintormcm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.VonNeumannTopology.lintormcm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.topology.VonNeumannTopology.rmcmtolin">
+<code class="descname">rmcmtolin</code><span class="sig-paren">(</span><em>rowindex</em>, <em>colindex</em>, <em>rowsize</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#VonNeumannTopology.rmcmtolin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.VonNeumannTopology.rmcmtolin" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -773,7 +858,7 @@ node 0 is connected to [8,1,6,3]</p>
 <span id="gp-paralleldriver-module"></span><h2>gp.paralleldriver module<a class="headerlink" href="#module-gp.paralleldriver" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="gp.paralleldriver.runBenchmark">
-<code class="descclassname">gp.paralleldriver.</code><code class="descname">runBenchmark</code><span class="sig-paren">(</span><em>topo=None</em>, <em>processcount=None</em>, <em>outfolder=None</em>, <em>display=False</em>, <em>generations=None</em>, <em>population=None</em>, <em>phases=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/paralleldriver.html#runBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.paralleldriver.runBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">gp.paralleldriver.</code><code class="descname">runBenchmark</code><span class="sig-paren">(</span><em>config</em>, <em>topo=None</em>, <em>processcount=None</em>, <em>outfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/paralleldriver.html#runBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.paralleldriver.runBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -783,8 +868,8 @@ node 0 is connected to [8,1,6,3]</p>
 <dt id="gp.population.OrderedPopulation">
 <em class="property">class </em><code class="descclassname">gp.population.</code><code class="descname">OrderedPopulation</code><span class="sig-paren">(</span><em>iterable=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#OrderedPopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.OrderedPopulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gp.population.Population" title="gp.population.Population"><code class="xref py py-class docutils literal"><span class="pre">gp.population.Population</span></code></a></p>
-<p>Prototype code for an ordered dict.
-&#64;deprecated as it implies [item]=item</p>
+<p>Prototype code for an ordered dict.</p>
+<p>&#64;deprecated as it implies [item]=item</p>
 <dl class="method">
 <dt id="gp.population.OrderedPopulation.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>iterable=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#OrderedPopulation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.OrderedPopulation.__init__" title="Permalink to this definition">¶</a></dt>
@@ -796,8 +881,7 @@ node 0 is connected to [8,1,6,3]</p>
 <dt id="gp.population.Population">
 <em class="property">class </em><code class="descclassname">gp.population.</code><code class="descname">Population</code><span class="sig-paren">(</span><em>iterable=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#Population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.Population" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Interface to a population structure. Sorts a population in order and provides iterators and if possible random access
-and membership testing using hashes.</p>
+<p>Interface to a population structure. Sorts a population in order and provides iterators and if possible random access and membership testing using hashes.</p>
 <p>The Base class is unusable, serves only as an interface.</p>
 <dl class="method">
 <dt id="gp.population.Population.__init__">
@@ -913,7 +997,8 @@ and membership testing using hashes.</p>
 <dl class="method">
 <dt id="gp.population.SetPopulation.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>iterable=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/population.html#SetPopulation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.population.SetPopulation.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dd><p>Construct with iterable and key.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -987,11 +1072,6 @@ and membership testing using hashes.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="gp.testalgorithm.GPTest.testBruteElitist">
-<code class="descname">testBruteElitist</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testBruteElitist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testBruteElitist" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="gp.testalgorithm.GPTest.testBruteElitistExtended">
 <code class="descname">testBruteElitistExtended</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testBruteElitistExtended"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testBruteElitistExtended" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1007,6 +1087,17 @@ and membership testing using hashes.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="gp.testalgorithm.GPTest.testDeterminism">
+<code class="descname">testDeterminism</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testDeterminism"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testDeterminism" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that the algorithm runs deterministic if a seed is set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.testalgorithm.GPTest.testFolding">
+<code class="descname">testFolding</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testFolding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testFolding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="gp.testalgorithm.GPTest.testInitialization">
 <code class="descname">testInitialization</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testInitialization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testInitialization" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1019,6 +1110,11 @@ and membership testing using hashes.</p>
 <dl class="method">
 <dt id="gp.testalgorithm.GPTest.testTournament">
 <code class="descname">testTournament</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testTournament"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testTournament" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.testalgorithm.GPTest.testVariableDepth">
+<code class="descname">testVariableDepth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testVariableDepth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testVariableDepth" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1061,6 +1157,11 @@ and membership testing using hashes.</p>
 <dl class="method">
 <dt id="gp.testalgorithm.TopologyTest.testTreeTopology">
 <code class="descname">testTreeTopology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#TopologyTest.testTreeTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.TopologyTest.testTreeTopology" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.testalgorithm.TopologyTest.testVNTopology">
+<code class="descname">testVNTopology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#TopologyTest.testVNTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.TopologyTest.testVNTopology" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

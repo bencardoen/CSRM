@@ -53,51 +53,69 @@
 <span class="c1">#      Author: Ben Cardoen</span>
 
 <span class="kn">from</span> <span class="nn">expression.tree</span> <span class="k">import</span> <span class="n">Tree</span>
-<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">traceFunction</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">traceFunction</span><span class="p">,</span> <span class="n">getRandom</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
 
+
 <div class="viewcode-block" id="Mutate"><a class="viewcode-back" href="../../expression.html#expression.operators.Mutate">[docs]</a><span class="k">class</span> <span class="nc">Mutate</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Mutate a subexpression in the tree</span>
+<span class="sd">    Mutate a subexpression in the tree</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Mutate.mutate"><a class="viewcode-back" href="../../expression.html#expression.operators.Mutate.mutate">[docs]</a>    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">tr</span><span class="p">:</span><span class="n">Tree</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">equaldepth</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limitdepth</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">selectiondepth</span><span class="p">:</span><span class="nb">int</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="Mutate.mutate"><a class="viewcode-back" href="../../expression.html#expression.operators.Mutate.mutate">[docs]</a>    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">tr</span><span class="p">:</span><span class="n">Tree</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">equaldepth</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limitdepth</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">selectiondepth</span><span class="p">:</span><span class="nb">int</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">mindepthratio</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Replace a random node with a new generated subexpression.</span>
+<span class="sd">        Replace a random node with a new generated subexpression.</span>
 
-<span class="sd">            If no variables are supplied, the existing set is reused.</span>
+<span class="sd">        If no variables are supplied, the existing set is reused.</span>
 
-<span class="sd">            This operator is capable of operating using 3 policies specified by its parameters.</span>
+<span class="sd">        This operator is capable of operating using 3 policies specified by its parameters.</span>
 
-<span class="sd">            With equaldepth set, the resulting mutation will always have the same depth as the original tree.</span>
-<span class="sd">            With limitdepth set, the resulting tree will have a depth &lt;= limit</span>
-<span class="sd">            With selectiondepth set, the target depth for the mutation point can be specified.</span>
+<span class="sd">        With equaldepth set, the resulting mutation will always have the same depth as the original tree.</span>
+<span class="sd">        With limitdepth set, the resulting tree will have a depth &lt;= limit</span>
+<span class="sd">        With selectiondepth set, the target depth for the mutation point can be specified.</span>
+<span class="sd">        With mindepthratio set, the</span>
 
-<span class="sd">            For instance to create a mutation operator that mutates only leafs and replaces them with leafs:</span>
-<span class="sd">                equaldepth=True, limitdepth=0, selectiondepth=tr.getDepth()</span>
+<span class="sd">        For instance to create a mutation operator that mutates only leafs and replaces them with leafs:</span>
+<span class="sd">            equaldepth=True, limitdepth=0, selectiondepth=tr.getDepth()</span>
 
-<span class="sd">            :param Tree tr: Tree to modify in place</span>
-<span class="sd">            :param variables: set of variables</span>
-<span class="sd">            :param bool equaldepth: if set the generated subtree will have the same depth as the node removed, resulting in a mutation which conserves tree depth</span>
-<span class="sd">            :param int limitdepth: if not 0 prevent the mutation from growing a resulting tree with depth larger than limit</span>
-<span class="sd">            :param int selectiondepth: if not -1 specify at which depth the insertion point is chosen</span>
-<span class="sd">            :param Random rng: prng used to generate the new subtree and its attaching location</span>
+<span class="sd">        :param Tree tr: Tree to modify in place</span>
+<span class="sd">        :param variables: set of variables</span>
+<span class="sd">        :param bool equaldepth: if set the generated subtree will have the same depth as the node removed, resulting in a mutation which conserves tree depth</span>
+<span class="sd">        :param int limitdepth: if not 0 prevent the mutation from growing a resulting tree with depth larger than limit</span>
+<span class="sd">        :param int selectiondepth: if not -1 specify at which depth the insertion point is chosen</span>
+<span class="sd">        :param Random rng: prng used to generate the new subtree and its attaching location</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="c1">#logger.info(&quot;Tree is {}&quot;.format(tr))</span>
+        <span class="c1">#logger.info(&quot;Arguments for mutation = limdepth = {}, selectiondepth = {}, mindepthratio = {}, d = {}&quot;.format(limitdepth, selectiondepth, mindepthratio, tr.getDepth()))</span>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">getRandom</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Non deterministic mode&quot;</span><span class="p">)</span>
 
         <span class="n">d</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#logger.info(&quot;Not operating on constant tree.&quot;)</span>
+            <span class="k">return</span>
 
         <span class="n">selectdepth</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">selectiondepth</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="n">selectdepth</span> <span class="o">=</span> <span class="n">selectiondepth</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Selection depth set with treedepth </span><span class="si">{}</span><span class="s2"> and chosen depth </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">selectdepth</span><span class="p">))</span>
+            <span class="c1">#logger.debug(&quot;Selection depth set with treedepth {} and chosen depth {}&quot;.format(d, selectdepth))</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">d</span><span class="o">&gt;=</span><span class="n">selectdepth</span><span class="p">)</span>
 
-        <span class="n">insertpoint</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">getRandomNode</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">selectdepth</span><span class="p">)</span>
+        <span class="n">mindepth</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">mindepthratio</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">mindepthratio</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">mindepthratio</span> <span class="o">&lt;=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">mindepth</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span> <span class="n">mindepthratio</span> <span class="o">*</span> <span class="n">d</span> <span class="p">),</span><span class="mi">1</span><span class="p">),</span> <span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">insertpoint</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">getRandomNode</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">selectdepth</span><span class="p">,</span> <span class="n">mindepth</span><span class="o">=</span><span class="n">mindepth</span><span class="p">)</span>
         <span class="n">depth_at_i</span> <span class="o">=</span> <span class="n">insertpoint</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Insertion point = </span><span class="si">{}</span><span class="s2"> at depth </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">insertpoint</span><span class="p">,</span> <span class="n">depth_at_i</span><span class="p">))</span>
+        <span class="c1">#logger.info(&quot;Insertion point = {} at depth {}&quot;.format(insertpoint, depth_at_i))</span>
+
+        <span class="k">if</span> <span class="n">mindepth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">depth_at_i</span> <span class="o">&gt;=</span> <span class="n">mindepth</span><span class="p">)</span>
 
         <span class="n">targetdepth</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">equaldepth</span><span class="p">:</span>
@@ -106,6 +124,7 @@
                 <span class="c1"># Have an existing tree with depth d.</span>
                 <span class="n">limit</span> <span class="o">=</span> <span class="n">limitdepth</span> <span class="o">-</span> <span class="n">depth_at_i</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Depth is limited by </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">limitdepth</span><span class="p">,</span> <span class="n">limit</span><span class="p">))</span>
+            <span class="c1"># Insert here</span>
             <span class="n">targetdepth</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Picking a random depth </span><span class="si">{}</span><span class="s2"> for mutation&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">targetdepth</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -116,35 +135,68 @@
         <span class="n">subtree</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">growTree</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">targetdepth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">tr</span><span class="o">.</span><span class="n">spliceSubTree</span><span class="p">(</span><span class="n">insertpoint</span><span class="p">,</span> <span class="n">subtree</span><span class="o">.</span><span class="n">getRoot</span><span class="p">())</span></div></div>
 
+
 <div class="viewcode-block" id="Crossover"><a class="viewcode-back" href="../../expression.html#expression.operators.Crossover">[docs]</a><span class="k">class</span> <span class="nc">Crossover</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Subtree crossover operator</span>
+<span class="sd">    Subtree crossover operator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Crossover.subtreecrossover"><a class="viewcode-back" href="../../expression.html#expression.operators.Crossover.subtreecrossover">[docs]</a>    <span class="k">def</span> <span class="nf">subtreecrossover</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">limitdepth</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="Crossover.subtreecrossover"><a class="viewcode-back" href="../../expression.html#expression.operators.Crossover.subtreecrossover">[docs]</a>    <span class="k">def</span> <span class="nf">subtreecrossover</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">limitdepth</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">symmetric</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mindepthratio</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Perform a subtree crossover in place.</span>
+<span class="sd">        Perform a subtree crossover in place.</span>
 
-<span class="sd">            A subtree from left and right are chosen (influenced by seed) and exchanged.</span>
+<span class="sd">        A subtree from left and right are chosen (influenced by seed) and exchanged.</span>
 
-<span class="sd">            :param Tree left: tree to modify with right&#39;s subtree</span>
-<span class="sd">            :param Tree right: tree to modify with left&#39;s subtree</span>
-<span class="sd">            :param int seed: seed for PRNG (selection of subtree)</span>
-<span class="sd">            :param int depth: if not None, forces subtree selection to pick subtrees at the given depth. Else the chosen depth is in [1, min(left.getDepth(), right.getDepth())]</span>
-<span class="sd">            :param int limitdepth: if not -1, restricts the depth of the operation.</span>
-<span class="sd">            :param Random rng: rng used in calls to select subtrees</span>
+<span class="sd">        :param Tree left: tree to modify with right&#39;s subtree</span>
+<span class="sd">        :param Tree right: tree to modify with left&#39;s subtree</span>
+<span class="sd">        :param int seed: seed for PRNG (selection of subtree)</span>
+<span class="sd">        :param int depth: if not None, forces subtree selection to pick subtrees at the given depth. Else the chosen depth is in [1, min(left.getDepth(), right.getDepth())]</span>
+<span class="sd">        :param int limitdepth: if not -1, restricts the depth of the operation. The resulting tree will not be larger than this value.</span>
+<span class="sd">        :param Random rng: rng used in calls to select subtrees</span>
+<span class="sd">        :param float mindepthratio: determines lower bracket of range to select depth in.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ld</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
         <span class="n">rd</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">ld</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">rd</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#logger.info(&quot;Not operating on constant tree&quot;)</span>
+            <span class="k">return</span>
+
+        <span class="n">lmindepth</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">rmindepth</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">minmaxdepth</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ld</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span>
+        <span class="c1"># if mindepthratio is set, pick a lower bracket value based by that ratio per tree</span>
+        <span class="k">if</span> <span class="n">mindepthratio</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># can be zero, don&#39;t use if mindepthratio</span>
+            <span class="n">lmindepth</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span> <span class="nb">max</span><span class="p">(</span> <span class="nb">int</span><span class="p">(</span><span class="n">mindepthratio</span> <span class="o">*</span> <span class="n">ld</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="p">,</span> <span class="n">ld</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">rmindepth</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span> <span class="nb">max</span><span class="p">(</span> <span class="nb">int</span><span class="p">(</span><span class="n">mindepthratio</span> <span class="o">*</span> <span class="n">rd</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="p">,</span> <span class="n">rd</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1">#logger.info(&quot;Setting lmin {} rmin {} in trees ld {} rd {} based on {}&quot;.format(lmindepth, rmindepth, ld, rd, mindepthratio))</span>
         <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Non deterministic mode&quot;</span><span class="p">)</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">getRandom</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mindepth</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">left</span><span class="o">.</span><span class="n">getDepth</span><span class="p">(),</span> <span class="n">right</span><span class="o">.</span><span class="n">getDepth</span><span class="p">())</span>
-            <span class="n">chosendepth</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">mindepth</span><span class="p">)</span>
-            <span class="n">depth</span> <span class="o">=</span> <span class="n">chosendepth</span>
+            <span class="k">if</span> <span class="n">symmetric</span><span class="p">:</span>
+                <span class="n">ldepth</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">lmindepth</span><span class="p">,</span><span class="n">rmindepth</span><span class="p">),</span> <span class="n">minmaxdepth</span><span class="p">)</span>
+                <span class="n">rdepth</span> <span class="o">=</span> <span class="n">ldepth</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rdepth</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">lmindepth</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span>
+                <span class="n">ldepth</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">rmindepth</span><span class="p">,</span> <span class="n">ld</span><span class="p">)</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="p">[</span><span class="n">ldepth</span><span class="p">,</span> <span class="n">rdepth</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
         <span class="k">if</span> <span class="n">limitdepth</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">depth</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ld</span><span class="p">,</span> <span class="n">rd</span><span class="p">,</span> <span class="n">limitdepth</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
-        <span class="n">Tree</span><span class="o">.</span><span class="n">swapSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span></div></div>
+            <span class="n">maxleftsubtreedepth</span> <span class="o">=</span> <span class="p">(</span><span class="n">ld</span><span class="o">-</span><span class="n">depth</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">maxrightsubtreedepth</span> <span class="o">=</span> <span class="p">(</span><span class="n">rd</span> <span class="o">-</span> <span class="n">depth</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">leftsurplus</span> <span class="o">=</span> <span class="p">(</span><span class="n">maxleftsubtreedepth</span> <span class="o">+</span> <span class="n">depth</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">limitdepth</span>
+            <span class="n">rightsurplus</span> <span class="o">=</span> <span class="p">(</span><span class="n">maxrightsubtreedepth</span> <span class="o">+</span> <span class="n">depth</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">limitdepth</span>
+            <span class="k">if</span> <span class="n">leftsurplus</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">depth</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">leftsurplus</span>
+            <span class="k">if</span> <span class="n">rightsurplus</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">depth</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">rightsurplus</span>
+        <span class="n">Tree</span><span class="o">.</span><span class="n">swapSubtrees</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span> <span class="n">symmetric</span><span class="o">=</span><span class="n">symmetric</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">left</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">limitdepth</span> <span class="ow">or</span> <span class="n">right</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">limitdepth</span><span class="p">)</span> <span class="ow">and</span> <span class="n">limitdepth</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Left depth </span><span class="si">{}</span><span class="s2"> or right depth exceeds limit </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">left</span><span class="o">.</span><span class="n">getDepth</span><span class="p">(),</span> <span class="n">right</span><span class="o">.</span><span class="n">getDepth</span><span class="p">(),</span> <span class="n">limitdepth</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span></div></div>
 </pre></div>
 
           </div>
