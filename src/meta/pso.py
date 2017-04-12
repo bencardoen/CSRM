@@ -108,7 +108,7 @@ class PSO:
         ob1 = self.bestparticle
         ob2 = self.globalbest
         nb = self.getBestIndex()
-        if ob1 is None or nb[1] > ob1[1]:
+        if ob1 is None or nb[1] < ob1[1]:
             self.bestparticle = nb
             self.globalbest = self.particles[self.bestparticle[0]].best
         logger.info("Old best is {} with {}".format(ob1, ob2))
