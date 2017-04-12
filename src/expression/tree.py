@@ -224,8 +224,6 @@ class Tree:
         if dpoint != 0:
             return [self.evaluateTree(index=i) for i in range(dpoint)]
         else:
-            # TODO use as ctexpr detection
-            #logger.info(" Constant Tree is {}".format(self.toExpression()))
             return [self.evaluateTree(index=None)]
 
     def scoreTree(self, expected, distancefunction):
@@ -238,7 +236,6 @@ class Tree:
         """
         actual = self.evaluateAll()
         if self.getDataPointCount() == 0:
-            #logger.warning("Constant expression, repeating results")
             actual = [actual[0] for _ in range(len(expected))]
         f = distancefunction(actual, expected, tree=self)
         self.setFitness(f)
@@ -321,7 +318,7 @@ class Tree:
                             if tokenLeafs:
                                 child = t.makeConstant(Constant(1.0), node)
                             else:
-                                if (_rng.randrange(0, 2) & 1) and variables:# todo bias features
+                                if (_rng.randrange(0, 2) & 1) and variables:
                                     child = t.makeLeaf(_rng.choice(variables), node)
                                 else:
                                     child = t.makeConstant(Constant.generateConstant(rng=_rng), node)
@@ -394,9 +391,7 @@ class Tree:
         :returns: a selected node, never root
         """
         assert(isinstance(seed, int) or seed is None)
-        #logger.info("RNG = {} SEED = {}".format(rng, seed))
         ln = self.lastposition
-        #logger.info("LSN = {} ".format(ln))
         if depth is not None:
             assert(depth <= self.getDepth())
         r = rng or getRandom()
@@ -454,8 +449,6 @@ class Tree:
         """
         self.setModified(True)
         self.modifiedDepth=True
-        #self.testInvariant()
-        # Unlink the current node
         npos = node.getPosition()
         self._deleteNode(npos)
         parent = self.getParent(node)

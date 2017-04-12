@@ -374,7 +374,6 @@ class GPAlgorithm():
             self.testInvariant()
             if self._trace:
                 self.printForestToDot("process_{}_phase_{}_generation_{}".format(self.pid, self._phase, i))
-        #logger.debug("\tArchival")
         self._phase += 1
         self.archive(modified)
 

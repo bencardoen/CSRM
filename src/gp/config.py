@@ -20,7 +20,7 @@ class Config:
         self.seed = 0
         self.pid = 0
         self.datapointcount = 20
-        self.datapointrange = (1, 10)
+        self.datapointrange = (1, 5)
         self.communicationsize = 2
         self.display = False
         self.topo = None

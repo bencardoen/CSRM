@@ -274,6 +274,7 @@ def pearson(actual, expected):
         denom = numpy.sqrt( numpy.sum( numpy.square(va) ) * numpy.sum( numpy.square( vb ) ) )
     except FloatingPointError as e:
         logger.warning("Distance is {} due to FP Error".format(e))
+        logger.warning("Actual {} vs expected {}".format(actual, expected))
         raise e
         denom = 0
     p = None

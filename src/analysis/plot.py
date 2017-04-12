@@ -50,9 +50,8 @@ def plotDotData(data, mean=None, std=None, var=None, generationstep=1, labelx=No
     x = [d+1 for d in range(len(data[0]))]
     dlen = len(data)
     colors = ["navy" for _ in range(dlen)]
-    # todo constants
     size = Constants.PLOT_SIZE_DEFAULT
-    alpha=Constants.PLOT_ALPHA_DEFAULT
+    alpha = Constants.PLOT_ALPHA_DEFAULT
     if cool:
         size = Constants.PLOT_SIZE_COOL
         if dlen <= 256:
