@@ -26,15 +26,18 @@ class OptimizerTest(unittest.TestCase):
         Y = t.evaluateAll()
         t.doConstantFolding()
         t.scoreTree(Y, _fit)
-        p = PSO(particlecount = 50, particle=t, distancefunction=_fit, expected=Y, seed=0, iterations=20)
+        pcount = 50
+        icount = 50
+        p = PSO(particlecount = 50, particle=copyObject(t), distancefunction=_fit, expected=Y, seed=0, iterations=50)
         p.run()
+        sol = p.getOptimalSolution()
+        self.assertEqual(sol["cost"], pcount*icount + pcount)
+        best = sol["solution"]
         tm = copyObject(t)
-        c = [ct for ct in tm.getConstants() if ct]
-        b = p.globalbest
-        for const, b in zip(c,b):
-            const.setValue(b)
+        tm.updateValues(best)
         tm.scoreTree(Y, _fit)
         self.assertAlmostEqual(tm.getFitness() , second=t.getFitness(), places=6)
+        self.assertNotEqual(tm.getFitness(), t.getFitness())
 
 
 if __name__=="__main__":

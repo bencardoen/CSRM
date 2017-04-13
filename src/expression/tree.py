@@ -497,6 +497,13 @@ class Tree:
         """
         return [ c.getConstant() for c in self.getNodes()]
 
+    def updateValues(self, values):
+        const = [ c.getConstant() for c in self.getNodes()]
+        const = [c for c in const if c]
+        for v, const in zip(values, const):
+            const.setValue(v)
+
+
     def getVariables(self):
         return self.getRoot().getVariables()
 
