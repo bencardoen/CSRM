@@ -149,13 +149,7 @@ class TreeTopology(Topology):
         :param int size: Number of nodes. Size+1 should be a power of 2
         """
         super().__init__(size)
-        assert(powerOf2(size+1))
-        self._depth = size.bit_length()-1
         self.spreadpolicy = DistributeSpreadPolicy
-
-    @property
-    def depth(self):
-        return self._depth
 
     def getSource(self, target:int):
         assert(target < self.size)
@@ -165,18 +159,19 @@ class TreeTopology(Topology):
 
     def getTarget(self, source:int):
         assert(source < self.size)
-        v = [] if self.isLeaf(source) else [2*source + 1, 2*source+2]
-        #logger.debug("getTarget called with {} ->{}".format(source, v))
-        return v
+        left = 2*source +1
+        right = 2*source +2
+        if left >= self.size:
+            return []
+        if right >= self.size:
+            return [left]
+        return [left, right]
 
     def isLeaf(self, node:int)->bool:
         """
         Return true if node is a leaf.
         """
-        assert(node < self.size)
-        # use fact that last level of binary tree with k nodes has 2^log2(k) leaves
-        cutoff = (self.size - 2**self.depth)
-        return node >= cutoff
+        return self.getTarget(node)==[]
 
     def __str__(self):
         return "TreeTopology " + super().__str__()

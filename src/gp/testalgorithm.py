@@ -269,18 +269,41 @@ class TopologyTest(unittest.TestCase):
                 self.assertTrue(i in rev[t])
 
     def testTreeTopology(self):
-        size = 15
+        size = 16
         r = TreeTopology(size)
-        d = size.bit_length()-1
-        a = size - 2**d
-        b = size - 1
-        for i in range(a, b):
-            self.assertTrue(r.isLeaf(i))
-            self.assertTrue(r.getTarget(i) == [])
-        for j in range(0, size - 2**(size.bit_length()-1) ):
-            self.assertFalse(r.isLeaf(j))
-            self.assertTrue(r.getTarget(j) != [])
-        self.assertEqual(r.getSource(0) , [])
+        for i in range(size):
+            if i > 7:
+                self.assertEqual(r.getTarget(i), [])
+            else:
+                if i == 7:
+                    self.assertEqual(r.getTarget(i), [15])
+                else:
+                    self.assertTrue(len(r.getTarget(i))== 2)
+        size = 4
+        r = TreeTopology(size)
+        for i in range(size):
+            if i > 1:
+                self.assertEqual(r.getTarget(i), [])
+            else:
+                if i == 1:
+                    self.assertEqual(r.getTarget(i), [3])
+                else:
+                    self.assertTrue(len(r.getTarget(i))== 2)
+        size = 9
+        r = TreeTopology(size)
+        for i in range(size):
+            if i > 3:
+                self.assertEqual(r.getTarget(i), [])
+            else:
+                self.assertTrue(len(r.getTarget(i))== 2)
+        size = 25
+        r = TreeTopology(size)
+        for i in range(size):
+            if i > 11:
+                self.assertEqual(r.getTarget(i), [])
+            else:
+                self.assertTrue(len(r.getTarget(i))== 2)
+
 
     def testVNTopology(self):
         size = 6
