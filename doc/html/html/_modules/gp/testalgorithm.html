@@ -1,0 +1,372 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gp.testalgorithm &#8212; CSRM 0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="CSRM 0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gp.testalgorithm</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#This file is part of the CSRM project.</span>
+<span class="c1">#Copyright 2016 - 2017 University of Antwerp</span>
+<span class="c1">#https://www.uantwerpen.be/en/</span>
+<span class="c1">#Licensed under the EUPL V.1.1</span>
+<span class="c1">#A full copy of the license is in COPYING.txt, or can be found at</span>
+<span class="c1">#https://joinup.ec.europa.eu/community/eupl/og_page/eupl</span>
+<span class="c1">#      Author: Ben Cardoen</span>
+
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">expression.operators</span> <span class="k">import</span> <span class="n">Mutate</span><span class="p">,</span> <span class="n">Crossover</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">generateVariables</span><span class="p">,</span> <span class="n">rootmeansquare</span>
+<span class="kn">from</span> <span class="nn">gp.algorithm</span> <span class="k">import</span> <span class="n">GPAlgorithm</span><span class="p">,</span> <span class="n">BruteElitist</span><span class="p">,</span> <span class="n">BruteCoolingElitist</span><span class="p">,</span> <span class="n">Constants</span>
+<span class="kn">from</span> <span class="nn">gp.population</span> <span class="k">import</span> <span class="n">Population</span><span class="p">,</span> <span class="n">SLWKPopulation</span><span class="p">,</span> <span class="n">OrderedPopulation</span><span class="p">,</span> <span class="n">SetPopulation</span>
+<span class="kn">from</span> <span class="nn">gp.parallelalgorithm</span> <span class="k">import</span> <span class="n">ParallelGP</span><span class="p">,</span> <span class="n">SequentialPGP</span>
+<span class="kn">from</span> <span class="nn">gp.topology</span> <span class="k">import</span> <span class="n">RandomStaticTopology</span><span class="p">,</span> <span class="n">TreeTopology</span><span class="p">,</span> <span class="n">VonNeumannTopology</span><span class="p">,</span> <span class="n">RandomDynamicTopology</span><span class="p">,</span> <span class="n">RingTopology</span>
+<span class="kn">from</span> <span class="nn">expression.tree</span> <span class="k">import</span> <span class="n">Tree</span>
+<span class="kn">from</span> <span class="nn">expression.node</span> <span class="k">import</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">expression.functions</span> <span class="k">import</span> <span class="n">testfunctions</span><span class="p">,</span> <span class="n">pearsonfitness</span> <span class="k">as</span> <span class="n">_fit</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">neg</span>
+<span class="kn">from</span> <span class="nn">analysis.convergence</span> <span class="k">import</span> <span class="n">Convergence</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
+<span class="n">outputfolder</span> <span class="o">=</span> <span class="s2">&quot;../output/&quot;</span>
+
+<div class="viewcode-block" id="generateForest"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.generateForest">[docs]</a><span class="k">def</span> <span class="nf">generateForest</span><span class="p">(</span><span class="n">fsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">([</span><span class="mi">10</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">3</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">9</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span><span class="p">)]</span>
+    <span class="n">forest</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">fsize</span><span class="p">):</span>
+        <span class="n">forest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">forest</span></div>
+
+
+<div class="viewcode-block" id="GPTest"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest">[docs]</a><span class="k">class</span> <span class="nc">GPTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+
+<div class="viewcode-block" id="GPTest.testInitialization"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest.testInitialization">[docs]</a>    <span class="k">def</span> <span class="nf">testInitialization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">GPAlgorithm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">printForestToDot</span><span class="p">(</span><span class="n">outputfolder</span> <span class="o">+</span> <span class="s2">&quot;forest&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GPTest.testPopulation"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest.testPopulation">[docs]</a>    <span class="k">def</span> <span class="nf">testPopulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fs</span><span class="o">=</span><span class="mi">10</span>
+        <span class="n">forest</span> <span class="o">=</span> <span class="n">generateForest</span><span class="p">(</span><span class="n">fsize</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">SetPopulation</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_tree</span> <span class="p">:</span> <span class="mi">0</span><span class="o">-</span><span class="n">_tree</span><span class="o">.</span><span class="n">getFitness</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">forest</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">forest</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">t</span> <span class="ow">in</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">forest</span><span class="p">):</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">setFitness</span><span class="p">(</span><span class="mi">10</span><span class="o">-</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">top</span><span class="p">()</span>
+            <span class="n">t2</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">forest</span><span class="p">):</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">setFitness</span><span class="p">(</span><span class="mi">10</span><span class="o">-</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">slicesize</span><span class="o">=</span><span class="mi">4</span>
+        <span class="n">kn</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">getN</span><span class="p">(</span><span class="n">slicesize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kn</span><span class="p">),</span> <span class="n">slicesize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">fs</span><span class="p">)</span>
+        <span class="n">kn</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">removeN</span><span class="p">(</span><span class="n">slicesize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kn</span><span class="p">),</span> <span class="n">slicesize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">fs</span><span class="o">-</span><span class="n">slicesize</span><span class="p">)</span>
+        <span class="n">rem</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">getAll</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rem</span><span class="p">)</span> <span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rem</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">removeAll</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="GPTest.testVirtualBase"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest.testVirtualBase">[docs]</a>    <span class="k">def</span> <span class="nf">testVirtualBase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Y </span><span class="si">{}</span><span class="s2"> X </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">GPAlgorithm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1">#g.printForest()</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="c1">#g.printForest()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting BE algorithm&quot;</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">BruteElitist</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">printForestToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;prefix&quot;</span><span class="p">)</span></div>
+        <span class="c1">#g.printForest()</span>
+
+<div class="viewcode-block" id="GPTest.testBruteElitist"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest.testBruteElitist">[docs]</a>    <span class="k">def</span> <span class="nf">testBruteElitist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Y </span><span class="si">{}</span><span class="s2"> X </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting BE algorithm&quot;</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">BruteElitist</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="c1">#        g.setTrace(True, outputfolder)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">printForestToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;firstresult&quot;</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">printForestToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;secondresult&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GPTest.testBruteElitistExtended"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest.testBruteElitistExtended">[docs]</a>    <span class="k">def</span> <span class="nf">testBruteElitistExtended</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">vpoint</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span><span class="n">dpoint</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="p">[</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dpoint</span><span class="p">)]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Y </span><span class="si">{}</span><span class="s2"> X </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting BE algorithm&quot;</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">BruteElitist</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">printForestToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;firstresult_extended&quot;</span><span class="p">)</span></div>
+        <span class="c1">#g.run()</span>
+        <span class="c1">#g.printForestToDot(outputfolder+&quot;secondresult_extended&quot;)</span>
+
+<div class="viewcode-block" id="GPTest.testBmark"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest.testBmark">[docs]</a>    <span class="k">def</span> <span class="nf">testBmark</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">testfunctions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">expr</span> <span class="ow">in</span> <span class="n">testfunctions</span><span class="p">:</span>
+            <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">10</span>
+            <span class="n">vpoint</span> <span class="o">=</span> <span class="mi">5</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">BruteElitist</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">printForestToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;bmark&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># These two tests serve as a benchmark to verify cooling effect of mutation operator</span>
+<div class="viewcode-block" id="GPTest.testConvergence"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest.testConvergence">[docs]</a>    <span class="k">def</span> <span class="nf">testConvergence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">testfunctions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="n">vpoint</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Y </span><span class="si">{}</span><span class="s2"> X </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">BruteElitist</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">executeAlgorithm</span><span class="p">()</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">getConvergenceStatistics</span><span class="p">()</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">Convergence</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">plotFitness</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">plotComplexity</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">plotOperators</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">savePlots</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">expr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GPTest.testCooling"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest.testCooling">[docs]</a>    <span class="k">def</span> <span class="nf">testCooling</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">testfunctions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="n">vpoint</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Y </span><span class="si">{}</span><span class="s2"> X </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">BruteCoolingElitist</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">executeAlgorithm</span><span class="p">()</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">getConvergenceStatistics</span><span class="p">()</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">Convergence</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">plotFitness</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">plotComplexity</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">plotOperators</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">savePlots</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">expr</span><span class="o">+</span><span class="s2">&quot;_cooling&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GPTest.testTournament"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.GPTest.testTournament">[docs]</a>    <span class="k">def</span> <span class="nf">testTournament</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">testfunctions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="n">vpoint</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Y </span><span class="si">{}</span><span class="s2"> X </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">BruteCoolingElitist</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">tournamentsize</span> <span class="o">=</span> <span class="mi">4</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">executeAlgorithm</span><span class="p">()</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">getConvergenceStatistics</span><span class="p">()</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">Convergence</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">plotFitness</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">plotComplexity</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">plotOperators</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">savePlots</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">expr</span><span class="o">+</span><span class="s2">&quot;_tournament&quot;</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="TopologyTest"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.TopologyTest">[docs]</a><span class="k">class</span> <span class="nc">TopologyTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TopologyTest.testInverse"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.TopologyTest.testInverse">[docs]</a>    <span class="k">def</span> <span class="nf">testInverse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">rs</span> <span class="o">=</span> <span class="n">RandomStaticTopology</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">)]</span>
+        <span class="n">trg</span> <span class="o">=</span> <span class="p">[</span><span class="n">rs</span><span class="o">.</span><span class="n">getTarget</span><span class="p">(</span><span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">)]</span>
+        <span class="n">rev</span> <span class="o">=</span> <span class="p">[</span><span class="n">rs</span><span class="o">.</span><span class="n">getSource</span><span class="p">(</span><span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">trg</span><span class="p">),</span> <span class="n">l</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">rev</span><span class="p">),</span> <span class="n">l</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TopologyTest.testMultiLink"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.TopologyTest.testMultiLink">[docs]</a>    <span class="k">def</span> <span class="nf">testMultiLink</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">rs</span> <span class="o">=</span> <span class="n">RandomStaticTopology</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">)]</span>
+        <span class="n">trg</span> <span class="o">=</span> <span class="p">[</span><span class="n">rs</span><span class="o">.</span><span class="n">getTarget</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">)]</span>
+        <span class="n">rev</span> <span class="o">=</span> <span class="p">[</span><span class="n">rs</span><span class="o">.</span><span class="n">getSource</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">)]</span>
+        <span class="c1"># ensure i -&gt; [a, b, c] =&gt; i in rev[a]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">targets</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trg</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">rev</span><span class="p">[</span><span class="n">t</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TopologyTest.testTreeTopology"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.TopologyTest.testTreeTopology">[docs]</a>    <span class="k">def</span> <span class="nf">testTreeTopology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">15</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">TreeTopology</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">2</span><span class="o">**</span><span class="n">d</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">isLeaf</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getTarget</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">size</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">isLeaf</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getTarget</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">!=</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getSource</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">,</span> <span class="p">[])</span></div></div>
+
+
+<div class="viewcode-block" id="PGPTest"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.PGPTest">[docs]</a><span class="k">class</span> <span class="nc">PGPTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="PGPTest.testConstruct"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.PGPTest.testConstruct">[docs]</a>    <span class="k">def</span> <span class="nf">testConstruct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">testfunctions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">vpoint</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Y </span><span class="si">{}</span><span class="s2"> X </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+        <span class="n">pcount</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">algo</span> <span class="o">=</span> <span class="n">SequentialPGP</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">pcount</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">topo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">splitData</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">algo</span><span class="o">.</span><span class="n">executeAlgorithm</span><span class="p">()</span>
+        <span class="n">algo</span><span class="o">.</span><span class="n">reportOutput</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PGPTest.testAllTopologies"><a class="viewcode-back" href="../../gp.html#gp.testalgorithm.PGPTest.testAllTopologies">[docs]</a>    <span class="k">def</span> <span class="nf">testAllTopologies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">testfunctions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">vpoint</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">generations</span><span class="o">=</span><span class="mi">10</span>
+        <span class="n">depth</span><span class="o">=</span><span class="mi">7</span>
+        <span class="n">phases</span><span class="o">=</span><span class="mi">2</span>
+        <span class="n">pcount</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">population</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">archivesize</span> <span class="o">=</span> <span class="n">pcount</span><span class="o">*</span><span class="mi">2</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vpoint</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Y </span><span class="si">{}</span><span class="s2"> X </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span>
+        <span class="n">topos</span> <span class="o">=</span> <span class="p">[</span><span class="n">RandomStaticTopology</span><span class="p">(</span><span class="n">pcount</span><span class="p">),</span> <span class="n">TreeTopology</span><span class="p">(</span><span class="n">pcount</span><span class="p">),</span> <span class="n">VonNeumannTopology</span><span class="p">(</span><span class="n">pcount</span><span class="o">+</span><span class="mi">2</span><span class="p">),</span> <span class="n">RandomDynamicTopology</span><span class="p">(</span><span class="n">pcount</span><span class="p">),</span> <span class="n">RingTopology</span><span class="p">(</span><span class="n">pcount</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">topos</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Testing topology </span><span class="si">{}</span><span class="s2"> which is mapped as </span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
+            <span class="n">algo</span> <span class="o">=</span> <span class="n">SequentialPGP</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span> <span class="n">topo</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">splitData</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">archivesize</span><span class="o">=</span><span class="n">archivesize</span><span class="p">)</span>
+            <span class="n">algo</span><span class="o">.</span><span class="n">executeAlgorithm</span><span class="p">()</span>
+            <span class="n">algo</span><span class="o">.</span><span class="n">reportOutput</span><span class="p">()</span></div></div>
+
+
+
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">outputfolder</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Output directory does not exist : creating...&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">outputfolder</span><span class="p">)</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ben Cardoen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

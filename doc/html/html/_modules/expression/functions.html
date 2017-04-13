@@ -1,0 +1,450 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>expression.functions &#8212; CSRM 0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="CSRM 0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for expression.functions</h1><div class="highlight"><pre>
+<span></span><span class="c1">#This file is part of the CSRM project.</span>
+<span class="c1">#Copyright 2016 - 2017 University of Antwerp</span>
+<span class="c1">#https://www.uantwerpen.be/en/</span>
+<span class="c1">#Licensed under the EUPL V.1.1</span>
+<span class="c1">#A full copy of the license is in COPYING.txt, or can be found at</span>
+<span class="c1">#https://joinup.ec.europa.eu/community/eupl/og_page/eupl</span>
+<span class="c1">#      Author: Ben Cardoen</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">matchFloat</span><span class="p">,</span> <span class="n">matchVariable</span><span class="p">,</span> <span class="n">approximateMultiple</span><span class="p">,</span> <span class="n">traceFunction</span><span class="p">,</span> <span class="n">rootmeansquare</span><span class="p">,</span> <span class="n">rootmeansquarenormalized</span><span class="p">,</span> <span class="n">pearson</span>
+<span class="kn">from</span> <span class="nn">expression.node</span> <span class="k">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">expression.constants</span> <span class="k">import</span> <span class="n">Constants</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># Function objects that can be used in an expression.</span>
+<span class="c1"># Most screen parameters to avoid expensive (frequent) exceptions.</span>
+<span class="c1"># For example : div(a/0) is not legal, but catching often generated expression</span>
+<span class="c1"># is too expensive</span>
+
+<div class="viewcode-block" id="plus"><a class="viewcode-back" href="../../expression.html#expression.functions.plus">[docs]</a><span class="k">def</span> <span class="nf">plus</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span></div>
+
+<div class="viewcode-block" id="minus"><a class="viewcode-back" href="../../expression.html#expression.functions.minus">[docs]</a><span class="k">def</span> <span class="nf">minus</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">plus</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="n">b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="multiply"><a class="viewcode-back" href="../../expression.html#expression.functions.multiply">[docs]</a><span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span></div>
+
+<div class="viewcode-block" id="power"><a class="viewcode-back" href="../../expression.html#expression.functions.power">[docs]</a><span class="k">def</span> <span class="nf">power</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">Constants</span><span class="o">.</span><span class="n">SIZE_LIMIT</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">Constants</span><span class="o">.</span><span class="n">BASE_LIMIT</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">b</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">pow</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="division"><a class="viewcode-back" href="../../expression.html#expression.functions.division">[docs]</a><span class="k">def</span> <span class="nf">division</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="modulo"><a class="viewcode-back" href="../../expression.html#expression.functions.modulo">[docs]</a><span class="k">def</span> <span class="nf">modulo</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">%</span> <span class="n">b</span></div>
+
+<div class="viewcode-block" id="logarithm"><a class="viewcode-back" href="../../expression.html#expression.functions.logarithm">[docs]</a><span class="k">def</span> <span class="nf">logarithm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">b</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">&gt;</span><span class="n">Constants</span><span class="o">.</span><span class="n">SIZE_LIMIT</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">log</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="maximum"><a class="viewcode-back" href="../../expression.html#expression.functions.maximum">[docs]</a><span class="k">def</span> <span class="nf">maximum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="minimum"><a class="viewcode-back" href="../../expression.html#expression.functions.minimum">[docs]</a><span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="sine"><a class="viewcode-back" href="../../expression.html#expression.functions.sine">[docs]</a><span class="k">def</span> <span class="nf">sine</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="cosine"><a class="viewcode-back" href="../../expression.html#expression.functions.cosine">[docs]</a><span class="k">def</span> <span class="nf">cosine</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="absolute"><a class="viewcode-back" href="../../expression.html#expression.functions.absolute">[docs]</a><span class="k">def</span> <span class="nf">absolute</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ln"><a class="viewcode-back" href="../../expression.html#expression.functions.ln">[docs]</a><span class="k">def</span> <span class="nf">ln</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">logarithm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">e</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="exponential"><a class="viewcode-back" href="../../expression.html#expression.functions.exponential">[docs]</a><span class="k">def</span> <span class="nf">exponential</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">power</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="square_root"><a class="viewcode-back" href="../../expression.html#expression.functions.square_root">[docs]</a><span class="k">def</span> <span class="nf">square_root</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="tangent"><a class="viewcode-back" href="../../expression.html#expression.functions.tangent">[docs]</a><span class="k">def</span> <span class="nf">tangent</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">approximateMultiple</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="tangenth"><a class="viewcode-back" href="../../expression.html#expression.functions.tangenth">[docs]</a><span class="k">def</span> <span class="nf">tangenth</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="generateOrderedFunctionTable"><a class="viewcode-back" href="../../expression.html#expression.functions.generateOrderedFunctionTable">[docs]</a><span class="k">def</span> <span class="nf">generateOrderedFunctionTable</span><span class="p">(</span><span class="n">fset</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">fset</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span> <span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span></div>
+
+
+<span class="c1"># function : {prettyprint, arity, precedence, associativity, class}</span>
+<span class="c1"># Default hash is location in memory, which changes, so for deterministic choice, use a one time sort.</span>
+<span class="n">functionset</span> <span class="o">=</span> <span class="p">{</span> <span class="n">plus</span><span class="p">:(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">minus</span><span class="p">:(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">multiply</span><span class="p">:(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">division</span><span class="p">:(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">modulo</span><span class="p">:(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">power</span><span class="p">:(</span><span class="s2">&quot;**&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">square_root</span><span class="p">:(</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
+                <span class="n">logarithm</span><span class="p">:(</span><span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">maximum</span><span class="p">:(</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">minimum</span><span class="p">:(</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">ln</span><span class="p">:(</span><span class="s2">&quot;ln&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">exponential</span><span class="p">:(</span><span class="s2">&quot;exp&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
+                <span class="n">sine</span><span class="p">:(</span><span class="s2">&quot;sin&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">cosine</span><span class="p">:(</span><span class="s2">&quot;cos&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">absolute</span><span class="p">:(</span><span class="s2">&quot;abs&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">tangenth</span><span class="p">:(</span><span class="s2">&quot;tanh&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">tangent</span><span class="p">:(</span><span class="s2">&quot;tan&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+                <span class="p">}</span>
+
+<span class="n">functions</span> <span class="o">=</span> <span class="n">generateOrderedFunctionTable</span><span class="p">(</span><span class="n">functionset</span><span class="p">)</span>
+
+<span class="c1"># Testfunctions from M.F. Korns&#39; paper &quot;A baseline symbolic regression algorithm&quot;</span>
+<span class="n">testfunctions</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s2">&quot;1.57 + (24.3*x3)&quot;</span><span class="p">,</span> <span class="s2">&quot;0.23+(14.2*((x3+x1)/(3.0*x4)))&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-5.41 + (4.9*(((x3-x0)+(x1/x4))/(3*x4)))&quot;</span><span class="p">,</span> <span class="s2">&quot;-2.3 + (0.13*sin(x2))&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;3.0 + (2.13 * ln(x4))&quot;</span><span class="p">,</span> <span class="s2">&quot;1.3 + (0.13*sqrt(x0))&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;213.80940889 - (213.80940889*exp(-0.54723748542*x0))&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;6.87+(11*sqrt(7.23*x0*x3*x4))&quot;</span><span class="p">,</span><span class="s2">&quot;((sqrt(x0)/ln(x1))*exp(x2)/(x3 ** 2))&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;0.81 + 24.3 * ( ( 2.0*x1+3.0*x2 **2) /(4.0*x3**3 + 5.0*x4**4) )&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;6.87+ 11* cos(7.23*x0**3)&quot;</span><span class="p">,</span> <span class="s2">&quot;2.0 - 2.1 * cos(9.8*x0) * sin(1.3*x4)&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;32-3.0*( (tan(x0)/tan(x1) )*( tan(x2) / tan(x3) ))&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;22 - 4.2*((cos(x0)-tan(x1))*(tanh(x2)/sin(x3)))&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;12.0 - 6.0* tan(x0)/exp(x1) * (ln(x2)-tan(x3) ) &quot;</span>
+                <span class="p">]</span>
+
+<span class="n">tokens</span> <span class="o">=</span> <span class="p">{</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">functionset</span><span class="o">.</span><span class="n">items</span><span class="p">())}</span>
+<span class="n">braces</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span><span class="s1">&#39;)&#39;</span><span class="p">]</span>
+<span class="c1"># A reverse map containing the first letter of each function object</span>
+<span class="n">prefixes</span> <span class="o">=</span> <span class="p">{</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">functionset</span><span class="o">.</span><span class="n">items</span><span class="p">())}</span>
+
+
+<div class="viewcode-block" id="getRandomFunction"><a class="viewcode-back" href="../../expression.html#expression.functions.getRandomFunction">[docs]</a><span class="k">def</span> <span class="nf">getRandomFunction</span><span class="p">(</span><span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">functions</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="getFunctionComplexity"><a class="viewcode-back" href="../../expression.html#expression.functions.getFunctionComplexity">[docs]</a><span class="k">def</span> <span class="nf">getFunctionComplexity</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">functionset</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="tokenize"><a class="viewcode-back" href="../../expression.html#expression.functions.tokenize">[docs]</a><span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :returns: expression parsed as a list of tokens</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># Prepare input</span>
+    <span class="n">expression</span> <span class="o">=</span> <span class="n">preParse</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>
+    <span class="n">detect</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">functionset</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span> <span class="c1"># list of tokens following a unary minus</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">expression</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">output</span> <span class="ow">and</span> <span class="n">output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">detect</span><span class="p">):</span>
+                <span class="n">expression</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="n">handleUnaryMinus</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;^&#39;</span><span class="p">:</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="s1">&#39;**&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">braces</span><span class="p">:</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">prefixes</span> <span class="p">:</span> <span class="c1"># functions</span>
+            <span class="n">expression</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="n">parseFunction</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">matchFloat</span><span class="p">(</span><span class="n">expression</span><span class="p">[</span><span class="n">i</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>  <span class="c1"># -1 since we will increment i in any case</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">))]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">v</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">parseVariable</span><span class="p">(</span><span class="n">expression</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="n">variables</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">+=</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid pattern in string </span><span class="si">{}</span><span class="s2"> , full expr </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expression</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="n">expression</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to decode number, string is </span><span class="si">{}</span><span class="s2">  in expr</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expression</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="n">expression</span><span class="p">))</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="isFunction"><a class="viewcode-back" href="../../expression.html#expression.functions.isFunction">[docs]</a><span class="k">def</span> <span class="nf">isFunction</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">functionset</span> <span class="ow">and</span> <span class="n">functionset</span><span class="p">[</span><span class="n">token</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;F&#39;</span></div>
+
+
+<div class="viewcode-block" id="isOperator"><a class="viewcode-back" href="../../expression.html#expression.functions.isOperator">[docs]</a><span class="k">def</span> <span class="nf">isOperator</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">functionset</span> <span class="ow">and</span> <span class="n">functionset</span><span class="p">[</span><span class="n">token</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;F&#39;</span></div>
+
+
+<div class="viewcode-block" id="infixToPostfix"><a class="viewcode-back" href="../../expression.html#expression.functions.infixToPostfix">[docs]</a><span class="k">def</span> <span class="nf">infixToPostfix</span><span class="p">(</span><span class="n">infix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dijkstra&#39;s shunting yard algorithm to convert an infix expression to postfix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">infix</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">token</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">token</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">token</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;apppending t </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stack</span> <span class="ow">and</span> <span class="n">isFunction</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;apppending f </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">Constant</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;apppending c </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">Variable</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;appending v </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">functionset</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">functionset</span><span class="p">[</span><span class="n">token</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">isFunction</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">oper</span> <span class="o">=</span> <span class="n">functionset</span><span class="p">[</span><span class="n">token</span><span class="p">]</span>
+                <span class="k">while</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">stack</span><span class="p">:</span>
+                    <span class="n">top</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;checking for operator precedence </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">top</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">isOperator</span><span class="p">(</span><span class="n">top</span><span class="p">):</span>
+                        <span class="n">operonstack</span> <span class="o">=</span> <span class="n">functionset</span><span class="p">[</span><span class="n">top</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">oper</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;L&#39;</span> <span class="ow">and</span> <span class="n">oper</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">operonstack</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>   <span class="c1"># l assoc and less precedence</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; R and leq : apppending o </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+                            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                        <span class="k">elif</span> <span class="n">oper</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">operonstack</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; L and le : apppending o </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+                            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;pushing operator </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">))</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;apppending last of stack </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="infixToPrefix"><a class="viewcode-back" href="../../expression.html#expression.functions.infixToPrefix">[docs]</a><span class="k">def</span> <span class="nf">infixToPrefix</span><span class="p">(</span><span class="n">infix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert infix to prefix by way of postfix conversion.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Algorithm is mirror of i to p, roles of () are reversed.</span>
+    <span class="c1"># Reverse input, swap (), i to p, reverse result</span>
+    <span class="n">infix</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">infix</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">infix</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+            <span class="n">infix</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span>
+        <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
+            <span class="n">infix</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;)&#39;</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">infixToPostfix</span><span class="p">(</span><span class="n">infix</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">tmp</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="parseVariable"><a class="viewcode-back" href="../../expression.html#expression.functions.parseVariable">[docs]</a><span class="k">def</span> <span class="nf">parseVariable</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :returns: Variable or None , newindex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">matchVariable</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">vindex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">]]))</span>
+        <span class="k">return</span> <span class="p">(</span> <span class="n">Variable</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="n">vindex</span><span class="p">],</span> <span class="n">vindex</span><span class="p">)</span> <span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="handleUnaryMinus"><a class="viewcode-back" href="../../expression.html#expression.functions.handleUnaryMinus">[docs]</a><span class="k">def</span> <span class="nf">handleUnaryMinus</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">matchFloat</span><span class="p">(</span><span class="n">expression</span><span class="p">[</span><span class="n">index</span><span class="p">:])</span>
+    <span class="k">if</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>  <span class="c1"># -1 since we will increment i in any case</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">))]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">newindex</span> <span class="o">=</span> <span class="n">parseVariable</span><span class="p">(</span><span class="n">expression</span><span class="p">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span> <span class="n">variables</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">newindex</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;(&#39;</span><span class="p">,</span><span class="n">Constant</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">tokens</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span> <span class="n">v</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">expression</span><span class="p">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span> <span class="c1"># case : -(5+3) -&gt; (-1*(5+3))</span>
+                <span class="n">lcount</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">index</span>
+                <span class="k">while</span> <span class="n">j</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">expression</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
+                        <span class="n">lcount</span><span class="o">+=</span><span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">expression</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+                        <span class="n">lcount</span> <span class="o">-=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">lcount</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                                <span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span><span class="p">[:]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span> <span class="o">+</span> <span class="n">expression</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+                            <span class="k">break</span>
+                    <span class="n">j</span><span class="o">+=</span><span class="mi">1</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;(&#39;</span><span class="p">,</span><span class="n">Constant</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">tokens</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid pattern in string </span><span class="si">{}</span><span class="s2"> , full expr </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expression</span><span class="p">[</span><span class="n">index</span><span class="p">:],</span> <span class="n">expression</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to decode number.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">expression</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="parseFunction"><a class="viewcode-back" href="../../expression.html#expression.functions.parseFunction">[docs]</a><span class="k">def</span> <span class="nf">parseFunction</span><span class="p">(</span><span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decode a function from the stream</span>
+
+<span class="sd">    :returns: expression, newindex, newoutput</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># reversed since we want a greedy match, e.g. tanh is preferred over tan|h</span>
+    <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">expression</span><span class="p">[</span><span class="n">index</span><span class="p">:</span><span class="n">index</span><span class="o">+</span><span class="n">length</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> at index </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="p">[</span><span class="n">tokens</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="n">length</span><span class="o">-</span><span class="mi">1</span>
+            <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid chars </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">expression</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="preParse"><a class="viewcode-back" href="../../expression.html#expression.functions.preParse">[docs]</a><span class="k">def</span> <span class="nf">preParse</span><span class="p">(</span><span class="n">expression</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clean up expression before tokenizer operates on it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;**&quot;</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">expression</span></div>
+
+<div class="viewcode-block" id="rmsfitness"><a class="viewcode-back" href="../../expression.html#expression.functions.rmsfitness">[docs]</a><span class="k">def</span> <span class="nf">rmsfitness</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fitnessfunction</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">distancefunction</span><span class="o">=</span><span class="n">rootmeansquare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="rmsnormfitness"><a class="viewcode-back" href="../../expression.html#expression.functions.rmsnormfitness">[docs]</a><span class="k">def</span> <span class="nf">rmsnormfitness</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fitnessfunction</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">distancefunction</span><span class="o">=</span><span class="n">rootmeansquarenormalized</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="pearsonfitness"><a class="viewcode-back" href="../../expression.html#expression.functions.pearsonfitness">[docs]</a><span class="k">def</span> <span class="nf">pearsonfitness</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fitnessfunction</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">distancefunction</span><span class="o">=</span><span class="n">pearson</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="fitnessfunction"><a class="viewcode-back" href="../../expression.html#expression.functions.fitnessfunction">[docs]</a><span class="k">def</span> <span class="nf">fitnessfunction</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">distancefunction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fitness function based on a distance measure.</span>
+<span class="sd">        :param list actual: Y&#39;, actual approximated valus</span>
+<span class="sd">        :param list expected: Y, expected values</span>
+<span class="sd">        :param Tree tree: the instance to operate on</span>
+<span class="sd">        :param function distancefunction: function object that accepts actual, expected as parameters and returns a numerical distance. If None, rootmeansquare is used.</span>
+
+<span class="sd">        Returns d(Y&#39;, Y).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">actual</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Tree instance has no datapoints : invalid&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Constants</span><span class="o">.</span><span class="n">MINFITNESS</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Tree instance has no matching datapoints : invalid&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Constants</span><span class="o">.</span><span class="n">MINFITNESS</span>
+
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">actual</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Tree instance has an invalid expression for a datapoint </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">Constants</span><span class="o">.</span><span class="n">MINFITNESS</span>
+
+    <span class="n">distance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">distancefunction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="n">rootmeansquare</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="n">distancefunction</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">distance</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ben Cardoen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

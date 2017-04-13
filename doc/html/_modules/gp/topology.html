@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gp.topology &#8212; CSRM 0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="CSRM 0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gp.topology</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#This file is part of the CSRM project.</span>
+<span class="c1">#Copyright 2016 - 2017 University of Antwerp</span>
+<span class="c1">#https://www.uantwerpen.be/en/</span>
+<span class="c1">#Licensed under the EUPL V.1.1</span>
+<span class="c1">#A full copy of the license is in COPYING.txt, or can be found at</span>
+<span class="c1">#https://joinup.ec.europa.eu/community/eupl/og_page/eupl</span>
+<span class="c1">#      Author: Ben Cardoen</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">powerOf2</span><span class="p">,</span> <span class="n">getRandom</span>
+<span class="kn">from</span> <span class="nn">gp.spreadpolicy</span> <span class="k">import</span> <span class="n">DistributeSpreadPolicy</span><span class="p">,</span> <span class="n">CopySpreadPolicy</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">ceil</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Topology"><a class="viewcode-back" href="../../gp.html#gp.topology.Topology">[docs]</a><span class="k">class</span> <span class="nc">Topology</span><span class="p">():</span>
+<div class="viewcode-block" id="Topology.__init__"><a class="viewcode-back" href="../../gp.html#gp.topology.Topology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">spreadpolicy</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spreadpolicy</span> <span class="o">=</span> <span class="n">CopySpreadPolicy</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spreadpolicy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spreadpolicy</span>
+
+    <span class="nd">@spreadpolicy</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">spreadpolicy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spreadpolicy</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Topology.getTarget"><a class="viewcode-back" href="../../gp.html#gp.topology.Topology.getTarget">[docs]</a>    <span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Topology.getSource"><a class="viewcode-back" href="../../gp.html#gp.topology.Topology.getSource">[docs]</a>    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Topology</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> --&gt; </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getTarget</span><span class="p">(</span><span class="n">source</span><span class="p">))</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)])</span>
+
+<div class="viewcode-block" id="Topology.toDot"><a class="viewcode-back" href="../../gp.html#gp.topology.Topology.toDot">[docs]</a>    <span class="k">def</span> <span class="nf">toDot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span> <span class="ow">or</span> <span class="s2">&quot;output.dot&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;digraph BST{</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;[label = </span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;P </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">]&quot;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getTarget</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                    <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; -&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="NoneTopology"><a class="viewcode-back" href="../../gp.html#gp.topology.NoneTopology">[docs]</a><span class="k">class</span> <span class="nc">NoneTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stub class for a sequential sinle instances process.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NoneTopology.__init__"><a class="viewcode-back" href="../../gp.html#gp.topology.NoneTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NoneTopology.getTarget"><a class="viewcode-back" href="../../gp.html#gp.topology.NoneTopology.getTarget">[docs]</a>    <span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="NoneTopology.getSource"><a class="viewcode-back" href="../../gp.html#gp.topology.NoneTopology.getSource">[docs]</a>    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span></div></div>
+
+
+<div class="viewcode-block" id="RandomStaticTopology"><a class="viewcode-back" href="../../gp.html#gp.topology.RandomStaticTopology">[docs]</a><span class="k">class</span> <span class="nc">RandomStaticTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomStaticTopology.__init__"><a class="viewcode-back" href="../../gp.html#gp.topology.RandomStaticTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">links</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="n">getRandom</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Non deterministic mode&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_links</span> <span class="o">=</span> <span class="n">links</span> <span class="ow">or</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMapping</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">links</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_links</span>
+
+<div class="viewcode-block" id="RandomStaticTopology.getTarget"><a class="viewcode-back" href="../../gp.html#gp.topology.RandomStaticTopology.getTarget">[docs]</a>    <span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">[</span><span class="n">source</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RandomStaticTopology.getSource"><a class="viewcode-back" href="../../gp.html#gp.topology.RandomStaticTopology.getSource">[docs]</a>    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reversemap</span><span class="p">[</span><span class="n">target</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RandomStaticTopology.setMapping"><a class="viewcode-back" href="../../gp.html#gp.topology.RandomStaticTopology.setMapping">[docs]</a>    <span class="k">def</span> <span class="nf">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a mapping where each node is not connected to itself, but to *self._links* nodes.</span>
+
+<span class="sd">        Where only one link is needed, ensure that each node has both a source and target.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_map</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)]</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_links</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">repeat</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">while</span> <span class="n">repeat</span><span class="p">:</span>
+                <span class="n">repeat</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="n">repeat</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="k">del</span> <span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">)</span>
+                <span class="n">indices</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reversemap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reverseMapping</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_reverseMapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rev</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">trglist</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trglist</span><span class="p">:</span>
+                <span class="n">rev</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rev</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;RandomStaticTopology with </span><span class="si">{}</span><span class="s2"> links per node &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_links</span><span class="p">)</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TreeTopology"><a class="viewcode-back" href="../../gp.html#gp.topology.TreeTopology">[docs]</a><span class="k">class</span> <span class="nc">TreeTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tree structure.</span>
+
+<span class="sd">    Each node sends to its children. Leaves send to None.</span>
+<span class="sd">    This is a full binary tree.</span>
+<span class="sd">    For N nodes, the tree has (N-1) links, with no cycling dependencies.</span>
+<span class="sd">    Communication overhead is minimized, while still allowing for diffusion.</span>
+<span class="sd">    With each node generating independently, the pipeline effect is largely avoided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TreeTopology.__init__"><a class="viewcode-back" href="../../gp.html#gp.topology.TreeTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int size: Number of nodes. Size+1 should be a power of 2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">powerOf2</span><span class="p">(</span><span class="n">size</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spreadpolicy</span> <span class="o">=</span> <span class="n">DistributeSpreadPolicy</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">depth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span>
+
+<div class="viewcode-block" id="TreeTopology.getSource"><a class="viewcode-back" href="../../gp.html#gp.topology.TreeTopology.getSource">[docs]</a>    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">target</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">[(</span><span class="n">target</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="c1">#logger.debug(&quot;getSource called with {} -&gt;{}&quot;.format(target, v))</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+<div class="viewcode-block" id="TreeTopology.getTarget"><a class="viewcode-back" href="../../gp.html#gp.topology.TreeTopology.getTarget">[docs]</a>    <span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">source</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isLeaf</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">source</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">source</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
+        <span class="c1">#logger.debug(&quot;getTarget called with {} -&gt;{}&quot;.format(source, v))</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+<div class="viewcode-block" id="TreeTopology.isLeaf"><a class="viewcode-back" href="../../gp.html#gp.topology.TreeTopology.isLeaf">[docs]</a>    <span class="k">def</span> <span class="nf">isLeaf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return true if node is a leaf.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">node</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="c1"># use fact that last level of binary tree with k nodes has 2^log2(k) leaves</span>
+        <span class="n">cutoff</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span> <span class="o">&gt;=</span> <span class="n">cutoff</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;TreeTopology &quot;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="RandomDynamicTopology"><a class="viewcode-back" href="../../gp.html#gp.topology.RandomDynamicTopology">[docs]</a><span class="k">class</span> <span class="nc">RandomDynamicTopology</span><span class="p">(</span><span class="n">RandomStaticTopology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Variation on Static, on demand a new mapping is calculated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RandomDynamicTopology.__init__"><a class="viewcode-back" href="../../gp.html#gp.topology.RandomDynamicTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RandomDynamicTopology.recalculate"><a class="viewcode-back" href="../../gp.html#gp.topology.RandomDynamicTopology.recalculate">[docs]</a>    <span class="k">def</span> <span class="nf">recalculate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMapping</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Dynamic topology with </span><span class="si">{}</span><span class="s2"> links &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">)</span> <span class="o">+</span> <span class="n">Topology</span><span class="o">.</span><span class="n">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RingTopology"><a class="viewcode-back" href="../../gp.html#gp.topology.RingTopology">[docs]</a><span class="k">class</span> <span class="nc">RingTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple Ring Topology</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RingTopology.__init__"><a class="viewcode-back" href="../../gp.html#gp.topology.RingTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RingTopology.getSource"><a class="viewcode-back" href="../../gp.html#gp.topology.RingTopology.getSource">[docs]</a>    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">target</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RingTopology.getTarget"><a class="viewcode-back" href="../../gp.html#gp.topology.RingTopology.getTarget">[docs]</a>    <span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">source</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;RingTopology&quot;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="VonNeumannTopology"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology">[docs]</a><span class="k">class</span> <span class="nc">VonNeumannTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    2D grid, with each node connected with 4 nodes.</span>
+
+<span class="sd">    Edge nodes are connectect in a cyclic form. E.g. a square of 9 nodes (3x3),</span>
+<span class="sd">    node 0 is connected to [8,1,6,3]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="VonNeumannTopology.__init__"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int size: an integer square</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rt</span> <span class="o">=</span> <span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">size</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rem</span> <span class="o">=</span> <span class="n">size</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">rt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">size</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rem</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rem</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">+=</span> <span class="mi">1</span></div>
+        <span class="c1">#logger.info(&quot;RT = {} Diff = {} Rows = {}&quot;.format(self.rt, self.rem, self.rowcount))</span>
+
+<div class="viewcode-block" id="VonNeumannTopology.getSource"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.getSource">[docs]</a>    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># Symmetric relationship</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getTarget</span><span class="p">(</span><span class="n">target</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VonNeumannTopology.lintormcm"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.lintormcm">[docs]</a>    <span class="k">def</span> <span class="nf">lintormcm</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">rowsize</span><span class="p">):</span>
+        <span class="n">colindex</span> <span class="o">=</span> <span class="n">index</span> <span class="o">%</span> <span class="n">rowsize</span>
+        <span class="n">rowindex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">index</span><span class="o">-</span><span class="n">colindex</span><span class="p">)</span> <span class="o">/</span> <span class="n">rowsize</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rowindex</span><span class="p">,</span> <span class="n">colindex</span></div>
+
+<div class="viewcode-block" id="VonNeumannTopology.rmcmtolin"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.rmcmtolin">[docs]</a>    <span class="k">def</span> <span class="nf">rmcmtolin</span><span class="p">(</span><span class="n">rowindex</span><span class="p">,</span> <span class="n">colindex</span><span class="p">,</span> <span class="n">rowsize</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rowindex</span> <span class="o">*</span> <span class="n">rowsize</span> <span class="o">+</span> <span class="n">colindex</span></div>
+
+<div class="viewcode-block" id="VonNeumannTopology.getTarget"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.getTarget">[docs]</a>    <span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For a small grid, duplicates are possible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span class="n">source</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">size</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="p">(</span><span class="n">source</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">size</span>
+        <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">VonNeumannTopology</span><span class="o">.</span><span class="n">lintormcm</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rt</span><span class="p">)</span>
+        <span class="n">down</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">VonNeumannTopology</span><span class="o">.</span><span class="n">rmcmtolin</span><span class="p">((</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowcount</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rt</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">up</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">VonNeumannTopology</span><span class="o">.</span><span class="n">rmcmtolin</span><span class="p">((</span><span class="n">r</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowcount</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rt</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">up</span><span class="p">,</span> <span class="n">down</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;VonNeumannTopology&quot;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>
+
+
+<span class="n">topologies</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;grid&quot;</span><span class="p">:</span><span class="n">VonNeumannTopology</span><span class="p">,</span> <span class="s2">&quot;randomstatic&quot;</span><span class="p">:</span><span class="n">RandomStaticTopology</span><span class="p">,</span> <span class="s2">&quot;randomdynamic&quot;</span><span class="p">:</span><span class="n">RandomDynamicTopology</span><span class="p">,</span> <span class="s2">&quot;tree&quot;</span><span class="p">:</span><span class="n">TreeTopology</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span><span class="n">NoneTopology</span><span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ben Cardoen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>meta package &#8212; CSRM 0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="CSRM 0.0 documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="meta-package">
+<h1>meta package<a class="headerlink" href="#meta-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-meta.pso">
+<span id="meta-pso-module"></span><h2>meta.pso module<a class="headerlink" href="#module-meta.pso" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="meta.pso.Instance">
+<em class="property">class </em><code class="descclassname">meta.pso.</code><code class="descname">Instance</code><span class="sig-paren">(</span><em>tree</em>, <em>expected</em>, <em>distancefunction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="meta.pso.Instance.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>tree</em>, <em>expected</em>, <em>distancefunction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Instance.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Instance.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.Instance.update">
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Instance.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Instance.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.Instance.updateFitness">
+<code class="descname">updateFitness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Instance.updateFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Instance.updateFitness" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.Instance.updateValues">
+<code class="descname">updateValues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Instance.updateValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Instance.updateValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="meta.pso.PSO">
+<em class="property">class </em><code class="descclassname">meta.pso.</code><code class="descname">PSO</code><span class="sig-paren">(</span><em>particlecount: int</em>, <em>particle</em>, <em>expected</em>, <em>distancefunction</em>, <em>seed=0</em>, <em>iterations=50</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#PSO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.PSO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Particle Swarm Optimization.</p>
+<p>Swarm optimizer with n dimensions, inertia weight damping.</p>
+<dl class="method">
+<dt id="meta.pso.PSO.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>particlecount: int</em>, <em>particle</em>, <em>expected</em>, <em>distancefunction</em>, <em>seed=0</em>, <em>iterations=50</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#PSO.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.PSO.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.PSO.doIteration">
+<code class="descname">doIteration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#PSO.doIteration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.PSO.doIteration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.PSO.getBest">
+<code class="descname">getBest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#PSO.getBest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.PSO.getBest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.PSO.getBestIndex">
+<code class="descname">getBestIndex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#PSO.getBestIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.PSO.getBestIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.PSO.report">
+<code class="descname">report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#PSO.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.PSO.report" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="meta.pso.PSO.rone">
+<code class="descname">rone</code><a class="headerlink" href="#meta.pso.PSO.rone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="meta.pso.PSO.rtwo">
+<code class="descname">rtwo</code><a class="headerlink" href="#meta.pso.PSO.rtwo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.PSO.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#PSO.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.PSO.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="meta.pso.Particle">
+<em class="property">class </em><code class="descclassname">meta.pso.</code><code class="descname">Particle</code><span class="sig-paren">(</span><em>objectinstance</em>, <em>rng</em>, <em>Y</em>, <em>distancefunction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Particle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Particle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#meta.pso.Instance" title="meta.pso.Instance"><code class="xref py py-class docutils literal"><span class="pre">meta.pso.Instance</span></code></a></p>
+<p>PSO Particle.</p>
+<p>Wrap around an object with dimensions which PSO can optimize.</p>
+<dl class="method">
+<dt id="meta.pso.Particle.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>objectinstance</em>, <em>rng</em>, <em>Y</em>, <em>distancefunction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Particle.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Particle.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.Particle.inertiaweight">
+<code class="descname">inertiaweight</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Particle.inertiaweight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Particle.inertiaweight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Control velocity, in absence of velocity limits (which require dimension limit) this is useful to prevent velocity explosion.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.Particle.initializePosition">
+<code class="descname">initializePosition</code><span class="sig-paren">(</span><em>rng</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Particle.initializePosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Particle.initializePosition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perturb initial position.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.Particle.randominertiaweight">
+<code class="descname">randominertiaweight</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Particle.randominertiaweight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Particle.randominertiaweight" title="Permalink to this definition">¶</a></dt>
+<dd><p>From literature, this is not optimal for all cases, but on average leads to least error.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.Particle.updatePosition">
+<code class="descname">updatePosition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Particle.updatePosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Particle.updatePosition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="meta.pso.Particle.updateVelocity">
+<code class="descname">updateVelocity</code><span class="sig-paren">(</span><em>c1</em>, <em>c2</em>, <em>r1</em>, <em>r2</em>, <em>g</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/pso.html#Particle.updateVelocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.pso.Particle.updateVelocity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-meta.testoptimizer">
+<span id="meta-testoptimizer-module"></span><h2>meta.testoptimizer module<a class="headerlink" href="#module-meta.testoptimizer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="meta.testoptimizer.OptimizerTest">
+<em class="property">class </em><code class="descclassname">meta.testoptimizer.</code><code class="descname">OptimizerTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/testoptimizer.html#OptimizerTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.testoptimizer.OptimizerTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="meta.testoptimizer.OptimizerTest.testPSO">
+<code class="descname">testPSO</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/meta/testoptimizer.html#OptimizerTest.testPSO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meta.testoptimizer.OptimizerTest.testPSO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-meta">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-meta" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">meta package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-meta.pso">meta.pso module</a></li>
+<li><a class="reference internal" href="#module-meta.testoptimizer">meta.testoptimizer module</a></li>
+<li><a class="reference internal" href="#module-meta">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/meta.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ben Cardoen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/meta.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

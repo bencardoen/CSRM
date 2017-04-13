@@ -1,0 +1,442 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>expression.tools &#8212; CSRM 0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="CSRM 0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for expression.tools</h1><div class="highlight"><pre>
+<span></span><span class="c1">#This file is part of the CSRM project.</span>
+<span class="c1">#Copyright 2016 - 2017 University of Antwerp</span>
+<span class="c1">#https://www.uantwerpen.be/en/</span>
+<span class="c1">#Licensed under the EUPL V.1.1</span>
+<span class="c1">#A full copy of the license is in COPYING.txt, or can be found at</span>
+<span class="c1">#https://joinup.ec.europa.eu/community/eupl/og_page/eupl</span>
+<span class="c1">#      Author: Ben Cardoen</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">call</span>
+<span class="kn">import</span> <span class="nn">webbrowser</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">scipy.stats.stats</span> <span class="k">import</span> <span class="n">pearsonr</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="msb"><a class="viewcode-back" href="../../expression.html#expression.tools.msb">[docs]</a><span class="k">def</span> <span class="nf">msb</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return most significant bit (max(i) s.t. b[i]==1)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">b</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">i</span></div>
+
+<div class="viewcode-block" id="powerOf2"><a class="viewcode-back" href="../../expression.html#expression.tools.powerOf2">[docs]</a><span class="k">def</span> <span class="nf">powerOf2</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :returns: True if a is a power of 2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># source https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2</span>
+    <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">a</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="rmtocm"><a class="viewcode-back" href="../../expression.html#expression.tools.rmtocm">[docs]</a><span class="k">def</span> <span class="nf">rmtocm</span><span class="p">(</span><span class="n">lst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a column major equivalent of row major encoded lst</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">[</span> <span class="p">[</span><span class="n">lst</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">)]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="compareLists"><a class="viewcode-back" href="../../expression.html#expression.tools.compareLists">[docs]</a><span class="k">def</span> <span class="nf">compareLists</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return true if left and right contain the same elements, disregarding order and None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lefttrim</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">left</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
+    <span class="n">righttrim</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">right</span> <span class="k">if</span> <span class="n">y</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">Counter</span><span class="p">(</span><span class="n">lefttrim</span><span class="p">)</span> <span class="o">==</span> <span class="n">Counter</span><span class="p">(</span><span class="n">righttrim</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="approximateMultiple"><a class="viewcode-back" href="../../expression.html#expression.tools.approximateMultiple">[docs]</a><span class="k">def</span> <span class="nf">approximateMultiple</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    let a = 6.001*math.pi, b=math.pi, epsilon= 0.1, returns True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">m</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">epsilon</span></div>
+
+
+<div class="viewcode-block" id="almostEqual"><a class="viewcode-back" href="../../expression.html#expression.tools.almostEqual">[docs]</a><span class="k">def</span> <span class="nf">almostEqual</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Absolute comparison</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">left</span> <span class="o">-</span> <span class="n">right</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="copyObject"><a class="viewcode-back" href="../../expression.html#expression.tools.copyObject">[docs]</a><span class="k">def</span> <span class="nf">copyObject</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="copyJSON"><a class="viewcode-back" href="../../expression.html#expression.tools.copyJSON">[docs]</a><span class="k">def</span> <span class="nf">copyJSON</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="generateSVG"><a class="viewcode-back" href="../../expression.html#expression.tools.generateSVG">[docs]</a><span class="k">def</span> <span class="nf">generateSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">call</span><span class="p">([</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span> <span class="s2">&quot;-o </span><span class="si">{}</span><span class="s2">.svg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dotfile</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">]),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dotfile</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="showSVG"><a class="viewcode-back" href="../../expression.html#expression.tools.showSVG">[docs]</a><span class="k">def</span> <span class="nf">showSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">outfile</span> <span class="o">=</span> <span class="n">dotfile</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.svg&quot;</span>
+    <span class="n">generateSVG</span><span class="p">(</span><span class="n">dotfile</span><span class="p">)</span>
+    <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="matchFloat"><a class="viewcode-back" href="../../expression.html#expression.tools.matchFloat">[docs]</a><span class="k">def</span> <span class="nf">matchFloat</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Try to parse a floating point expression at begin of expr, return string representation if found or None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?&quot;</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">v</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="matchVariable"><a class="viewcode-back" href="../../expression.html#expression.tools.matchVariable">[docs]</a><span class="k">def</span> <span class="nf">matchVariable</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Try to match a variable at begin of expr, return string representation if found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[xX][_]?\d+&quot;</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">v</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="generateVariables"><a class="viewcode-back" href="../../expression.html#expression.tools.generateVariables">[docs]</a><span class="k">def</span> <span class="nf">generateVariables</span><span class="p">(</span><span class="n">varcount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">datacount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a list of datapoints.</span>
+
+<span class="sd">    :param int varcount: number of features</span>
+<span class="sd">    :param int datacount: number of datapoints per feature</span>
+<span class="sd">    :param int seed: Seed for the rng</span>
+<span class="sd">    :returns: a list of varcount lists each datacount sized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">datacount</span><span class="p">)]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">varcount</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">sort</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)):</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="traceFunction"><a class="viewcode-back" href="../../expression.html#expression.tools.traceFunction">[docs]</a><span class="k">def</span> <span class="nf">traceFunction</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logcall</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to log a function with an optional logger.</span>
+<span class="sd">    Logs arguments and return value of the function object at debug level if no logger is given,</span>
+<span class="sd">    else uses the logcall object.</span>
+
+<span class="sd">    :param function fn: function object, implicit</span>
+<span class="sd">    :param function logcall: logging callable, e.g. logcall=logger.getLogger(&#39;global&#39;).debug</span>
+
+<span class="sd">    Example usage :</span>
+
+<span class="sd">    @traceFunction(logcall=logging.getLogger(&#39;global&#39;).error) or @traceFunction</span>
+
+<span class="sd">    def myfunc(...):</span>
+
+<span class="sd">    Based on : https://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">logcall</span><span class="p">:</span>
+        <span class="n">logcall</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span>
+
+    <span class="c1"># This is the wrapping decorator, without kargs</span>
+    <span class="k">def</span> <span class="nf">_decorate</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">function</span><span class="p">)</span><span class="c1"># don&#39;t need this, but it is helpful to avoid __name__ overwriting</span>
+        <span class="c1"># This is the actual decorator, pass arguments and log.</span>
+        <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">logcall</span><span class="p">(</span><span class="s2">&quot;Function </span><span class="si">{}</span><span class="s2"> called with pargs</span><span class="se">\n</span><span class="si">{}</span><span class="s2"> and kargs</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+            <span class="n">rv</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">logcall</span><span class="p">(</span><span class="s2">&quot;Function </span><span class="si">{}</span><span class="s2"> returns </span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">rv</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">rv</span>
+        <span class="k">return</span> <span class="n">inner</span>
+
+    <span class="k">if</span> <span class="n">fn</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_decorate</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_decorate</span></div>
+
+<div class="viewcode-block" id="scaleTransformation"><a class="viewcode-back" href="../../expression.html#expression.tools.scaleTransformation">[docs]</a><span class="k">def</span> <span class="nf">scaleTransformation</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scale iterable to fit within [lower, upper]</span>
+<span class="sd">    Returns min, max of elements</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">actuallow</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="n">actualhigh</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">el</span> <span class="o">&lt;</span> <span class="n">actuallow</span><span class="p">:</span>
+            <span class="n">actuallow</span> <span class="o">=</span> <span class="n">el</span>
+        <span class="k">if</span> <span class="n">el</span> <span class="o">&gt;</span> <span class="n">actualhigh</span><span class="p">:</span>
+            <span class="n">actualhigh</span> <span class="o">=</span> <span class="n">el</span>
+        <span class="n">length</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">actualrange</span> <span class="o">=</span> <span class="n">actualhigh</span><span class="o">-</span><span class="n">actuallow</span>
+    <span class="n">requiredrange</span> <span class="o">=</span> <span class="n">upper</span><span class="o">-</span><span class="n">lower</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">actuallow</span>
+        <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">requiredrange</span><span class="o">/</span><span class="n">actualrange</span>
+        <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lower</span>
+    <span class="k">return</span> <span class="n">actuallow</span><span class="p">,</span> <span class="n">actualhigh</span></div>
+
+
+
+
+<div class="viewcode-block" id="rootmeansquare"><a class="viewcode-back" href="../../expression.html#expression.tools.rootmeansquare">[docs]</a><span class="k">def</span> <span class="nf">rootmeansquare</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RMSE</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected</span><span class="p">))</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="rootmeansquarenormalized"><a class="viewcode-back" href="../../expression.html#expression.tools.rootmeansquarenormalized">[docs]</a><span class="k">def</span> <span class="nf">rootmeansquarenormalized</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalized RMSE.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected</span><span class="p">))</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+    <span class="n">ma</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">nrmse</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">ma</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nrmse</span></div>
+
+<div class="viewcode-block" id="pearson"><a class="viewcode-back" href="../../expression.html#expression.tools.pearson">[docs]</a><span class="k">def</span> <span class="nf">pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Return Pearson correlation coefficient.</span>
+
+<span class="sd">    Calculates correlation between actual and expected, offsetting it so it can be used as a distance function.</span>
+<span class="sd">    The returned value is in the range [0, 1] with 0 optimal distance.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        r = \frac{\sum{(a-E[a])*(b-E[b])}}{\sqrt{\sum{(a-E[a])^2}*\sum{(b-E[b])^2}}}</span>
+
+
+<span class="sd">    :param actual: Actual values returned by evaluating a single approximation</span>
+<span class="sd">    :param expected: Desired values</span>
+<span class="sd">    :returns float: (1 - r)/2</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+    <span class="n">meana</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">meanb</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">va</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">meana</span>
+    <span class="n">vb</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">meanb</span>
+    <span class="n">nom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">va</span><span class="o">*</span><span class="n">vb</span>  <span class="p">)</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">va</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span> <span class="n">vb</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">denom</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># truncate rounding</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">nom</span><span class="o">/</span><span class="n">denom</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span>
+    <span class="k">return</span> <span class="n">r</span></div>
+
+<span class="k">def</span> <span class="nf">_pearson</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+    <span class="n">nsum</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span>
+    <span class="n">nsquare</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span>
+    <span class="n">nsqrt</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span>
+    <span class="n">nom</span> <span class="o">=</span> <span class="n">nsum</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">nsum</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="n">nsum</span><span class="p">(</span><span class="n">b</span><span class="p">))</span><span class="o">/</span><span class="n">N</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">nsqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">nsum</span><span class="p">(</span><span class="n">nsquare</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="o">-</span> <span class="n">nsquare</span><span class="p">(</span><span class="n">nsum</span><span class="p">(</span><span class="n">a</span><span class="p">))</span><span class="o">/</span><span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">nsum</span><span class="p">(</span><span class="n">nsquare</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="o">-</span> <span class="n">nsquare</span><span class="p">(</span><span class="n">nsum</span><span class="p">(</span><span class="n">b</span><span class="p">))</span><span class="o">/</span><span class="n">N</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">nom</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">denom</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="randomizedConsume"><a class="viewcode-back" href="../../expression.html#expression.tools.randomizedConsume">[docs]</a><span class="k">def</span> <span class="nf">randomizedConsume</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a generator to a random element in the list without repeating.</span>
+
+<span class="sd">    :param list lst: modified in place, at the last call the list is empty.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">lsize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lsize</span><span class="p">):</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">yield</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="getKSamples"><a class="viewcode-back" href="../../expression.html#expression.tools.getKSamples">[docs]</a><span class="k">def</span> <span class="nf">getKSamples</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a K-sample of X,Y.</span>
+<span class="sd">    X is a 2 dimensional array with f=len(X) features, each having g=len(X[0]) entries. fxg</span>
+<span class="sd">    Y is a 1 dimensional vector with g entries : 1xg</span>
+
+<span class="sd">    :returns: X&#39;, Y&#39; of dimensions (fxk, 1xk) respectively</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">K</span><span class="o">&lt;=</span> <span class="n">values</span><span class="p">)</span>
+    <span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span> <span class="n">values</span> <span class="p">),</span> <span class="n">K</span><span class="p">))</span>
+    <span class="n">Xk</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="p">)]</span>
+    <span class="n">Yk</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="p">):</span>
+            <span class="n">Xk</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">Yk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Xk</span><span class="p">,</span> <span class="n">Yk</span></div>
+
+<div class="viewcode-block" id="sampleExclusiveList"><a class="viewcode-back" href="../../expression.html#expression.tools.sampleExclusiveList">[docs]</a><span class="k">def</span> <span class="nf">sampleExclusiveList</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">exclude</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Consume a list, get k random distinct values, with *exclude*</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">lsize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">k</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">lst</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="n">exclude</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k</span><span class="o">-=</span><span class="mi">1</span>
+            <span class="k">yield</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="consume"><a class="viewcode-back" href="../../expression.html#expression.tools.consume">[docs]</a><span class="k">def</span> <span class="nf">consume</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a generator to an element in the list.</span>
+<span class="sd">    :param lst list: empties the list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">listlength</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">listlength</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">item</span></div>
+
+
+<div class="viewcode-block" id="permutate"><a class="viewcode-back" href="../../expression.html#expression.tools.permutate">[docs]</a><span class="k">def</span> <span class="nf">permutate</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a generator to a random element in the list without repeating.</span>
+<span class="sd">        When the generator halts, the list a random permumation (in place).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+    <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">lsize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="n">limit</span> <span class="o">=</span> <span class="n">lsize</span><span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lsize</span><span class="p">):</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="n">lst</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">limit</span><span class="p">]</span>
+        <span class="n">lst</span><span class="p">[</span><span class="n">limit</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="n">limit</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">yield</span> <span class="n">item</span></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">lst</span>  <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]]</span>
+    <span class="n">clst</span> <span class="o">=</span> <span class="n">rmtocm</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">clst</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ben Cardoen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>meta.pso &#8212; CSRM 0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="CSRM 0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for meta.pso</h1><div class="highlight"><pre>
+<span></span><span class="c1">#This file is part of the CMSR project.</span>
+<span class="c1">#Copyright 2016 - 2017 University of Antwerp</span>
+<span class="c1">#https://www.uantwerpen.be/en/</span>
+<span class="c1">#Licensed under the EUPL V.1.1</span>
+<span class="c1">#A full copy of the license is in COPYING.txt, or can be found at</span>
+<span class="c1">#https://joinup.ec.europa.eu/community/eupl/og_page/eupl</span>
+<span class="c1">#      Author: Ben Cardoen</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">getRandom</span><span class="p">,</span> <span class="n">copyObject</span>
+<span class="kn">from</span> <span class="nn">expression.tree</span> <span class="k">import</span> <span class="n">Tree</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Instance"><a class="viewcode-back" href="../../meta.html#meta.pso.Instance">[docs]</a><span class="k">class</span> <span class="nc">Instance</span><span class="p">:</span>
+<div class="viewcode-block" id="Instance.__init__"><a class="viewcode-back" href="../../meta.html#meta.pso.Instance.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">distancefunction</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constants</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">getConstants</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constants</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constants</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">getFitness</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expected</span> <span class="o">=</span> <span class="n">expected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distancefunction</span> <span class="o">=</span> <span class="n">distancefunction</span></div>
+
+<div class="viewcode-block" id="Instance.updateValues"><a class="viewcode-back" href="../../meta.html#meta.pso.Instance.updateValues">[docs]</a>    <span class="k">def</span> <span class="nf">updateValues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cur</span><span class="p">,</span> <span class="n">const</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">constants</span><span class="p">):</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instance.updateFitness"><a class="viewcode-back" href="../../meta.html#meta.pso.Instance.updateFitness">[docs]</a>    <span class="k">def</span> <span class="nf">updateFitness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">evaluationcost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expected</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">distancefunction</span><span class="p">)</span>
+        <span class="n">newf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">getFitness</span><span class="p">()</span>
+        <span class="n">oldf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span>
+        <span class="k">if</span> <span class="n">newf</span> <span class="o">&lt;</span> <span class="n">oldf</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">[:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">newf</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">getFitness</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instance.update"><a class="viewcode-back" href="../../meta.html#meta.pso.Instance.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateValues</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateFitness</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Particle"><a class="viewcode-back" href="../../meta.html#meta.pso.Particle">[docs]</a><span class="k">class</span> <span class="nc">Particle</span><span class="p">(</span><span class="n">Instance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PSO Particle.</span>
+
+<span class="sd">    Wrap around an object with dimensions which PSO can optimize.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="Particle.__init__"><a class="viewcode-back" href="../../meta.html#meta.pso.Particle.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objectinstance</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">distancefunction</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">objectinstance</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">distancefunction</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">))]</span> <span class="c1"># zero velocity fails at times, convergence halts.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initializePosition</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Particle.inertiaweight"><a class="viewcode-back" href="../../meta.html#meta.pso.Particle.inertiaweight">[docs]</a>    <span class="k">def</span> <span class="nf">inertiaweight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Control velocity, in absence of velocity limits (which require dimension limit) this is useful to prevent velocity explosion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">randominertiaweight</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Particle.randominertiaweight"><a class="viewcode-back" href="../../meta.html#meta.pso.Particle.randominertiaweight">[docs]</a>    <span class="k">def</span> <span class="nf">randominertiaweight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        From literature, this is not optimal for all cases, but on average leads to least error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span></div>
+
+<div class="viewcode-block" id="Particle.initializePosition"><a class="viewcode-back" href="../../meta.html#meta.pso.Particle.initializePosition">[docs]</a>    <span class="k">def</span> <span class="nf">initializePosition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perturb initial position.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">[:]</span></div>
+
+<div class="viewcode-block" id="Particle.updateVelocity"><a class="viewcode-back" href="../../meta.html#meta.pso.Particle.updateVelocity">[docs]</a>    <span class="k">def</span> <span class="nf">updateVelocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">)):</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inertiaweight</span><span class="p">()</span><span class="o">*</span><span class="n">vi</span> <span class="o">+</span> <span class="n">c1</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="n">r1</span> <span class="o">+</span> <span class="n">c2</span> <span class="o">*</span> <span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="n">r2</span></div>
+
+
+<div class="viewcode-block" id="Particle.updatePosition"><a class="viewcode-back" href="../../meta.html#meta.pso.Particle.updatePosition">[docs]</a>    <span class="k">def</span> <span class="nf">updatePosition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">)):</span>
+            <span class="n">xi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">xi</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Particle fitness </span><span class="si">{}</span><span class="s2"> with velocity </span><span class="si">{}</span><span class="s2"> position </span><span class="si">{}</span><span class="s2"> and best </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PSO"><a class="viewcode-back" href="../../meta.html#meta.pso.PSO">[docs]</a><span class="k">class</span> <span class="nc">PSO</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Particle Swarm Optimization.</span>
+
+<span class="sd">    Swarm optimizer with n dimensions, inertia weight damping.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PSO.__init__"><a class="viewcode-back" href="../../meta.html#meta.pso.PSO.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particlecount</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">particle</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">distancefunction</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">getRandom</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using zero seed&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">particlecount</span> <span class="o">=</span> <span class="n">particlecount</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="n">iterations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentiteration</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Particle</span><span class="p">(</span><span class="n">copyObject</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">expected</span><span class="p">,</span> <span class="n">distancefunction</span><span class="o">=</span><span class="n">distancefunction</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">particlecount</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c1</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c2</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bestparticle</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">globalbest</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">getBest</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<div class="viewcode-block" id="PSO.getBest"><a class="viewcode-back" href="../../meta.html#meta.pso.PSO.getBest">[docs]</a>    <span class="k">def</span> <span class="nf">getBest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ob1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bestparticle</span>
+        <span class="n">nb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getBestIndex</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ob1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">nb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ob1</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bestparticle</span> <span class="o">=</span> <span class="n">nb</span><span class="p">[:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">globalbest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bestparticle</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">best</span><span class="p">[:]</span></div>
+
+<div class="viewcode-block" id="PSO.getBestIndex"><a class="viewcode-back" href="../../meta.html#meta.pso.PSO.getBestIndex">[docs]</a>    <span class="k">def</span> <span class="nf">getBestIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">([(</span><span class="n">index</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">fitness</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">)],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rtwo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<div class="viewcode-block" id="PSO.doIteration"><a class="viewcode-back" href="../../meta.html#meta.pso.PSO.doIteration">[docs]</a>    <span class="k">def</span> <span class="nf">doIteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">updateVelocity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rone</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rtwo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">globalbest</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">updatePosition</span><span class="p">()</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">getBest</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PSO.run"><a class="viewcode-back" href="../../meta.html#meta.pso.PSO.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">doIteration</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">currentiteration</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="PSO.report"><a class="viewcode-back" href="../../meta.html#meta.pso.PSO.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;In iteration </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> current population is </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentiteration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles</span><span class="p">]))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Best overall is for particles index </span><span class="si">{}</span><span class="s2"> with fitness </span><span class="si">{}</span><span class="s2"> and values </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bestparticle</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">bestparticle</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">globalbest</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ben Cardoen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gp.paralleldriver &#8212; CSRM 0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="CSRM 0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gp.paralleldriver</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#This file is part of the CSRM project.</span>
+<span class="c1">#Copyright 2016 - 2017 University of Antwerp</span>
+<span class="c1">#https://www.uantwerpen.be/en/</span>
+<span class="c1">#Licensed under the EUPL V.1.1</span>
+<span class="c1">#A full copy of the license is in COPYING.txt, or can be found at</span>
+<span class="c1">#https://joinup.ec.europa.eu/community/eupl/og_page/eupl</span>
+<span class="c1">#      Author: Ben Cardoen</span>
+
+<span class="kn">from</span> <span class="nn">expression.functions</span> <span class="k">import</span> <span class="n">testfunctions</span><span class="p">,</span> <span class="n">pearsonfitness</span> <span class="k">as</span> <span class="n">_fit</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">expression.tree</span> <span class="k">import</span> <span class="n">Tree</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">generateVariables</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">gp.topology</span> <span class="k">import</span> <span class="n">RandomStaticTopology</span><span class="p">,</span> <span class="n">topologies</span>
+<span class="kn">from</span> <span class="nn">gp.config</span> <span class="k">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">gp.parallelalgorithm</span> <span class="k">import</span> <span class="n">ParallelGP</span><span class="p">,</span> <span class="n">SequentialPGP</span><span class="p">,</span> <span class="n">isMPI</span>
+<span class="kn">from</span> <span class="nn">gp.algorithm</span> <span class="k">import</span> <span class="n">BruteCoolingElitist</span>
+<span class="kn">from</span> <span class="nn">expression.constants</span> <span class="k">import</span> <span class="n">Constants</span>
+<span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">getKSamples</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">webbrowser</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
+
+<span class="c1"># Depending on system, mpi4py is either in mpich or global</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">mpich.mpi4py</span> <span class="k">import</span> <span class="n">MPI</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using mpi4py with mpich import&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="k">import</span> <span class="n">MPI</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using mpi4py without mpich import&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">finale</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;FAILED import mpi&quot;</span><span class="p">)</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="runBenchmark"><a class="viewcode-back" href="../../gp.html#gp.paralleldriver.runBenchmark">[docs]</a><span class="k">def</span> <span class="nf">runBenchmark</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">topo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">processcount</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">outfolder</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+    <span class="n">pid</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">pid</span>
+    <span class="n">generations</span><span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">generations</span>
+    <span class="n">display</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">display</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="n">testfunctions</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">expr</span><span class="p">]</span>
+    <span class="n">depth</span><span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">maxdepth</span>
+    <span class="n">initialdepth</span><span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">initialdepth</span>
+    <span class="n">phases</span><span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">phases</span>
+    <span class="n">pcount</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="k">if</span> <span class="n">isMPI</span><span class="p">()</span> <span class="k">else</span> <span class="n">processcount</span>
+    <span class="n">population</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">population</span>
+    <span class="n">commsize</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">communicationsize</span>
+    <span class="n">archivesize</span> <span class="o">=</span> <span class="n">population</span>
+    <span class="c1">#logger.info(&quot;Configuration is {}&quot;.format(config))</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">variablepoint</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">datapointcount</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">datapointrange</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">upper</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">datapointrange</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">==</span> <span class="n">config</span><span class="o">.</span><span class="n">variablepoint</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="n">config</span><span class="o">.</span><span class="n">datapointcount</span><span class="p">)</span>
+    <span class="n">tr</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="o">==</span><span class="n">config</span><span class="o">.</span><span class="n">datapointcount</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">topo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Topology is None, using RStatic&quot;</span><span class="p">)</span>
+        <span class="n">topo</span> <span class="o">=</span> <span class="n">RandomStaticTopology</span>
+    <span class="n">algo</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">topo</span> <span class="o">==</span> <span class="n">RandomStaticTopology</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">topo</span><span class="p">(</span><span class="n">pcount</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">pid</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">topo</span><span class="p">(</span><span class="n">pcount</span><span class="p">)</span>
+    <span class="n">samplecount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">SAMPLING_RATIO</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">isMPI</span><span class="p">():</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting MPI Parallel implementation&quot;</span><span class="p">)</span>
+        <span class="n">Xk</span><span class="p">,</span> <span class="n">Yk</span> <span class="o">=</span> <span class="n">getKSamples</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">samplecount</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">pid</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">BruteCoolingElitist</span><span class="p">(</span><span class="n">Xk</span><span class="p">,</span> <span class="n">Yk</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="n">population</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">pid</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span> <span class="n">archivesize</span><span class="o">=</span><span class="n">archivesize</span><span class="p">,</span> <span class="n">initialdepth</span><span class="o">=</span><span class="n">initialdepth</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">pid</span>
+        <span class="n">algo</span> <span class="o">=</span> <span class="n">ParallelGP</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">communicationsize</span><span class="o">=</span><span class="n">commsize</span><span class="p">,</span> <span class="n">topo</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="n">pid</span><span class="p">,</span> <span class="n">Communicator</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting Sequential implementation&quot;</span><span class="p">)</span>
+        <span class="n">algo</span> <span class="o">=</span> <span class="n">SequentialPGP</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="o">=</span><span class="n">_fit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">generations</span><span class="o">=</span><span class="n">generations</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span> <span class="n">topo</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">archivesize</span><span class="o">=</span><span class="n">archivesize</span><span class="p">,</span> <span class="n">communicationsize</span><span class="o">=</span><span class="n">commsize</span><span class="p">,</span> <span class="n">initialdepth</span><span class="o">=</span><span class="n">initialdepth</span><span class="p">)</span>
+    <span class="n">algo</span><span class="o">.</span><span class="n">executeAlgorithm</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Writing output to folder </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">outfolder</span><span class="p">))</span>
+    <span class="n">algo</span><span class="o">.</span><span class="n">reportOutput</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outputfolder</span> <span class="o">=</span> <span class="n">outfolder</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="n">display</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Benchmark complete for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pid</span><span class="p">))</span>
+
+    <span class="c1"># if MPI, merge all results and print</span>
+    <span class="k">if</span> <span class="n">isMPI</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">display</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Opening results for proces </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pid</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">processcount</span><span class="p">):</span>
+                <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;file://&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;output_</span><span class="si">{}</span><span class="s2">.html&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Start/Stop AWS EC2 instances&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--topology&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;space separated ids of instances&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--processcount&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of processes for sequential run&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="s1">&#39;--generations&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of generations&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--phases&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of phases&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--outputfolder&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Folder to write data to&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--displaystats&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Wether to dispay convergence statistics for each process&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="s1">&#39;--population&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Population per instance&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--maxdepth&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Max depth of any tree&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;--initialdepth&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;initialdepth depth of any tree&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--datapointcount&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of datapoints to operate on. &quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--communicationsize&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Nr of samples requested from an instance to distribute.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="s1">&#39;--expressionid&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Nr of expression to test&quot;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">topo</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">toponame</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">topology</span>
+        <span class="k">if</span> <span class="n">toponame</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">topologies</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No such topogoly : should be one of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">topologies</span><span class="o">.</span><span class="n">keys</span><span class="p">()]))</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">topo</span> <span class="o">=</span> <span class="n">topologies</span><span class="p">[</span><span class="n">toponame</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Chosen topology </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">topo</span><span class="p">))</span>
+    <span class="n">processcount</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">isMPI</span><span class="p">():</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Ignoring processcount, using MPI value&quot;</span><span class="p">)</span>
+        <span class="n">processcount</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">processcount</span><span class="p">:</span>
+            <span class="n">processcount</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">processcount</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;using processcount </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">processcount</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No process count specified, ABORTING!&quot;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">outputfolder</span> <span class="o">=</span> <span class="s2">&quot;../output/&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Output folder = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">outputfolder</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">outputfolder</span><span class="p">:</span>
+        <span class="n">outputfolder</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">outputfolder</span>
+        <span class="k">if</span> <span class="n">outputfolder</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">outputfolder</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">topo</span> <span class="o">=</span> <span class="n">topo</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">displaystats</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">generations</span><span class="p">:</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">generations</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">generations</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">population</span><span class="p">:</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">population</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">expressionid</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">expressionid</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">testfunctions</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">expressionid</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">expr</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">expressionid</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No such expression!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">phases</span><span class="p">:</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">phases</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">phases</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">maxdepth</span><span class="p">:</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">maxdepth</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">maxdepth</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">initialdepth</span><span class="p">:</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">initialdepth</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">initialdepth</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">datapointcount</span><span class="p">:</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">datapointcount</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">datapointcount</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">communicationsize</span><span class="p">:</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">communicationsize</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">communicationsize</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Config is </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+    <span class="n">outputfolder</span> <span class="o">+=</span> <span class="n">c</span><span class="o">.</span><span class="n">concatValues</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outputfolder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">runBenchmark</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">topo</span><span class="p">,</span> <span class="n">processcount</span><span class="p">,</span> <span class="n">outfolder</span><span class="o">=</span><span class="n">outputfolder</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ben Cardoen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
