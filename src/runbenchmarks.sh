@@ -11,9 +11,9 @@ MD=10
 
 #mpiexec -n 3 python3 -m gp.paralleldriver -c 3 -t tree
 
-topos=( randomstatic grid tree )
+topos=( grid tree )
 fases=(30)
-processcounts=(3 7 15 31)
+processcounts=(4 9 16 25)
 
 for expressionid in {0..14}
 #do python3 -m gp.paralleldriver -e $expressionid;
