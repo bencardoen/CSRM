@@ -11,6 +11,31 @@ import logging
 logger = logging.getLogger('global')
 
 
+class Optimizer:
+    """
+    Base class of optimizer, provides shared state and interface.
+    """
+
+    def __init__(self, populationcount, iterations, expected, distancefunction, seed=0):
+        self.populationcount = populationcount
+        self.iterations = iterations
+        self.currentiteration = 0
+        self.expected = expected
+        self.distancefunction = distancefunction
+        if seed is None:
+            logger.error("Seed is none : non deterministic mode")
+        self.rng = getRandom(seed if seed is not None else 0)
+        self.cost = 0
+        self.history = 0
+        self.treshold = int(self.iterations / 2)
+
+    def getOptimalSolution():
+        raise NotImplementedError
+
+    def run():
+        raise NotImplementedError
+
+
 class Instance:
     def __init__(self, tree, expected, distancefunction):
         self.tree = tree
@@ -89,28 +114,23 @@ class Particle(Instance):
         return "Particle fitness {} with velocity {} position {} and best {}".format(self.fitness, self.velocity, self.current, self.best)
 
 
-class PSO:
+class PSO(Optimizer):
     """
     Particle Swarm Optimization.
 
     Swarm optimizer with n dimensions, inertia weight damping.
     """
 
-    def __init__(self, particlecount:int, particle, expected, distancefunction, seed=0, iterations=50):
+    def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations):
+        super().__init__(populationcount=populationcount, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
         self.rng = getRandom(seed)
         if seed is None:
             logger.warning("Using zero seed")
-        self.particlecount = particlecount
-        self.iterations = iterations
-        self.currentiteration = 0
-        self.particles = [Particle(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction) for _ in range(particlecount)]
+        self.particles = [Particle(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction) for _ in range(self.populationcount)]
         self.c1 = 2
         self.c2 = 2
         self.bestparticle = None
         self.globalbest = None
-        self.cost = 0
-        self.history = 0
-        self.treshold = int(self.iterations / 2)
         self.determineBest()
 
     @property
