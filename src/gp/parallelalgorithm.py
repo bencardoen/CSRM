@@ -129,6 +129,7 @@ class ParallelGP():
         After this method completes all sent buffers and requests are purged.
         """
         #logger.debug("Process {} :: MPI, waiting for sendrequests to complete".format(self.pid))
+        logger.info("Process {} :: MPI, waiting complete, clearing requests".format(self.pid))
         if self._waits:
             requests = [(k,v) for k,v in self._waits.items()]
             while requests:
@@ -170,7 +171,7 @@ class ParallelGP():
         senders = self.topo.getSource(self.pid)
         received = []
         for sender in senders:
-            #logger.debug("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
+            logger.info("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
             buf = self.communicator.recv(source=sender, tag=0) # todo extend tag usage
             #logger.debug("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
             # for b in received:

@@ -268,6 +268,17 @@ class TopologyTest(unittest.TestCase):
             for t in targets:
                 self.assertTrue(i in rev[t])
 
+    def testCycle(self):
+        size = 4
+        rs = RandomStaticTopology(size, seed=0)
+        logger.info("RS {}".format(rs))
+        trg = [rs.getTarget(i) for i in range(size)]
+        rev = [rs.getSource(i) for i in range(size)]
+        # ensure i -> [a, b, c] => i in rev[a]
+        for i,targets in enumerate(trg):
+            for t in targets:
+                self.assertTrue(i in rev[t])
+
     def testTreeTopology(self):
         size = 16
         r = TreeTopology(size)

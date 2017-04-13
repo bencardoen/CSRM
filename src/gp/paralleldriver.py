@@ -62,10 +62,11 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
     algo = None
     t = None
     if topo == RandomStaticTopology:
-        t = topo(pcount, seed=pid)
+        t = topo(pcount, seed=0)
     else:
         t = topo(pcount)
     samplecount = int(Constants.SAMPLING_RATIO * len(Y))
+    logger.info("Topology {}".format(t))
     if isMPI():
         logger.info("Starting MPI Parallel implementation")
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
