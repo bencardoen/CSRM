@@ -129,10 +129,15 @@ class ParallelGP():
         After this method completes all sent buffers and requests are purged.
         """
         #logger.debug("Process {} :: MPI, waiting for sendrequests to complete".format(self.pid))
-        for k,v in self._waits.items():
-            #logger.debug("Process {} :: MPI, waiting for send to {}".format(self.pid, k))
-            v.wait()
-        #logger.debug("Process {} :: MPI, waiting complete, clearing requests".format(self.pid))
+        if self._waits:
+            requests = [(k,v) for k,v in self._waits.items()]
+            while requests:
+                requests = [(k,v) for k,v in self._waits.items()]
+                for k,v in requests:
+                    if v.test():
+                        v.wait()
+                        del self._waits[k]
+        logger.info("Process {} :: MPI, waiting complete, clearing requests".format(self.pid))
         self._sendbuffer.clear()
         self._waits.clear()
 
