@@ -105,6 +105,7 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--communicationsize', type=int, help="Nr of samples requested from an instance to distribute.")
     parser.add_argument('-e', '--expressionid', type=int, help="Nr of expression to test")
     args = parser.parse_args()
+    #print(args)
     topo = None
     if args.topology is not None:
         toponame = args.topology
@@ -138,9 +139,10 @@ if __name__ == "__main__":
         c.generations = args.generations
     if args.population:
         c.population = args.population
-    if args.expressionid:
+    if args.expressionid is not None:
         if args.expressionid < len(testfunctions) and args.expressionid >= 0:
             c.expr = args.expressionid
+            logger.info("Expression ID = {}".format(c.expr))
         else:
             logger.error("No such expression!")
             raise ValueError

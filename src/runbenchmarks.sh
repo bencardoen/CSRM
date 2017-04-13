@@ -24,6 +24,7 @@ do
         do
             for fase in "${fases[@]}";
             do
+                #echo -c $processcount -e $expressionid -m $MD -i 4 -t "$topo" -f $fase
                 mpiexec -n $processcount python3 -m gp.paralleldriver -c $processcount -e $expressionid -m $MD -i 4 -t "$topo" -f $fase
             done
         done
