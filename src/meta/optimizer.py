@@ -47,8 +47,6 @@ class Instance:
         self.distancefunction = distancefunction
 
     def updateValues(self):
-        # for cur, const in zip(self.current, self.constants):
-        #     const.setValue(cur)
         self.tree.updateValues(self.current)
 
     def updateFitness(self):

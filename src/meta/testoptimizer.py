@@ -13,7 +13,7 @@ import os
 from expression.functions import testfunctions, pearsonfitness as _fit
 import random
 import pickle
-from meta.pso import PSO, Instance
+from meta.optimizer import PSO, Instance
 import unittest
 logger = logging.getLogger('global')
 
