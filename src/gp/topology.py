@@ -230,10 +230,19 @@ class VonNeumannTopology(Topology):
         if self.rem:
             self.rowcount += 1
         #logger.info("RT = {} Diff = {} Rows = {}".format(self.rt, self.rem, self.rowcount))
+        self.mapping = {}
+        self.reversemapping = {}
+        for i in range(self.size):
+            self.mapping[i] = self._getTarget(i)
+        for k, v in self.mapping.items():
+            for j in v:
+                if j not in self.reversemapping:
+                    self.reversemapping[j] = [k]
+                else:
+                    self.reversemapping[j].append(k)
 
     def getSource(self, target:int):
-        # Symmetric relationship
-        return self.getTarget(target)
+        return self.reversemapping[target]
 
     def lintormcm(index, rowsize):
         colindex = index % rowsize
@@ -243,7 +252,7 @@ class VonNeumannTopology(Topology):
     def rmcmtolin(rowindex, colindex, rowsize):
         return rowindex * rowsize + colindex
 
-    def getTarget(self, source:int):
+    def _getTarget(self, source:int):
         """
         For a small grid, duplicates are possible.
         """
@@ -255,6 +264,9 @@ class VonNeumannTopology(Topology):
         up = min(VonNeumannTopology.rmcmtolin((r-1) % self.rowcount, c, self.rt), self.size-1)
         targets = [left, right, up, down]
         return list(set(targets))
+
+    def getTarget(self, source:int):
+        return self.mapping[source]
 
     def __str__(self):
         return "VonNeumannTopology" + super().__str__()

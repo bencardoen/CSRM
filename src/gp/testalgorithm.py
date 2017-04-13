@@ -317,16 +317,17 @@ class TopologyTest(unittest.TestCase):
 
 
     def testVNTopology(self):
-        size = 6
+        size = 7
         r = VonNeumannTopology(size)
-        logger.info("Topo is {}".format(r))
+        #logger.info("Topo is {}".format(r))
         for i in range(size):
             #logger.info(VonNeumannTopology.lintormcm(i, 3))
             targetsi = r.getTarget(i)
             #logger.info("Targets for {} are {}".format(i, targetsi))
-            sourcesi = r.getSource(i)
-            #logger.info("Sources for {} are {}".format(i, sourcesi))
-            self.assertEqual(targetsi, sourcesi)
+            for t in targetsi:
+                self.assertTrue(i in r.getSource(t))
+            #sourcesi = r.getSource(i)
+            #logger.info("{} has sources {}".format(i, sourcesi))
 
 
     def testSpreadPolicy(self):
