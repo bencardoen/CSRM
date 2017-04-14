@@ -279,7 +279,11 @@ def pearson(actual, expected):
 
     """
     #logger.info("Pearson for input actual {} expected {}".format(actual, expected))
-    if numpy.std(actual) == 0 or numpy.std(expected) == 0:
+    try:
+        if numpy.std(actual) == 0 or numpy.std(expected) == 0:
+            return 1
+    except FloatingPointError as e:
+        logger.warning("FPE in fitness calculation, returning 1" )
         return 1
     a = numpy.asarray(actual)
     b = numpy.asarray(expected)
