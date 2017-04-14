@@ -215,18 +215,14 @@ def infixToPostfix(infix):
             stack.append(token)
         elif token == ')':
             while stack[-1] != '(':
-                logger.debug("apppending t {}".format(stack[-1]))
                 result.append(stack.pop(-1))
             stack.pop(-1)
             if stack and isFunction(stack[-1]):
-                logger.debug("apppending f {}".format(stack[-1]))
                 result.append(stack.pop(-1))
         elif isinstance(token, Constant):
             result.append(token)
-            logger.debug("apppending c {}".format(token))
         elif isinstance(token, Variable):
             result.append(token)
-            logger.debug("appending v {}".format(token))
         elif token in functionset:
             if isFunction(token):
                 stack.append(token)
@@ -234,23 +230,18 @@ def infixToPostfix(infix):
                 oper = functionset[token]
                 while True and stack:
                     top = stack[-1]
-                    logger.debug("checking for operator precedence {}".format(top))
                     if isOperator(top):
                         operonstack = functionset[top]
                         if oper[3] == 'L' and oper[2] <= operonstack[2]:   # l assoc and less precedence
-                            logger.debug(" R and leq : apppending o {}".format(stack[-1]))
                             result.append(stack.pop(-1))
                         elif oper[2] < operonstack[2]:
-                            logger.debug(" L and le : apppending o {}".format(stack[-1]))
                             result.append(stack.pop(-1))
                         else:
                             break
                     else:
                         break
-                logger.debug("pushing operator {}".format(token))
                 stack.append(token)
     while stack:
-        logger.debug("apppending last of stack {}".format(stack[-1]))
         result.append(stack.pop(-1))
     return result
 

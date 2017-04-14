@@ -364,6 +364,29 @@ class TreeTest(unittest.TestCase):
         cycled = tree.toExpression()
         self.assertEqual(expr, cycled)
 
+    def testConversionRegression(self):
+        """
+        Convert basic expression to tree
+        """
+        expr = "( cos( ( ( 0.19669731160658688 / x4 ) * ( cos( ( 0.22522712182469018 - x2 ) ) ) ) ) )"
+        variables = generateVariables(10, 10, 0)
+        tree = Tree.createTreeFromExpression(expr, variables=variables)
+        tree.printToDot(outputfolder+"t20createdFromExpressionBasic.dot")
+        cycled = tree.toExpression()
+        self.assertEqual(expr, cycled)
+        expr = "( cos( ( ( 0.19669731160658688 / x4 ) * ( cos( ( 0.22522712182469018 - x2 ) ) ) ) ) )"
+        variables = generateVariables(10, 10, 0)
+        tree = Tree.createTreeFromExpression(expr, variables=variables)
+        tree.printToDot(outputfolder+"t20createdFromExpressionBasic.dot")
+        cycled = tree.toExpression()
+        self.assertEqual(expr, cycled)
+        expr= "0.8967869641417475"
+        variables = generateVariables(10, 10, 0)
+        tree = Tree.createTreeFromExpression(expr, variables=variables)
+        tree.printToDot(outputfolder+"t20createdFromExpressionBasic.dot")
+        cycled = tree.toExpression()
+        self.assertEqual(expr, cycled)
+
 
     def testConversionToTreeFunctions(self):
         """

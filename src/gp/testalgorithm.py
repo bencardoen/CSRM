@@ -168,6 +168,36 @@ class GPTest(unittest.TestCase):
         s.saveData(title, "../output/")
         #s.displayPlots("summary", title=title)
         # summarize Sampling results
+        g.writePopulation("../output/writetest")
+
+    def testIncremental(self):
+        expr = testfunctions[2]
+        dpoint = 20
+        vpoint = 5
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
+        logger.debug("Y {} X {}".format(Y, X))
+        g = BruteCoolingElitist(X, Y, popsize=10, maxdepth=5, fitnessfunction=_fit, seed=0, generations=20, phases=5, initialdepth=3, archivefile="../output/readtesta")
+        g.executeAlgorithm()
+        stats = g.getConvergenceStatistics()
+        c = Convergence(stats)
+        c.plotFitness()
+        c.plotComplexity()
+        c.plotOperators()
+        c.savePlots("output", title=expr+"_incremental")
+        #c.displayPlots("output", title=expr+"_cooling")
+        sums = [g.summarizeSamplingResults(X, Y)]
+        s = SummarizedResults(sums)
+        s.plotFitness()
+        s.plotDifference()
+        s.plotPrediction()
+        title = "Collected results for all processes"
+        s.savePlots((outputfolder or "")+"collected", title=title)
+        s.saveData(title, "../output/")
+        #s.displayPlots("summary", title=title)
+        # summarize Sampling results
+        g.writePopulation("../output/writetest")
 
     def testVariableDepth(self):
         expr = testfunctions[2]
@@ -364,7 +394,6 @@ class TopologyTest(unittest.TestCase):
             result = CopySpreadPolicy.spread(buffer, rng.randint(5,10))
             for r in result:
                 self.assertTrue(len(r) == s)
-
 
 
 class PGPTest(unittest.TestCase):

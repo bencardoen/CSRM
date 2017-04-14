@@ -28,7 +28,7 @@ class GPAlgorithm():
     In itself it will not evolve a solution.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed=None, archivesize=None, history=None, phases=None, tournamentsize=None, initialdepth=None, skipconstantexpressions=False):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations=1, seed=None, archivesize=None, history=None, phases=None, tournamentsize=None, initialdepth=None, skipconstantexpressions=False, archivefile=None):
         """
         Initializes a forest of trees randomly constructed.
 
@@ -64,6 +64,9 @@ class GPAlgorithm():
         """ Expected data """
         self._Y = Y
         self._skipconstantexpressions = skipconstantexpressions
+        self._archiveinputfile = archivefile
+        if archivefile:
+            self._archiveoutputfile = archivefile + "_out" if archivefile else None
         self._initialize()
         self._archive = SetPopulation(key=lambda _tree: _tree.getFitness())
         self._generations = generations
@@ -204,7 +207,16 @@ class GPAlgorithm():
         Seed the population with random samples.
         """
         assert(len(self._variables))
-        for i in range(self._popsize):
+        trees = []
+        if self._archiveinputfile:
+            trees = self.readPopulation(self._archiveinputfile)
+        for i in range(min(len(trees), self._popsize)):
+            t = trees[i]
+            self._population.add(t)
+        diffsize = self._popsize - len(self._population)
+        assert(diffsize >= 0)
+        logger.info("Have {} spots to fill".format(diffsize))
+        for i in range(diffsize):
             self.addRandomTree()
 
     def addRandomTree(self):
@@ -279,6 +291,9 @@ class GPAlgorithm():
                 "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
                 "diff_fitness":dfit, "features":features, "last_fitness":lastfit[-1]}
 
+    def getPopulation(self):
+        return [p.toExpression() for p in self._population]
+
     def summarizeGeneration(self, replacementcount:list, mutategain:list, crossovergain:list, evaluations:list, optimizergains:dict, generation:int, phase:int):
         """
         Compute fitness statistics for the current generation and record them
@@ -342,6 +357,35 @@ class GPAlgorithm():
         diff = self._popsize - len(self._population)
         for _ in range(diff):
             self.addRandomTree()
+
+    def writePopulation(self, filename):
+        with open(filename, 'w') as f:
+            for p in self._population:
+                f.write(p.toExpression() + "\n")
+
+    def readPopulation(self, filename):
+        trees = []
+        try:
+            with open(filename, 'r') as f:
+                trees = []
+                lines = f.readlines()
+                for l in lines:
+                    #logger.info("Reading {}".format(l))
+                    t = None
+                    try:
+                        t = Tree.createTreeFromExpression(l[:-1], variables=self._X)
+                        t.scoreTree(self._Y, self._fitnessfunction)
+                        if t.getFitness() == Constants.MINFITNESS:
+                            logger.warning("Stored tree sample with expression {} gave invalid fitness value on new data, skipping.".format(l))
+                        else:
+                            #logger.info("Accepted stored tree sample.")
+                            trees.append(t)
+                    except ValueError as e:
+                        logger.error("Failed parsing instance expression {}".format(l))
+        except FileNotFoundError as e:
+            logger.error("Archive file not found {}".format(filename))
+        return trees
+
 
     def restart(self):
         """
@@ -495,8 +539,8 @@ class BruteElitist(GPAlgorithm):
     replaces unfit samples.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None, skipconstantexpressions=False):
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions)
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None, skipconstantexpressions=False, archivefile=None):
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions, archivefile=archivefile)
 
     def evolve(self, selection):
         """
@@ -637,9 +681,9 @@ class BruteCoolingElitist(BruteElitist):
     The cooling schedule 'predicts' efficiency of the operators.
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None,depthcooling=False, skipconstantexpressions=False):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None,depthcooling=False, skipconstantexpressions=False, archivefile=None):
         self._depthcooling = depthcooling
-        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions)
+        super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions, archivefile=archivefile)
 
     @property
     def depthcooling(self):

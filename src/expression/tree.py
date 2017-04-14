@@ -604,6 +604,20 @@ class Tree:
         """
         pfix = infixToPrefix(tokenize(expr, variables))
         result = Tree()
+        if len(pfix) == 1:
+            token = pfix[0]
+            node = None
+            if isinstance(token, Constant):
+                node =  ConstantNode( 0, token)
+            else:
+                if isinstance(token, Variable):
+                    node =  VariableNode( 0, token)
+                else:
+                    logger.error("Creating tree from single node without constant or variable.")
+                    raise ValueError
+            result._addNode(node, 0)
+            result.setDataPointCount()
+            return result
         lastnode = None
         for token in pfix:
             if isFunction(token) or isOperator(token):

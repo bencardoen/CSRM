@@ -105,6 +105,10 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--datapointcount', type=int, help="Number of datapoints to operate on. ")
     parser.add_argument('-s', '--communicationsize', type=int, help="Nr of samples requested from an instance to distribute.")
     parser.add_argument('-e', '--expressionid', type=int, help="Nr of expression to test")
+    parser.add_argument('-a', '--archiveinputfile', type=str, help="Use incremental mode, read stored expressions from a previous run in *archivefile*")
+    parser.add_argument('-o', '--archiveoutputfile', type=str, help="Use incremental mode, write stored expressions run to *archivefile* **Note** For multiple processes a selection of the best samples is made, not the entire population.")
+    # TODO split input output ? Use a copy operation?
+    # Or just one file?
     args = parser.parse_args()
     #print(args)
     topo = None
