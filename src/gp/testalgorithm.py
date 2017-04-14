@@ -413,6 +413,22 @@ class PGPTest(unittest.TestCase):
         algo.executeAlgorithm()
         algo.reportOutput()
 
+    def testParallelWrite(self):
+        expr = testfunctions[2]
+        dpoint = 10
+        vpoint = 5
+        depth = 5
+        popcount = 20
+        initialdepth = 4
+        X = generateVariables(vpoint, dpoint, seed=0, sort=True, lower=-10, upper=10)
+        t = Tree.createTreeFromExpression(expr, X)
+        Y = t.evaluateAll()
+        logger.debug("Y {} X {}".format(Y, X))
+        pcount = 4
+        algo = SequentialPGP(X, Y, pcount, popcount, maxdepth=depth, fitnessfunction=_fit, seed=0, generations=15, phases=4, topo=None, initialdepth=initialdepth, archivefile="../testfiles/readtest")
+        algo.executeAlgorithm()
+        algo.reportOutput(save=True, outputfolder="../output/")
+
     def testAllTopologies(self):
         expr = testfunctions[2]
         rng = getRandom(0)

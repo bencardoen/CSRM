@@ -42,7 +42,7 @@ class ParallelGP():
     Executes a composite GP algorithm in parallel, adding communication and synchronization to the algorithm.
     """
 
-    def __init__(self, algo:GPAlgorithm,X, Y, communicationsize:int=None, topo:Topology=None, pid = None, Communicator = None,):
+    def __init__(self, algo:GPAlgorithm,X, Y, communicationsize:int=None, topo:Topology=None, pid = None, Communicator = None):
         """
         Construct a PGP instance using an existing GP algo.
 
@@ -171,11 +171,7 @@ class ParallelGP():
         senders = self.topo.getSource(self.pid)
         received = []
         for sender in senders:
-            #logger.info("Process {} :: MPI, Retrieving SYNC buffer from {}".format(self.pid, sender))
             buf = self.communicator.recv(source=sender, tag=0) # todo extend tag usage
-            #logger.debug("Process {} :: MPI, Received buffer length {} from {}".format(self.pid, len(buf), sender))
-            # for b in received:
-            #     logger.info("Process {} :: MPI received {}".format(b))
             received += buf
         self.algorithm.archiveExternal(received)
 
@@ -217,6 +213,7 @@ class ParallelGP():
         :param bool display: Display results in browser (WARNING : CPU intensive for large sets)
         :param str outputfolder: modify output directory
         """
+        logger.info("RPO P with save {}".format(save))
         reportOutput([self], X=self._X, Y=self._Y, save=save, display=display, outputfolder=outputfolder, pid=self.pid)
 
     def summarizeResults(self, X, Y):
@@ -234,7 +231,7 @@ class SequentialPGP():
     This is a driver class for the ParallelGP class, to be used when MPI is not active.
     """
 
-    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, archivesize=None, communicationsize=None, initialdepth=None):
+    def __init__(self, X, Y, processcount:int, popsize:int, maxdepth:int, fitnessfunction, seed:int, generations:int, phases:int, topo:Topology=None, archivesize=None, communicationsize=None, initialdepth=None, archivefile=None):
         """
         Construct a SeqPGP instance, driving a set of GP instances.
 
@@ -259,7 +256,7 @@ class SequentialPGP():
         samplecount = int(Constants.SAMPLING_RATIO * len(Y))
         for i in range(processcount):
             xsample, ysample = getKSamples(X, Y, samplecount, rng=rng, seed=i)
-            g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=maxdepth, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
+            g = BruteCoolingElitist(xsample, ysample, popsize=popsize, maxdepth=maxdepth, fitnessfunction=fitnessfunction, seed=i, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth, archivefile=archivefile)
             g.pid = i
             pgp = ParallelGP(g, X, Y, communicationsize=self._communicationsize, topo=self._topo, pid=i)
             self._processes.append(pgp)
@@ -325,7 +322,9 @@ def reportOutput(processes, X, Y, save=False, display=False, outputfolder=None, 
         s = SummarizedResults(sums)
         title = "Collected results for all processes"
         if save:
+            # refactor
             s.savePlots((outputfolder or "")+"collected", title=title)
             s.saveData(title, outputfolder)
+            s.saveBest(outputfolder + "bestresults.txt")
         if display:
             s.displayPlots("summary", title=title)

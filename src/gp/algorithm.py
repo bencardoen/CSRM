@@ -67,6 +67,7 @@ class GPAlgorithm():
         self._archiveinputfile = archivefile
         if archivefile:
             self._archiveoutputfile = archivefile + "_out" if archivefile else None
+        self.archiveoutfile = None
         self._initialize()
         self._archive = SetPopulation(key=lambda _tree: _tree.getFitness())
         self._generations = generations
@@ -210,12 +211,11 @@ class GPAlgorithm():
         trees = []
         if self._archiveinputfile:
             trees = self.readPopulation(self._archiveinputfile)
-        for i in range(min(len(trees), self._popsize)):
-            t = trees[i]
-            self._population.add(t)
+            for i in range(min(len(trees), self._popsize)):
+                t = trees[i]
+                self._population.add(t)
         diffsize = self._popsize - len(self._population)
         assert(diffsize >= 0)
-        logger.info("Have {} spots to fill".format(diffsize))
         for i in range(diffsize):
             self.addRandomTree()
 
@@ -270,6 +270,7 @@ class GPAlgorithm():
             t.scoreTree(Y, self._fitnessfunction)
         try:
             fit = [d.getFitness() if d.getFitness()!= Constants.MINFITNESS else Constants.PEARSONMINFITNESS for d in self._population]
+            scoredpopulation = [(f, t.toExpression()) for f, t in zip(fit, self._population)]
             features = [d.getFeatures() for d in self._population]
             depths = [d.getDepth() for d in self._population]
             comp = [d.getScaledComplexity() for d in self._population]
@@ -289,7 +290,7 @@ class GPAlgorithm():
         return {"fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                 "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
                 "corr_fitness":cfit, "diff_mean_fitness":dmeanfit, "diff_std_fitness":dsdfit, "diff_variance_fitness":dvfit,
-                "diff_fitness":dfit, "features":features, "last_fitness":lastfit[-1]}
+                "diff_fitness":dfit, "features":features, "last_fitness":lastfit[-1], "solution":scoredpopulation}
 
     def getPopulation(self):
         return [p.toExpression() for p in self._population]

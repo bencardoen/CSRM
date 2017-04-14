@@ -24,6 +24,7 @@ class Config:
         self.communicationsize = 2
         self.display = False
         self.topo = None
+        self.archiveseedfile = None
 
     def concatValues(self):
         q = "_"

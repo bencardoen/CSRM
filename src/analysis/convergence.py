@@ -11,6 +11,8 @@ from expression.tools import rmtocm
 import logging
 import json
 import numpy
+from functools import reduce
+from itertools import chain
 from expression.tools import copyObject
 logger = logging.getLogger('global')
 
@@ -155,6 +157,21 @@ class SummarizedResults(Plotter):
         super().__init__()
         self._results = results
         self.plotAll()
+
+    def saveBest(self, filename):
+        if filename is None:
+            logger.warning("Filename is still None!!")
+            assert(False)
+        scored = []
+        for r in self._results:
+            scored += r["solution"]
+        sscored = sorted(scored, key=lambda x : x[0])
+        rl = len(self._results)
+        pl = int(len(sscored) / rl)
+        sscored = sscored[0:pl]
+        with open(filename, 'w') as f:
+            for _, s in sscored:
+                f.write(s+"\n")
 
     def plotFitness(self):
         fitness = rmtocm([r['fitness'] for r in self._results])

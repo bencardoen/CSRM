@@ -77,7 +77,7 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
         logger.info("Starting Sequential implementation")
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth)
     algo.executeAlgorithm()
-    logger.debug("Writing output to folder {}".format(outfolder))
+    logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)
     logger.info("Benchmark complete for {}".format(pid))
 
@@ -106,9 +106,7 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--communicationsize', type=int, help="Nr of samples requested from an instance to distribute.")
     parser.add_argument('-e', '--expressionid', type=int, help="Nr of expression to test")
     parser.add_argument('-a', '--archiveinputfile', type=str, help="Use incremental mode, read stored expressions from a previous run in *archivefile*")
-    parser.add_argument('-o', '--archiveoutputfile', type=str, help="Use incremental mode, write stored expressions run to *archivefile* **Note** For multiple processes a selection of the best samples is made, not the entire population.")
-    # TODO split input output ? Use a copy operation?
-    # Or just one file?
+
     args = parser.parse_args()
     #print(args)
     topo = None
@@ -138,6 +136,7 @@ if __name__ == "__main__":
         if outputfolder[-1] != '/':
             outputfolder += '/'
     c = Config()
+    c.outputfolder = outputfolder
     c.topo = topo
     c.display = True if args.displaystats else False
     if args.generations:
@@ -161,6 +160,8 @@ if __name__ == "__main__":
         c.datapointcount = args.datapointcount
     if args.communicationsize:
         c.communicationsize = args.communicationsize
+    if args.archiveinputfile:
+        c.archiveinputfile = args.archiveinputfile
     logger.info("Config is {} ".format(c.__dict__.items()))
     outputfolder += c.concatValues() + "/"
     os.makedirs(outputfolder, exist_ok=True)
