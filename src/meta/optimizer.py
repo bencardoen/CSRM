@@ -16,7 +16,7 @@ class Optimizer:
     Base class of optimizer, provides shared state and interface.
     """
 
-    def __init__(self, populationcount, iterations, expected, distancefunction, seed=0):
+    def __init__(self, populationcount, particle, iterations, expected, distancefunction, seed=0):
         self.populationcount = populationcount
         self.iterations = iterations
         self.currentiteration = 0
@@ -32,8 +32,20 @@ class Optimizer:
     def getOptimalSolution():
         raise NotImplementedError
 
-    def run():
+    def run(self):
         raise NotImplementedError
+
+
+class PassThroughOptimizer(Optimizer):
+    def __init__(self, populationcount, particle, iterations, expected, distancefunction, seed=0):
+        super().__init__(populationcount, particle, iterations, expected, distancefunction, seed)
+        self.particle = particle
+
+    def getOptimalSolution(self):
+        return {"cost":0, "solution":[c.getValue() for c in self.particle.getConstants() if c is not None]}
+
+    def run(self):
+        pass
 
 
 class Instance:
@@ -120,7 +132,7 @@ class PSO(Optimizer):
     """
 
     def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations):
-        super().__init__(populationcount=populationcount, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
+        super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
         self.rng = getRandom(seed)
         if seed is None:
             logger.warning("Using zero seed")

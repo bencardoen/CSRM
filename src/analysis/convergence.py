@@ -69,8 +69,7 @@ class Convergence(Plotter):
         self.plotSeries(keys = ['foldingsavings'], labels=["Generation","Reduction % of nodes. (more is better)"], title="Constant Folding effectiveness", legend=["Constant folding."])
 
     def plotFoldingGainsTrend(self):
-        #self.plotTrend(keys=["mutate_gain", "crossover_gain"], axislabels=["Generation","Mean gain by operator"], legend = ["Mutations","Crossovers"], title="Operator gain in fitness.")
-        self.plotTrend(keyvalues = ['foldingsavings'], axislabels=["Generation","Reduction % of nodes. (more is better)"], title="Constant Folding effectiveness", legend=["Constant folding."])
+        self.plotTrend(keyvalues = ['foldingsavings'], axislabels=["Generation","Reduction % of nodes. (more is better)"], title="Constant Folding effectiveness trend", legend=["Constant folding."])
 
 
     def plotComplexity(self):

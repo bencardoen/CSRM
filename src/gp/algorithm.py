@@ -12,6 +12,7 @@ from expression.tools import randomizedConsume, copyObject, consume, pearson as 
 from expression.constants import Constants
 from gp.population import SetPopulation
 from expression.node import Variable
+from meta.optimizer import PSO, PassThroughOptimizer
 import random
 import logging
 import numpy
@@ -476,24 +477,34 @@ class GPAlgorithm():
     def minDepthRatio(self, popindex:int):
         return 0
 
+    # def optimize(self, selected):
+    #     """
+    #     Apply a metaheuristic to the selection (in place).
+    #
+    #     Will apply constant folding to make the optimizing step more efficient.
+    #     :returns gain: statistics object recording gains.
+    #     """
+    #     totalnodes = sum([t.nodecount for t in selected])
+    #     gain = {"optimizer":{}, "nodecount":totalnodes}
+    #     g = 0
+    #     for i, t in enumerate(selected):
+    #         g += t.doConstantFolding()
+    #         # optimize
+    #         # scoreTree
+    #         gain["optimizer"][i] = t.getFitness()
+    #     gain["foldingsavings"] = g
+    #     gain["fitnessgains"] = [t.getFitness() for t in selected]
+    #     #logger.info("Ctopt gain is {}".format(gain))
+    #     return gain
+
     def optimize(self, selected):
         """
         Apply a metaheuristic to the selection (in place).
-
-        Will apply constant folding to make the optimizing step more efficient.
-        :returns gain: statistics object recording gains.
         """
         totalnodes = sum([t.nodecount for t in selected])
         gain = {"optimizer":{}, "nodecount":totalnodes}
-        g = 0
-        for i, t in enumerate(selected):
-            g += t.doConstantFolding()
-            # optimize
-            # scoreTree
-            gain["optimizer"][i] = t.getFitness()
-        gain["foldingsavings"] = g
-        gain["fitnessgains"] = [t.getFitness() for t in selected]
-        #logger.info("Ctopt gain is {}".format(gain))
+        gain["foldingsavings"] = 0
+        gain["fitnessgains"] = [0 for t in selected]
         return gain
 
     def update(self, modified):
