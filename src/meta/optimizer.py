@@ -163,7 +163,7 @@ class PSO(Optimizer):
 
     def stopcondition(self):
         if self.history > self.treshold:
-            logger.info("Exceeded convergence limit, no improvement in solution after {} rounds".format(self.treshold))
+            #logger.info("Exceeded convergence limit, no improvement in solution after {} rounds".format(self.treshold))
             return True
 
     @property

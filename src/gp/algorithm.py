@@ -142,11 +142,14 @@ class GPAlgorithm():
     def getArchived(self, n:int):
         # have at least self._archivephase samples
         assert(len(self._archive))
+        arch = []
         if n > len(self._archive):
             logger.warning("Requesting more samples than archive contains")
-            return self._archive.getAll()
+            arch = self._archive.getAll()
         else:
-            return self._archive.getN(n)
+            arch = self._archive.getN(n)
+        logger.info("Returning {} archived samples.".format(len(arch)))
+        return [copyObject(a) for a in arch]
 
     def archiveExternal(self, lst):
         """
@@ -156,11 +159,10 @@ class GPAlgorithm():
         """
         logger.info("Adding {} to archive".format(len(lst)))
         for x in lst:
-            #TODO verify
             expr = x.toExpression()
             x2 = Tree.createTreeFromExpression(expr, variables=self._X)
             x2.scoreTree(self._Y, self._fitnessfunction)
-            logger.info("Adding external to archive with fitness {}".format(x2.getFitness()))
+            #logger.info("Adding external to archive with fitness {}".format(x2.getFitness()))
             self.addToArchive(x2)
 
     def addConvergenceStat(self, generation, stat, phase):
@@ -521,10 +523,15 @@ class GPAlgorithm():
         """
         Add t to the archive and truncate worst if necessary.
         """
+        #logger.info("Adding {} to archive".format(t))
         if t not in self._archive:
             self._archive.add(t)
             if len(self._archive) > self._archivesize:
                 self._archive.drop()
+        else:
+            pass
+            #logger.warning("Sample {} already in archive!".format(t))
+            #logger.warning("Archive is {}".format([t.getFitness() for t in self._archive]))
 
 
 class BruteElitist(GPAlgorithm):
@@ -687,6 +694,7 @@ class BruteCoolingElitist(BruteElitist):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions, archivefile=archivefile)
         self.optimizer = optimizer
         self.optimizestrategy = optimizestrategy if optimizestrategy is not None else 1
+        logger.info("optimizestrategy {}".format(self.optimizestrategy))
 
     @property
     def depthcooling(self):
@@ -715,14 +723,13 @@ class BruteCoolingElitist(BruteElitist):
         """
         totalnodes = sum([t.nodecount for t in selected])
         gain = {"nodecount":totalnodes, "optimizercost":0, "fitnessgains":[0 for t in selected], "fitnessgainsrelative":[0 for t in selected], "foldingsavings":0}
-        g = 0
         j = 0
         if self.optimizer and self.optimizestrategy > 0:
             logger.info("Using optimizer")
             for t in selected:
                 if t.getValuedConstants():
                     oldf = t.getFitness()
-                    g += t.doConstantFolding()
+                    gain["foldingsavings"] += t.doConstantFolding()
                     opt = self.optimizer(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
                     opt.run()
                     sol = opt.getOptimalSolution()
@@ -748,8 +755,46 @@ class BruteCoolingElitist(BruteElitist):
         else:
             #logger.warning("No optimizer set, skipping.")
             pass
-        gain["foldingsavings"] = g
         return gain
+
+    def optimizeBest(self, selected):
+        totalnodes = sum([t.nodecount for t in selected])
+        gain = {"nodecount":totalnodes, "optimizercost":0, "fitnessgains":[0 for t in selected], "fitnessgainsrelative":[0 for t in selected], "foldingsavings":0}
+        for t in selected:
+            oldf = t.getFitness()
+            gain["foldingsavings"] += t.doConstantFolding()
+            opt = self.optimizer(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
+            opt.run()
+            sol = opt.getOptimalSolution()
+            gain["optimizercost"] += sol["cost"]
+            best = sol["solution"]
+            tm = copyObject(t)
+            tm.updateValues(best)
+            tm.scoreTree(self._Y, self._fitnessfunction)
+            newf = tm.getFitness()
+            fgain = oldf - newf
+            if fgain < 0:
+                # It's possible the initial perturbation disturbs the optimizer enough to cause this behavior
+                pass
+            else:
+                t.updateValues(best)
+                t.scoreTree(self._Y, self._fitnessfunction)
+                gain["fitnessgains"].append(fgain)
+                gain["fitnessgainsrelative"].append(fgain/oldf)
+        # Store gain
+
+    def archive(self, modified):
+        """
+        Simple archiving strategy, get best of generation and store.
+        """
+        #logger.info("Optimizer archiving")
+        best = self._population.getN(self._archivephase)
+        best = [copyObject(b) for b in best]
+        if self.optimizestrategy == 0:
+            #logger.info("Archive optimization running.")
+            self.optimizeBest(best)
+        for b in best:
+            self.addToArchive(b)
 
 
 

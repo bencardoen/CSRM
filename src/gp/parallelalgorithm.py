@@ -116,9 +116,9 @@ class ParallelGP():
             logging.info("Process {} :: Parallel executing Phase {}".format(self.pid, i))
             self.executePhase()
             #self.algorithm.printForestToDot("Process_{}_phase_{}".format(self.pid, i))
-            #logging.info("Process {} :: Parallel sending in  Phase {}".format(self.pid, i))
+            logger.info("Process {} :: Parallel sending in  Phase {}".format(self.pid, i))
             self.send()
-            #logging.info("Process {} :: Parallel receiving in  Phase {}".format(self.pid, i))
+            logger.info("Process {} :: Parallel receiving in  Phase {}".format(self.pid, i))
             self.receiveCommunications()
 
 
@@ -152,9 +152,9 @@ class ParallelGP():
         selectedsamples, buf = [], []
         if targetcount:
             selectedsamples = self.algorithm.getArchived(self._communicationsize)
-            #logger.info("Process {} :: Got from algorithm {} ".format(self.pid, [s.toExpression() for s in selectedsamples] ))
+            logger.info("Process {} :: Got from algorithm {} ".format(self.pid, len(selectedsamples) ))
             buf = self.spreadpolicy.spread(selectedsamples, targetcount)
-        #logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
+        logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
         if self.communicator:
             self.waitForSendRequests()
             for index, target in enumerate(targets):
@@ -173,7 +173,8 @@ class ParallelGP():
         for sender in senders:
             buf = self.communicator.recv(source=sender, tag=0) # todo extend tag usage
             received += buf
-        self.algorithm.archiveExternal(received)
+        if received :
+            self.algorithm.archiveExternal(received)
 
     def collectSummaries(self):
         """
@@ -268,7 +269,6 @@ class SequentialPGP():
             for i, process in enumerate(self._processes):
                 process.executePhase()
                 buf, targets = process.send()
-                #process.algorithm.printForestToDot("Process_{}_phase_{}".format(i, j))
                 if not targets:
                     continue
                 for index, target in enumerate(targets):

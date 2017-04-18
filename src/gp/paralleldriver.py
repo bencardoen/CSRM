@@ -76,10 +76,9 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
         algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
         logger.info("Starting Sequential implementation")
-        #TODO add optimizer
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth, optimizer = config.optimizer, optimizestrategy=config.optimizestrategy)
     algo.executeAlgorithm()
-    logger.info("Writing output to folder {}".format(outfolder))
+    #logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)
     logger.info("Benchmark complete for {}".format(pid))
 
@@ -152,14 +151,14 @@ if __name__ == "__main__":
             exit(0)
         if args.hybridstrategy is not None:
             strat = args.hybridstrategy
-            if strat > 0 and strat <= c.population:
+            if strat >= -1 and strat <= c.population:
                 c.optimizestrategy = strat
             else:
-                logger.error("Invalid value {} for hybrid strategy, should be 0 > k <= {}".format(strat, c.population))
+                logger.error("Invalid value {} for hybrid strategy, should be -1 >= k <= {}".format(strat, c.population))
                 exit(0)
         else:
-            logger.info("No optimizer strategy given, assuming 1 (best per run)")
-            c.optimizestrategy = 1
+            logger.info("No optimizer strategy given, assuming 0 (best per run)")
+            c.optimizestrategy = 0
 
     c.outputfolder = outputfolder
     c.topo = topo
