@@ -79,7 +79,9 @@ class Convergence(Plotter):
         self.plotPopulationOverGenerations(keyword='complexity')
 
     def plotOptimizerGains(self):
-        self.plotPopulationOverGenerations(keyword = "fitnessgains")
+        pass
+        # Fix to plot single set of values 
+        #self.plotPopulationOverGenerations(keyword = "fitnessgains")
 
     # TODO add mean, cost
 

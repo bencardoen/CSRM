@@ -154,10 +154,13 @@ class GPAlgorithm():
 
         Each sample will have its variable set updated to match the rest of the population.
         """
-        #logger.info("Adding {} to archive".format(len(lst)))
+        logger.info("Adding {} to archive".format(len(lst)))
         for x in lst:
+            #TODO verify
             expr = x.toExpression()
             x2 = Tree.createTreeFromExpression(expr, variables=self._X)
+            x2.scoreTree(self._Y, self._fitnessfunction)
+            logger.info("Adding external to archive with fitness {}".format(x2.getFitness()))
             self.addToArchive(x2)
 
     def addConvergenceStat(self, generation, stat, phase):
@@ -478,32 +481,12 @@ class GPAlgorithm():
     def minDepthRatio(self, popindex:int):
         return 0
 
-    # def optimize(self, selected):
-    #     """
-    #     Apply a metaheuristic to the selection (in place).
-    #
-    #     Will apply constant folding to make the optimizing step more efficient.
-    #     :returns gain: statistics object recording gains.
-    #     """
-    #     totalnodes = sum([t.nodecount for t in selected])
-    #     gain = {"optimizer":{}, "nodecount":totalnodes}
-    #     g = 0
-    #     for i, t in enumerate(selected):
-    #         g += t.doConstantFolding()
-    #         # optimize
-    #         # scoreTree
-    #         gain["optimizer"][i] = t.getFitness()
-    #     gain["foldingsavings"] = g
-    #     gain["fitnessgains"] = [t.getFitness() for t in selected]
-    #     #logger.info("Ctopt gain is {}".format(gain))
-    #     return gain
-
     def optimize(self, selected):
         """
         Apply a metaheuristic to the selection (in place).
         """
         totalnodes = sum([t.nodecount for t in selected])
-        gain = {"optimizer":{}, "nodecount":totalnodes}
+        gain = {"nodecount":totalnodes}
         gain["foldingsavings"] = 0
         gain["fitnessgains"] = [0 for t in selected]
         return gain
@@ -730,40 +713,42 @@ class BruteCoolingElitist(BruteElitist):
         Will apply constant folding to make the optimizing step more efficient.
         :returns gain: statistics object recording gains.
         """
-        logger.info("Optimizing {}".format([t.getFitness() for t in selected]))
         totalnodes = sum([t.nodecount for t in selected])
-        gain = {"optimizer":{}, "nodecount":totalnodes, "optimizercost":0, "fitnessgains":[], "fitnessgainsrelative":[]}
+        gain = {"nodecount":totalnodes, "optimizercost":0, "fitnessgains":[0 for t in selected], "fitnessgainsrelative":[0 for t in selected], "foldingsavings":0}
         g = 0
         j = 0
-        for t in selected:
-            if t.getValuedConstants():
-                oldf = t.getFitness()
-                g += t.doConstantFolding()
-                opt = PSO(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
-                opt.run()
-                sol = opt.getOptimalSolution()
-                gain["optimizercost"] += sol["cost"]
-                best = sol["solution"]
-                tm = copyObject(t)
-                tm.updateValues(best)
-                tm.scoreTree(self._Y, self._fitnessfunction)
-                newf = tm.getFitness()
-                fgain = oldf - newf
-                if fgain < 0:
-                    # It's possible the initial perturbation disturbs the optimizer enough to cause this behavior
-                    pass
-                else:
-                    logger.info("Fitness decreased, using result, fold {} fnew {}".format(oldf, newf))
-                    t.updateValues(best)
-                    t.scoreTree(self._Y, self._fitnessfunction)
-                    gain["fitnessgains"].append(fgain)
-                    gain["fitnessgainsrelative"].append(fgain/oldf)
-                j += 1
-                if j > self.optimizestrategy:
-                    logger.info("Cutoff reached, skipping optimize step, {} > {}".format(j, self.optimizestrategy))
-                    break
+        if self.optimizer and self.optimizestrategy > 0:
+            logger.info("Using optimizer")
+            for t in selected:
+                if t.getValuedConstants():
+                    oldf = t.getFitness()
+                    g += t.doConstantFolding()
+                    opt = self.optimizer(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
+                    opt.run()
+                    sol = opt.getOptimalSolution()
+                    gain["optimizercost"] += sol["cost"]
+                    best = sol["solution"]
+                    tm = copyObject(t)
+                    tm.updateValues(best)
+                    tm.scoreTree(self._Y, self._fitnessfunction)
+                    newf = tm.getFitness()
+                    fgain = oldf - newf
+                    if fgain < 0:
+                        # It's possible the initial perturbation disturbs the optimizer enough to cause this behavior
+                        pass
+                    else:
+                        t.updateValues(best)
+                        t.scoreTree(self._Y, self._fitnessfunction)
+                        gain["fitnessgains"].append(fgain)
+                        gain["fitnessgainsrelative"].append(fgain/oldf)
+                    j += 1
+                    if j > self.optimizestrategy:
+                        logger.info("Cutoff reached, skipping optimize step, {} > {}".format(j, self.optimizestrategy))
+                break
+        else:
+            #logger.warning("No optimizer set, skipping.")
+            pass
         gain["foldingsavings"] = g
-        #logger.info("Ctopt gain is {}".format(gain))
         return gain
 
 

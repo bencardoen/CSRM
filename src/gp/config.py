@@ -7,7 +7,6 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-
 class Config:
     def __init__(self):
         self.population = 20
@@ -25,11 +24,13 @@ class Config:
         self.display = False
         self.topo = None
         self.archiveseedfile = None
+        self.optimizer = None
+        self.optimizestrategy = None
 
     def concatValues(self):
         q = "_"
         for k,v in sorted(self.__dict__.items()):
-            if str(k) == "topo":
+            if str(k) == "topo" or str(k) == "optimizer":
                 q += str(k) + str(v.__name__)
             else:
                 q += str(k)+str(v)

@@ -18,6 +18,7 @@ from gp.parallelalgorithm import ParallelGP, SequentialPGP, isMPI
 from gp.algorithm import BruteCoolingElitist
 from expression.constants import Constants
 from expression.tools import getKSamples
+from meta.optimizer import optimizers
 import logging
 import webbrowser
 import os
@@ -70,12 +71,13 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
     if isMPI():
         logger.info("Starting MPI Parallel implementation")
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
-        g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth)
+        g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth, optimizer=config.optimizer, optimizestrategy=config.optimizestrategy)
         g.pid = pid
         algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
         logger.info("Starting Sequential implementation")
-        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth)
+        #TODO add optimizer
+        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth, optimizer = config.optimizer, optimizestrategy=config.optimizestrategy)
     algo.executeAlgorithm()
     logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)
@@ -92,7 +94,7 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
 if __name__ == "__main__":
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
-    parser = argparse.ArgumentParser(description='Start/Stop AWS EC2 instances')
+    parser = argparse.ArgumentParser(description='Start parallel GPSR')
     parser.add_argument('-t', '--topology', help='space separated ids of instances')
     parser.add_argument('-c', '--processcount', type=int, help='Number of processes for sequential run')
     parser.add_argument('-g', '--generations', type=int, help='Number of generations')
@@ -106,6 +108,8 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--communicationsize', type=int, help="Nr of samples requested from an instance to distribute.")
     parser.add_argument('-e', '--expressionid', type=int, help="Nr of expression to test")
     parser.add_argument('-a', '--archiveinputfile', type=str, help="Use incremental mode, read stored expressions from a previous run in *archivefile*")
+    parser.add_argument('-k', '--hybrid', type=str, help="Use a hybrid optimizer")
+    parser.add_argument('-j', '--hybridstrategy', type=int, help="Set the hybrid optimizer strategy")
 
     args = parser.parse_args()
     #print(args)
@@ -118,6 +122,7 @@ if __name__ == "__main__":
         else:
             topo = topologies[toponame]
             logger.info("Chosen topology {}".format(topo))
+
     processcount = 1
     if isMPI():
         logger.info("Ignoring processcount, using MPI value")
@@ -136,13 +141,32 @@ if __name__ == "__main__":
         if outputfolder[-1] != '/':
             outputfolder += '/'
     c = Config()
+    if args.population:
+        c.population = args.population
+
+    if args.hybrid:
+        if args.hybrid in optimizers:
+            c.optimizer = optimizers[args.hybrid]
+        else:
+            logger.error("No such optimizer!!, choices are {}".format(optimizers.keys()))
+            exit(0)
+        if args.hybridstrategy is not None:
+            strat = args.hybridstrategy
+            if strat > 0 and strat <= c.population:
+                c.optimizestrategy = strat
+            else:
+                logger.error("Invalid value {} for hybrid strategy, should be 0 > k <= {}".format(strat, c.population))
+                exit(0)
+        else:
+            logger.info("No optimizer strategy given, assuming 1 (best per run)")
+            c.optimizestrategy = 1
+
     c.outputfolder = outputfolder
     c.topo = topo
     c.display = True if args.displaystats else False
     if args.generations:
         c.generations = args.generations
-    if args.population:
-        c.population = args.population
+
     if args.expressionid is not None:
         if args.expressionid < len(testfunctions) and args.expressionid >= 0:
             c.expr = args.expressionid
