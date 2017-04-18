@@ -737,7 +737,7 @@ class BruteCoolingElitist(BruteElitist):
         Will apply constant folding to make the optimizing step more efficient.
         :returns gain: statistics object recording gains.
         """
-        logger.info("Running optimizer")
+        #logger.info("Running optimizer")
         totalnodes = sum([t.nodecount for t in selected])
         gain = {"nodecount":totalnodes, "optimizercost":0, "fitnessgains":[0 for t in selected], "fitnessgainsrelative":[0 for t in selected], "foldingsavings":0}
         j = 0
@@ -779,26 +779,27 @@ class BruteCoolingElitist(BruteElitist):
         totalnodes = sum([t.nodecount for t in selected])
         gain = {"nodecount":totalnodes, "optimizercost":0, "fitnessgains":[0 for t in selected], "fitnessgainsrelative":[0 for t in selected], "foldingsavings":0}
         for t in selected:
-            oldf = t.getFitness()
-            gain["foldingsavings"] += t.doConstantFolding()
-            opt = self.optimizer(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
-            opt.run()
-            sol = opt.getOptimalSolution()
-            gain["optimizercost"] += sol["cost"]
-            best = sol["solution"]
-            tm = copyObject(t)
-            tm.updateValues(best)
-            tm.scoreTree(self._Y, self._fitnessfunction)
-            newf = tm.getFitness()
-            fgain = oldf - newf
-            if fgain < 0:
-                # It's possible the initial perturbation disturbs the optimizer enough to cause this behavior
-                pass
-            else:
-                t.updateValues(best)
-                t.scoreTree(self._Y, self._fitnessfunction)
-                gain["fitnessgains"].append(fgain)
-                gain["fitnessgainsrelative"].append(fgain/oldf)
+            if t.getValuedConstants():
+                oldf = t.getFitness()
+                gain["foldingsavings"] += t.doConstantFolding()
+                opt = self.optimizer(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
+                opt.run()
+                sol = opt.getOptimalSolution()
+                gain["optimizercost"] += sol["cost"]
+                best = sol["solution"]
+                tm = copyObject(t)
+                tm.updateValues(best)
+                tm.scoreTree(self._Y, self._fitnessfunction)
+                newf = tm.getFitness()
+                fgain = oldf - newf
+                if fgain < 0:
+                    # It's possible the initial perturbation disturbs the optimizer enough to cause this behavior
+                    pass
+                else:
+                    t.updateValues(best)
+                    t.scoreTree(self._Y, self._fitnessfunction)
+                    gain["fitnessgains"].append(fgain)
+                    gain["fitnessgainsrelative"].append(fgain/oldf)
         #logger.info("Storing gain {}".format(gain))
         stats = self._convergencestats[self._phase][-1]
         if "fitnessgains" in stats:

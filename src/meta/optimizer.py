@@ -29,7 +29,7 @@ class Optimizer:
         self.history = 0
         self.treshold = int(self.iterations / 2)
 
-    def getOptimalSolution():
+    def getOptimalSolution(self):
         raise NotImplementedError
 
     def run(self):
@@ -76,7 +76,7 @@ class Instance:
         self.updateFitness()
 
 
-class Particle(Instance):
+class PSOParticle(Instance):
     """
     PSO Particle.
 
@@ -125,6 +125,60 @@ class Particle(Instance):
         return "Particle fitness {} with velocity {} position {} and best {}".format(self.fitness, self.velocity, self.current, self.best)
 
 
+class DEVector(Instance):
+    """
+    DE Vector
+    """
+
+    def __init__(self, objectinstance, rng, Y, distancefunction, particlenr):
+        super().__init__(objectinstance, Y, distancefunction)
+        self.rng = rng
+        if particlenr != 0:
+            self.current = [c * rng.random() for c in self.current]
+            self.best = self.current[:]
+        self.update()
+
+    @staticmethod
+    def createDonor(chosen, F):
+        c1, c2, c3 = chosen
+        #logger.info("Creating donor with {}".format([c.current for c in chosen]))
+        d = [a -b for a,b in zip(c2.current, c3.current)]
+        #logger.info("Diff donor with {}".format(d))
+        c = [o + F*k for o,k in zip(c1.current, d)]
+        return c
+
+    @staticmethod
+    def createCrossover(X, V, rng, Cr):
+        vlen = len(V)
+        #logger.info("V is {}".format(V))
+        indices = [i for i in range(vlen)]
+        jrand = rng.choice(indices)
+        #logger.info("JRand is {}".format(jrand))
+        U = []
+        for i in range(vlen):
+            r = rng.random()
+            ui = 0
+            if r < Cr or i == jrand:
+                ui = V[i]
+            else:
+                ui = X[i]
+            U.append(ui)
+        return U
+
+    def testUpdate(self, U):
+        oldf = self.fitness
+        oldc = self.current[:]
+        self.current = U
+        self.update()
+        uf = self.fitness
+        if uf <= oldf:
+            # allready done
+            pass
+        else:
+            self.current = oldc
+            self.update()
+
+
 class PSO(Optimizer):
     """
     Particle Swarm Optimization.
@@ -140,7 +194,7 @@ class PSO(Optimizer):
         self.rng = getRandom(seed)
         if seed is None:
             logger.warning("Using zero seed")
-        self.particles = [Particle(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1) for i in range(self.populationcount)]
+        self.particles = [PSOParticle(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1) for i in range(self.populationcount)]
         self.c1 = 2
         self.c2 = 2
         self.bestparticle = None
@@ -197,11 +251,60 @@ class PSO(Optimizer):
 
 
 class DE(Optimizer):
-    def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations):
+    def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations, testrun=False):
         super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
+        self.vectors = [DEVector(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1) for i in range(self.populationcount)]
+        self.F = 0.6
+        # We assume non dependency (can't really otherwise)
+        self.Cr = 0.1
+        self.D = len(self.vectors[0].current)
+        assert(self.D>0)
+        #logger.info("D is {}".format(self.D))
 
-    def run():
-        logger.warning("Not Implemented!")
+    def stopcondition(self):
+        # This would require K x N updates to check if we stalled
+        # It's faster to just run the algorithm.
+        return False
+
+    def run(self):
+        for _ in range(self.iterations):
+            self.iteration()
+            if self.stopcondition():
+                break
+        #logger.warning("Not Implemented!")
+
+    def report(self):
+        vs = sorted(self.vectors, key=lambda x: x.fitness)
+        best = vs[0]
+        logger.info("Current best in generation {} is {}".format(self.currentiteration, best.fitness))
+        #return {"cost":bc, "solution":bv}
+
+    def getOptimalSolution(self):
+        vs = sorted(self.vectors, key=lambda x: x.fitness)
+        best = vs[0]
+        bv = best.current
+        bc = sum([v.cost for v in self.vectors])
+        return {"cost":bc, "solution":bv}
+
+
+    def iteration(self):
+        choices = [i for i in range(len(self.vectors))]
+        for i, v in enumerate(self.vectors):
+            X = self.vectors[i]
+            # Mutate
+            chosen = self.rng.sample(choices, 3)
+            while i in chosen:
+                chosen = self.rng.sample(choices, 3)
+            V = DEVector.createDonor([self.vectors[j] for j in chosen], self.F)
+
+            # Bin crossover
+            U = DEVector.createCrossover(V, X.current[:], rng=self.rng, Cr=self.Cr)
+
+            # Selection
+            X.testUpdate(U)
+        #self.report()
+        self.currentiteration += 1
+        # update
 
 
 class ABC(Optimizer):
