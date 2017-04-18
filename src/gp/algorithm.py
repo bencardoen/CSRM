@@ -167,12 +167,13 @@ class GPAlgorithm():
             self.addToArchive(x2)
 
     def addConvergenceStat(self, generation, stat, phase):
+        #logger.info("Adding stat to gen {} phase {} ".format(generation, phase))
         if len(self._convergencestats) <= phase:
             self._convergencestats.append([])
         if len(self._convergencestats[phase]) <= generation:
             self._convergencestats[phase].append(stat)
         else:
-            self._convergencestats[generation] = stat
+            self._convergencestats[phase][generation] = stat
 
     def getConvergenceStat(self, generation, phase):
         return self._convergencestats[phase][generation]
@@ -329,6 +330,8 @@ class GPAlgorithm():
         nc = optimizergains["nodecount"]
         constantfoldingsavings = fsavings/nc * 100
         fitnessgains = optimizergains["fitnessgains"]
+        fitnessgainsrelative = optimizergains["fitnessgainsrelative"]
+        optimizercost = optimizergains["optimizercost"]
 
         assert(isinstance(replacementcount, list))
         #logger.debug("Generation {} SUMMARY:: fitness \tmean {} \tsd {} \tvar {} \treplacements {}".format(generation, mean, sd, v, replacementcount[0]))
@@ -336,7 +339,7 @@ class GPAlgorithm():
         self.addConvergenceStat(generation, {    "fitness":fit,"mean_fitness":mean, "std_fitness":sd, "variance_fitness":v, "depth":depths,
                                                  "replacements":replacementcount[0],"mutations":replacementcount[1], "crossovers":replacementcount[2],
                                                  "mean_complexity":cmean, "std_complexity":csd, "variance_complexity":cv,"complexity":comp,
-                                                 "mutate_gain":mmg, "crossover_gain":mcg, "mean_evaluations":meaneval, "foldingsavings":constantfoldingsavings, "fitnessgains":fitnessgains}, phase)
+                                                 "mutate_gain":mmg, "crossover_gain":mcg, "mean_evaluations":meaneval, "foldingsavings":constantfoldingsavings, "fitnessgains":fitnessgains, "fitnessgainsrelative":fitnessgainsrelative, "optimizercost":optimizercost}, phase)
 
     def setTrace(self, v, prefix):
         """
@@ -431,8 +434,9 @@ class GPAlgorithm():
             self.testInvariant()
             if self._trace:
                 self.printForestToDot("process_{}_phase_{}_generation_{}".format(self.pid, self._phase, i))
-        self._phase += 1
+        #self._phase += 1
         self.archive(modified)
+        self._phase += 1
 
     def executeAlgorithm(self):
         self._phase = 0
@@ -494,8 +498,10 @@ class GPAlgorithm():
         """
         totalnodes = sum([t.nodecount for t in selected])
         gain = {"nodecount":totalnodes}
-        gain["foldingsavings"] = 0
+        gain["foldingsavings"] = sum(t.doConstantFolding() for t in self._population)
         gain["fitnessgains"] = [0 for t in selected]
+        gain["fitnessgainsrelative"] = [0 for t in selected]
+        gain["optimizercost"] = [0 for t in selected]
         return gain
 
     def update(self, modified):
@@ -684,6 +690,7 @@ class BruteElitist(GPAlgorithm):
         best = self._population.getN(self._archivephase)
         for b in best:
             self.addToArchive(copyObject(b))
+        return None
 
 
 class BruteCoolingElitist(BruteElitist):
@@ -730,15 +737,17 @@ class BruteCoolingElitist(BruteElitist):
         Will apply constant folding to make the optimizing step more efficient.
         :returns gain: statistics object recording gains.
         """
+        logger.info("Running optimizer")
         totalnodes = sum([t.nodecount for t in selected])
         gain = {"nodecount":totalnodes, "optimizercost":0, "fitnessgains":[0 for t in selected], "fitnessgainsrelative":[0 for t in selected], "foldingsavings":0}
         j = 0
+        gain["foldingsavings"] = sum( [t.doConstantFolding() for t in selected])
         if self.optimizer and self.optimizestrategy > 0:
             logger.info("Using optimizer")
             for t in selected:
                 if t.getValuedConstants():
                     oldf = t.getFitness()
-                    gain["foldingsavings"] += t.doConstantFolding()
+                    #gain["foldingsavings"] += t.doConstantFolding()
                     opt = self.optimizer(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
                     opt.run()
                     sol = opt.getOptimalSolution()
@@ -790,6 +799,23 @@ class BruteCoolingElitist(BruteElitist):
                 t.scoreTree(self._Y, self._fitnessfunction)
                 gain["fitnessgains"].append(fgain)
                 gain["fitnessgainsrelative"].append(fgain/oldf)
+        #logger.info("Storing gain {}".format(gain))
+        stats = self._convergencestats[self._phase][-1]
+        if "fitnessgains" in stats:
+            stats["fitnessgains"] += gain["fitnessgains"]
+        else:
+            stats["fitnessgains"] = gain["fitnessgains"]
+        if "fitnessgainsrelative" in stats:
+            stats["fitnessgainsrelative"] += gain["fitnessgainsrelative"]
+        else:
+            stats["fitnessgainsrelative"] = gain["fitnessgainsrelative"]
+        if "optimizercost" in stats:
+            stats["optimizercost"] + gain["optimizercost"]
+        else:
+            stats["optimizercost"] = gain["optimizercost"]
+        #logger.info("Updating stats {}".format(stats))
+        self._convergencestats[self._phase][-1] = stats
+        #self.addConvergenceStat(generation = self._generations-1, phase=self._phase, gain)
         # Store gain
 
     def archive(self, modified):
@@ -798,6 +824,7 @@ class BruteCoolingElitist(BruteElitist):
         """
         #logger.info("Optimizer archiving")
         best = self._population.getN(self._archivephase)
+        assert(len(best) <= self._archivephase)
         best = [copyObject(b) for b in best]
         if self.optimizestrategy == 0:
             #logger.info("Archive optimization running.")

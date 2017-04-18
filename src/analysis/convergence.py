@@ -79,9 +79,21 @@ class Convergence(Plotter):
         self.plotPopulationOverGenerations(keyword='complexity')
 
     def plotOptimizerGains(self):
-        pass
-        # Fix to plot single set of values 
-        #self.plotPopulationOverGenerations(keyword = "fitnessgains")
+        gains = []
+        optcost = []
+        rgains = []
+        for i, run in enumerate(self._convergencestats):
+            gains.append(sum(run[-1]["fitnessgains"]))
+            rgains.append(sum(run[-1]["fitnessgainsrelative"]))
+            optcost.append(run[-1]["optimizercost"])
+
+        p = plotLineData([gains], labelx="Phases", labely="Optimizer gain in fitness", title="Optimizer Gain", legend=["Gains"], dot=True)
+        self.addPlot(p)
+        p = plotLineData([rgains], labelx="Phases", labely="Relative Optimizer gain in fitness", title="Optimizer Gain", legend=["Relative Gains"], dot=True)
+        self.addPlot(p)
+        p = plotLineData([optcost], labelx="Phases", labely="Optimizer cost in weighted evaluations", title="Optimizer Cost", legend=["Cost"], dot=True)
+        self.addPlot(p)
+
 
     # TODO add mean, cost
 
