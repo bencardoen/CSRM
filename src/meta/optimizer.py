@@ -83,11 +83,11 @@ class Particle(Instance):
     Wrap around an object with dimensions which PSO can optimize.
     """
 
-    def __init__(self, objectinstance, rng, Y, distancefunction):
+    def __init__(self, objectinstance, rng, Y, distancefunction, particlenr):
             super().__init__(objectinstance, Y, distancefunction)
             self.velocity = [0.01 for _ in range(len(self.current))] # zero velocity fails at times, convergence halts.
             self.rng = rng
-            self.initializePosition(rng=self.rng)
+            self.initializePosition(rng=self.rng, i=particlenr)
             self.update()
 
     def inertiaweight(self):
@@ -102,11 +102,12 @@ class Particle(Instance):
         """
         return 0.5 + self.rng.random()/2
 
-    def initializePosition(self, rng):
+    def initializePosition(self, rng, i):
         """
         Perturb initial position.
         """
-        self.current = [c * rng.random() for c in self.current]
+        if i != 0:
+            self.current = [c * rng.random() for c in self.current]
         self.best = self.current[:]
 
     def updateVelocity(self, c1, c2, r1, r2, g):
@@ -131,12 +132,15 @@ class PSO(Optimizer):
     Swarm optimizer with n dimensions, inertia weight damping.
     """
 
-    def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations):
+    def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations, testrun=False):
+        """
+        :param testrun: If True, assume that partcile is allready the optimum (in which case we won't be able to anything, so perturbation is needed). Otherwise use particle as an initial solution and then perturb.
+        """
         super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
         self.rng = getRandom(seed)
         if seed is None:
             logger.warning("Using zero seed")
-        self.particles = [Particle(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction) for _ in range(self.populationcount)]
+        self.particles = [Particle(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1) for i in range(self.populationcount)]
         self.c1 = 2
         self.c2 = 2
         self.bestparticle = None
@@ -181,7 +185,7 @@ class PSO(Optimizer):
         for i in range(self.iterations):
             self.doIteration()
             self.currentiteration += 1
-            self.report()
+            #self.report()
             if self.stopcondition():
                 break
         for p in self.particles:
@@ -190,3 +194,22 @@ class PSO(Optimizer):
     def report(self):
         #logger.info("In iteration {} of {} current population is {}".format(self.currentiteration, self.iterations, [str(p) + "\n" for p in self.particles]))
         logger.info("Best overall is for particles index {} with fitness {} and values {}".format(self.bestparticle[0], self.bestparticle[1], self.globalbest))
+
+
+class DE(Optimizer):
+    def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations):
+        super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
+
+    def run():
+        logger.warning("Not Implemented!")
+
+
+class ABC(Optimizer):
+    def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations):
+        super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
+
+    def run():
+        logger.warning("Not Implemented!")
+
+
+optimizers = {"pso": PSO, "de": DE, "none":PassThroughOptimizer, "abc":ABC}

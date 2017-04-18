@@ -409,6 +409,7 @@ class GPAlgorithm():
         for i in range(self._generations):
             selected = self.select()
             modified, count, gm, gc, evaluations = self.evolve(selected)
+            #logger.info("Modified is {} of type {} and length {}".format(modified, type(modified), len(modified)))
             gains = self.optimize(modified)
             self.update(modified)
             assert(isinstance(count, list))
@@ -691,11 +692,18 @@ class BruteCoolingElitist(BruteElitist):
     Uses a cooling strategy to apply operators, maximizing gain in the initial process but reducing cost when gain is no longer possible.
 
     The cooling schedule 'predicts' efficiency of the operators.
+
+    The optimizer if, passed, will be applied to the constants in the generated expressions.
+
+    :param optimizer: class name of optimizer to use
+    :param optimizestrategy: 0 (None), 1 (Best only), k (k best), populationcount (all).
     """
 
-    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None,depthcooling=False, skipconstantexpressions=False, archivefile=None):
+    def __init__(self, X, Y, popsize, maxdepth, fitnessfunction, generations, seed=None, phases=None, archivesize=None, initialdepth=None,depthcooling=False, skipconstantexpressions=False, archivefile=None,optimizer=None, optimizestrategy=None):
         self._depthcooling = depthcooling
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions, archivefile=archivefile)
+        self.optimizer = optimizer
+        self.optimizestrategy = optimizestrategy if optimizestrategy is not None else 1
 
     @property
     def depthcooling(self):
@@ -714,6 +722,50 @@ class BruteCoolingElitist(BruteElitist):
             return coolingMinDepthRatio(self._currentgeneration, self._generations, popindex, self._popsize, rng=self._rng)
         else:
             return 0
+
+    def optimize(self, selected):
+        """
+        Apply a metaheuristic to the selection (in place).
+
+        Will apply constant folding to make the optimizing step more efficient.
+        :returns gain: statistics object recording gains.
+        """
+        logger.info("Optimizing {}".format([t.getFitness() for t in selected]))
+        totalnodes = sum([t.nodecount for t in selected])
+        gain = {"optimizer":{}, "nodecount":totalnodes, "optimizercost":0, "fitnessgains":[], "fitnessgainsrelative":[]}
+        g = 0
+        j = 0
+        for t in selected:
+            if t.getValuedConstants():
+                oldf = t.getFitness()
+                g += t.doConstantFolding()
+                opt = PSO(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
+                opt.run()
+                sol = opt.getOptimalSolution()
+                gain["optimizercost"] += sol["cost"]
+                best = sol["solution"]
+                tm = copyObject(t)
+                tm.updateValues(best)
+                tm.scoreTree(self._Y, self._fitnessfunction)
+                newf = tm.getFitness()
+                fgain = oldf - newf
+                if fgain < 0:
+                    # It's possible the initial perturbation disturbs the optimizer enough to cause this behavior
+                    pass
+                else:
+                    logger.info("Fitness decreased, using result, fold {} fnew {}".format(oldf, newf))
+                    t.updateValues(best)
+                    t.scoreTree(self._Y, self._fitnessfunction)
+                    gain["fitnessgains"].append(fgain)
+                    gain["fitnessgainsrelative"].append(fgain/oldf)
+                j += 1
+                if j > self.optimizestrategy:
+                    logger.info("Cutoff reached, skipping optimize step, {} > {}".format(j, self.optimizestrategy))
+                    break
+        gain["foldingsavings"] = g
+        #logger.info("Ctopt gain is {}".format(gain))
+        return gain
+
 
 
 def probabilityMutate(generation:int, generations:int, ranking:int, population:int, rng:random.Random=None)->bool:

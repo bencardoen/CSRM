@@ -497,6 +497,12 @@ class Tree:
         """
         return [ c.getConstant() for c in self.getNodes()]
 
+    def getValuedConstants(self):
+        """
+        Return only existing constants.
+        """
+        return [c for c in self.getConstants() if c]
+
     def updateValues(self, values):
         const = [ c.getConstant() for c in self.getNodes()]
         const = [c for c in const if c]
