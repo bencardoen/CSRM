@@ -751,7 +751,7 @@ class BruteCoolingElitist(BruteElitist):
                     opt = self.optimizer(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
                     opt.run()
                     sol = opt.getOptimalSolution()
-                    gain["optimizercost"] += sol["cost"]
+                    gain["optimizercost"] += sol["cost"] *t.evaluationcost
                     best = sol["solution"]
                     tm = copyObject(t)
                     tm.updateValues(best)
@@ -785,7 +785,7 @@ class BruteCoolingElitist(BruteElitist):
                 opt = self.optimizer(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
                 opt.run()
                 sol = opt.getOptimalSolution()
-                gain["optimizercost"] += sol["cost"]
+                gain["optimizercost"] += sol["cost"] * t.evaluationcost
                 best = sol["solution"]
                 tm = copyObject(t)
                 tm.updateValues(best)
@@ -811,7 +811,7 @@ class BruteCoolingElitist(BruteElitist):
         else:
             stats["fitnessgainsrelative"] = gain["fitnessgainsrelative"]
         if "optimizercost" in stats:
-            stats["optimizercost"] + gain["optimizercost"]
+            stats["optimizercost"] += gain["optimizercost"]
         else:
             stats["optimizercost"] = gain["optimizercost"]
         #logger.info("Updating stats {}".format(stats))
