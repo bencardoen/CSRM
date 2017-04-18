@@ -62,8 +62,13 @@ class GPAlgorithm():
         self._trace = False
         """ Input data """
         self._X = X
+        #logger.debug("X is {} x {}".format(len(X), len(X[0])))
+        #logger.info("Sum X {}".format(sum([sum(x) for x in X])))
+        #logger.info("\n\nX is {}\n\n".format(X))
         """ Expected data """
         self._Y = Y
+        # logger.info("Y is {} {}".format(len(Y), Y))
+        # logger.info("Sum Y is {}".format(sum(Y)))
         self._skipconstantexpressions = skipconstantexpressions
         self._archiveinputfile = archivefile
         if archivefile:
@@ -148,7 +153,6 @@ class GPAlgorithm():
             arch = self._archive.getAll()
         else:
             arch = self._archive.getN(n)
-        logger.info("Returning {} archived samples.".format(len(arch)))
         return [copyObject(a) for a in arch]
 
     def archiveExternal(self, lst):
@@ -157,12 +161,9 @@ class GPAlgorithm():
 
         Each sample will have its variable set updated to match the rest of the population.
         """
-        logger.info("Adding {} to archive".format(len(lst)))
         for x in lst:
             expr = x.toExpression()
             x2 = Tree.createTreeFromExpression(expr, variables=self._X)
-            x2.scoreTree(self._Y, self._fitnessfunction)
-            #logger.info("Adding external to archive with fitness {}".format(x2.getFitness()))
             self.addToArchive(x2)
 
     def addConvergenceStat(self, generation, stat, phase):
@@ -354,16 +355,20 @@ class GPAlgorithm():
         """
         After a run of x generations, reseed the population based on the archive
         """
+        #logger.info("Reseeding")
         archived = self._archive.getAll()
         for a in archived:
+            #a.scoreTree(self._Y, self._fit)
             self.addTree(copyObject(a))
         # Retrim the current population by removing the least fit samples
+        #logger.info("Population after archive usage is {}".format([t.getFitness() for t in self._population]))
         while len(self._population) > self._popsize:
             self._population.drop()
         # If we have too few, refill with random samples
         diff = self._popsize - len(self._population)
         for _ in range(diff):
             self.addRandomTree()
+        #logger.info("After reseeding population is {}".format([t.getFitness() for t in self._population]))
 
     def writePopulation(self, filename):
         with open(filename, 'w') as f:
@@ -523,15 +528,19 @@ class GPAlgorithm():
         """
         Add t to the archive and truncate worst if necessary.
         """
-        #logger.info("Adding {} to archive".format(t))
+        #logger.info("Adding {} to archive".format(t.getFitness()))
+        if t.getFitness() == Constants.MINFITNESS:
+            #logger.info("Invalid communicated sample, ignoring.")
+            return
         if t not in self._archive:
             self._archive.add(t)
             if len(self._archive) > self._archivesize:
+                #logger.info("Archive overflowing.")
                 self._archive.drop()
         else:
             pass
-            #logger.warning("Sample {} already in archive!".format(t))
-            #logger.warning("Archive is {}".format([t.getFitness() for t in self._archive]))
+            # logger.warning("Sample {} already in archive!".format(t.getFitness()))
+            # logger.warning("Archive is {}".format([t.getFitness() for t in self._archive]))
 
 
 class BruteElitist(GPAlgorithm):

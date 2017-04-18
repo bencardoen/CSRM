@@ -116,9 +116,9 @@ class ParallelGP():
             logging.info("Process {} :: Parallel executing Phase {}".format(self.pid, i))
             self.executePhase()
             #self.algorithm.printForestToDot("Process_{}_phase_{}".format(self.pid, i))
-            logger.info("Process {} :: Parallel sending in  Phase {}".format(self.pid, i))
+            #logger.info("Process {} :: Parallel sending in  Phase {}".format(self.pid, i))
             self.send()
-            logger.info("Process {} :: Parallel receiving in  Phase {}".format(self.pid, i))
+            #logger.info("Process {} :: Parallel receiving in  Phase {}".format(self.pid, i))
             self.receiveCommunications()
 
 
@@ -152,14 +152,15 @@ class ParallelGP():
         selectedsamples, buf = [], []
         if targetcount:
             selectedsamples = self.algorithm.getArchived(self._communicationsize)
-            logger.info("Process {} :: Got from algorithm {} ".format(self.pid, len(selectedsamples) ))
+            # logger.info("Process {} :: Got from algorithm {} ".format(self.pid, len(selectedsamples) ))
+            # logger.info("Process {} :: Got from algorithm {} ".format(self.pid, [t.getFitness() for t in selectedsamples] ))
             buf = self.spreadpolicy.spread(selectedsamples, targetcount)
-        logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
+        #     logger.info("Process {} :: Sendbuffer {} ".format(self.pid, [[t.getFitness() for t in b] for b in buf] ))
+        # logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
         if self.communicator:
             self.waitForSendRequests()
             for index, target in enumerate(targets):
                 self._sendbuffer[target] = buf[index]
-                #logger.info("Process {} :: MPI, Sending ASYNC {} --> [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), target))
                 self._waits[target] = self.communicator.isend(buf[index], dest=target, tag=0)
         else:
             return buf, targets
@@ -174,6 +175,7 @@ class ParallelGP():
             buf = self.communicator.recv(source=sender, tag=0) # todo extend tag usage
             received += buf
         if received :
+            #logger.info("Process {} :: Received {}".format(self.pid, [t.getFitness() for t in received]))
             self.algorithm.archiveExternal(received)
 
     def collectSummaries(self):
