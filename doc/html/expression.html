@@ -887,6 +887,12 @@ With mindepthratio set, the</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="expression.testtree.TreeTest.testConversionRegression">
+<code class="descname">testConversionRegression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testConversionRegression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testConversionRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert basic expression to tree</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="expression.testtree.TreeTest.testConversionToTreeBasic">
 <code class="descname">testConversionToTreeBasic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testConversionToTreeBasic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testConversionToTreeBasic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert basic expression to tree</p>
@@ -1432,7 +1438,10 @@ Each node has an optional constant weight</p>
 <dl class="method">
 <dt id="expression.tree.Tree.doConstantFolding">
 <code class="descname">doConstantFolding</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.doConstantFolding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.doConstantFolding" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Apply constant folding on this tree.</p>
+<p>For each subtree that represents a constant expression, replace the subtree with a single node.
+:returns : The difference in nodes (&gt;=0), iow gain from applying the operation.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="expression.tree.Tree.evaluateAll">
@@ -1547,6 +1556,12 @@ Each node has an optional constant weight</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="expression.tree.Tree.getValuedConstants">
+<code class="descname">getValuedConstants</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getValuedConstants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getValuedConstants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return only existing constants.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="expression.tree.Tree.getVariables">
 <code class="descname">getVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.getVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.getVariables" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1554,7 +1569,9 @@ Each node has an optional constant weight</p>
 <dl class="staticmethod">
 <dt id="expression.tree.Tree.growTree">
 <em class="property">static </em><code class="descname">growTree</code><span class="sig-paren">(</span><em>variables</em>, <em>depth: int</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.growTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.growTree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Grow a tree up to depth.</p>
+<dd><p>Grow a tree up to a given depth.</p>
+<p>For large depth values this method has a lower complexity than makeRandomTree.
+Bottom up construction allows for far faster detection of invalid (sub) trees.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1566,7 +1583,9 @@ Each node has an optional constant weight</p>
 <dl class="method">
 <dt id="expression.tree.Tree.isConstantExpressionLazy">
 <code class="descname">isConstantExpressionLazy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.isConstantExpressionLazy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.isConstantExpressionLazy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Checks if this tree is a constant expression with worst case O(N), but best case O(1).</p>
+<p>Do not call this if you intend to do constant folding, this requires a full traversal.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="expression.tree.Tree.isLeaf">
@@ -1611,7 +1630,7 @@ Each node has an optional constant weight</p>
 <dt id="expression.tree.Tree.makeRandomTree">
 <em class="property">static </em><code class="descname">makeRandomTree</code><span class="sig-paren">(</span><em>variables</em>, <em>depth: int</em>, <em>rng=None</em>, <em>tokenLeafs=False</em>, <em>limit=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.makeRandomTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.makeRandomTree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a random expression tree with a random selection of variables.</p>
-<p>Topdown construction, there is no guarantee that this construction renders a semantically valid tree</p>
+<p>Repeats generation until a valid tree is found (iow valid for each x in variables).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1692,7 +1711,20 @@ Each node has an optional constant weight</p>
 <dt id="expression.tree.Tree.swapSubtrees">
 <em class="property">static </em><code class="descname">swapSubtrees</code><span class="sig-paren">(</span><em>left</em>, <em>right</em>, <em>depth=None</em>, <em>rng=None</em>, <em>symmetric=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.swapSubtrees"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.swapSubtrees" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given two trees, pick random subtree roots and swap them between the trees.</p>
-<p>Will swap out subtrees at equal depth.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>left</strong> &#8211; left tree (modified in place)</li>
+<li><strong>right</strong> &#8211; right tree (modified in place)</li>
+<li><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; target depth, if None randomly generated</li>
+<li><strong>symmetric</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, select subtrees at equal depth of both trees, ensuring depth is maintained.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1706,6 +1738,11 @@ Each node has an optional constant weight</p>
 <code class="descname">toExpression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.toExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.toExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print the tree to an infix expression.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="expression.tree.Tree.updateValues">
+<code class="descname">updateValues</code><span class="sig-paren">(</span><em>values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tree.html#Tree.updateValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tree.Tree.updateValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="expression.tree.Tree.updateVariables">

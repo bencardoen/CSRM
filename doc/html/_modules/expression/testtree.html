@@ -410,6 +410,29 @@
         <span class="n">cycled</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">toExpression</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">cycled</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="TreeTest.testConversionRegression"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testConversionRegression">[docs]</a>    <span class="k">def</span> <span class="nf">testConversionRegression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert basic expression to tree</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="s2">&quot;( cos( ( ( 0.19669731160658688 / x4 ) * ( cos( ( 0.22522712182469018 - x2 ) ) ) ) ) )&quot;</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;t20createdFromExpressionBasic.dot&quot;</span><span class="p">)</span>
+        <span class="n">cycled</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">toExpression</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">cycled</span><span class="p">)</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="s2">&quot;( cos( ( ( 0.19669731160658688 / x4 ) * ( cos( ( 0.22522712182469018 - x2 ) ) ) ) ) )&quot;</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;t20createdFromExpressionBasic.dot&quot;</span><span class="p">)</span>
+        <span class="n">cycled</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">toExpression</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">cycled</span><span class="p">)</span>
+        <span class="n">expr</span><span class="o">=</span> <span class="s2">&quot;0.8967869641417475&quot;</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;t20createdFromExpressionBasic.dot&quot;</span><span class="p">)</span>
+        <span class="n">cycled</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">toExpression</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">cycled</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="TreeTest.testConversionToTreeFunctions"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testConversionToTreeFunctions">[docs]</a>    <span class="k">def</span> <span class="nf">testConversionToTreeFunctions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

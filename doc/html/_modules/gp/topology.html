@@ -195,13 +195,7 @@
 <span class="sd">        :param int size: Number of nodes. Size+1 should be a power of 2</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">powerOf2</span><span class="p">(</span><span class="n">size</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spreadpolicy</span> <span class="o">=</span> <span class="n">DistributeSpreadPolicy</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">depth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span>
 
 <div class="viewcode-block" id="TreeTopology.getSource"><a class="viewcode-back" href="../../gp.html#gp.topology.TreeTopology.getSource">[docs]</a>    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">target</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
@@ -211,18 +205,19 @@
 
 <div class="viewcode-block" id="TreeTopology.getTarget"><a class="viewcode-back" href="../../gp.html#gp.topology.TreeTopology.getTarget">[docs]</a>    <span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">source</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isLeaf</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">source</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">source</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
-        <span class="c1">#logger.debug(&quot;getTarget called with {} -&gt;{}&quot;.format(source, v))</span>
-        <span class="k">return</span> <span class="n">v</span></div>
+        <span class="n">left</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">source</span> <span class="o">+</span><span class="mi">1</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">source</span> <span class="o">+</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="n">left</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">right</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">left</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="TreeTopology.isLeaf"><a class="viewcode-back" href="../../gp.html#gp.topology.TreeTopology.isLeaf">[docs]</a>    <span class="k">def</span> <span class="nf">isLeaf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return true if node is a leaf.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">node</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-        <span class="c1"># use fact that last level of binary tree with k nodes has 2^log2(k) leaves</span>
-        <span class="n">cutoff</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">node</span> <span class="o">&gt;=</span> <span class="n">cutoff</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getTarget</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">==</span><span class="p">[]</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;TreeTopology &quot;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>
@@ -279,12 +274,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">rem</span> <span class="o">=</span> <span class="n">size</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">rt</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">size</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rem</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rt</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rem</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">+=</span> <span class="mi">1</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="c1">#logger.info(&quot;RT = {} Diff = {} Rows = {}&quot;.format(self.rt, self.rem, self.rowcount))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reversemapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getTarget</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reversemapping</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reversemapping</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reversemapping</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="VonNeumannTopology.getSource"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.getSource">[docs]</a>    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
-        <span class="c1"># Symmetric relationship</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getTarget</span><span class="p">(</span><span class="n">target</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reversemapping</span><span class="p">[</span><span class="n">target</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="VonNeumannTopology.lintormcm"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.lintormcm">[docs]</a>    <span class="k">def</span> <span class="nf">lintormcm</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">rowsize</span><span class="p">):</span>
         <span class="n">colindex</span> <span class="o">=</span> <span class="n">index</span> <span class="o">%</span> <span class="n">rowsize</span>
@@ -294,7 +298,7 @@
 <div class="viewcode-block" id="VonNeumannTopology.rmcmtolin"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.rmcmtolin">[docs]</a>    <span class="k">def</span> <span class="nf">rmcmtolin</span><span class="p">(</span><span class="n">rowindex</span><span class="p">,</span> <span class="n">colindex</span><span class="p">,</span> <span class="n">rowsize</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">rowindex</span> <span class="o">*</span> <span class="n">rowsize</span> <span class="o">+</span> <span class="n">colindex</span></div>
 
-<div class="viewcode-block" id="VonNeumannTopology.getTarget"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.getTarget">[docs]</a>    <span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For a small grid, duplicates are possible.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -305,7 +309,10 @@
         <span class="n">down</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">VonNeumannTopology</span><span class="o">.</span><span class="n">rmcmtolin</span><span class="p">((</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowcount</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rt</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">up</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">VonNeumannTopology</span><span class="o">.</span><span class="n">rmcmtolin</span><span class="p">((</span><span class="n">r</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowcount</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rt</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">up</span><span class="p">,</span> <span class="n">down</span><span class="p">]</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>
+
+<div class="viewcode-block" id="VonNeumannTopology.getTarget"><a class="viewcode-back" href="../../gp.html#gp.topology.VonNeumannTopology.getTarget">[docs]</a>    <span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">source</span><span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;VonNeumannTopology&quot;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>

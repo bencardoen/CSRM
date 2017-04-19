@@ -334,7 +334,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a random expression tree with a random selection of variables.</span>
 
-<span class="sd">        Topdown construction, there is no guarantee that this construction renders a semantically valid tree</span>
+<span class="sd">        Repeats generation until a valid tree is found (iow valid for each x in variables).</span>
 
 <span class="sd">        :param bool tokenLeafs: if set, only use constants</span>
 <span class="sd">        :param int limit: raises Exception if no valid tree can be found in at least limit tries</span>
@@ -377,7 +377,7 @@
                 <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">cnt</span> <span class="o">&gt;=</span> <span class="n">limit</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid iteration count&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Tree generation failed within constraints.&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">t</span><span class="o">.</span><span class="n">setDataPointCount</span><span class="p">()</span>
                 <span class="k">return</span> <span class="n">t</span></div>
@@ -406,7 +406,10 @@
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="Tree.growTree"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.growTree">[docs]</a>    <span class="k">def</span> <span class="nf">growTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Grow a tree up to depth.</span>
+<span class="sd">        Grow a tree up to a given depth.</span>
+
+<span class="sd">        For large depth values this method has a lower complexity than makeRandomTree.</span>
+<span class="sd">        Bottom up construction allows for far faster detection of invalid (sub) trees.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using non deterministic mode&quot;</span><span class="p">)</span>
@@ -543,6 +546,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span> <span class="n">c</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNodes</span><span class="p">()]</span></div>
 
+<div class="viewcode-block" id="Tree.getValuedConstants"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getValuedConstants">[docs]</a>    <span class="k">def</span> <span class="nf">getValuedConstants</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return only existing constants.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConstants</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Tree.updateValues"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.updateValues">[docs]</a>    <span class="k">def</span> <span class="nf">updateValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">const</span> <span class="o">=</span> <span class="p">[</span> <span class="n">c</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNodes</span><span class="p">()]</span>
+        <span class="n">const</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">const</span> <span class="k">if</span> <span class="n">c</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">const</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">const</span><span class="p">):</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Tree.getVariables"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.getVariables">[docs]</a>    <span class="k">def</span> <span class="nf">getVariables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRoot</span><span class="p">()</span><span class="o">.</span><span class="n">getVariables</span><span class="p">()</span></div>
 
@@ -600,7 +616,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given two trees, pick random subtree roots and swap them between the trees.</span>
 
-<span class="sd">        Will swap out subtrees at equal depth.</span>
+<span class="sd">        :param left: left tree (modified in place)</span>
+<span class="sd">        :param right: right tree (modified in place)</span>
+<span class="sd">        :param int depth: target depth, if None randomly generated</span>
+<span class="sd">        :param bool symmetric: if True, select subtrees at equal depth of both trees, ensuring depth is maintained.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">lefttreedepth</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
         <span class="n">righttreedepth</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
@@ -643,6 +662,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pfix</span> <span class="o">=</span> <span class="n">infixToPrefix</span><span class="p">(</span><span class="n">tokenize</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">variables</span><span class="p">))</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pfix</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="n">pfix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">Constant</span><span class="p">):</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="n">ConstantNode</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">Variable</span><span class="p">):</span>
+                    <span class="n">node</span> <span class="o">=</span> <span class="n">VariableNode</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Creating tree from single node without constant or variable.&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">_addNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">setDataPointCount</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">result</span>
         <span class="n">lastnode</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">pfix</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">isFunction</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="ow">or</span> <span class="n">isOperator</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
@@ -684,6 +717,11 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">vlist</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Tree.isConstantExpressionLazy"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.isConstantExpressionLazy">[docs]</a>    <span class="k">def</span> <span class="nf">isConstantExpressionLazy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if this tree is a constant expression with worst case O(N), but best case O(1).</span>
+
+<span class="sd">        Do not call this if you intend to do constant folding, this requires a full traversal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">isConstantExpressionLazy</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Tree.toExpression"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.toExpression">[docs]</a>    <span class="k">def</span> <span class="nf">toExpression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -693,6 +731,12 @@
         <span class="k">return</span> <span class="n">Node</span><span class="o">.</span><span class="n">nodeToExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Tree.doConstantFolding"><a class="viewcode-back" href="../../expression.html#expression.tree.Tree.doConstantFolding">[docs]</a>    <span class="k">def</span> <span class="nf">doConstantFolding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply constant folding on this tree.</span>
+
+<span class="sd">        For each subtree that represents a constant expression, replace the subtree with a single node.</span>
+<span class="sd">        :returns : The difference in nodes (&gt;=0), iow gain from applying the operation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">oc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodecount</span>
         <span class="n">rootctexpr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">isConstantExpression</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">rootctexpr</span><span class="p">:</span>
