@@ -264,7 +264,7 @@ class SequentialPGP():
             pgp = ParallelGP(g, X, Y, communicationsize=self._communicationsize, topo=self._topo, pid=i)
             self._processes.append(pgp)
             self._phases = pgp.phases
-        logger.info("Topology = \n{}".format(self._topo))
+        #logger.info("Topology = \n{}".format(self._topo))
 
     def executeAlgorithm(self):
         for j in range(self._phases):

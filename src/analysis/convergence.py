@@ -83,19 +83,24 @@ class Convergence(Plotter):
         optcost = []
         rgains = []
         for i, run in enumerate(self._convergencestats):
-            gains.append(sum(run[-1]["fitnessgains"]))
-            rgains.append(sum(run[-1]["fitnessgainsrelative"]))
-            optcost.append(run[-1]["optimizercost"])
+            g, r, o = 0, 0, 0
+            for j in run:
+                #logger.info("Generation is {}".format(j["fitnessgains"]))
+                g += sum(j["fitnessgains"])
+                #logger.info("Generation is {}".format(j["fitnessgainsrelative"]))
+                r += sum(j["fitnessgainsrelative"])
+                #logger.info("Generation is {}".format(j["optimizercost"]))
+                o += j["optimizercost"]
+            gains.append(g)
+            rgains.append(r)
+            optcost.append(o)
 
-        p = plotLineData([gains], labelx="Phases", labely="Optimizer gain in fitness", title="Optimizer Gain", legend=["Gains"], dot=True)
+        p = plotLineData([gains], labelx="Phases", labely="Total Optimizer gain in fitness", title="Optimizer Gain per phase (summation)", legend=["Gains"], dot=True)
         self.addPlot(p)
-        p = plotLineData([rgains], labelx="Phases", labely="Relative Optimizer gain in fitness", title="Optimizer Gain", legend=["Relative Gains"], dot=True)
+        p = plotLineData([rgains], labelx="Phases", labely="Relative Optimizer gain in fitness", title="Relative Optimizer Gain per phase (summation)", legend=["Relative Gains"], dot=True)
         self.addPlot(p)
         p = plotLineData([optcost], labelx="Phases", labely="Optimizer cost in weighted evaluations", title="Optimizer Cost", legend=["Cost"], dot=True)
         self.addPlot(p)
-
-
-    # TODO add mean, cost
 
     def plotOperators(self):
         self.plotSeries(keys = ['mutations','crossovers'], labels=["Generation","Succes ratio of operator"], title="Modfications", legend=["Mutations","Crossovers"])

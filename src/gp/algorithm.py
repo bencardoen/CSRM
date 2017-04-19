@@ -738,7 +738,7 @@ class BruteCoolingElitist(BruteElitist):
         j = 0
         gain["foldingsavings"] = sum( [t.doConstantFolding() for t in selected])
         if self.optimizer and self.optimizestrategy > 0:
-            logger.info("Using optimizer")
+            #logger.info("Using optimizer with strategy {}".format(self.optimizestrategy))
             for t in selected:
                 if t.getValuedConstants():
                     oldf = t.getFitness()
@@ -760,12 +760,12 @@ class BruteCoolingElitist(BruteElitist):
                         t.scoreTree(self._Y, self._fitnessfunction)
                         gain["fitnessgains"].append(fgain)
                         gain["fitnessgainsrelative"].append(fgain/oldf)
-                    j += 1
                     if j > self.optimizestrategy:
-                        logger.info("Cutoff reached, skipping optimize step, {} > {}".format(j, self.optimizestrategy))
-                break
+                        break
+                    j += 1
         else:
             pass
+        #logger.info("Gains are {}".format(gain))
         return gain
 
     def optimizeBest(self, selected):
@@ -798,20 +798,25 @@ class BruteCoolingElitist(BruteElitist):
                     gain["fitnessgainsrelative"].append(fgain/oldf)
         #logger.info("Storing gain {}".format(gain))
         stats = self._convergencestats[self._phase][-1]
-        if "fitnessgains" in stats:
-            stats["fitnessgains"] += gain["fitnessgains"]
-        else:
-            stats["fitnessgains"] = gain["fitnessgains"]
-        if "fitnessgainsrelative" in stats:
-            stats["fitnessgainsrelative"] += gain["fitnessgainsrelative"]
-        else:
-            stats["fitnessgainsrelative"] = gain["fitnessgainsrelative"]
-        if "optimizercost" in stats:
-            stats["optimizercost"] += gain["optimizercost"]
-        else:
-            stats["optimizercost"] = gain["optimizercost"]
+        # if "fitnessgains" in stats:
+        #     stats["fitnessgains"] += gain["fitnessgains"]
+        # else:
+        #     stats["fitnessgains"] = gain["fitnessgains"]
+        # if "fitnessgainsrelative" in stats:
+        #     stats["fitnessgainsrelative"] += gain["fitnessgainsrelative"]
+        # else:
+        #     stats["fitnessgainsrelative"] = gain["fitnessgainsrelative"]
+        # if "optimizercost" in stats:
+        #     stats["optimizercost"] += gain["optimizercost"]
+        # else:
+        #     stats["optimizercost"] = gain["optimizercost"]
+        # if "foldingsavings" in stats:
+        #     stats["foldingsavings"] += gain["foldingsavings"]
+        # else:
+        #     stats["foldingsavings"] = gain["foldingsavings"]
+            
+        mergedict(stats, gain, ["fitnessgains", "fitnessgainsrelative", "optimizercost", "foldingsavings"])
         self._convergencestats[self._phase][-1] = stats
-
 
     def archive(self, modified):
         """
@@ -859,3 +864,15 @@ def probabilityMutate(generation:int, generations:int, ranking:int, population:i
 
 def coolingMinDepthRatio(generation:int, generations:int, ranking:int, population:int, rng: random.Random=None):
     return generation / generations
+
+
+def mergedict(left, right, keys):
+    """
+    For a set of keys present in right, if it exists in left add it, else create it.
+    """
+    for k in keys:
+        if k in left:
+            left[k] += right[k]
+        else:
+            left[k] = right[k]
+    return left
