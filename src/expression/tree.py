@@ -288,7 +288,7 @@ class Tree:
         """
         Generate a random expression tree with a random selection of variables.
 
-        Topdown construction, there is no guarantee that this construction renders a semantically valid tree
+        Repeats generation until a valid tree is found (iow valid for each x in variables).
 
         :param bool tokenLeafs: if set, only use constants
         :param int limit: raises Exception if no valid tree can be found in at least limit tries
@@ -331,7 +331,7 @@ class Tree:
                 cnt += 1
                 if limit is not None:
                     if cnt >= limit:
-                        raise ValueError("Invalid iteration count")
+                        raise ValueError("Tree generation failed within constraints.")
             else:
                 t.setDataPointCount()
                 return t
@@ -360,7 +360,10 @@ class Tree:
     @staticmethod
     def growTree(variables, depth: int, rng=None):
         """
-        Grow a tree up to depth.
+        Grow a tree up to a given depth.
+
+        For large depth values this method has a lower complexity than makeRandomTree.
+        Bottom up construction allows for far faster detection of invalid (sub) trees.
         """
         if rng is None:
             logger.warning("Using non deterministic mode")
@@ -567,7 +570,10 @@ class Tree:
         """
         Given two trees, pick random subtree roots and swap them between the trees.
 
-        Will swap out subtrees at equal depth.
+        :param left: left tree (modified in place)
+        :param right: right tree (modified in place)
+        :param int depth: target depth, if None randomly generated
+        :param bool symmetric: if True, select subtrees at equal depth of both trees, ensuring depth is maintained.
         """
         lefttreedepth = left.getDepth()
         righttreedepth = right.getDepth()
@@ -614,10 +620,10 @@ class Tree:
             token = pfix[0]
             node = None
             if isinstance(token, Constant):
-                node =  ConstantNode( 0, token)
+                node = ConstantNode( 0, token)
             else:
                 if isinstance(token, Variable):
-                    node =  VariableNode( 0, token)
+                    node = VariableNode( 0, token)
                 else:
                     logger.error("Creating tree from single node without constant or variable.")
                     raise ValueError
@@ -665,6 +671,11 @@ class Tree:
         return sorted(vlist)
 
     def isConstantExpressionLazy(self):
+        """
+        Checks if this tree is a constant expression with worst case O(N), but best case O(1).
+
+        Do not call this if you intend to do constant folding, this requires a full traversal.
+        """
         return self.root.isConstantExpressionLazy()
 
     def toExpression(self):
@@ -674,6 +685,12 @@ class Tree:
         return Node.nodeToExpression(self.root)
 
     def doConstantFolding(self):
+        """
+        Apply constant folding on this tree.
+
+        For each subtree that represents a constant expression, replace the subtree with a single node.
+        :returns : The difference in nodes (>=0), iow gain from applying the operation.
+        """
         oc = self.nodecount
         rootctexpr = self.root.isConstantExpression()
         if rootctexpr:

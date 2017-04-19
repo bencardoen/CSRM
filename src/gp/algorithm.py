@@ -434,7 +434,6 @@ class GPAlgorithm():
             self.testInvariant()
             if self._trace:
                 self.printForestToDot("process_{}_phase_{}_generation_{}".format(self.pid, self._phase, i))
-        #self._phase += 1
         self.archive(modified)
         self._phase += 1
 
@@ -457,9 +456,7 @@ class GPAlgorithm():
         Select a subset of the current population to operate on.
         """
         assert(len(self._population))
-        #logger.debug("Selecting {} from {}".format(self._tournamentsize, self._population))
         sel = self._population.removeN(self._tournamentsize)
-        #logger.debug("Selected {} ".format(sel))
         assert(len(sel) == self._tournamentsize)
         assert(len(self._population) == self._popsize - self._tournamentsize)
         return sel
@@ -534,19 +531,14 @@ class GPAlgorithm():
         """
         Add t to the archive and truncate worst if necessary.
         """
-        #logger.info("Adding {} to archive".format(t.getFitness()))
         if t.getFitness() == Constants.MINFITNESS:
-            #logger.info("Invalid communicated sample, ignoring.")
             return
         if t not in self._archive:
             self._archive.add(t)
             if len(self._archive) > self._archivesize:
-                #logger.info("Archive overflowing.")
                 self._archive.drop()
         else:
             pass
-            # logger.warning("Sample {} already in archive!".format(t.getFitness()))
-            # logger.warning("Archive is {}".format([t.getFitness() for t in self._archive]))
 
 
 class BruteElitist(GPAlgorithm):
@@ -725,6 +717,9 @@ class BruteCoolingElitist(BruteElitist):
         return probabilityMutate(generation, generations, ranking, population, rng=rng)
 
     def minDepthRatio(self, popindex):
+        """
+        Return, based on the sample index, current generation a depth ratio value that determines on which depth the operators should operate.
+        """
         if self.depthcooling:
             return coolingMinDepthRatio(self._currentgeneration, self._generations, popindex, self._popsize, rng=self._rng)
         else:
@@ -747,7 +742,6 @@ class BruteCoolingElitist(BruteElitist):
             for t in selected:
                 if t.getValuedConstants():
                     oldf = t.getFitness()
-                    #gain["foldingsavings"] += t.doConstantFolding()
                     opt = self.optimizer(populationcount = 50, particle=copyObject(t), distancefunction=self._fitnessfunction, expected=self._Y, seed=0, iterations=50)
                     opt.run()
                     sol = opt.getOptimalSolution()
@@ -771,11 +765,13 @@ class BruteCoolingElitist(BruteElitist):
                         logger.info("Cutoff reached, skipping optimize step, {} > {}".format(j, self.optimizestrategy))
                 break
         else:
-            #logger.warning("No optimizer set, skipping.")
             pass
         return gain
 
     def optimizeBest(self, selected):
+        """
+        Optimize those samples that have been selected for archiving at the end of a phase.
+        """
         totalnodes = sum([t.nodecount for t in selected])
         gain = {"nodecount":totalnodes, "optimizercost":0, "fitnessgains":[0 for t in selected], "fitnessgainsrelative":[0 for t in selected], "foldingsavings":0}
         for t in selected:
@@ -814,21 +810,17 @@ class BruteCoolingElitist(BruteElitist):
             stats["optimizercost"] += gain["optimizercost"]
         else:
             stats["optimizercost"] = gain["optimizercost"]
-        #logger.info("Updating stats {}".format(stats))
         self._convergencestats[self._phase][-1] = stats
-        #self.addConvergenceStat(generation = self._generations-1, phase=self._phase, gain)
-        # Store gain
+
 
     def archive(self, modified):
         """
-        Simple archiving strategy, get best of generation and store.
+        Archive the best k of the current generation in the last phase, optimize them based on the preset strategy.
         """
-        #logger.info("Optimizer archiving")
         best = self._population.getN(self._archivephase)
         assert(len(best) <= self._archivephase)
         best = [copyObject(b) for b in best]
         if self.optimizestrategy == 0:
-            #logger.info("Archive optimization running.")
             self.optimizeBest(best)
         for b in best:
             self.addToArchive(b)

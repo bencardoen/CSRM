@@ -49,7 +49,18 @@ class PassThroughOptimizer(Optimizer):
 
 
 class Instance:
+    """
+    Wraps a problem instance s.t. the optimizers can operate on it without exposing the underlying problem.
+    """
+
     def __init__(self, tree, expected, distancefunction):
+        """
+        Construct instance.
+
+        :param tree: Tree instance
+        :param expected: Set of values the instance should approach as near as possible
+        :param distancefunction: function used to score the difference between the evaluation of the tree and the expected values.
+        """
         self.tree = tree
         self.current = [c.getValue() for c in [c for c in self.tree.getConstants() if c]]
         self.best = self.current[:]
@@ -131,6 +142,11 @@ class DEVector(Instance):
     """
 
     def __init__(self, objectinstance, rng, Y, distancefunction, particlenr):
+        """
+        Construct DE Vector.
+
+        :param particlenr: if this is 0, do not perturb this instance.
+        """
         super().__init__(objectinstance, Y, distancefunction)
         self.rng = rng
         if particlenr != 0:
@@ -140,20 +156,22 @@ class DEVector(Instance):
 
     @staticmethod
     def createDonor(chosen, F):
+        """
+        Given 3 vectors and F, obtain a mutated vector.
+        """
         c1, c2, c3 = chosen
-        #logger.info("Creating donor with {}".format([c.current for c in chosen]))
         d = [a -b for a,b in zip(c2.current, c3.current)]
-        #logger.info("Diff donor with {}".format(d))
         c = [o + F*k for o,k in zip(c1.current, d)]
         return c
 
     @staticmethod
     def createCrossover(X, V, rng, Cr):
+        """
+        Binomial crossover.
+        """
         vlen = len(V)
-        #logger.info("V is {}".format(V))
         indices = [i for i in range(vlen)]
         jrand = rng.choice(indices)
-        #logger.info("JRand is {}".format(jrand))
         U = []
         for i in range(vlen):
             r = rng.random()
@@ -166,6 +184,9 @@ class DEVector(Instance):
         return U
 
     def testUpdate(self, U):
+        """
+        Update this instance with U's values, if they evaluate to better or equal fitness, apply, else rollback.
+        """
         oldf = self.fitness
         oldc = self.current[:]
         self.current = U
@@ -216,8 +237,10 @@ class PSO(Optimizer):
             self.history +=1
 
     def stopcondition(self):
+        """
+        Halt the algorithm if self.treshold generations do not improve the best fitness value.
+        """
         if self.history > self.treshold:
-            #logger.info("Exceeded convergence limit, no improvement in solution after {} rounds".format(self.treshold))
             return True
 
     @property
@@ -229,7 +252,6 @@ class PSO(Optimizer):
             p.updateVelocity(self.c1, self.c2, self.rone, self.rtwo, self.globalbest)
             p.updatePosition()
             p.update()
-            #print(type(self.cost))
         self.determineBest()
 
     def getOptimalSolution(self):
@@ -239,18 +261,20 @@ class PSO(Optimizer):
         for i in range(self.iterations):
             self.doIteration()
             self.currentiteration += 1
-            #self.report()
             if self.stopcondition():
                 break
         for p in self.particles:
             self.cost += p.cost
 
     def report(self):
-        #logger.info("In iteration {} of {} current population is {}".format(self.currentiteration, self.iterations, [str(p) + "\n" for p in self.particles]))
         logger.info("Best overall is for particles index {} with fitness {} and values {}".format(self.bestparticle[0], self.bestparticle[1], self.globalbest))
 
 
 class DE(Optimizer):
+    """
+    Differential Evolution with binomial crossover.
+    """
+
     def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations, testrun=False):
         super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
         self.vectors = [DEVector(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1) for i in range(self.populationcount)]
@@ -259,11 +283,8 @@ class DE(Optimizer):
         self.Cr = 0.1
         self.D = len(self.vectors[0].current)
         assert(self.D>0)
-        #logger.info("D is {}".format(self.D))
 
     def stopcondition(self):
-        # This would require K x N updates to check if we stalled
-        # It's faster to just run the algorithm.
         return False
 
     def run(self):
@@ -271,13 +292,12 @@ class DE(Optimizer):
             self.iteration()
             if self.stopcondition():
                 break
-        #logger.warning("Not Implemented!")
 
     def report(self):
         vs = sorted(self.vectors, key=lambda x: x.fitness)
         best = vs[0]
         logger.info("Current best in generation {} is {}".format(self.currentiteration, best.fitness))
-        #return {"cost":bc, "solution":bv}
+
 
     def getOptimalSolution(self):
         vs = sorted(self.vectors, key=lambda x: x.fitness)
@@ -302,12 +322,15 @@ class DE(Optimizer):
 
             # Selection
             X.testUpdate(U)
-        #self.report()
         self.currentiteration += 1
-        # update
+
 
 
 class ABC(Optimizer):
+    """
+    Articifical Bee Colony.
+    """
+
     def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations):
         super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
 
