@@ -37,7 +37,7 @@ except ImportError as e:
         exit(0)
 
 
-def runBenchmark(config, topo=None, processcount = None, outfolder = None):
+def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=None, Y=None):
     comm = MPI.COMM_WORLD
     pid = comm.Get_rank()
     config.pid = pid
@@ -51,9 +51,13 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None):
     population = config.population
     commsize = config.communicationsize
     archivesize = population
-    #logger.info("Configuration is {}".format(config))
-    X = generateVariables(config.variablepoint, config.datapointcount, seed=config.seed, sort=True, lower=config.datapointrange[0], upper=config.datapointrange[1])
+    if X is None:
+        logger.info("No input data provided, generating...")
+        X = generateVariables(config.variablepoint, config.datapointcount, seed=config.seed, sort=True, lower=config.datapointrange[0], upper=config.datapointrange[1])
     assert(len(X) == config.variablepoint and len(X[0]) == config.datapointcount)
+    if Y is None:
+        logger.info("No expected data provided, assuming testproblem, generating expected data based on input values.")
+    expr = testfunctions[config.expr]
     tr = Tree.createTreeFromExpression(expr, X)
     Y = tr.evaluateAll()
     assert(len(Y) ==config.datapointcount)

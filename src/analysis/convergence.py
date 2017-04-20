@@ -88,7 +88,9 @@ class Convergence(Plotter):
                 #logger.info("Generation is {}".format(j["fitnessgains"]))
                 g += sum(j["fitnessgains"])
                 #logger.info("Generation is {}".format(j["fitnessgainsrelative"]))
-                r += sum(j["fitnessgainsrelative"])
+                rgs = j["fitnessgainsrelative"]
+                srgs = sum(rgs)
+                r += srgs
                 #logger.info("Generation is {}".format(j["optimizercost"]))
                 o += j["optimizercost"]
             gains.append(g)
