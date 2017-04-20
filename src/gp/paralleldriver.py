@@ -120,7 +120,7 @@ if __name__ == "__main__":
     parser.add_argument('-j', '--hybridstrategy', type=int, help="Set the hybrid optimizer strategy")
     parser.add_argument('-x', '--inputdatafile', type=str, help="A file with input data in csv.")
     parser.add_argument('-y', '--expecteddatafile', type=str, help="A file with expected data in csv.")
-    parser.add_argument('-r', '--dataranges', type=str, help="A set of tuples with of (xmin,xmax) for each variable to sample input from, or a single one to provide limits for all.")
+    parser.add_argument('-r', '--dataranges', type=str, help="A string of comma separated values with min,max for each variable. E.g. 0,1,0,1,2,3 for 3 variables.")
 
     args = parser.parse_args()
     #print(args)
@@ -214,7 +214,17 @@ if __name__ == "__main__":
         if Y is None:
             logger.error("Data decoding failed!!")
             exit(0)
+    if args.dataranges:
+        logger.info("Data ranges given, parsing")
+        dataranges = args.dataranges
+        rngs = dataranges.split(",")
+        ranges = []
+        for i in range(len(rngs)-1):
+            # TODO step length 2
+            ranges.append((float(rngs[i]), float(rngs[i+1])))
+        logger.info("Parsed ranges is {}".format(ranges))
+        
     logger.info("Config is {} ".format(c.__dict__.items()))
     outputfolder += c.concatValues() + "/"
     os.makedirs(outputfolder, exist_ok=True)
-    runBenchmark(c, topo, processcount, outfolder=outputfolder, X=X, Y=Y)
+    #runBenchmark(c, topo, processcount, outfolder=outputfolder, X=X, Y=Y)
