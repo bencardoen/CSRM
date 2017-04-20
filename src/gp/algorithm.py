@@ -701,7 +701,7 @@ class BruteCoolingElitist(BruteElitist):
         self._depthcooling = depthcooling
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions, archivefile=archivefile)
         self.optimizer = optimizer
-        self.optimizestrategy = optimizestrategy if optimizestrategy is not None else 1
+        self.optimizestrategy = optimizestrategy if optimizestrategy is not None else -1
         logger.info("optimizestrategy {}".format(self.optimizestrategy))
 
     @property
@@ -801,7 +801,7 @@ class BruteCoolingElitist(BruteElitist):
                     gain["fitnessgainsrelative"].append(relative)
         #logger.info("Storing gain {}".format(gain))
         stats = self._convergencestats[self._phase][-1]
-            
+
         mergedict(stats, gain, ["fitnessgains", "fitnessgainsrelative", "optimizercost", "foldingsavings"])
         self._convergencestats[self._phase][-1] = stats
 

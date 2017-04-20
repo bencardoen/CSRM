@@ -27,6 +27,7 @@ class Config:
         self.archiveseedfile = None
         self.optimizer = None
         self.optimizestrategy = None
+        self.ranges = None
         """Optimizer strategy : -1 : None, 0: Only apply to archiving (i.e. best per phase), 0<k<=pop : optimize k best samples per generation."""
 
 

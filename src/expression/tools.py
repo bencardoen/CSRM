@@ -41,11 +41,11 @@ def powerOf2(a:int)->bool:
     """
     # source https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
     return False if a == 0 else (a & (a-1) == 0)
-    
+
 def readVariables(filename, featurecount, samplecount):
     """
     Reads a set of variables in from file.
-    
+
     Expects a single line per feature(variable), with the values comma separated.
     """
     logger.info("Reading {} with {} expected features and {} expected points per feature".format(filename, featurecount, samplecount))
@@ -184,6 +184,9 @@ def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lowe
     rng.seed(seed)
     if ranges is None:
         ranges = [(lower, upper) for d in range(varcount)]
+        # logger.info("None Ranges, generating {}".format(ranges))
+    # else:
+    #     logger.info("Ranges is {}".format(ranges))
     result = [ [rng.uniform(ranges[x][0], ranges[x][1]) for d in range(datacount)] for x in range(varcount)]
     if sort:
         for i in range(len(result)):

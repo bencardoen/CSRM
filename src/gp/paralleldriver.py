@@ -53,7 +53,7 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
     archivesize = population
     if X is None:
         logger.info("No input data provided, generating...")
-        X = generateVariables(config.variablepoint, config.datapointcount, seed=config.seed, sort=True, lower=config.datapointrange[0], upper=config.datapointrange[1])
+        X = generateVariables(config.variablepoint, config.datapointcount, seed=config.seed, sort=True, lower=config.datapointrange[0], upper=config.datapointrange[1], ranges=config.ranges)
     else:
         logger.info("Using user provided input data.")
     assert(len(X) == config.variablepoint and len(X[0]) == config.datapointcount)
@@ -96,6 +96,14 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
             logger.info("Opening results for proces {}".format(pid))
             for i in range(processcount):
                 webbrowser.open('file://' + os.path.realpath(outputfolder+"output_{}.html".format(i)))
+
+
+def updateConfig(configobj, attributes, args):
+    for a in attributes:
+        argatt = getattr(args, a)
+        if argatt is not None:
+            setattr(configobj, a, argatt)
+
 
 
 if __name__ == "__main__":
@@ -185,18 +193,8 @@ if __name__ == "__main__":
         else:
             logger.error("No such expression!")
             raise ValueError
-    if args.phases:
-        c.phases = args.phases
-    if args.maxdepth:
-        c.maxdepth = args.maxdepth
-    if args.initialdepth:
-        c.initialdepth = args.initialdepth
-    if args.datapointcount:
-        c.datapointcount = args.datapointcount
-    if args.communicationsize:
-        c.communicationsize = args.communicationsize
-    if args.archiveinputfile:
-        c.archiveinputfile = args.archiveinputfile
+    updateConfig(c, ["phases", "maxdepth", "initialdepth", "datapointcount", "communicationsize", "archiveinputfile"], args)
+
     if args.featurecount:
         logger.info("Using {} features".format(args.featurecount))
         c.variablepoint = args.featurecount
@@ -209,7 +207,7 @@ if __name__ == "__main__":
             exit(0)
     Y = None
     if args.expecteddatafile:
-        logger.info("Reading expected data")        
+        logger.info("Reading expected data")
         Y = readVariables(args.expecteddatafile, 1 , c.datapointcount)
         if Y is None:
             logger.error("Data decoding failed!!")
@@ -219,12 +217,27 @@ if __name__ == "__main__":
         dataranges = args.dataranges
         rngs = dataranges.split(",")
         ranges = []
-        for i in range(len(rngs)-1):
-            # TODO step length 2
-            ranges.append((float(rngs[i]), float(rngs[i+1])))
-        logger.info("Parsed ranges is {}".format(ranges))
-        
+        if len(rngs) % 2 != 0:
+            logger.error("Invalid data ranges length.")
+            exit(0)
+        try:
+            for i in range(0, len(rngs), 2):
+                lower = float(rngs[i])
+                upper = float(rngs[i+1])
+                ranges.append((lower, upper))
+        except ValueError as e:
+            logger.error("Error decoding ranges from {}".format(rngs))
+            exit(0)
+        if len(ranges) == 1:
+            #logger.info("Extending singleton range")
+            ranges = [ranges[0] for _ in range(c.variablepoint)]
+        if len(ranges) != c.variablepoint:
+            logger.error("Ranges object has invalid length {} for featurecount {}".format(len(ranges), c.variablepoint))
+            exit(0)
+        c.ranges = ranges
+        #logger.info("Parsed ranges is {}".format(ranges))
+
     logger.info("Config is {} ".format(c.__dict__.items()))
     outputfolder += c.concatValues() + "/"
     os.makedirs(outputfolder, exist_ok=True)
-    #runBenchmark(c, topo, processcount, outfolder=outputfolder, X=X, Y=Y)
+    runBenchmark(c, topo, processcount, outfolder=outputfolder, X=X, Y=Y)
