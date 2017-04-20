@@ -6,7 +6,7 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-from expression.tools import rootmeansquare, pearson, rootmeansquarenormalized, traceFunction, approximateMultiple, randomizedConsume, permutate, flatten, readVariables
+from expression.tools import rootmeansquare, pearson, rootmeansquarenormalized, traceFunction, approximateMultiple, randomizedConsume, permutate, flatten, readVariables, generateVariables
 import unittest
 import logging
 import math
@@ -42,10 +42,39 @@ class ToolTest(unittest.TestCase):
         v = approximateMultiple(a, b, 0.001)
         self.assertEqual(v, True)
         
+    def testGenerateVariables(self):
+#        def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lower=0, upper=1, rng=None, ranges=None):
+        upper = 1 
+        lower = 0
+        v = generateVariables(varcount=5, datacount=4, seed=0, sort=False, lower=lower, upper=upper, rng=None, ranges=None)
+        self.assertEqual(len(v), 5)
+        self.assertEqual(len(v[0]), 4)
+        for q in v:
+            self.assertTrue(min(q) >= lower)
+            self.assertTrue(max(q) <= upper)
+        upper = 7
+        lower = 0.5
+        v = generateVariables(varcount=5, datacount=4, seed=0, sort=False, lower=lower, upper=upper, rng=None, ranges=[(lower,upper) for _ in range(5)])
+        self.assertEqual(len(v), 5)
+        self.assertEqual(len(v[0]), 4)
+        for q in v:
+            self.assertTrue(min(q) >= lower)
+            self.assertTrue(max(q) <= upper)        
+            
+        upper = 7
+        lower = 0.5
+        ranges = [(1,2), (2,3), (4,5)]
+        v = generateVariables(varcount=3, datacount=4, seed=0, sort=False, lower=lower, upper=upper, rng=None, ranges=ranges)
+        self.assertEqual(len(v), 3)
+        self.assertEqual(len(v[0]), 4)
+        for i,q in enumerate(v):
+            self.assertTrue(min(q) >= ranges[i][0])
+            self.assertTrue(max(q) <= ranges[i][1])
+            
     def testDecodeVariables(self):
-        vs = readVariables("../testfiles/validvars.txt", 3, 4)
-        vsi = readVariables("../testfiles/invalidvars.txt", 3, 4)
-        vsi2 = readVariables("../testfiles/invalidvariables.txt", 3, 4)
+        vs = readVariables("../testfiles/validvars.txt", 5, 4)
+        vsi = readVariables("../testfiles/invalidvars.txt", 5, 4)
+        vsi2 = readVariables("../testfiles/invalidvariables.txt", 5, 4)
         self.assertTrue(vs)
         self.assertFalse(vsi)
         self.assertFalse(vsi2)

@@ -168,7 +168,7 @@ def matchVariable(expr: str):
         return None
 
 
-def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lower=0, upper=1, rng=None):
+def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lower=0, upper=1, rng=None, ranges=None):
     """
     Generate a list of datapoints.
 
@@ -182,7 +182,9 @@ def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lowe
     if seed is None:
         logger.warning("Using non deterministic mode")
     rng.seed(seed)
-    result = [ [rng.uniform(lower, upper) for d in range(datacount)] for x in range(varcount)]
+    if ranges is None:
+        ranges = [(lower, upper) for d in range(varcount)]
+    result = [ [rng.uniform(ranges[x][0], ranges[x][1]) for d in range(datacount)] for x in range(varcount)]
     if sort:
         for i in range(len(result)):
             result[i].sort()

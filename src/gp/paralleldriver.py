@@ -120,6 +120,7 @@ if __name__ == "__main__":
     parser.add_argument('-j', '--hybridstrategy', type=int, help="Set the hybrid optimizer strategy")
     parser.add_argument('-x', '--inputdatafile', type=str, help="A file with input data in csv.")
     parser.add_argument('-y', '--expecteddatafile', type=str, help="A file with expected data in csv.")
+    parser.add_argument('-r', '--dataranges', type=str, help="A set of tuples with of (xmin,xmax) for each variable to sample input from, or a single one to provide limits for all.")
 
     args = parser.parse_args()
     #print(args)
