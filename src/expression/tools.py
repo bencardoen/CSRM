@@ -41,6 +41,44 @@ def powerOf2(a:int)->bool:
     """
     # source https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
     return False if a == 0 else (a & (a-1) == 0)
+    
+def readVariables(filename, featurecount, samplecount):
+    """
+    Reads a set of variables in from file.
+    
+    Expects a single line per feature(variable), with the values comma separated.
+    """
+    logger.info("Reading {} with {} expected features and {} expected points per feature".format(filename, featurecount, samplecount))
+    decoded = None
+    try:
+        invalid = False
+        decoded = []
+        with open(filename, 'r') as f:
+            for line in f:
+                feature = []
+                values = line.split(',')
+                for v in values:
+                    try:
+                        val = float(v)
+                        feature.append(val)
+                    except ValueError as e:
+                        logger.error("Could not decode value {}".format(v))
+                decoded.append(feature)
+        logger.info("Decoded is {}".format(decoded))
+        if len(decoded) != featurecount:
+            logger.error("Read featurecount {} doesn't match expected nr {} of features".format(len(decoded), featurecount))
+            invalid = True
+        for i,d in enumerate(decoded):
+            if len(d) != samplecount:
+                logger.error("Read samplecount {} doesn't match expected nr {} of samplepoints for feature nr {}".format(len(d), samplecount, i))
+                invalid = True
+        if invalid:
+            return None
+        else:
+            return decoded
+    except IOError as e:
+        logger.error("Cannot decode data file")
+    return decoded
 
 
 def rmtocm(lst):

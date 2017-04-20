@@ -6,7 +6,7 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
-from expression.tools import rootmeansquare, pearson, rootmeansquarenormalized, traceFunction, approximateMultiple, randomizedConsume, permutate, flatten
+from expression.tools import rootmeansquare, pearson, rootmeansquarenormalized, traceFunction, approximateMultiple, randomizedConsume, permutate, flatten, readVariables
 import unittest
 import logging
 import math
@@ -41,7 +41,15 @@ class ToolTest(unittest.TestCase):
         a = 6*math.pi + 0.0001
         v = approximateMultiple(a, b, 0.001)
         self.assertEqual(v, True)
-
+        
+    def testDecodeVariables(self):
+        vs = readVariables("../testfiles/validvars.txt", 3, 4)
+        vsi = readVariables("../testfiles/invalidvars.txt", 3, 4)
+        vsi2 = readVariables("../testfiles/invalidvariables.txt", 3, 4)
+        self.assertTrue(vs)
+        self.assertFalse(vsi)
+        self.assertFalse(vsi2)
+        
     def testTracing(self):
         """
         Test logging decorator

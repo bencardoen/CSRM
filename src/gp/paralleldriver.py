@@ -17,7 +17,7 @@ from gp.config import Config
 from gp.parallelalgorithm import ParallelGP, SequentialPGP, isMPI
 from gp.algorithm import BruteCoolingElitist
 from expression.constants import Constants
-from expression.tools import getKSamples
+from expression.tools import getKSamples, readVariables
 from meta.optimizer import optimizers
 import logging
 import webbrowser
@@ -108,11 +108,14 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--maxdepth', type=int, help="Max depth of any tree")
     parser.add_argument('-i', '--initialdepth', type=int, help="initialdepth depth of any tree")
     parser.add_argument('-d', '--datapointcount', type=int, help="Number of datapoints to operate on. ")
+    parser.add_argument('-q', '--featurecount', type=int, help="Number of features to generate or read. ")
     parser.add_argument('-s', '--communicationsize', type=int, help="Nr of samples requested from an instance to distribute.")
     parser.add_argument('-e', '--expressionid', type=int, help="Nr of expression to test")
     parser.add_argument('-a', '--archiveinputfile', type=str, help="Use incremental mode, read stored expressions from a previous run in *archivefile*")
     parser.add_argument('-k', '--hybrid', type=str, help="Use a hybrid optimizer")
     parser.add_argument('-j', '--hybridstrategy', type=int, help="Set the hybrid optimizer strategy")
+    parser.add_argument('-x', '--inputdatafile', type=str, help="A file with input data in csv.")
+    parser.add_argument('-y', '--expecteddatafile', type=str, help="A file with expected data in csv.")
 
     args = parser.parse_args()
     #print(args)
@@ -189,6 +192,15 @@ if __name__ == "__main__":
         c.communicationsize = args.communicationsize
     if args.archiveinputfile:
         c.archiveinputfile = args.archiveinputfile
+    if args.featurecount:
+        logger.info("Using {} features".format(args.featurecount))
+        c.variablepoint = args.featurecount
+    if args.inputdatafile:
+        logger.info("Reading input data")
+        X = readVariables(args.inputdatafile, c.variablepoint, c.datapointcount)
+    if args.expecteddatafile:
+        logger.info("Reading expected data")        
+        Y = readVariables(args.expecteddatafile, 1 , c.datapointcount)
     logger.info("Config is {} ".format(c.__dict__.items()))
     outputfolder += c.concatValues() + "/"
     os.makedirs(outputfolder, exist_ok=True)

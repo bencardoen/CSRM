@@ -795,25 +795,12 @@ class BruteCoolingElitist(BruteElitist):
                     t.updateValues(best)
                     t.scoreTree(self._Y, self._fitnessfunction)
                     gain["fitnessgains"].append(fgain)
-                    gain["fitnessgainsrelative"].append(fgain/oldf)
+                    relative = fgain
+                    if oldf != 0:
+                        relative /= oldf
+                    gain["fitnessgainsrelative"].append(relative)
         #logger.info("Storing gain {}".format(gain))
         stats = self._convergencestats[self._phase][-1]
-        # if "fitnessgains" in stats:
-        #     stats["fitnessgains"] += gain["fitnessgains"]
-        # else:
-        #     stats["fitnessgains"] = gain["fitnessgains"]
-        # if "fitnessgainsrelative" in stats:
-        #     stats["fitnessgainsrelative"] += gain["fitnessgainsrelative"]
-        # else:
-        #     stats["fitnessgainsrelative"] = gain["fitnessgainsrelative"]
-        # if "optimizercost" in stats:
-        #     stats["optimizercost"] += gain["optimizercost"]
-        # else:
-        #     stats["optimizercost"] = gain["optimizercost"]
-        # if "foldingsavings" in stats:
-        #     stats["foldingsavings"] += gain["foldingsavings"]
-        # else:
-        #     stats["foldingsavings"] = gain["foldingsavings"]
             
         mergedict(stats, gain, ["fitnessgains", "fitnessgainsrelative", "optimizercost", "foldingsavings"])
         self._convergencestats[self._phase][-1] = stats
