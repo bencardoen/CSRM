@@ -203,10 +203,16 @@ if __name__ == "__main__":
     if args.inputdatafile:
         logger.info("Reading input data")
         X = readVariables(args.inputdatafile, c.variablepoint, c.datapointcount)
+        if X is None:
+            logger.error("Data decoding failed!!")
+            exit(0)
     Y = None
     if args.expecteddatafile:
         logger.info("Reading expected data")        
         Y = readVariables(args.expecteddatafile, 1 , c.datapointcount)
+        if Y is None:
+            logger.error("Data decoding failed!!")
+            exit(0)
     logger.info("Config is {} ".format(c.__dict__.items()))
     outputfolder += c.concatValues() + "/"
     os.makedirs(outputfolder, exist_ok=True)
