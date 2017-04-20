@@ -54,9 +54,13 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
     if X is None:
         logger.info("No input data provided, generating...")
         X = generateVariables(config.variablepoint, config.datapointcount, seed=config.seed, sort=True, lower=config.datapointrange[0], upper=config.datapointrange[1])
+    else:
+        logger.info("Using user provided input data.")
     assert(len(X) == config.variablepoint and len(X[0]) == config.datapointcount)
     if Y is None:
         logger.info("No expected data provided, assuming testproblem, generating expected data based on input values.")
+    else:
+        logger.info("Using user provided expected data.")
     expr = testfunctions[config.expr]
     tr = Tree.createTreeFromExpression(expr, X)
     Y = tr.evaluateAll()
@@ -195,13 +199,15 @@ if __name__ == "__main__":
     if args.featurecount:
         logger.info("Using {} features".format(args.featurecount))
         c.variablepoint = args.featurecount
+    X = None
     if args.inputdatafile:
         logger.info("Reading input data")
         X = readVariables(args.inputdatafile, c.variablepoint, c.datapointcount)
+    Y = None
     if args.expecteddatafile:
         logger.info("Reading expected data")        
         Y = readVariables(args.expecteddatafile, 1 , c.datapointcount)
     logger.info("Config is {} ".format(c.__dict__.items()))
     outputfolder += c.concatValues() + "/"
     os.makedirs(outputfolder, exist_ok=True)
-    runBenchmark(c, topo, processcount, outfolder=outputfolder)
+    runBenchmark(c, topo, processcount, outfolder=outputfolder, X=X, Y=Y)
