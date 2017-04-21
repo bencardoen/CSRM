@@ -63,3 +63,6 @@ class Constants():
     PLOT_SIZE_DEPTH=8
     PLOT_ALPHA_DEFAULT=0.5
     PLOT_ALPHA_DEPTH=0.15
+
+    # Defines normal distribution in ABC
+    NORMAL_SCALE = 20

@@ -42,6 +42,7 @@ def powerOf2(a:int)->bool:
     # source https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
     return False if a == 0 else (a & (a-1) == 0)
 
+
 def readVariables(filename, featurecount, samplecount):
     """
     Reads a set of variables in from file.
@@ -192,6 +193,15 @@ def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lowe
         for i in range(len(result)):
             result[i].sort()
     return result
+
+
+def getNormal(seed, mean, size):
+    assert(seed is not None)
+    #logger.info("Getting normal ")
+    numpy.random.seed(int(seed))
+    n = numpy.random.normal(loc=mean, scale=size)
+    #logger.info("Getting normal for mean {}  spread {} is {}".format(mean, size, n))
+    return n
 
 
 def traceFunction(fn=None, logcall=None):

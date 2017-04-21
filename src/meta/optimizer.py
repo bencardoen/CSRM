@@ -5,8 +5,9 @@
 #A full copy of the license is in COPYING.txt, or can be found at
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
-from expression.tools import getRandom, copyObject
+from expression.tools import getRandom, copyObject, getNormal
 from expression.tree import Tree
+from expression.constants import Constants
 import logging
 logger = logging.getLogger('global')
 
@@ -200,6 +201,84 @@ class DEVector(Instance):
             self.update()
 
 
+class ABCSolution(Instance):
+    """
+    ABC Solution
+    """
+
+    @staticmethod
+    def modify(value, rng):
+        m = value * ABCSolution.phi(rng)
+        #logger.info("Modifying {} to {}".format(value, m))
+        assert( abs(m) <= abs(value) )
+        return m
+
+    @staticmethod
+    def phi(rng):
+        rv = rng.random() * 2 -1
+        #logger.info("Modification factor is {}".format(rv))
+        assert(abs(rv) <= 1)
+        return rv
+
+    def createNormal(basevalues, scale, rng):
+        newvalues = []
+        for b in basevalues:
+            nv = getNormal(seed=rng.uniform(0, 1024), mean=b, size=scale)
+            newvalues.append(nv)
+        return newvalues
+
+    def __init__(self, objectinstance, rng, Y, distancefunction, particlenr, limit):
+        """
+        ABC Solution instance
+
+        :param particlenr: if this is 0, do not perturb this instance.
+        """
+        super().__init__(objectinstance, Y, distancefunction)
+        self.rng = rng
+        if particlenr != 0:
+            self.current = [ABCSolution.modify(c, self.rng) for c in self.current]
+            self.best = self.current[:]
+        self.update()
+        self.improvementfailure = 0
+        self.D = len(self.current)
+        #self.limit = int(limit * self.D) # too large for large swarms
+        self.limit = limit
+        #logger.info("D = {} and limit = {}".format(self.D, self.limit))
+
+    def validSolution(self):
+        return self.improvementfailure < self.limit
+
+    def generateNew(self, other):
+        xi = self.current[:]
+        xj = other.current[:]
+        indices = [i for i in range(len(xi))]
+        assert(len(xi) == len(xj))
+        k = self.rng.choice(indices)
+        xik = xi[k]
+        xjk = xj[k]
+        xik += ABCSolution.phi(self.rng) * ( xik - xjk)
+        xi[k] = xik
+        return xi
+
+    def testUpdate(self, nvalues):
+        oldsc = self.current[:]
+        oldf = self.fitness
+        self.current = nvalues
+        self.update()
+        if self.fitness < oldf:
+            self.improvementfailure = 0
+        else:
+            self.improvementfailure += 1
+            self.current = oldsc
+            self.update()
+
+    def reinit(self, values):
+        self.current = values
+        self.best = values
+        self.update()
+        self.improvementfailure = 0
+
+
 class PSO(Optimizer):
     """
     Particle Swarm Optimization.
@@ -214,7 +293,7 @@ class PSO(Optimizer):
         super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
         self.rng = getRandom(seed)
         if seed is None:
-            logger.warning("Using zero seed")
+            logger.warning("Using None seed")
         self.particles = [PSOParticle(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1) for i in range(self.populationcount)]
         self.c1 = 2
         self.c2 = 2
@@ -325,17 +404,110 @@ class DE(Optimizer):
         self.currentiteration += 1
 
 
-
 class ABC(Optimizer):
     """
     Articifical Bee Colony.
     """
 
-    def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations):
+    def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations, testrun=False):
         super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
+        self.onlookers = self.populationcount
+        self.employedcount = self.populationcount
+        self.scouts = 1
+        self.c = 0.75
+        self.original = [c.getValue() for c in particle.getValuedConstants()]
+        self.sources = [ABCSolution(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1, limit = self.c * self.onlookers) for i in range(self.populationcount)]
+        self.sumfit = None
+        self.D = self.sources[0].D
+        self.fitnessweights = None
+        self.indices = [i for i in range(len(self.sources))]
+        self.updateFitness()
+        assert(self.sumfit is not None and self.fitnessweights is not None)
+        self.best = None
+        self.memorizebest()
+        assert(self.best)
 
-    def run():
-        logger.warning("Not Implemented!")
+    def sumfitness(self):
+        f = 0
+        for source in self.sources:
+            f += 1 / (1 + source.fitness)
+        return f
+
+    def selectIth(self):
+        r = self.rng.uniform(0,1)
+        for i,w in enumerate(self.fitnessweights):
+            if r < w:
+                break
+        i = max(i-1, 0)
+        return i
+
+    def calculatefitnessweights(self):
+        weights = [(1/(1+source.fitness))/self.sumfit for source in self.sources]
+        assert(sum(weights) > 0.999999)
+        fw = []
+        last = 0
+        for w in weights:
+            last += w
+            fw.append(last)
+        return fw
+
+    def updateFitness(self):
+        self.sumfit = self.sumfitness()
+        self.fitnessweights = self.calculatefitnessweights()
+
+
+    def run(self):
+        for i in range(self.iterations):
+            self.doIteration()
+
+    def doIteration(self):
+        self.employedphase()
+        self.onlookerphase()
+        self.scoutphase()
+        self.memorizebest()
+
+    def employedphase(self):
+        for i, source in enumerate(self.sources):
+            self.singleStep(i)
+
+    def singleStep(self, sourceindex):
+        source = self.sources[sourceindex]
+        targetindex = sourceindex
+        while targetindex == sourceindex:
+            targetindex = self.rng.choice(self.indices)
+        target = self.sources[targetindex]
+        newvalues = source.generateNew(target)
+        source.testUpdate(newvalues)
+
+
+    def onlookerphase(self):
+        # same as employed but assignment is based on fitness
+        #logger.info("Onlooker phase")
+        self.updateFitness()
+        for i in range(self.onlookers):
+            selectedsourceindex = self.selectIth()
+            self.singleStep(selectedsourceindex)
+
+    def scoutphase(self):
+        scoutsused = 0
+        for i in range(len(self.sources)):
+            if not self.sources[i].validSolution():
+                # Get normal valued with size minconstant around current instance
+                # / 4 to ensure 95% of samples is within normal_scale
+                new = ABCSolution.createNormal(self.original, Constants.NORMAL_SCALE / 4, rng=self.rng)
+                self.sources[i].reinit(new)
+                scoutsused += 1
+                if scoutsused > self.scouts:
+                    break
+
+    def memorizebest(self):
+        best = min([(i, source.fitness) for i, source in enumerate(self.sources)] , key = lambda x : x[1])
+        self.best = best
+
+    def getOptimalSolution(self):
+        bestsource = self.sources[self.best[0]]
+        return {"cost":bestsource.cost, "solution":bestsource.current[:]}
+
 
 
 optimizers = {"pso": PSO, "de": DE, "none":PassThroughOptimizer, "abc":ABC}
