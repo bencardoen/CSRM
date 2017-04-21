@@ -7,6 +7,7 @@
 #      Author: Ben Cardoen
 from expression.tools import getRandom, copyObject, getNormal
 from expression.tree import Tree
+from functools import reduce
 from expression.constants import Constants
 import logging
 logger = logging.getLogger('global')
@@ -63,7 +64,7 @@ class Instance:
         :param distancefunction: function used to score the difference between the evaluation of the tree and the expected values.
         """
         self.tree = tree
-        self.current = [c.getValue() for c in [c for c in self.tree.getConstants() if c]]
+        self.current = [c.getValue() for c in [q for q in self.tree.getConstants() if q]]
         self.best = self.current[:]
         self.cost = 0
         self.fitness = self.tree.getFitness()
@@ -161,8 +162,8 @@ class DEVector(Instance):
         Given 3 vectors and F, obtain a mutated vector.
         """
         c1, c2, c3 = chosen
-        d = [a -b for a,b in zip(c2.current, c3.current)]
-        c = [o + F*k for o,k in zip(c1.current, d)]
+        #d = [a -b for a,b in zip(c2.current, c3.current)]
+        c = [o + F*k for o,k in zip(c1.current, [a -b for a,b in zip(c2.current, c3.current)])]
         return c
 
     @staticmethod
@@ -203,20 +204,19 @@ class DEVector(Instance):
 
 class ABCSolution(Instance):
     """
-    ABC Solution
+    ABC Solution source.
+
+    Is invalidated if it isn't improved after a preset amount of iterations.
     """
 
     @staticmethod
     def modify(value, rng):
         m = value * ABCSolution.phi(rng)
-        #logger.info("Modifying {} to {}".format(value, m))
-        assert( abs(m) <= abs(value) )
         return m
 
     @staticmethod
     def phi(rng):
         rv = rng.random() * 2 -1
-        #logger.info("Modification factor is {}".format(rv))
         assert(abs(rv) <= 1)
         return rv
 
@@ -241,8 +241,9 @@ class ABCSolution(Instance):
         self.update()
         self.improvementfailure = 0
         self.D = len(self.current)
-        #self.limit = int(limit * self.D) # too large for large swarms
-        self.limit = limit
+        #logger.info("Limit arg = {}".format(limit))
+        self.limit = int(limit * self.D) # too large for large swarms
+        #self.limit = limit
         #logger.info("D = {} and limit = {}".format(self.D, self.limit))
 
     def validSolution(self):
@@ -413,10 +414,10 @@ class ABC(Optimizer):
         super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
         self.onlookers = self.populationcount
         self.employedcount = self.populationcount
-        self.scouts = 1
+        self.scouts = self.populationcount
         self.c = 0.75
         self.original = [c.getValue() for c in particle.getValuedConstants()]
-        self.sources = [ABCSolution(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1, limit = self.c * self.onlookers) for i in range(self.populationcount)]
+        self.sources = [ABCSolution(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1, limit = self.c *self.onlookers / 2) for i in range(self.populationcount)]
         self.sumfit = None
         self.D = self.sources[0].D
         self.fitnessweights = None
@@ -428,10 +429,8 @@ class ABC(Optimizer):
         assert(self.best)
 
     def sumfitness(self):
-        f = 0
-        for source in self.sources:
-            f += 1 / (1 + source.fitness)
-        return f
+        q = reduce(lambda x,y: x + (1/(1+y.fitness)), self.sources , 0)
+        return q
 
     def selectIth(self):
         r = self.rng.uniform(0,1)
@@ -454,7 +453,6 @@ class ABC(Optimizer):
     def updateFitness(self):
         self.sumfit = self.sumfitness()
         self.fitnessweights = self.calculatefitnessweights()
-
 
     def run(self):
         for i in range(self.iterations):
