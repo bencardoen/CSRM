@@ -39,7 +39,7 @@ class Optimizer:
         Halt the algorithm if self.treshold generations do not improve the best fitness value.
         """
         if self.history > self.treshold:
-            logger.info("stopcondition triggers {} > {}".format(self.history, self.treshold))
+            #logger.info("stopcondition triggerd {} > {}".format(self.history, self.treshold))
             return True
 
     def run(self):
@@ -462,6 +462,8 @@ class ABC(Optimizer):
     def run(self):
         for i in range(self.iterations):
             self.doIteration()
+            if self.stopcondition():
+                break
 
     def doIteration(self):
         self.employedphase()
@@ -504,7 +506,16 @@ class ABC(Optimizer):
                     break
 
     def memorizebest(self):
+        oldbest = self.best
         best = min([(i, source.fitness) for i, source in enumerate(self.sources)] , key = lambda x : x[1])
+        #logger.info("Best is {}".format(best))
+        if oldbest and oldbest[1] == best[1]:
+            self.history += 1
+            #logger.info("Best value is still old value")
+        else:
+            #if oldbest is not None:
+                #logger.info("found new best {} < {}".format(best[1], oldbest[1]))
+            self.history = 0
         self.best = best
 
     def getOptimalSolution(self):
