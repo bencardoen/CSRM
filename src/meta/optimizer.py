@@ -16,9 +16,23 @@ logger = logging.getLogger('global')
 class Optimizer:
     """
     Base class of optimizer, provides shared state and interface.
+
+    Usage of subclasses is :
+        a = subclass(populationcount, particle, iterations, expected, distancefunction, seed)
+        a.run()
+        opt = a.getOptimalSolution()
     """
 
     def __init__(self, populationcount, particle, iterations, expected, distancefunction, seed=0):
+        """
+        Construct an instance of a generic optimizer.
+
+        :param: particle : expression.tree.Tree instance
+        :param populationcount: size of swarm
+        :param iterations: maximum nr of iterations (algorithm will stop if no global improvement is found within iterations/2)
+        :param expected: expected data
+        :param distancefunction: the algorithm will minimize the outcome of this function.
+        """
         self.populationcount = populationcount
         self.iterations = iterations
         self.currentiteration = 0
@@ -32,6 +46,11 @@ class Optimizer:
         self.treshold = int(self.iterations / 2)
 
     def getOptimalSolution(self):
+        """
+        Returns the optimizal solution.
+
+        :returns: a dict with keys cost : floating point >=0 representing the cost of this algorithm in (weighted) evaluations, key solution : list of optimized real valued constants matching the lowest fitness value.
+        """
         raise NotImplementedError
 
     def stopcondition(self):
@@ -171,7 +190,7 @@ class DEVector(Instance):
         """
         c1, c2, c3 = chosen
         #d = [a -b for a,b in zip(c2.current, c3.current)]
-        c = [o + F*k for o,k in zip(c1.current, [a -b for a,b in zip(c2.current, c3.current)])]
+        c = [o + F*k for o,k in zip(c1.current, (a -b for a,b in zip(c2.current, c3.current)))]
         return c
 
     @staticmethod
@@ -249,7 +268,6 @@ class ABCSolution(Instance):
         self.update()
         self.improvementfailure = 0
         self.D = len(self.current)
-        #logger.info("Limit arg = {}".format(limit))
         self.limit = int(limit * self.D) # too large for large swarms
         #self.limit = limit
         #logger.info("D = {} and limit = {}".format(self.D, self.limit))
@@ -377,12 +395,11 @@ class DE(Optimizer):
         best = vs[0]
         logger.info("Current best in generation {} is {}".format(self.currentiteration, best.fitness))
 
-
     def getOptimalSolution(self):
         vs = sorted(self.vectors, key=lambda x: x.fitness)
         best = vs[0]
         bv = best.current
-        bc = sum([v.cost for v in self.vectors])
+        bc = sum((v.cost for v in self.vectors))
         return {"cost":bc, "solution":bv}
 
 
@@ -446,13 +463,14 @@ class ABC(Optimizer):
         return i
 
     def calculatefitnessweights(self):
-        weights = [(1/(1+source.fitness))/self.sumfit for source in self.sources]
-        assert(sum(weights) > 0.999999)
+        weights = ((1/(1+source.fitness))/self.sumfit for source in self.sources)
+        #assert(sum(weights) > 0.999999)
         fw = []
         last = 0
         for w in weights:
             last += w
             fw.append(last)
+        assert(len(fw))
         return fw
 
     def updateFitness(self):
@@ -507,21 +525,15 @@ class ABC(Optimizer):
 
     def memorizebest(self):
         oldbest = self.best
-        best = min([(i, source.fitness) for i, source in enumerate(self.sources)] , key = lambda x : x[1])
-        #logger.info("Best is {}".format(best))
+        best = min(((i, source.fitness) for i, source in enumerate(self.sources)) , key = lambda x : x[1])
         if oldbest and oldbest[1] == best[1]:
             self.history += 1
-            #logger.info("Best value is still old value")
         else:
-            #if oldbest is not None:
-                #logger.info("found new best {} < {}".format(best[1], oldbest[1]))
             self.history = 0
         self.best = best
 
     def getOptimalSolution(self):
         bestsource = self.sources[self.best[0]]
         return {"cost":bestsource.cost, "solution":bestsource.current[:]}
-
-
 
 optimizers = {"pso": PSO, "de": DE, "none":PassThroughOptimizer, "abc":ABC}
