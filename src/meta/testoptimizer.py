@@ -28,7 +28,7 @@ class OptimizerTest(unittest.TestCase):
         t.scoreTree(Y, _fit)
         pcount = 50
         icount = 50
-        p = PSO(populationcount = 50, particle=copyObject(t), distancefunction=_fit, expected=Y, seed=0, iterations=100, testrun=True)
+        p = PSO(populationcount = 50, particle=copyObject(t), distancefunction=_fit, expected=Y, seed=0, iterations=50, testrun=True)
         p.run()
         sol = p.getOptimalSolution()
         self.assertTrue(sol["cost"], pcount*icount + pcount)
@@ -49,7 +49,7 @@ class OptimizerTest(unittest.TestCase):
         t.scoreTree(Y, _fit)
         pcount = 50
         icount = 50
-        p = DE(populationcount = 50, particle=copyObject(t), distancefunction=_fit, expected=Y, seed=0, iterations=100, testrun=True)
+        p = DE(populationcount = 50, particle=copyObject(t), distancefunction=_fit, expected=Y, seed=0, iterations=50, testrun=True)
         p.run()
         sol = p.getOptimalSolution()
         self.assertTrue(sol["cost"], pcount*icount + pcount)
@@ -70,7 +70,7 @@ class OptimizerTest(unittest.TestCase):
         t.scoreTree(Y, _fit)
         pcount = 50
         icount = 50
-        p = ABC(populationcount = 50, particle=copyObject(t), distancefunction=_fit, expected=Y, seed=0, iterations=100, testrun=True)
+        p = ABC(populationcount = 50, particle=copyObject(t), distancefunction=_fit, expected=Y, seed=0, iterations=50, testrun=True)
         p.run()
         sol = p.getOptimalSolution()
         self.assertTrue(sol["cost"], pcount*icount + pcount)

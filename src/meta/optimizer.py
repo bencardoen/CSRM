@@ -34,6 +34,14 @@ class Optimizer:
     def getOptimalSolution(self):
         raise NotImplementedError
 
+    def stopcondition(self):
+        """
+        Halt the algorithm if self.treshold generations do not improve the best fitness value.
+        """
+        if self.history > self.treshold:
+            logger.info("stopcondition triggers {} > {}".format(self.history, self.treshold))
+            return True
+
     def run(self):
         raise NotImplementedError
 
@@ -316,13 +324,6 @@ class PSO(Optimizer):
         else:
             self.history +=1
 
-    def stopcondition(self):
-        """
-        Halt the algorithm if self.treshold generations do not improve the best fitness value.
-        """
-        if self.history > self.treshold:
-            return True
-
     @property
     def rtwo(self):
         return self.rng.random()
@@ -362,10 +363,8 @@ class DE(Optimizer):
         # We assume non dependency (can't really otherwise)
         self.Cr = 0.1
         self.D = len(self.vectors[0].current)
+        self.best = sorted(self.vectors, key=lambda x: x.fitness)[0]
         assert(self.D>0)
-
-    def stopcondition(self):
-        return False
 
     def run(self):
         for _ in range(self.iterations):
@@ -389,6 +388,7 @@ class DE(Optimizer):
 
     def iteration(self):
         choices = [i for i in range(len(self.vectors))]
+        oldbest = self.best
         for i, v in enumerate(self.vectors):
             X = self.vectors[i]
             # Mutate
@@ -402,6 +402,11 @@ class DE(Optimizer):
 
             # Selection
             X.testUpdate(U)
+            if X.fitness < oldbest.fitness:
+                self.best = X
+                self.history = 0
+        if oldbest == self.best:
+            self.history += 1
         self.currentiteration += 1
 
 
