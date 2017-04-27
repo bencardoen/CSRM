@@ -430,6 +430,12 @@ called methods to alter behavior</p>
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="gp.algorithm.mergedict">
+<code class="descclassname">gp.algorithm.</code><code class="descname">mergedict</code><span class="sig-paren">(</span><em>left</em>, <em>right</em>, <em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/algorithm.html#mergedict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.mergedict" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a set of keys present in right, if it exists in left add it, else create it.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="gp.algorithm.probabilityMutate">
 <code class="descclassname">gp.algorithm.</code><code class="descname">probabilityMutate</code><span class="sig-paren">(</span><em>generation: int</em>, <em>generations: int</em>, <em>ranking: int</em>, <em>population: int</em>, <em>rng: random.Random = None</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/gp/algorithm.html#probabilityMutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.probabilityMutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a probability to mutate based on 2 parameters : the current generation and the the ranking of the sample.</p>
@@ -899,7 +905,12 @@ node 0 is connected to [8,1,6,3]</p>
 <span id="gp-paralleldriver-module"></span><h2>gp.paralleldriver module<a class="headerlink" href="#module-gp.paralleldriver" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="gp.paralleldriver.runBenchmark">
-<code class="descclassname">gp.paralleldriver.</code><code class="descname">runBenchmark</code><span class="sig-paren">(</span><em>config</em>, <em>topo=None</em>, <em>processcount=None</em>, <em>outfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/paralleldriver.html#runBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.paralleldriver.runBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">gp.paralleldriver.</code><code class="descname">runBenchmark</code><span class="sig-paren">(</span><em>config</em>, <em>topo=None</em>, <em>processcount=None</em>, <em>outfolder=None</em>, <em>X=None</em>, <em>Y=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/paralleldriver.html#runBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.paralleldriver.runBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gp.paralleldriver.updateConfig">
+<code class="descclassname">gp.paralleldriver.</code><code class="descname">updateConfig</code><span class="sig-paren">(</span><em>configobj</em>, <em>attributes</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/paralleldriver.html#updateConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.paralleldriver.updateConfig" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

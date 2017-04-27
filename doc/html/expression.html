@@ -127,6 +127,11 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="expression.constants.Constants.NORMAL_SCALE">
+<code class="descname">NORMAL_SCALE</code><em class="property"> = 20</em><a class="headerlink" href="#expression.constants.Constants.NORMAL_SCALE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="expression.constants.Constants.PEARSONMINFITNESS">
 <code class="descname">PEARSONMINFITNESS</code><em class="property"> = 1</em><a class="headerlink" href="#expression.constants.Constants.PEARSONMINFITNESS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -779,8 +784,18 @@ With mindepthratio set, the</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="expression.testtools.ToolTest.testDecodeVariables">
+<code class="descname">testDecodeVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtools.html#ToolTest.testDecodeVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtools.ToolTest.testDecodeVariables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.testtools.ToolTest.testFlatten">
 <code class="descname">testFlatten</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtools.html#ToolTest.testFlatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtools.ToolTest.testFlatten" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="expression.testtools.ToolTest.testGenerateVariables">
+<code class="descname">testGenerateVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtools.html#ToolTest.testGenerateVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtools.ToolTest.testGenerateVariables" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1211,7 +1226,7 @@ With mindepthratio set, the</p>
 
 <dl class="function">
 <dt id="expression.tools.generateVariables">
-<code class="descclassname">expression.tools.</code><code class="descname">generateVariables</code><span class="sig-paren">(</span><em>varcount: int</em>, <em>datacount: int</em>, <em>seed: int</em>, <em>sort=False</em>, <em>lower=0</em>, <em>upper=1</em>, <em>rng=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#generateVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.generateVariables" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.tools.</code><code class="descname">generateVariables</code><span class="sig-paren">(</span><em>varcount: int</em>, <em>datacount: int</em>, <em>seed: int</em>, <em>sort=False</em>, <em>lower=0</em>, <em>upper=1</em>, <em>rng=None</em>, <em>ranges=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#generateVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.generateVariables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a list of datapoints.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1246,6 +1261,11 @@ Y is a 1 dimensional vector with g entries : 1xg</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="function">
+<dt id="expression.tools.getNormal">
+<code class="descclassname">expression.tools.</code><code class="descname">getNormal</code><span class="sig-paren">(</span><em>seed</em>, <em>mean</em>, <em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#getNormal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.getNormal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="expression.tools.getRandom">
@@ -1332,6 +1352,13 @@ The returned value is in the range [0, 1] with 0 optimal distance.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="expression.tools.readVariables">
+<code class="descclassname">expression.tools.</code><code class="descname">readVariables</code><span class="sig-paren">(</span><em>filename</em>, <em>featurecount</em>, <em>samplecount</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/tools.html#readVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.readVariables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a set of variables in from file.</p>
+<p>Expects a single line per feature(variable), with the values comma separated.</p>
 </dd></dl>
 
 <dl class="function">

@@ -164,6 +164,7 @@ class GPAlgorithm():
         for x in lst:
             expr = x.toExpression()
             x2 = Tree.createTreeFromExpression(expr, variables=self._X)
+            #.info("Adding {}".format(expr))
             self.addToArchive(x2)
 
     def addConvergenceStat(self, generation, stat, phase):

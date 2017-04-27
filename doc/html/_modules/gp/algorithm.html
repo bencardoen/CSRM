@@ -747,7 +747,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_depthcooling</span> <span class="o">=</span> <span class="n">depthcooling</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">popsize</span><span class="p">,</span> <span class="n">maxdepth</span><span class="p">,</span> <span class="n">fitnessfunction</span><span class="p">,</span> <span class="n">generations</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span> <span class="n">archivesize</span><span class="o">=</span><span class="n">archivesize</span><span class="p">,</span> <span class="n">initialdepth</span><span class="o">=</span><span class="n">initialdepth</span><span class="p">,</span> <span class="n">skipconstantexpressions</span><span class="o">=</span><span class="n">skipconstantexpressions</span><span class="p">,</span> <span class="n">archivefile</span><span class="o">=</span><span class="n">archivefile</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimizestrategy</span> <span class="o">=</span> <span class="n">optimizestrategy</span> <span class="k">if</span> <span class="n">optimizestrategy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizestrategy</span> <span class="o">=</span> <span class="n">optimizestrategy</span> <span class="k">if</span> <span class="n">optimizestrategy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;optimizestrategy </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizestrategy</span><span class="p">))</span></div>
 
     <span class="nd">@property</span>
@@ -784,7 +784,7 @@
         <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;foldingsavings&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">doConstantFolding</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">selected</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizestrategy</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using optimizer&quot;</span><span class="p">)</span>
+            <span class="c1">#logger.info(&quot;Using optimizer with strategy {}&quot;.format(self.optimizestrategy))</span>
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">selected</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">getValuedConstants</span><span class="p">():</span>
                     <span class="n">oldf</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">getFitness</span><span class="p">()</span>
@@ -806,12 +806,12 @@
                         <span class="n">t</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitnessfunction</span><span class="p">)</span>
                         <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;fitnessgains&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fgain</span><span class="p">)</span>
                         <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;fitnessgainsrelative&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fgain</span><span class="o">/</span><span class="n">oldf</span><span class="p">)</span>
-                    <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizestrategy</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cutoff reached, skipping optimize step, </span><span class="si">{}</span><span class="s2"> &gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizestrategy</span><span class="p">))</span>
-                <span class="k">break</span>
+                        <span class="k">break</span>
+                    <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">pass</span>
+        <span class="c1">#logger.info(&quot;Gains are {}&quot;.format(gain))</span>
         <span class="k">return</span> <span class="n">gain</span></div>
 
 <div class="viewcode-block" id="BruteCoolingElitist.optimizeBest"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteCoolingElitist.optimizeBest">[docs]</a>    <span class="k">def</span> <span class="nf">optimizeBest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selected</span><span class="p">):</span>
@@ -841,23 +841,15 @@
                     <span class="n">t</span><span class="o">.</span><span class="n">updateValues</span><span class="p">(</span><span class="n">best</span><span class="p">)</span>
                     <span class="n">t</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitnessfunction</span><span class="p">)</span>
                     <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;fitnessgains&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fgain</span><span class="p">)</span>
-                    <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;fitnessgainsrelative&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fgain</span><span class="o">/</span><span class="n">oldf</span><span class="p">)</span>
+                    <span class="n">relative</span> <span class="o">=</span> <span class="n">fgain</span>
+                    <span class="k">if</span> <span class="n">oldf</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">relative</span> <span class="o">/=</span> <span class="n">oldf</span>
+                    <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;fitnessgainsrelative&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">relative</span><span class="p">)</span>
         <span class="c1">#logger.info(&quot;Storing gain {}&quot;.format(gain))</span>
         <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convergencestats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;fitnessgains&quot;</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
-            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;fitnessgains&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;fitnessgains&quot;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;fitnessgains&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;fitnessgains&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;fitnessgainsrelative&quot;</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
-            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;fitnessgainsrelative&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;fitnessgainsrelative&quot;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;fitnessgainsrelative&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;fitnessgainsrelative&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;optimizercost&quot;</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
-            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;optimizercost&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;optimizercost&quot;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;optimizercost&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gain</span><span class="p">[</span><span class="s2">&quot;optimizercost&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_convergencestats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span></div>
 
+        <span class="n">mergedict</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;fitnessgains&quot;</span><span class="p">,</span> <span class="s2">&quot;fitnessgainsrelative&quot;</span><span class="p">,</span> <span class="s2">&quot;optimizercost&quot;</span><span class="p">,</span> <span class="s2">&quot;foldingsavings&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convergencestats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span></div>
 
 <div class="viewcode-block" id="BruteCoolingElitist.archive"><a class="viewcode-back" href="../../gp.html#gp.algorithm.BruteCoolingElitist.archive">[docs]</a>    <span class="k">def</span> <span class="nf">archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modified</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -905,6 +897,18 @@
 
 <div class="viewcode-block" id="coolingMinDepthRatio"><a class="viewcode-back" href="../../gp.html#gp.algorithm.coolingMinDepthRatio">[docs]</a><span class="k">def</span> <span class="nf">coolingMinDepthRatio</span><span class="p">(</span><span class="n">generation</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">generations</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">ranking</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">population</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">rng</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">generation</span> <span class="o">/</span> <span class="n">generations</span></div>
+
+
+<div class="viewcode-block" id="mergedict"><a class="viewcode-back" href="../../gp.html#gp.algorithm.mergedict">[docs]</a><span class="k">def</span> <span class="nf">mergedict</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a set of keys present in right, if it exists in left add it, else create it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">left</span><span class="p">:</span>
+            <span class="n">left</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">right</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">left</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">right</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">left</span></div>
 </pre></div>
 
           </div>
