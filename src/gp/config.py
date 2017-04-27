@@ -34,6 +34,8 @@ class Config:
     def concatValues(self):
         q = "_"
         for k,v in sorted(self.__dict__.items()):
+            if str(k) in ["display", "outputfolder"]:
+                continue
             if str(k) == "topo" or str(k) == "optimizer":
                 q += str(k) + (str(v.__name__) if v else "None")
             else:
