@@ -105,6 +105,9 @@ class Instance:
         self.cost += 1
         self.tree.scoreTree(self.expected, self.distancefunction)
         newf = self.tree.getFitness()
+        if newf == Constants.MINFITNESS:
+            newf = Constants.PEARSONMINFITNESS
+            self.tree.fitness = newf
         oldf = self.fitness
         if newf < oldf:
             self.best = self.current[:]
@@ -290,7 +293,7 @@ class ABCSolution(Instance):
     def testUpdate(self, nvalues):
         oldsc = self.current[:]
         oldf = self.fitness
-        self.current = nvalues
+        self.current = nvalues[:]
         self.update()
         if self.fitness < oldf:
             self.improvementfailure = 0
@@ -298,6 +301,8 @@ class ABCSolution(Instance):
             self.improvementfailure += 1
             self.current = oldsc
             self.update()
+            if oldf != 1:
+                assert(self.fitness != 1)
 
     def reinit(self, values):
         self.current = values
@@ -452,6 +457,9 @@ class ABC(Optimizer):
 
     def sumfitness(self):
         q = reduce(lambda x,y: x + (1/(1+y.fitness)), self.sources , 0)
+        if q <= 0:
+            logger.error("Sum fitness is {}".format([y.fitness for y in self.sources]))
+            raise ValueError
         return q
 
     def selectIth(self):

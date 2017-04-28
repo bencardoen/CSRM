@@ -13,7 +13,7 @@ MD=10
 
 fases=(10 20)
 optimizers=( none de abc pso )
-strategies=( 0 1 2 )
+strategies=( 0 )
 
 for expressionid in {0..14}
 #do python3 -m gp.paralleldriver -e $expressionid;
