@@ -176,6 +176,9 @@ if __name__ == "__main__":
             else:
                 logger.error("Invalid value {} for hybrid strategy, should be -1 >= k <= {}".format(strat, c.population))
                 exit(0)
+            if args.hybrid == "none":
+                logger.info("Skipping optimizer strategy for a passthrough object")
+                c.optimizestrategy = -1
         else:
             logger.info("No optimizer strategy given, assuming 0 (best per run)")
             c.optimizestrategy = 0
