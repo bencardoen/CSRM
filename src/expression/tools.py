@@ -351,11 +351,11 @@ def pearson(actual, expected):
     except FloatingPointError as e:
         logger.warning("Distance is {} due to FP Error".format(e))
         logger.warning("Actual {} vs expected {}".format(actual, expected))
-        raise e
         denom = 0
+        return 1
     p = None
     if denom == 0:
-        # if denom is zero, there is no measurable difference between the values and their mean.
+        # if denom is zero, there is no measurable difference between the values and their mean,
         # this will hold for the nom as well, resulting in a score of 1 (without division)
         # p = 1 gives too much of an advantage
         # TODO ask prof Broeckhove
