@@ -11,7 +11,7 @@ MD=10
 
 #mpiexec -n 3 python3 -m gp.paralleldriver -c 3 -t tree
 
-fases=(20)
+fases=(10 20)
 optimizers=( none de abc pso )
 strategies=( 0 1 2 )
 
