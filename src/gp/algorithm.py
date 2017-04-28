@@ -164,6 +164,7 @@ class GPAlgorithm():
         for x in lst:
             expr = x.toExpression()
             x2 = Tree.createTreeFromExpression(expr, variables=self._X)
+            x2.scoreTree(self._Y, self._fitnessfunction)
             #.info("Adding {}".format(expr))
             self.addToArchive(x2)
 
