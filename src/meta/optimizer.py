@@ -455,6 +455,9 @@ class ABC(Optimizer):
         return q
 
     def selectIth(self):
+        """
+        Do a tournament wheel selection.
+        """
         r = self.rng.uniform(0,1)
         for i,w in enumerate(self.fitnessweights):
             if r < w:
