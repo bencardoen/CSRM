@@ -434,9 +434,9 @@ class ABC(Optimizer):
 
     def __init__(self, populationcount:int, particle, expected, distancefunction, seed, iterations, testrun=False):
         super().__init__(populationcount=populationcount, particle=particle, expected=expected, distancefunction=distancefunction, seed=seed, iterations=iterations)
-        self.onlookers = self.populationcount
-        self.employedcount = self.populationcount
-        self.scouts = self.populationcount
+        self.onlookers = self.populationcount // 2
+        self.employedcount = self.populationcount // 2
+        self.scouts = self.populationcount // 2
         self.c = 0.75
         self.original = [c.getValue() for c in particle.getValuedConstants()]
         self.sources = [ABCSolution(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1, limit = self.c *self.onlookers / 2) for i in range(self.populationcount)]
