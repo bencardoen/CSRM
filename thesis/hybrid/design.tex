@@ -51,7 +51,7 @@ As a stopcondition our tool uses a preset number of iterations. The user specifi
 \subsection{Initialization}
 Initialization is done using the 'full' method \cite{GP}. The algorithm has a parameter initial depth, each new expression in the population is created using that depth.
  
-\subsubsection{Invalid expressions}
+\subsubsection{Invalid expressions}\label{subsubinvalidexpressions}
 Generating a random expression is done by generating random subtrees and merging them. A critical point to observe is that randomly generating expressions can be invalid for their domain. The ubiquitous example here is division by zero. Several approaches to solve this problem exist. One can define 'safe' variants of the functions, in case of division by zero, one can return a predefined value that will still result in a valid tree. The downside of this approach is that the division function's semantics is altered, a practitioner, given a resulting expression, would have to know that some functions are no longer corresponding entirely to their mathematical equivalents. 
 The other option is assigning maximum fitness to an invalid expression. While simple, this approach needs a careful implementation. From a practical standpoint wrapping functions in exception handling code will quickly deteriorate performance. 
 Our approach is quick domain check for each calculation, avoiding exceptions.
@@ -68,19 +68,27 @@ We can generate random expressions and let the evolution stage of the algorithm 
 This can lead to unwanted behavior in the algorithm itself. For high q values we can have a significant part of the population that is at any one time invalid. This can lead to premature convergence, similar to a scenario where the population is artificially small or dominated by a set of highly fit individuals. Another observation to make is the algorithm will waste operations (mutation, crossover) on expressions that are improbable to contribute to a good solution. 
 While more expensive computationally, we therefore prohibit generation of invalid expressions in the initialization. 
 
+\subsection{Evaluation and cost}
+Evaluating a tree requires a traversal, once for each datapoint. In order to compare optimization algorithms across implementations practitioners can use as a measure the number of evaluations required to reach a certain fitness level. If this measure is used, one should take into account that not all evaluations are equal. With the trees varying in depth and density the evaluation cost varies significantly. Furthermore, evaluation "1 + 2" is computationally far less expensive than "log(3, 4)".
+Our tool uses a complexity measure that takes into account the density of the tree and which functions are used. A tree comprised of complex functions will score higher in cost than a corresponding tree using simple multiplications and additions. Although this is an option, we do not use this measure in the objective function. We would like to observe the effect of the cost, but not directly influence the algorithm. There is no direct link between more complex functions and an optimal solution. In certain domains the argument can be made that more complex functions are more likely to lead to overfitting, or more likely to lead to invalid trees (due to smaller domain).
 
 \subsection{Evolution}
-% Recap
+In the evolution stage we apply two operators on (a selection of) the population. The operators are configured to constrain the depth of the modified trees, enforcing the maximum depth parameter.
+We trace the application of the operators during the execution using an effectiveness measure. Each time an operator application is able to lower the fitness of a tree, this measure increases. Using this measure we can gain insight when and how certain optimizations and modifications work inside the algorithm.
 
 \subsubsection{Mutation}
-% Operate on ?
-% Which mutation operators do we support ?
-% Refer for cooling to experiments section
+Mutation works by selecting replacing a randomly chosen subexpression with a newly generated. In our implementation this means selecting a node in the tree and replacing it with a new subtree. Our mutation operator can be configured to replace the subtree with one of equal depth or a randomly chosen depth. The insertion point can be made depth-sensitive. A shallow node, a node with a low depth, is the root of a subtree with significant depth. Replacing such a subtree is therefore more likely to have a significant effect on the fitness value. Replacing a deep node will have on average a smaller effect. We will investigate this assumption in our experiments.
+In our implementation the mutation operator is applied using a cooling schedule, or on the entire population. 
+The cooling schedule uses the current fitness and the current generation of a tree to decide if mutation is likely to benefit from mutation. This is similar to the approach in simulated annealing. %ref
+Mutation introduces new information into the optimization process (a new subtree). This process can be constructive (lowering fitness) or destructive (increasing fitness). The idea behind the cooling schedule is that for fitter trees the mutation operation will not be able to improve fitness (decrease it), while for less fit trees it has a higher probability. 
+This probability is estimated using the current generation and fitness value (relative to the population), and using this information a random choice is made whether or not to apply mutation. In the experiments section we will investigate if this assumption holds, and if it leads to gains in fitness and or effectiveness.
+The mutation operates has to generate new subtrees, and therefore the same issues seen in the initialization  process\ref{subsubinvalidexpressions} apply here as well. The mutation operator will use an invalid subtree, at the cost of having to generate subtrees until a valid one is found. If the depth sensitive operation proves to generate equal or better fitness values, this could significantly reduce the computation cost of the operator.
 
 \subsubsection{Crossover}
-% Operate on ?
-% Which crossover operators do we support ?
-%
+Crossover operates on 2 trees in the population. It selects subtrees from both, and inserts them into each other. The resulting set of 4 trees is scored and the 2 fittest replace the original trees. As with mutation crossover can be configured to operate on a set depth, or pick a random depth. It can also work symmetric, picking an equal depth insertion point in both trees.
+Crossover in our implementation can be applied in sequence to the entire population, with pairwise mating in order of fitness. Alternatively a random selection can be used. A variant of both, alternating between the two schedules based on a random choice is a third option. This last reflects in part the roulette wheel selection method, although without replacement. %ref
+Crossover, unlike mutation, does not introduce new information in the sense that no new subtrees are generated. 
+Crossover can be configured to work with a decreasing depth, operating only on deeper nodes at the later stages of the algorithm. The assumption for this mode of operation is similar to that made for mutation. 
 
 \subsection{Selection}
 After evolution a decision has to be made on which expressions will be retained in the population. In our tool the population is fixed, so a replacement is in order. We use an elitist approach. If a an expression has a lower (better) fitness value after mutation, it is replaced. 
@@ -98,13 +106,13 @@ This leads us to the size of the archive. While no exact optimal value for this 
 We use a tree representation for an arithmetic expression, where each internal node represent a base function (unary or binary), and each leaf either a feature or a constant.
 
 \paragraph{Tree representation}
-We use a hybrid representation of a tree structure. The tree is a set of nodes, where each node holds a list of children nodes. This representation favors recursive traversal algorithms. In addition to this representation, the nodes of tree are stored in a dictionary keyed on the position of a node. This allows for O(1) access needed by the mutation and crossover operators. The overhead of this extra representation is minimal, since the keys are integers and only a reference is stored. A list representation would be faster in (indexed) access, but would waste memory for sparse trees. With a mix of unary and binary operators the average nodecount of a tree with depth d is $\frac{2^{d+1}-1  + d}{2}$ = O($2^d$) resulting in savings on the order of $2^d$. 
+We use a hybrid representation of a tree structure. The tree is a set of nodes, where each node holds a list of children nodes. This representation favors recursive traversal algorithms. In addition to this representation, the nodes of tree are stored in a dictionary keyed on the position of a node. This allows for O(1) access needed by the mutation and crossover operators. The overhead of this extra representation is minimal, since the keys are integers and only a reference is stored. A list representation would be faster in (indexed) access, but would waste memory for sparse trees. With a mix of unary and binary operators the average nodecount of a tree with depth d is $\frac{2^{d+1}-1  + d}{2}$ = O($2^d$) resulting in savings on the order of $2^d$, with d the depth of the tree.
 The algorithm has the choice which mode of access to use depending on the usage pattern. As an example, selecting a random node in the tree is O(1), selecting a node with a given depth is equally O(1). Splicing subtrees is equally an O(1) operation.
 
 \paragraph{Base functions}
 The set of base functions is determined by the problem domain. For symbolic regression we use the following set:\\
 +, -, \%, /, max, min, abs, tanh, sin, cos, tan, log, exp, power\\
-A problem with this set is the varying domain of each, why may or may not correspond with the domain of the features. A possible extension is to use orthogonal base functions such as Chebyshev polynomials. In our solution the functions listed correspond with their mathematical equivalent, division by zero is undefined. Other constraints are based on floating point representation (e.g overflow).
+A problem with this set is the varying domain of each, why may or may not correspond with the domain of the features. A possible extension is to use orthogonal base functions such as Chebyshev polynomials. In our solution the functions listed correspond with their mathematical equivalent, e.g. division by zero is undefined. Other constraints are based on floating point representation (e.g overflow).
 
 \paragraph{Constants}
 Constants are fixed values in leaves in the tree. The representation also allows for multiplicative weights for each node, which can be used to optimize the final solution. In contrast to the base functions with a limited set to choose from, constants have the entire floating point range at their disposal. The probability of selecting a 'right' value is nearly non existent, and domain information is lacking for these constants, it depends on the entire subtree holding the constant. We select a constant from a small range and allow the algorithm to recombine these constants later to larger values. This limiting of the search space can lead to the algorithm converging faster to a suboptimal solution.
@@ -121,11 +129,14 @@ This representation allows for fast access in selecting a (sub)set of fittest tr
 \subsection{Parameters}
 In this section we briefly list the main parameters of the algorithm and their effects on convergence, runtime and complexity.
 \subsubsection{Depth}
-% Why is this important ?
-% Bloat
-% Link with constants
-% More is not less
-% Complexity
+The depth of trees van vary between an initial and maximum value. If we know in advance an optimal solution uses 13 features, the tree should have at least 13 leaves in order to use each feature once. This requires a depth of at least 4. In practice the depth will need to be greater due to the use of unary functions, and bloat. Bloat is a known issue in GP %ref
+where the algorithm, unless constrained by limits or an objective function that penalizes depth, will tend to evolve deep trees without gaining much in fitness.
+A similar problem arises with the generation of constants. Suppose we would like to generate the constant 3.14, the probability of generating this by a single random call is extremely small. The algorithm will try to build an expression fitting 3.14. The problem with this is that this process is highly inefficient and uses nodes that could otherwise be used to approximate the expected values. 
+Without a solution for this issue, the user would have to take this into account and increase the depth parameter. 
+From \ref{subsubinvalidexpressions} we know that the initialization process and the mutation operator will become more costly exponentially with the increase in depth.
+A similar argument can be made for the time and space complexity of operating on deeper trees, both increase exponentially.
+
+% complexity
 \subsubsection{Populationsize}
 The population size is directly related to convergence speed. The catch is the quality of the solution, a very small population will lead to premature convergence, the population is lacking in diversity (or information viewed from a different perspective).
 A large population on the other leads to a large increase in runtime, unless the operators only work on a subset of the population. The optimal value is problem specific, but values in the range of 20-50 gives (for this tool) a good balance.
@@ -141,10 +152,6 @@ The user can provide the algorithm with input data, or can specify a range from 
 
 \subsubsection{Domain}
 Knowing the domain of the problem can significantly reduce the time needed to converge to a solution. In our implementation we assume no domain knowledge. While this increases the complexity of obtaining a good solution, it also makes for a more fair evaluation of the algorithm and optimizations used. 
-
-\subsubsection{Operator parameters}
-% Cooling, depth, symmetry
-%
 
 \subsection{Constant Optimization} \label{subconstantoptimization}
 % Constant expressions
