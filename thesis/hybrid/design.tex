@@ -7,11 +7,8 @@ The algorithm accepts an X = n x k matrix of input data, and an Y = 1 x k  vecto
 % UML
 
 \subsubsection{Implementation}
-Our tool is implemented in Python. As with any software tool, the 
-% Python, why ?
-%  +Portable, access to scientific libraries, ubiquitous
-%  -GIL
-%  Speed is an issue
+Our tool is implemented in Python. The language offers portability, access to rich libraries and fast development cycles. The disadvantages are speed and memory usage compared with compiled languages (e.g. C++) or newer scripting languages (e.g Julia). % ref julia.
+Furthermore, Python's usage of a global interpreter lock makes shared memory parallelism not feasible. Distributed programming is possible using MPI.
 
 \subsection{Fitness}
 
@@ -34,7 +31,7 @@ r = \frac{\sum_{i=0}^{n}{(y_i-E[Y])*(y'_i-E[Y'])}}{\sqrt{\sum_{j=0}^{n}{(y_j-E[Y
 This function has a range [0,1] which facilitates comparison across domains and allows combining it with other objective functions.
 The function reflects the aim of the algorithm. We not only want to assign a good (i.e. minimal) fitness value to a model that has a minimal distance, we also want to consider linearity between Y an Y'. 
 
-\subsubsection{Diversity}
+\subsubsection{Diversity}\label{subsubdiversity}
 Diversity, the concept of maintaining semantically different specimens, is an important aspect in metaheuristics. Concepts such as niching and partitioning are often used to promote this behavior, amongst other reasons to prevent premature convergence or even to promote multimodality.
 Our tool uses a simple measure that mimics the more advanced techniques stated above. It should be clear that for any combination of input and output data, there are a huge set of expressions with an identical fitness value. Such expressions can lead to premature convergence, consider a population of 5 where the 3 best samples all have fitness scores of 0.134. Our tool will aim to prevent retaining expressions that have identical fitness values.
 In contrast, in some metaheuristics \cite{DE} allowing replacement of solutions with identical fitness values (not duplication, but replacement), can actually help avoiding local minima. 
@@ -60,7 +57,7 @@ The other option is assigning maximum fitness to an invalid expression. While si
 Our approach is quick domain check for each calculation, avoiding exceptions.
 
 \paragraph{Invalidity probability}
-We define the probability that a randomly generated tree of depth d, with n possible variables, k possible base functions, and j data points as q. With more complex problems d will have to be increased. GP is also susceptible to bloat, increasing d even further. This issue will affect generation of subtrees in mutation. With more datapoints the probability of at least one leading to an invalid evaluation will increase linearly. An increase in d will lead to an exponential increase in the number of nodes in the tree. A node can be either a basefunction or a leaf (parameter or constant). For each additional node the probability q increases. We can conclude that q, while irrelevant for small problems and low depths, becomes a major constraint for larger problem statements. A performant approach of this issue is therefore needed.
+We define the probability that a randomly generated tree of depth d, with n possible features, k possible base functions, and j data points as q. With more complex problems d will have to be increased. GP is also susceptible to bloat, increasing d even further. This issue will affect generation of subtrees in mutation. With more datapoints the probability of at least one leading to an invalid evaluation will increase linearly. An increase in d will lead to an exponential increase in the number of nodes in the tree. A node can be either a basefunction or a leaf (parameter or constant). For each additional node the probability q increases. We can conclude that q, while irrelevant for small problems and depths, becomes a major constraint for larger problem statements. 
 
 \paragraph{Bottom up versus top down}
 There are two methods to generate a tree based expression : bottom up and top down. The top down approach is conceptually simpler, we select a random node and add randomly selected child nodes until the depth constraint in satisfied. The problem with this approach is that the expression can only be evaluated at completion, early detection of an invalid subtree is impossible. 
@@ -94,18 +91,35 @@ From these four expressions the two with minimal fitness survive to the next gen
 The algorithm holds an archive that functions as memory for best solutions obtained by seeding, from other processes, or the best expressions at the end of a phase.
 At the end of a phase we store the j best expressions out of the population. J is a parameter ranging from 1 to the population size n. With j == n we risk premature convergence, with j == 1 the risks exists that we lose good expressions from phases which will have to be rediscovered. 
 While there are numerous archiving strategies described in literature, we use a simple elitist approach. This means that there is no guarantee that the best j samples of phase i are retained, if they have fitness values lower than those present in the archive and the archive has no more empty slots, they will be ignored.
-This leads us to the size of the archive. While no exact optimal value for this exist, in order to function as memory between phases it should be similar in size to the amount of phases. The j parameter will influence this choice as well.
+This leads us to the size of the archive. While no exact optimal value for this exists, in order to function as memory between phases it should be similar in size to the amount of phases. The j parameter will influence this choice as well.
 
 \subsection{Representation and data structures}
 \subsubsection{Expression}
+We use a tree representation for an arithmetic expression, where each internal node represent a base function (unary or binary), and each leaf either a feature or a constant.
+
 \paragraph{Tree representation}
+We use a hybrid representation of a tree structure. The tree is a set of nodes, where each node holds a list of children nodes. This representation favors recursive traversal algorithms. In addition to this representation, the nodes of tree are stored in a dictionary keyed on the position of a node. This allows for O(1) access needed by the mutation and crossover operators. The overhead of this extra representation is minimal, since the keys are integers and only a reference is stored. A list representation would be faster in (indexed) access, but would waste memory for sparse trees. With a mix of unary and binary operators the average nodecount of a tree with depth d is $\frac{2^{d+1}-1  + d}{2}$ = O($2^d$) resulting in savings on the order of $2^d$. 
+The algorithm has the choice which mode of access to use depending on the usage pattern. As an example, selecting a random node in the tree is O(1), selecting a node with a given depth is equally O(1). Splicing subtrees is equally an O(1) operation.
+
 \paragraph{Base functions}
+The set of base functions is determined by the problem domain. For symbolic regression we use the following set:\\
++, -, \%, /, max, min, abs, tanh, sin, cos, tan, log, exp, power\\
+A problem with this set is the varying domain of each, why may or may not correspond with the domain of the features. A possible extension is to use orthogonal base functions such as Chebyshev polynomials. In our solution the functions listed correspond with their mathematical equivalent, division by zero is undefined. Other constraints are based on floating point representation (e.g overflow).
+
 \paragraph{Constants}
+Constants are fixed values in leaves in the tree. The representation also allows for multiplicative weights for each node, which can be used to optimize the final solution. In contrast to the base functions with a limited set to choose from, constants have the entire floating point range at their disposal. The probability of selecting a 'right' value is nearly non existent, and domain information is lacking for these constants, it depends on the entire subtree holding the constant. We select a constant from a small range and allow the algorithm to recombine these constants later to larger values. This limiting of the search space can lead to the algorithm converging faster to a suboptimal solution.
+% TODO reference main explanation of const optimization problem
+The constants are reference objects in the tree, and so can be accessed and modified in place by an optimizer.
+
 \paragraph{Features}
+Features are represented as an object holding a reference to a set of input values, and always occur as leaves. The choice for a random leaf is evenly distributed between constants and features.
+
 \subsubsection{Population}
+The population of trees is kept in a sorted dictionary, where the key is the fitness value and the value is a reference to the tree representing the expression. 
+This representation allows for fast access in selecting a (sub)set of fittest trees. It also allows for an O(1) check if we already have an equivalent solution, a tree with a fitness score which we already have in the population. This allows our diversity approach mentioned in \ref{subsubdiversity}.
 
 \subsection{Parameters}
-% Parameters and their effects, if needed refer to performance section
+In this section we briefly list the main parameters of the algorithm and their effects on convergence, runtime and complexity.
 \subsubsection{Depth}
 % Why is this important ?
 % Bloat
@@ -113,45 +127,49 @@ This leads us to the size of the archive. While no exact optimal value for this 
 % More is not less
 % Complexity
 \subsubsection{Populationsize}
-% How large is large ?
-% Exploration vs exploitation
-\subsubsection{Phases}
-% Phases needed to prevent early convergence.
-% Can lead to overfitting.
-\subsubsection{Generations}
-% Too few hinders convergence, to risks overfitting (mitigated by phases)
+The population size is directly related to convergence speed. The catch is the quality of the solution, a very small population will lead to premature convergence, the population is lacking in diversity (or information viewed from a different perspective).
+A large population on the other leads to a large increase in runtime, unless the operators only work on a subset of the population. The optimal value is problem specific, but values in the range of 20-50 gives (for this tool) a good balance.
+
+\subsubsection{Phases and generations}
+The execution of the algorithms comprises of g generations and r phases, resulting in a maximum of g x r iterations. 
+For both parameters a too small value will hinder convergence, while a high value can lead to overfitting. The optimal value is domain specific and dependent on the iterations required to approximate the expected data. This is by virtue of the problem statement unknown. There is a subtle difference in both. Each phase a reseed of the algorithm is done using the archive. This archive holds the best results from previous phases, external seeds and in a distributed setting the best best solutions from other processes.
+The remainder of the population is initialized with random tree. These trees introduce new information into the optimization process, and while expensive and with a low probability of improving fitness, nonetheless will help avoid premature convergence. 
+If the archive size is less than the population size, new trees will always be introduced. The rate at which the archive fills is dependent on the number of phases and a parameter which determines how many trees are archived. In a distributed setting this process accelerates using the input of other processes. If the archive is full after i phases, and the archive size is equal to the population, further phases will no longer have the benefit of newly generated trees. This does not prevent convergence, but could reduce the convergence rate in some scenarios.
 
 \subsubsection{Samples}
-% Samples : Ratio train v test
-% Representation, overfitting.
+The user can provide the algorithm with input data, or can specify a range from which to sample the input data. In addition, the ratio between training and testing data can be adjusted. Care should be taken in tuning this value. A low ratio will increase the probability that evolved solutions are invalid on the test data, while a high ratio will lead to overfitting.
 
 \subsubsection{Domain}
-% Unknown, how does it influence the algorithm
-% Choice of leaving out domain knowledge
+Knowing the domain of the problem can significantly reduce the time needed to converge to a solution. In our implementation we assume no domain knowledge. While this increases the complexity of obtaining a good solution, it also makes for a more fair evaluation of the algorithm and optimizations used. 
 
 \subsubsection{Operator parameters}
 % Cooling, depth, symmetry
 %
 
-\subsection{Constant Optimization}
+\subsection{Constant Optimization} \label{subconstantoptimization}
 % Constant expressions
 \subsubsection{Initialization revisited}
 % Prevent ctexprs
 \subsubsection{Folding}
 % Folding
+% Edge case : max(x, cte) with x < cte for all i is not detected, too expensive and not possible, do not have all data
 \subsubsection{ABC}
 \subsubsection{PSO}
 \subsubsection{DE}
 
-\subsection{Features}
-\subsubsection{Incremental support}
-% DOE, feeding the snake.
-\subsubsection{Statistics}
-% Insights, debugging, triggers
-\subsubsection{Visualization}
-% Trees
-%
+\subsection{Incremental support}
+Our tool support incremental operation. The user can provide seeds, expressions that are known or assumed to be good initial approximations. The algorithm writes out the best solutions obtained in an identical format. By combining this the user can create a Design Of Experiment (DOE) setup using the algorithm. As a use case, suppose the user wants to apply symbolic regression on the output of an expensive simulation. The simulator has k parameters, each with a different domain and j datapoints. The user wants insights into the correlation of the parameters. 
+A naive approach would be to generate output data for a full factorial experiment, and feed this into the CSRM tool. For both the simulator and the SR tool the cost of this approach would be prohibitive. It is likely that some parameters are even irrelevant, leading to unnecessary computation. Instead we can opt for a combined DOE approach. We start with a subset of parameters k' $<$ k and datapoints j' $<$ k. The simulation results Q of this subset are then given to the CSRM algorithm. It generates a solution, optimized for this subset of the problem. 
+The user then adds more parameters, k' $<$ k'' $<$ k and/or datapoints j' $<$ j'' $<$ j, runs the simulator again. The resulting output is given the CSRM tool, with Q as seed. This seed is used as memory of the previous run on the smaller input set. Unless there is no correlation between the incrementing datasets the CSRM tool can use the knowledge gained from the previous run to obtain faster convergence for this new dataset. In addition, by inspecting Q the user can already analyze a (partial) result regarding the initial parameter set. Suppose k = 5, and only 3 parameters are used in Q. Then the user can exclude the missing two parameters from the remainder of the experiment, as these are unlikely to contribute to the output.
+By chaining the simulator and CSRM tool together in such a way, an efficient DOE approach can potentially save both simulation and regression time, or result in increased quality of solutions. We will investigate this approach in our use case in Section 4. % ref
+% add diagram
+
+\subsection{Statistics and visualization}
+Stochastic algorithms are notoriously hard to debug. By virtue of the problem statement we do not know whether the rendered solution is what is expected. The size of the search space makes detecting edge cases impossible. In addition the algorithm functions as a black box, where output is presented to the user without a clear trace indicating how or why this output was obtained. Both for developer and practitioner insight into the algorithms inner workings is vital. 
+Our tool provides a wealth of runtime statistics ranging from fitness values per expression for each point in the execution, convergence behavior over time, depth and complexity of the expressions, cost of evaluations, effectiveness of operators, correlation between training en test fitness values and more. These statistics can be saved to disk for later analysis, or displayed in plots in a browser. Using this information the user can tune the parameters of the algorithm (e.g. overfitting due to an excessively large number of phases), the developer can look at how effective new modifications are (e.g. new mutation operator) and so on.
+It is even possible to trace the entire run of the algorithm step by step by saving the expressions in tree form, displayed in an SVG image rendered by Graphviz \cite{graphviz}.
 
 \subsection{Conclusion}
+In this section we have covered in detail the design of the CSRM tool, highlighting the choices made. 
 % Full featured tool offers insight, variation, testing.
 % 
