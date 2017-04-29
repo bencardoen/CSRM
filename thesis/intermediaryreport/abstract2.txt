@@ -1,0 +1,33 @@
+abstract paper 2:
+
+Convergence in Symbolic Regression using metaheuristics.
+~ What we have
+~ What we need
+~ How this work goes from want to need
+
+~ Convergence is still an open issue
+    ~ why
+        ~ Hard problem, infinite search space
+        ~ algorithms themselves have near intractable configuration space
+    ~ measures : predictive capability, complexity, cost of operators.
+~ Parameter space is huge
+~ Discrete v Continuous problem
+    ~ approaches
+        ~ our approach : comparison of effect
+    ~ constant folding (new)
+    ~ measure gain in structure savings and enables faster optimization at low cost
+~ Fitness function
+~ Operators
+    ~ effectiveness
+    ~ generating valid samples (new)
+    ~ cost
+    ~ variable depth, fixed depth, complexity, generating valid samples
+    ~ cooling schedule
+    ~ selection strategy
+
+Symbolic regression (SR) fits symbolic expression to a dataset of expected values.
+Amongst its advantages over other techniques are the ability for a practicioner to interpret the resulting expression, determine important features by their usage in the expression, and an insight into the behavior of the resulting model (e.g. continuity, derivation, extrema).
+SR combines a discrete combinatoric problem (combining base functions) with a continuous optimization problem (selecting and mutating constants).
+One of the main algorithms used in SR is genetic programming. The convergence characteristics of SR using GP are still an open issue.
+GP does not lend itself well to the last aspect. This paper will study convergence of a GP-SR implementation on selected use cases known for bad convergence.
+We introduce modifications to the classical mutation and crossover operators and observe their effects. We revisit the constant optimization problem by implementing an optimization in the main algorithm and combining it with metaheuristics.

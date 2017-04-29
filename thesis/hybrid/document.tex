@@ -1,0 +1,58 @@
+\documentclass[]{article}
+
+\usepackage{times}			
+\usepackage{url}			
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\usepackage[pdftex]{hyperref}
+\usepackage[numbers]{natbib}
+\usepackage{amsmath}
+
+%Tikz flowchart
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, text width=3cm, draw=black]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
+
+\title{Convergence of symbolic regression using metaheuristics
+    }
+\author{
+    %	\begin{tabular}{cccc}
+    Ben Cardoen  \\
+    ben.cardoen@student.uantwerpen.be
+    %		\multicolumn{3}{c}{\{firstname.lastname\}%@student.uantwerpen.be}
+    %	\end{tabular}
+}
+\begin{document}
+    
+    \maketitle
+    \section{Abstract}
+    \input{abstract.tex}
+    \section{Introduction}
+    \input{introduction.tex}
+    \section{Design}
+    \input{design.tex}
+    \section{Experiments}
+    \input{experiments.tex}
+    \section{Related Work}
+    \input{relatedwork.tex}
+    \section{Conclusion}
+    \input{conclusion.tex}
+    \section{Future work}
+    \input{future.tex}
+%    \section{Research Proposal}
+%    \input{researchproposal.tex}
+%    \section{State of the Art}
+%    \input{stateofart.tex}
+%    \section{Objectives}
+%    \input{objectives.tex}
+%    \section{Methodology}
+%    \input{methodology.tex}
+%    \section{Workplan}
+%    \input{workplan.tex}
+    \bibliographystyle{acm}
+    \bibliography{papers}
+    
+\end{document}
