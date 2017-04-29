@@ -1,0 +1,157 @@
+In this section we will detail the design of our tool, the algorithm and its parameters. 
+\subsection{Algorithm}
+\subsubsection{Input and output}
+The algorithm accepts an X = n x k matrix of input data, and an Y = 1 x k  vector of expected data. It will evolve expressions that result, when evaluated on X, in an 1 x k vector Y' that approximates Y. N is the number of features, or parameters, the expression can use. K is the number of datapoint per feature. The algorithm makes no assumptions on the domain or range of the expressions or data set. While domain specific knowledge can be of great value, in real world situations such data is not always known.
+% High level overview
+% Flow Chart
+% UML
+
+\subsubsection{Implementation}
+Our tool is implemented in Python. As with any software tool, the 
+% Python, why ?
+%  +Portable, access to scientific libraries, ubiquitous
+%  -GIL
+%  Speed is an issue
+
+\subsection{Fitness}
+
+\subsubsection{Distance function}
+The goal of the algorithm is to find f' such that
+\[Y = f(X)\]
+\[Y' = f'(X)\]
+\[dist(Y, Y') = e\]
+e is minimal.\\
+Not all distance functions are equally well suited for this purpose. A simple root mean squared error (RMSE) function has the issue of scale, the range of this function is [0, +$\infty$), which makes comparison problematic, especially if we want to combine it with other objective functions. A simple linear weighted sum requires that all terms use the same scale. 
+Normalization of RMSE is an option, however there is no single recommended approach to obtain this NRMSE. \\
+In this work we use a distance function based on the Pearson Correlation Coefficient. Specifically, we define 
+\[
+dist_p(Y, Y') = 1 - \vert r \vert
+\]
+with r
+\[
+r = \frac{\sum_{i=0}^{n}{(y_i-E[Y])*(y'_i-E[Y'])}}{\sqrt{\sum_{j=0}^{n}{(y_j-E[Y])^2}*\sum_{k=0}^{n}{(y'_k-E[Y'])^2}}}
+\]
+This function has a range [0,1] which facilitates comparison across domains and allows combining it with other objective functions.
+The function reflects the aim of the algorithm. We not only want to assign a good (i.e. minimal) fitness value to a model that has a minimal distance, we also want to consider linearity between Y an Y'. 
+
+\subsubsection{Diversity}
+Diversity, the concept of maintaining semantically different specimens, is an important aspect in metaheuristics. Concepts such as niching and partitioning are often used to promote this behavior, amongst other reasons to prevent premature convergence or even to promote multimodality.
+Our tool uses a simple measure that mimics the more advanced techniques stated above. It should be clear that for any combination of input and output data, there are a huge set of expressions with an identical fitness value. Such expressions can lead to premature convergence, consider a population of 5 where the 3 best samples all have fitness scores of 0.134. Our tool will aim to prevent retaining expressions that have identical fitness values.
+In contrast, in some metaheuristics \cite{DE} allowing replacement of solutions with identical fitness values (not duplication, but replacement), can actually help avoiding local minima. 
+
+\subsubsection{Predictive behavior}
+The algorithm evaluates specimens based on training data $X_t$, with $X_t$ a random sample from input data X of size j = r * k. R is the sampling ratio, the ratio between training and test data. K is the total amount of datapoints available per feature. 
+After completion of the algorithm the population is ordered based on minimized fitness values calculated on the training data. 
+In real world applications practitioners are also interested in the predictive qualities of the generates expression. In other words, how well do the expressions score on unknown data. In the final evaluation we score each expression on the full data to obtain this measure. 
+While this gives us some information on how good an expression is on the full data set, what we would like to know is how the algorithm's progress is related to the value. For example, if we add 10 more generations, or increase the population by a factor 1.5, do we gain or lose in predictive quality of the expressions? To define this we use a correlation between the fitness values using the training data and those of the full data. 
+This provides an immediate link between the two sets of values. 
+Finally, we calculate a correlation trend between the training fitness values at the end of each phase, and the final fitness values calculated on the full data. This gives us good measure of how the algorithm will converge on a good solution on the full data. 
+
+\subsubsection{Convergence limit}
+As a stopcondition our tool uses a preset number of iterations. The user specifies the number of generations (g) and phases (r), and the algorithm will at most execute g x r iterations. Convergence stalling is implemented by keeping track of the number of successful operations (mutation or crossover). If this value crosses a threshold value convergence has stalled and the algorithm is terminated.
+
+
+\subsection{Initialization}
+Initialization is done using the 'full' method \cite{GP}. The algorithm has a parameter initial depth, each new expression in the population is created using that depth.
+ 
+\subsubsection{Invalid expressions}
+Generating a random expression is done by generating random subtrees and merging them. A critical point to observe is that randomly generating expressions can be invalid for their domain. The ubiquitous example here is division by zero. Several approaches to solve this problem exist. One can define 'safe' variants of the functions, in case of division by zero, one can return a predefined value that will still result in a valid tree. The downside of this approach is that the division function's semantics is altered, a practitioner, given a resulting expression, would have to know that some functions are no longer corresponding entirely to their mathematical equivalents. 
+The other option is assigning maximum fitness to an invalid expression. While simple, this approach needs a careful implementation. From a practical standpoint wrapping functions in exception handling code will quickly deteriorate performance. 
+Our approach is quick domain check for each calculation, avoiding exceptions.
+
+\paragraph{Invalidity probability}
+We define the probability that a randomly generated tree of depth d, with n possible variables, k possible base functions, and j data points as q. With more complex problems d will have to be increased. GP is also susceptible to bloat, increasing d even further. This issue will affect generation of subtrees in mutation. With more datapoints the probability of at least one leading to an invalid evaluation will increase linearly. An increase in d will lead to an exponential increase in the number of nodes in the tree. A node can be either a basefunction or a leaf (parameter or constant). For each additional node the probability q increases. We can conclude that q, while irrelevant for small problems and low depths, becomes a major constraint for larger problem statements. A performant approach of this issue is therefore needed.
+
+\paragraph{Bottom up versus top down}
+There are two methods to generate a tree based expression : bottom up and top down. The top down approach is conceptually simpler, we select a random node and add randomly selected child nodes until the depth constraint in satisfied. The problem with this approach is that the expression can only be evaluated at completion, early detection of an invalid subtree is impossible. 
+In contrast a bottom up construction, where we generate small subtrees, evaluate them and if and only if valid merge them into a larger tree, allows for early detection of invalid expressions. A downside of this approach is the repeated evaluation of the subtrees. This can be mitigated by caching the result of the subtree.
+
+\paragraph{Disallowing invalid expressions in initialization}
+We can generate random expressions and let the evolution stage of the algorithm filter them out based on their fitness value, or we can enforce the constraint that no invalid expressions are introduced. The last option is computationally more expensive at first sight, since the algorithm is capable by definition of eliminating unfit expressions from the population. 
+This can lead to unwanted behavior in the algorithm itself. For high q values we can have a significant part of the population that is at any one time invalid. This can lead to premature convergence, similar to a scenario where the population is artificially small or dominated by a set of highly fit individuals. Another observation to make is the algorithm will waste operations (mutation, crossover) on expressions that are improbable to contribute to a good solution. 
+While more expensive computationally, we therefore prohibit generation of invalid expressions in the initialization. 
+
+
+\subsection{Evolution}
+% Recap
+
+\subsubsection{Mutation}
+% Operate on ?
+% Which mutation operators do we support ?
+% Refer for cooling to experiments section
+
+\subsubsection{Crossover}
+% Operate on ?
+% Which crossover operators do we support ?
+%
+
+\subsection{Selection}
+After evolution a decision has to be made on which expressions will be retained in the population. In our tool the population is fixed, so a replacement is in order. We use an elitist approach. If a an expression has a lower (better) fitness value after mutation, it is replaced. 
+In crossover we combine two expressions r, and t, resulting in two offspring s, u. 
+From these four expressions the two with minimal fitness survive to the next generation.
+
+\subsection{Archiving}
+The algorithm holds an archive that functions as memory for best solutions obtained by seeding, from other processes, or the best expressions at the end of a phase.
+At the end of a phase we store the j best expressions out of the population. J is a parameter ranging from 1 to the population size n. With j == n we risk premature convergence, with j == 1 the risks exists that we lose good expressions from phases which will have to be rediscovered. 
+While there are numerous archiving strategies described in literature, we use a simple elitist approach. This means that there is no guarantee that the best j samples of phase i are retained, if they have fitness values lower than those present in the archive and the archive has no more empty slots, they will be ignored.
+This leads us to the size of the archive. While no exact optimal value for this exist, in order to function as memory between phases it should be similar in size to the amount of phases. The j parameter will influence this choice as well.
+
+\subsection{Representation and data structures}
+\subsubsection{Expression}
+\paragraph{Tree representation}
+\paragraph{Base functions}
+\paragraph{Constants}
+\paragraph{Features}
+\subsubsection{Population}
+
+\subsection{Parameters}
+% Parameters and their effects, if needed refer to performance section
+\subsubsection{Depth}
+% Why is this important ?
+% Bloat
+% Link with constants
+% More is not less
+% Complexity
+\subsubsection{Populationsize}
+% How large is large ?
+% Exploration vs exploitation
+\subsubsection{Phases}
+% Phases needed to prevent early convergence.
+% Can lead to overfitting.
+\subsubsection{Generations}
+% Too few hinders convergence, to risks overfitting (mitigated by phases)
+
+\subsubsection{Samples}
+% Samples : Ratio train v test
+% Representation, overfitting.
+
+\subsubsection{Domain}
+% Unknown, how does it influence the algorithm
+% Choice of leaving out domain knowledge
+
+\subsubsection{Operator parameters}
+% Cooling, depth, symmetry
+%
+
+\subsection{Constant Optimization}
+% Constant expressions
+\subsubsection{Initialization revisited}
+% Prevent ctexprs
+\subsubsection{Folding}
+% Folding
+\subsubsection{ABC}
+\subsubsection{PSO}
+\subsubsection{DE}
+
+\subsection{Features}
+\subsubsection{Incremental support}
+% DOE, feeding the snake.
+\subsubsection{Statistics}
+% Insights, debugging, triggers
+\subsubsection{Visualization}
+% Trees
+%
+
+\subsection{Conclusion}
+% Full featured tool offers insight, variation, testing.
+% 
