@@ -1,0 +1,53 @@
+\subsection{Constant Optimization} \label{subconstantoptimization}
+Selecting base functions is a combinatoric, discrete problem. Selecting the right constants to use is a continuous problem, that GP tries to solve with a combinatoric approach. There are several aspects to this issue, we will go over each individually and show our approach.
+\subsubsection{Initialization revisited}
+During initialization it is possible that a tree represents a constant expression. Such an expression is only a valid approximation if no feature has an influence on Y, which is an extremely unlikely edge case. A constant expression is of no use for the algorithm, but without measures to prevent or remove these they will still be formed. Ideally such an expression will have a high (worse) fitness value than non constant expression, and will be eventually filtered out. Since detecting a constant expression is feasible in worst case O(n) with n the number of nodes in the tree, a more efficient approach is preventing constant expressions from being generated. 
+\paragraph{Constant expression detection}
+An expression is a constant expression if all its children are constant expressions. As a base case, a leaf node is a constant expression if it is not a feature. This problem statement allows us to define a recursive algorithm to detect constant expressions. It should be noted that its complexity is O(n) only in the worst case, when the tree is a constant expression. Upon detecting a non constant subtree, the algorithm returns early without a full traversal. 
+\paragraph{Preventing constant expressions}
+Using the checking procedure in the initialization, a tree marked as a constant expression is not allowed in the initialization procedure.
+It is still possible to create constant expressions by applying mutation and crossover. If the left subtree of a node is a constant expression, and the right is not constant, but this right is replaced by either mutation or crossover with a constant expression then the node becomes a constant expression. The mutation operator will not generate constant subtrees, so this leaves only crossover. Our tool does not prevent constant expressions from forming in this way, the evaluation following crossover will remove the constant expressions immediately.
+\subsubsection{Folding}
+\paragraph{Constant subtree problem}
+A tree can contain subtrees that represent constant expressions. This is an immediate effect of the GP algorithm trying to evolve the correct constant. This can lead to large subtrees that can be represented by a single node. Nodes used in such a constant subtree are not available for base functions. They waste memory and evaluation cost, without their presence the tree could become a fitter instance. We will evaluate these effects in the experiments section.
+\paragraph{Constant subtree folding}
+It is possible to use a depth sensitive objective function to try to mitigate this effect, but a more direct approach is replacing the subtrees.
+Using the previous constant expression detection technique we can collect all constant subtrees from a tree. We evaluate each subtree, and replace it with the constant value it represents. This leads to a saving nodes, possibly in depth. These savings can have an effect on the convergence as well. Mutation and crossover will no longer operate on constant subtrees, and the iterations and place in the tree that becomes available can be used to improve the tree.
+Constant folding requires an O(n) detection check, since the entire tree needs to be traversed. The folding operation itself is at worst O(n), if the entire tree is constant.
+\paragraph{Edge case}
+There are subtle edge cases that can't be detected using the above method. Consider the tree representing the expression
+\[
+f(x) = \max(x, 4 + \sin(0.3)) 
+\]
+The subexpression 4 + sin(0.3) is detected and folded into the constant 4.26. 
+We should not stop there, since f can still be a constant expression if $\forall i :  x_i < 4.26$. To verify this we need to evaluate f on all i datapoints. In contrast, the constant subtree detection code needs only 1 evaluation. Even if we should evaluate f for all i, this will not guarantee us that f is indeed a constant expression. All this check then proves is that for all i in the training data, f is constant. The testing data holds new values, for which f may or may not be constant. We conclude that this edge case cannot be prevented from occurring.
+\paragraph{Conclusion}
+Constant detection and folding mitigate some of the side effects of the constant optimization problem, they do not lead to a more efficient finding of the 'right' constant values. For this we need a continuous optimizer, algorithm designed specifically to optimize real valued problems.
+\subsection{Optimizers}
+\paragraph{Hybridizing GP}
+Using a real valued optimizer in combination with GP is a known solution \cite{GEDE, GPConst}.
+Which algorithm to combine is a difficult question. To our knowledge there is no comparison made between optimizaton algorithms to find out which is a better fit to combine with GP. 
+\paragraph{Problem statement}
+Given a tree with k constant leaves (since all constant subtrees are folded), we would like to find the most optimal values for those constants resulting in a lower (better) fitness. 
+\paragraph{Initialization}
+In most optimization problems the initial solution is not known, only the problem domain and an objective function. The problem we face here does have an initial solution, namely that generated by GP. Instead of choosing random points in the search space, we therefore opt by perturbing this initial solution. An immediate problem here is that the optimizer may simply converge on the initial solution. This risk can be high, given that GP already has evolved it as a suboptimal solution. 
+The problem faced by the population initialization step \ref{subsubinvalidexpressions} reappears here. We could pick random values in the search space, but these are likely to generate invalid trees. We need a balance between exploration and exploitation here. 
+\paragraph{Domain}
+Each tree instance has a completely different domain for each constant. We cannot therefore guide the optimizer with domain specific knowledge. This also reflects in the choice of parameters for the optimizer, which will have to be suboptimal for specific problem instances as we want them to work on the largest set of problems.
+\paragraph{Comparison and configuration}
+In order to keep the comparison between the algorithms fair they are each configured as similar as is possible. Since they are all population based, and given a maximum number of iterations, all three share these same parameter values. Each application of the algorithm has a significant cost in comparison with the main GP algorithm. In a single iteration with population p, the GP algorithm is likely to perform 2n evaluations (mutation and crossover). If we give the optimizer a population of m and q iterations, it will execute at most in the order of  m x q evaluations. Based on \cite{PSO} we use a default population of 50, and 50 iterations. This means the cost of the optimizer will quickly dominate that of the main GP algorithm, depending on when and on what we apply it.
+\subsubsection{ABC}
+Artificial Bee Colony \citep{ABC} is a relative new nature inspired optimization algorithm. It is not limited to continuous optimization, and has even been used for symbolic regression itself \cite{ABCSR}. One of its key advantages over other algorithms is a lower parameter count. Optimal values for an optimization algorithm have a large impact on its convergence behavior, so much so that other optimizers can be required to find the parameters of an optimizer. With a small parameter set finding optimal values becomes easier. Finding optimal values for these parameters is quite often related to the problem domain, and as we have seen each instance here will have a new domain. ABC is good at exploration (thanks to the scouting phase) though sometimes lacking in exploitation. To resolve this ABC can be combined with more exploitative algorithms \citep{ABCPSO}.
+\paragraph{Algorithm}
+ABC is a population based algorithm, using 3 distinct phases per iteration. We will refrain from using the nature analogy in describing the algorithm as it is quite often inappropriate. The algorithm maintains a set of potential solutions and a population of particles. Each particle is either employed, onlooker, or scout. An employed particle perturbs a known solution, and if an improvement in fitness is obtained replaces the old solution. If this fails a preset number of iterations, the solution is discarded and a new one scouted. Scouting in this context is generating a new potential solution. After the employed phase the onlooking particles decide, based on a fitness weighted probability, which solutions shoud be further optimized. In contrast to the employed particles they swap out solutions each iterations, whereas an employed particle is linked to a single solution. Finally exhausted solutions are replaced by scouted solutions.
+\paragraph{Configuration}
+We use a solution set of 50, a population of 25 employed particles, 25 onlookers and a single scout. These parameters are suggested in \citep{ABC}. A higher scout value is not warranted, since we already have a good starting point. More exploration would also result in the initialization problem dominating the runtime cost of the optimizer. 
+\paragraph{Psuedo code}
+% TODO
+\subsubsection{PSO}
+Particle Swarm Optimization \cite{PSO} is one of the oldest population based metaheuristics. 
+\paragraph{Algorithm}
+Each particle is assigned a n dimensional position in the search space, in our application a perturbed instance of the constant values we wish to optimize. A particle's position is updated using its velocity. This last is influenced by information from the global best and the local best. The concept of inertia is used to prevent velocity explosion \cite{PSOExplosion}.
+\paragraph{Configuration}
+% Link to PSO tutorial
+\subsubsection{DE}

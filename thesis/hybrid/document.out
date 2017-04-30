@@ -26,16 +26,18 @@
 \BOOKMARK [3][-]{subsubsection.3.9.3}{Phases and generations}{subsection.3.9}% 26
 \BOOKMARK [3][-]{subsubsection.3.9.4}{Samples}{subsection.3.9}% 27
 \BOOKMARK [3][-]{subsubsection.3.9.5}{Domain}{subsection.3.9}% 28
-\BOOKMARK [2][-]{subsection.3.10}{Constant Optimization}{section.3}% 29
-\BOOKMARK [3][-]{subsubsection.3.10.1}{Initialization revisited}{subsection.3.10}% 30
-\BOOKMARK [3][-]{subsubsection.3.10.2}{Folding}{subsection.3.10}% 31
-\BOOKMARK [3][-]{subsubsection.3.10.3}{ABC}{subsection.3.10}% 32
-\BOOKMARK [3][-]{subsubsection.3.10.4}{PSO}{subsection.3.10}% 33
-\BOOKMARK [3][-]{subsubsection.3.10.5}{DE}{subsection.3.10}% 34
-\BOOKMARK [2][-]{subsection.3.11}{Incremental support}{section.3}% 35
-\BOOKMARK [2][-]{subsection.3.12}{Statistics and visualization}{section.3}% 36
-\BOOKMARK [2][-]{subsection.3.13}{Conclusion}{section.3}% 37
-\BOOKMARK [1][-]{section.4}{Experiments}{}% 38
-\BOOKMARK [1][-]{section.5}{Related Work}{}% 39
-\BOOKMARK [1][-]{section.6}{Conclusion}{}% 40
-\BOOKMARK [1][-]{section.7}{Future work}{}% 41
+\BOOKMARK [2][-]{subsection.3.10}{Incremental support}{section.3}% 29
+\BOOKMARK [2][-]{subsection.3.11}{Statistics and visualization}{section.3}% 30
+\BOOKMARK [2][-]{subsection.3.12}{Conclusion}{section.3}% 31
+\BOOKMARK [1][-]{section.4}{Constant optimization}{}% 32
+\BOOKMARK [2][-]{subsection.4.1}{Constant Optimization}{section.4}% 33
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Initialization revisited}{subsection.4.1}% 34
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Folding}{subsection.4.1}% 35
+\BOOKMARK [2][-]{subsection.4.2}{Optimizers}{section.4}% 36
+\BOOKMARK [3][-]{subsubsection.4.2.1}{ABC}{subsection.4.2}% 37
+\BOOKMARK [3][-]{subsubsection.4.2.2}{PSO}{subsection.4.2}% 38
+\BOOKMARK [3][-]{subsubsection.4.2.3}{DE}{subsection.4.2}% 39
+\BOOKMARK [1][-]{section.5}{Experiments}{}% 40
+\BOOKMARK [1][-]{section.6}{Related Work}{}% 41
+\BOOKMARK [1][-]{section.7}{Conclusion}{}% 42
+\BOOKMARK [1][-]{section.8}{Future work}{}% 43

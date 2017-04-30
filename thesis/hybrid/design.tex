@@ -1,7 +1,7 @@
 In this section we will detail the design of our tool, the algorithm and its parameters. 
 \subsection{Algorithm}
 \subsubsection{Input and output}
-The algorithm accepts an X = n x k matrix of input data, and an Y = 1 x k  vector of expected data. It will evolve expressions that result, when evaluated on X, in an 1 x k vector Y' that approximates Y. N is the number of features, or parameters, the expression can use. K is the number of datapoint per feature. The algorithm makes no assumptions on the domain or range of the expressions or data set. While domain specific knowledge can be of great value, in real world situations such data is not always known.
+The algorithm accepts an X = n x k matrix of input data, and an Y = 1 x k  vector of expected data. It will evolve expressions that result, when evaluated on X, in an 1 x k vector Y' that approximates Y. N is the number of features, or parameters, the expression can use. K is the number of datapoints per feature. The algorithm makes no assumptions on the domain or range of the expressions or data set. While domain specific knowledge can be of great value, in real world situations such data is not always known.
 % High level overview
 % Flow Chart
 % UML
@@ -57,7 +57,7 @@ The other option is assigning maximum fitness to an invalid expression. While si
 Our approach is quick domain check for each calculation, avoiding exceptions.
 
 \paragraph{Invalidity probability}
-We define the probability that a randomly generated tree of depth d, with n possible features, k possible base functions, and j data points as q. With more complex problems d will have to be increased. GP is also susceptible to bloat, increasing d even further. This issue will affect generation of subtrees in mutation. With more datapoints the probability of at least one leading to an invalid evaluation will increase linearly. An increase in d will lead to an exponential increase in the number of nodes in the tree. A node can be either a basefunction or a leaf (parameter or constant). For each additional node the probability q increases. We can conclude that q, while irrelevant for small problems and depths, becomes a major constraint for larger problem statements. 
+We define the probability that a randomly generated tree of depth d, with n possible features, k possible base functions, and j data points as q. With more complex problems d will have to be increased. GP is also susceptible to bloat \cite{GPBloat}, increasing d even further. This issue will affect generation of subtrees in mutation. With more datapoints the probability of at least one leading to an invalid evaluation will increase linearly. An increase in d will lead to an exponential increase in the number of nodes in the tree. A node can be either a basefunction or a leaf (parameter or constant). For each additional node the probability q increases. We can conclude that q, while irrelevant for small problems and depths, becomes a major constraint for larger problem statements. 
 
 \paragraph{Bottom up versus top down}
 There are two methods to generate a tree based expression : bottom up and top down. The top down approach is conceptually simpler, we select a random node and add randomly selected child nodes until the depth constraint in satisfied. The problem with this approach is that the expression can only be evaluated at completion, early detection of an invalid subtree is impossible. 
@@ -152,17 +152,6 @@ The user can provide the algorithm with input data, or can specify a range from 
 
 \subsubsection{Domain}
 Knowing the domain of the problem can significantly reduce the time needed to converge to a solution. In our implementation we assume no domain knowledge. While this increases the complexity of obtaining a good solution, it also makes for a more fair evaluation of the algorithm and optimizations used. 
-
-\subsection{Constant Optimization} \label{subconstantoptimization}
-% Constant expressions
-\subsubsection{Initialization revisited}
-% Prevent ctexprs
-\subsubsection{Folding}
-% Folding
-% Edge case : max(x, cte) with x < cte for all i is not detected, too expensive and not possible, do not have all data
-\subsubsection{ABC}
-\subsubsection{PSO}
-\subsubsection{DE}
 
 \subsection{Incremental support}
 Our tool support incremental operation. The user can provide seeds, expressions that are known or assumed to be good initial approximations. The algorithm writes out the best solutions obtained in an identical format. By combining this the user can create a Design Of Experiment (DOE) setup using the algorithm. As a use case, suppose the user wants to apply symbolic regression on the output of an expensive simulation. The simulator has k parameters, each with a different domain and j datapoints. The user wants insights into the correlation of the parameters. 
