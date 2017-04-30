@@ -2,6 +2,49 @@ In this section we will detail the design of our tool, the algorithm and its par
 \subsection{Algorithm}
 \subsubsection{Input and output}
 The algorithm accepts an X = n x k matrix of input data, and an Y = 1 x k  vector of expected data. It will evolve expressions that result, when evaluated on X, in an 1 x k vector Y' that approximates Y. N is the number of features, or parameters, the expression can use. K is the number of datapoints per feature. The algorithm makes no assumptions on the domain or range of the expressions or data set. While domain specific knowledge can be of great value, in real world situations such data is not always known.
+\subsubsection{Control flow}
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\footnotesize}]
+\node (start) [startstop] {Start};
+\node (phase) [decision, below of=start, yshift=-0.5cm] {Phase $<$ Phases};
+\node (init) [process, below of=phase, yshift=-1cm] {0.0 Initialize};
+\node (gen) [process, right of=init, xshift=4cm] {0.1 Generate random};
+\node (while) [decision, below of=init, yshift=-1.5cm, align=center] {1. \\ Generation \\ $<$ \\ Generations }; % stopcondition?
+\node (eval) [process, below of=while, yshift=-1.5cm] {2. Evaluate Population};
+\node (select) [process, below of=eval] {3. Select};
+\node (evolve) [process, below of=select] {4. Evolve};
+\node (mutate) [process, right of=evolve, xshift=4cm, yshift = + 1 cm] {4.1 Mutate};
+\node (crossover) [process, below of=mutate ] {4.2 Crossover};
+\node (update) [process, below of=evolve] {5. Update Population};
+\node (archive) [process, right of=while, xshift=4cm] {0.2 Archive};
+\node (external) [process, right of=archive, xshift=4cm] {0.3 External};
+\node (optimizea) [process, below of=archive] {6.1 Optimize};
+\node (optimizet) [process, below of=update] {6.2 Optimize};
+
+\draw [arrow] (start) -- (phase);
+\draw [arrow] (phase) -- node[anchor=east]{yes}(init);
+\draw [arrow] (init) -- (while);
+\draw [arrow] (while) -- node[anchor=east]{yes}(eval);
+\draw [arrow] (while) -- node[anchor=south]{no}(archive);
+%\draw [arrow] (archive) -- (phase);
+\draw [arrow] (eval) -- (select);
+\draw [arrow] (select) -- (evolve);
+\draw [arrow] (evolve) -- (mutate);
+\draw [arrow] (mutate) -- (evolve);
+\draw [arrow] (evolve) -- (crossover);
+\draw [arrow] (crossover) -- (evolve);
+\draw [arrow] (evolve) -- (update);
+\draw [dashed, ->] (gen) -- node[anchor=south]{seeds}(init);
+\draw [dashed, ->] (archive) -- node[anchor=south]{seeds}(init);
+\draw [dashed, <->] (update) -- node[anchor=east]{optional}(optimizet);
+\draw [dashed, <->] (archive) -- node[anchor=east]{optional}(optimizea);
+\draw [dashed, <->] (external) -- node[anchor=south]{optional}(archive);
+\draw [arrow] (archive)-- +(2,0) |- (phase) node[near start,sloped,above] {};
+
+% \draw [arrow] (update) -- (eval);
+\draw [arrow] (update)-- +(-2,0) |- (while) node[near start,sloped,above] {};
+%\draw [dashed, ->] (update)-- +(+2,0) |- (archive) node[near start,sloped,above] {};
+%\draw [dashed, ->] (archive)-- +(0,+1) |- (init) node[near start,sloped,above] {};
+\end{tikzpicture}
 % High level overview
 % Flow Chart
 % UML
