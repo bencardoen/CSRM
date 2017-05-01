@@ -754,7 +754,7 @@ class BruteCoolingElitist(BruteElitist):
                     tm.scoreTree(self._Y, self._fitnessfunction)
                     newf = tm.getFitness()
                     fgain = oldf - newf
-                    if fgain < 0:
+                    if fgain <= 0:
                         # It's possible the initial perturbation disturbs the optimizer enough to cause this behavior
                         pass
                     else:
@@ -790,7 +790,7 @@ class BruteCoolingElitist(BruteElitist):
                 tm.scoreTree(self._Y, self._fitnessfunction)
                 newf = tm.getFitness()
                 fgain = oldf - newf
-                if fgain < 0:
+                if fgain <= 0:
                     # It's possible the initial perturbation disturbs the optimizer enough to cause this behavior
                     pass
                 else:
