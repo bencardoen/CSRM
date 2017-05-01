@@ -4,5 +4,8 @@
 *.bak
 *.aux
 *.log
+*.blg
+*.dvi
+*.bbl
 *.synctex.gz
 output/*.html

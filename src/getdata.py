@@ -7,7 +7,7 @@ resultfile = "Collected results for all processes"
 
 def preprocess(dirnames):
     for d in dirnames:
-        print(len(d))
+        #print(len(d))
         t = d.find("expr")
         if t != -1:
             #print("Renaming \n {} to \n {}".format(d, d[t:]))
@@ -56,7 +56,7 @@ csvheaders = ["expression", "optimizer", "mean training fitness", "mean test fit
 measures = ["trainingfitness", "fullfitness", "meantrainingfitness", "meanfullfitness"]
 algorithms = ["PSO", "DE", "ABC", "PassThroughOptimizer"]
 expressions = ["expr" + str(i) for i in range(15)]
-phases = ["phases" + str(i) for i in [10]]
+phases = ["phases" + str(i) for i in [2, 5, 10]]
 
 
 def writeResultsCSV(res, fname):
@@ -101,48 +101,20 @@ def writePlotsCSV(res, name):
                     f.write(",")
             f.write("\n")
             for algorithm in inv:
+                if algorithm == "PassThroughOptimizer":
+                    continue
                 f.write(algorithm + ",")
                 values = [None ]* len(expressions)
                 #print(values)
                 for i, expression in enumerate(expressions):
-                    values[i] = inv[algorithm][measure][expression]
+                    vi = inv[algorithm][measure][expression]
+                    pi = inv["PassThroughOptimizer"][measure][expression]
+                    values[i] = pi - vi # 0.2 - 0.1 = 0.1
                 for j, v in enumerate(values):
                     f.write(str(v))
                     if j != len(values):
                         f.write(',')
                 f.write("\n")
-        #f.write("Relative \n")
-        # for measure in measures:
-        #     f.write(measure + "\n")
-        #     f.write("algorithm, ")
-        #     for i,h in enumerate(expressions):
-        #         f.write(h)
-        #         if i != len(expressions):
-        #             f.write(",")
-        #     f.write("\n")
-        #     for algorithm in inv:
-        #         f.write(algorithm + ",")
-        #         values = [None ]* len(expressions)
-        #         #print(values)
-        #         for i, expression in enumerate(expressions):
-        #             vi = inv[algorithm][measure][expression]
-        #             # Get PassThroughOptimizer value
-        #             pi = inv["PassThroughOptimizer"][measure][expression]
-        #             if vi == 0:
-        #                 if pi == 0:
-        #                     values[i] = 1
-        #                 else:
-        #                     # none is not zero
-        #                     # vi is, so factor is difference
-        #                     print("Vi {} Pi {}".format(vi, pi))
-        #                     values[i] = pi
-        #             else:
-        #                 values[i] = pi / vi
-        #         for j, v in enumerate(values):
-        #             f.write(str(v))
-        #             if j != len(values):
-        #                 f.write(',')
-        #         f.write("\n")
 
 
 
@@ -151,25 +123,27 @@ def writePlotsCSV(res, name):
 if __name__=="__main__":
     dirs = os.walk('.')
     dirnames = [x[0] for x in dirs]
+    preprocess(dirnames)
     fullresults = {}
-    for e in expressions:
-        v = select(dirnames, [e])
-        v = select(v, phases)
-        trainingfitness = {}
-        meantrainingfitness = {}
-        fullfitness = {}
-        meanfullfitness = {}
-        for q in v:
-            op = getOptimizer(q)
-            tf = getValue(q, "last_fitness")
-            ff = getValue(q, "fitness")
-            trainingfitness[op] = tf[0]
-            fullfitness[op] = ff[0]
-            meantrainingfitness[op] = numpy.mean(tf[0:5])
-            meanfullfitness[op] = numpy.mean(ff[0:5])
+    for f in phases:
+        for e in expressions:
+            v = select(dirnames, [e])
+            v = select(v, [f])
+            trainingfitness = {}
+            meantrainingfitness = {}
+            fullfitness = {}
+            meanfullfitness = {}
+            for q in v:
+                op = getOptimizer(q)
+                tf = getValue(q, "last_fitness")
+                ff = getValue(q, "fitness")
+                trainingfitness[op] = tf[0]
+                fullfitness[op] = ff[0]
+                meantrainingfitness[op] = numpy.mean(tf[0:5])
+                meanfullfitness[op] = numpy.mean(ff[0:5])
 
-        fullresults[e] = {"trainingfitness":trainingfitness, "fullfitness":fullfitness, "meantrainingfitness":meantrainingfitness, "meanfullfitness":meanfullfitness}
+            fullresults[e] = {"trainingfitness":trainingfitness, "fullfitness":fullfitness, "meantrainingfitness":meantrainingfitness, "meanfullfitness":meanfullfitness}
 
-    writeResultsCSV(fullresults, "hybridresults.csv")
-    writeResultsJson(fullresults, "hybridresults.json")
-    writePlotsCSV(fullresults, "hybridplots.csv")
+        writeResultsCSV(fullresults, "hybridresults_{}_phases.csv".format(f))
+        writeResultsJson(fullresults, "hybridresults_{}_phases.json".format(f))
+        writePlotsCSV(fullresults, "hybridplots_{}_phases.csv".format(f))

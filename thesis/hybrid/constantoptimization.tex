@@ -8,19 +8,25 @@ An expression is a constant expression if all its children are constant expressi
 Using the checking procedure in the initialization, a tree marked as a constant expression is not allowed in the initialization procedure.
 It is still possible to create constant expressions by applying mutation and crossover. If the left subtree of a node is a constant expression, and the right is not constant, but this right is replaced by either mutation or crossover with a constant expression then the node becomes a constant expression. The mutation operator will not generate constant subtrees, so this leaves only crossover. Our tool does not prevent constant expressions from forming in this way, the evaluation following crossover will remove the constant expressions immediately.
 \subsubsection{Folding}
+% Future work : fold the multipliers
 \paragraph{Constant subtree problem}
 A tree can contain subtrees that represent constant expressions. This is an immediate effect of the GP algorithm trying to evolve the correct constant. This can lead to large subtrees that can be represented by a single node. Nodes used in such a constant subtree are not available for base functions. They waste memory and evaluation cost, without their presence the tree could become a fitter instance. We will evaluate these effects in the experiments section.
 \paragraph{Constant subtree folding}
 It is possible to use a depth sensitive objective function to try to mitigate this effect, but a more direct approach is replacing the subtrees.
 Using the previous constant expression detection technique we can collect all constant subtrees from a tree. We evaluate each subtree, and replace it with the constant value it represents. This leads to a saving nodes, possibly in depth. These savings can have an effect on the convergence as well. Mutation and crossover will no longer operate on constant subtrees, and the iterations and place in the tree that becomes available can be used to improve the tree.
 Constant folding requires an O(n) detection check, since the entire tree needs to be traversed. The folding operation itself is at worst O(n), if the entire tree is constant.
-\paragraph{Edge case}
+\paragraph{Edge cases}
 There are subtle edge cases that can't be detected using the above method. Consider the tree representing the expression
 \[
 f(x) = \max(x, 4 + \sin(0.3)) 
 \]
 The subexpression 4 + sin(0.3) is detected and folded into the constant 4.26. 
 We should not stop there, since f can still be a constant expression if $\forall i :  x_i < 4.26$. To verify this we need to evaluate f on all i datapoints. In contrast, the constant subtree detection code needs only 1 evaluation. Even if we should evaluate f for all i, this will not guarantee us that f is indeed a constant expression. All this check then proves is that for all i in the training data, f is constant. The testing data holds new values, for which f may or may not be constant. We conclude that this edge case cannot be prevented from occurring.
+Another similar case occurs in expressions of the form 
+\[
+f(x, y, z) = \tan(y) * \sqrt{x/x}
+\]
+In this reduced example the node $\sqrt{x/x}$ is simply $\sqrt{1}$. Outside of this example, detecting such cases is non trivial. There is clear benefit to do so, despite their low occurrence, if x's domain includes 0 this valid tree is never generated because it leads to division by zero in a single datapoint. One way to solve this is to use mathematical software to simplify the expressions, and then convert them back to tree representations. The cost of doing this should outweigh the benefit of applying it. It is not clear how frequent such cases are in real world data. % link future work
 \paragraph{Conclusion}
 Constant detection and folding mitigate some of the side effects of the constant optimization problem, they do not lead to a more efficient finding of the 'right' constant values. For this we need a continuous optimizer, algorithm designed specifically to optimize real valued problems.
 \subsection{Optimizers}

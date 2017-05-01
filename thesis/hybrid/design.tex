@@ -40,13 +40,9 @@ The algorithm accepts an X = n x k matrix of input data, and an Y = 1 x k  vecto
 \draw [dashed, <->] (external) -- node[anchor=south]{optional}(archive);
 \draw [arrow] (archive)-- +(2,0) |- (phase) node[near start,sloped,above] {};
 
-% \draw [arrow] (update) -- (eval);
 \draw [arrow] (update)-- +(-2,0) |- (while) node[near start,sloped,above] {};
-%\draw [dashed, ->] (update)-- +(+2,0) |- (archive) node[near start,sloped,above] {};
-%\draw [dashed, ->] (archive)-- +(0,+1) |- (init) node[near start,sloped,above] {};
 \end{tikzpicture}
 % High level overview
-% Flow Chart
 % UML
 
 \subsubsection{Implementation}
@@ -197,16 +193,76 @@ The user can provide the algorithm with input data, or can specify a range from 
 Knowing the domain of the problem can significantly reduce the time needed to converge to a solution. In our implementation we assume no domain knowledge. While this increases the complexity of obtaining a good solution, it also makes for a more fair evaluation of the algorithm and optimizations used. 
 
 \subsection{Incremental support}
-Our tool support incremental operation. The user can provide seeds, expressions that are known or assumed to be good initial approximations. The algorithm writes out the best solutions obtained in an identical format. By combining this the user can create a Design Of Experiment (DOE) setup using the algorithm. As a use case, suppose the user wants to apply symbolic regression on the output of an expensive simulation. The simulator has k parameters, each with a different domain and j datapoints. The user wants insights into the correlation of the parameters. 
-A naive approach would be to generate output data for a full factorial experiment, and feed this into the CSRM tool. For both the simulator and the SR tool the cost of this approach would be prohibitive. It is likely that some parameters are even irrelevant, leading to unnecessary computation. Instead we can opt for a combined DOE approach. We start with a subset of parameters k' $<$ k and datapoints j' $<$ k. The simulation results Q of this subset are then given to the CSRM algorithm. It generates a solution, optimized for this subset of the problem. 
+Our tool support incremental operation. The user can provide seeds, expressions that are known or assumed to be good initial approximations. The algorithm writes out the best solutions obtained in an identical format. By combining this the user can create a Design Of Experiment (DOE) setup using the algorithm. As a use case, suppose the user wants to apply symbolic regression on the output of an expensive simulation. The simulator has k features or parameters, each with a different domain and j datapoints. The user wants insights into the correlation of the parameters. 
+A naive approach would be to generate output data for a full factorial experiment, and feed this into the CSRM tool. For both the simulator and the SR tool the cost of this approach would be prohibitive. It is likely that some features are even irrelevant, leading to unnecessary computation. Instead we can opt for a combined DOE approach. We start with a subset of features k' $<$ k and datapoints j' $<$ k. The simulation results Q of this subset are then given to the CSRM algorithm. It generates a solution, optimized for this subset of the problem. 
 The user then adds more parameters, k' $<$ k'' $<$ k and/or datapoints j' $<$ j'' $<$ j, runs the simulator again. The resulting output is given the CSRM tool, with Q as seed. This seed is used as memory of the previous run on the smaller input set. Unless there is no correlation between the incrementing datasets the CSRM tool can use the knowledge gained from the previous run to obtain faster convergence for this new dataset. In addition, by inspecting Q the user can already analyze a (partial) result regarding the initial parameter set. Suppose k = 5, and only 3 parameters are used in Q. Then the user can exclude the missing two parameters from the remainder of the experiment, as these are unlikely to contribute to the output.
-By chaining the simulator and CSRM tool together in such a way, an efficient DOE approach can potentially save both simulation and regression time, or result in increased quality of solutions. We will investigate this approach in our use case in Section 4. % ref
+By chaining the simulator and CSRM tool together in such a way, an efficient DOE approach can potentially save both simulation and regression time, or result in increased quality of solutions. 
+The advantages are clear :
+\begin{itemize}
+\item The SR tool can start in parallel with the simulator, instead of having to wait until the simulator has completed all configurations.
+\item Reducing irrelevant parameters detected by the SR tool can save in configuration size for the simulator.
+\item The SR tool can reuse previous results as seeds, and tackles and slowly increasing search space with those initial values instead of starting without knowledge in a far larger search space.
+\end{itemize}
+Possible disadvantages are :
+\begin{itemize}
+\item The SR tool is not guaranteed to return the optimal solution, it is possible the process is misguided by suboptimal solutions. This risk exist as well in the full approach.
+\item Interpretation of the results can be needed in order to make the decision to prune features.
+\end{itemize}
+We will investigate this approach in our use case in  \ref{secexperiments}.
 % add diagram
+The following diagram illustrates a DOE hypercube design using our tool and a simulator. \\
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\footnotesize}]
+\node (start) [startstop] {Start};
+\node (featureset) [process, below of=start] {Features};
+\node (datapoints) [process, below of=featureset] {Datapoints};
+\node (x) [process, right of= datapoints,xshift=4cm, yshift=1cm] {X};
+\node (simulator) [process, right of=x, xshift=4cm] {Simulator};
+\node (srtool) [process, below of=x] {SR Tool};
+\node (expressions) [process, below of=srtool] {Expressions};
+\node (analyze) [process, below of=datapoints] {Analyze};
+%\node (phase) [decision, below of=start, yshift=-0.5cm] {Phase $<$ Phases};
+%\node (init) [process, below of=phase, yshift=-1cm] {0.0 Initialize};
+%\node (gen) [process, right of=init, xshift=4cm] {0.1 Generate random};
+%\node (while) [decision, below of=init, yshift=-1.5cm, align=center] {1. \\ Generation \\ $<$ \\ Generations }; % stopcondition?
+%\node (eval) [process, below of=while, yshift=-1.5cm] {2. Evaluate Population};
+%\node (select) [process, below of=eval] {3. Select};
+%\node (evolve) [process, below of=select] {4. Evolve};
+%\node (mutate) [process, right of=evolve, xshift=4cm, yshift = + 1 cm] {4.1 Mutate};
+%\node (crossover) [process, below of=mutate ] {4.2 Crossover};
+%\node (update) [process, below of=evolve] {5. Update Population};
+%\node (archive) [process, right of=while, xshift=4cm] {0.2 Archive};
+%\node (external) [process, right of=archive, xshift=4cm] {0.3 External};
+%\node (optimizea) [process, below of=archive] {6.1 Optimize};
+%\node (optimizet) [process, below of=update] {6.2 Optimize};
+
+\draw [arrow] (featureset) -- +(+2,0) |-(x) node[near start,sloped,above]{};
+\draw [arrow] (start) --(featureset);
+\draw [arrow] (datapoints) -- +(+2,0) |-(x) node[near start,sloped,above]{};
+\draw [arrow] (x) --node[anchor=south]{input}(simulator);
+\draw [arrow] (x) --(srtool);
+\draw [arrow] (simulator) -- (srtool)node[anchor=south]{Y};
+\draw [arrow] (srtool) --node[anchor=east]{generates}(expressions);
+\draw [arrow] (expressions)-- +(+2,0) |- (srtool) node[near start,sloped,below, anchor=south] {seeds};
+\draw [arrow] (expressions)-- +(-2, 0) |- (analyze) node[near start,sloped,above, anchor=south] {};
+\draw [arrow] (expressions)-- +(-2, 0) |- (analyze) node[near start,sloped,above, anchor=south] {};
+\draw [arrow] (analyze)-- +(-2, 0) |- (featureset) node[near start,sloped,above, anchor=south] {};
+\draw [arrow] (analyze)-- +(-2, 0) |- (datapoints) node[near start,sloped,above, anchor=south] {reduces/expands};
+
+%\draw [dashed, ->] (gen) -- node[anchor=south]{seeds}(init);
+%\draw [dashed, ->] (archive) -- node[anchor=south]{seeds}(init);
+%\draw [dashed, <->] (update) -- node[anchor=east]{optional}(optimizet);
+%\draw [dashed, <->] (archive) -- node[anchor=east]{optional}(optimizea);
+%\draw [dashed, <->] (external) -- node[anchor=south]{optional}(archive);
+%\draw [arrow] (archive)-- +(2,0) |- (phase) node[near start,sloped,above] {};
+%
+%\draw [arrow] (update)-- +(-2,0) |- (while) node[near start,sloped,above] {};
+\end{tikzpicture}
 
 \subsection{Statistics and visualization}
 Stochastic algorithms are notoriously hard to debug. By virtue of the problem statement we do not know whether the rendered solution is what is expected. The size of the search space makes detecting edge cases impossible. In addition the algorithm functions as a black box, where output is presented to the user without a clear trace indicating how or why this output was obtained. Both for developer and practitioner insight into the algorithms inner workings is vital. 
 Our tool provides a wealth of runtime statistics ranging from fitness values per expression for each point in the execution, convergence behavior over time, depth and complexity of the expressions, cost of evaluations, effectiveness of operators, correlation between training en test fitness values and more. These statistics can be saved to disk for later analysis, or displayed in plots in a browser. Using this information the user can tune the parameters of the algorithm (e.g. overfitting due to an excessively large number of phases), the developer can look at how effective new modifications are (e.g. new mutation operator) and so on.
 It is even possible to trace the entire run of the algorithm step by step by saving the expressions in tree form, displayed in an SVG image rendered by Graphviz \cite{graphviz}.
+% Add examples of visualization here
 
 \subsection{Conclusion}
 In this section we have covered in detail the design of the CSRM tool, highlighting the choices made. 
