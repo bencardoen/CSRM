@@ -59,11 +59,12 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
     assert(len(X) == config.variablepoint and len(X[0]) == config.datapointcount)
     if Y is None:
         logger.info("No expected data provided, assuming testproblem, generating expected data based on input values.")
+        expr = testfunctions[config.expr]
+        tr = Tree.createTreeFromExpression(expr, X)
+        Y = tr.evaluateAll()
     else:
         logger.info("Using user provided expected data.")
-    expr = testfunctions[config.expr]
-    tr = Tree.createTreeFromExpression(expr, X)
-    Y = tr.evaluateAll()
+
     assert(len(Y) ==config.datapointcount)
     if topo is None:
         logger.info("Topology is None, using RStatic")
@@ -212,6 +213,7 @@ if __name__ == "__main__":
     if args.expecteddatafile:
         logger.info("Reading expected data")
         Y = readVariables(args.expecteddatafile, 1 , c.datapointcount)
+        Y = Y[0]
         if Y is None:
             logger.error("Data decoding failed!!")
             exit(0)
