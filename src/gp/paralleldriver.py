@@ -80,12 +80,12 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
     if isMPI():
         logger.info("Starting MPI Parallel implementation")
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
-        g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth, optimizer=config.optimizer, optimizestrategy=config.optimizestrategy)
+        g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth, optimizer=config.optimizer, optimizestrategy=config.optimizestrategy, archive=config.archivefile)
         g.pid = pid
         algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
         logger.info("Starting Sequential implementation")
-        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth, optimizer = config.optimizer, optimizestrategy=config.optimizestrategy)
+        algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth, optimizer = config.optimizer, optimizestrategy=config.optimizestrategy, archivefile=config.archivefile)
     algo.executeAlgorithm()
     #logger.info("Writing output to folder {}".format(outfolder))
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)
@@ -217,6 +217,11 @@ if __name__ == "__main__":
         if Y is None:
             logger.error("Data decoding failed!!")
             exit(0)
+
+    if args.archiveinputfile:
+        logger.info("Using seedfile")
+        c.archivefile = args.archiveinputfile
+
     if args.dataranges:
         logger.info("Data ranges given, parsing")
         dataranges = args.dataranges

@@ -24,7 +24,7 @@ class Config:
         self.communicationsize = 2
         self.display = False
         self.topo = None
-        self.archiveseedfile = None
+        self.archivefile = None
         self.optimizer = None
         self.optimizestrategy = None
         self.ranges = None
