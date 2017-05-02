@@ -125,7 +125,7 @@
             <span class="k">return</span> <span class="n">decoded</span>
     <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Cannot decode data file&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">decoded</span></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="rmtocm"><a class="viewcode-back" href="../../expression.html#expression.tools.rmtocm">[docs]</a><span class="k">def</span> <span class="nf">rmtocm</span><span class="p">(</span><span class="n">lst</span><span class="p">):</span>
@@ -242,6 +242,9 @@
 
 
 <div class="viewcode-block" id="getNormal"><a class="viewcode-back" href="../../expression.html#expression.tools.getNormal">[docs]</a><span class="k">def</span> <span class="nf">getNormal</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a value in a normal distribution with given seed, around a mean and with size interpreted as scale (stddev).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span><span class="p">(</span><span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
     <span class="c1">#logger.info(&quot;Getting normal &quot;)</span>
     <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">seed</span><span class="p">))</span>
@@ -313,6 +316,9 @@
 
 
 <div class="viewcode-block" id="getRandom"><a class="viewcode-back" href="../../expression.html#expression.tools.getRandom">[docs]</a><span class="k">def</span> <span class="nf">getRandom</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper call to return a RNG that follows the python random interface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rng</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
@@ -345,6 +351,9 @@
 
 
 <div class="viewcode-block" id="equality"><a class="viewcode-back" href="../../expression.html#expression.tools.equality">[docs]</a><span class="k">def</span> <span class="nf">equality</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    First failure check between actual, expected.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.000001</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -352,6 +361,9 @@
 
 
 <div class="viewcode-block" id="placeholder"><a class="viewcode-back" href="../../expression.html#expression.tools.placeholder">[docs]</a><span class="k">def</span> <span class="nf">placeholder</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test function for pearson r.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># if equality(actual, expected):</span>
     <span class="c1">#     return 1</span>
     <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -397,11 +409,11 @@
     <span class="k">except</span> <span class="ne">FloatingPointError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Distance is </span><span class="si">{}</span><span class="s2"> due to FP Error&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Actual </span><span class="si">{}</span><span class="s2"> vs expected </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">expected</span><span class="p">))</span>
-        <span class="k">raise</span> <span class="n">e</span>
         <span class="n">denom</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="mi">1</span>
     <span class="n">p</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">denom</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># if denom is zero, there is no measurable difference between the values and their mean.</span>
+        <span class="c1"># if denom is zero, there is no measurable difference between the values and their mean,</span>
         <span class="c1"># this will hold for the nom as well, resulting in a score of 1 (without division)</span>
         <span class="c1"># p = 1 gives too much of an advantage</span>
         <span class="c1"># TODO ask prof Broeckhove</span>
@@ -538,6 +550,9 @@
 
 
 <div class="viewcode-block" id="flatten"><a class="viewcode-back" href="../../expression.html#expression.tools.flatten">[docs]</a><span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">nestedlist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Flatten a list recursively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">nestedlist</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -548,6 +563,9 @@
 
 
 <div class="viewcode-block" id="frequencyTable"><a class="viewcode-back" href="../../expression.html#expression.tools.frequencyTable">[docs]</a><span class="k">def</span> <span class="nf">frequencyTable</span><span class="p">(</span><span class="n">nestedvalues</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Absolute frequency of v in nestedvalues (can be nested).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">nv</span> <span class="o">=</span> <span class="n">flatten</span><span class="p">(</span><span class="n">nestedvalues</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nv</span><span class="p">:</span>

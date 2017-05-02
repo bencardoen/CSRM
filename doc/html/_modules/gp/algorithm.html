@@ -210,6 +210,8 @@
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
             <span class="n">expr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">toExpression</span><span class="p">()</span>
             <span class="n">x2</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_X</span><span class="p">)</span>
+            <span class="n">x2</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitnessfunction</span><span class="p">)</span>
+            <span class="c1">#.info(&quot;Adding {}&quot;.format(expr))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addToArchive</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GPAlgorithm.addConvergenceStat"><a class="viewcode-back" href="../../gp.html#gp.algorithm.GPAlgorithm.addConvergenceStat">[docs]</a>    <span class="k">def</span> <span class="nf">addConvergenceStat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generation</span><span class="p">,</span> <span class="n">stat</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
@@ -798,7 +800,7 @@
                     <span class="n">tm</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitnessfunction</span><span class="p">)</span>
                     <span class="n">newf</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">getFitness</span><span class="p">()</span>
                     <span class="n">fgain</span> <span class="o">=</span> <span class="n">oldf</span> <span class="o">-</span> <span class="n">newf</span>
-                    <span class="k">if</span> <span class="n">fgain</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">fgain</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="c1"># It&#39;s possible the initial perturbation disturbs the optimizer enough to cause this behavior</span>
                         <span class="k">pass</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -834,7 +836,7 @@
                 <span class="n">tm</span><span class="o">.</span><span class="n">scoreTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitnessfunction</span><span class="p">)</span>
                 <span class="n">newf</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">getFitness</span><span class="p">()</span>
                 <span class="n">fgain</span> <span class="o">=</span> <span class="n">oldf</span> <span class="o">-</span> <span class="n">newf</span>
-                <span class="k">if</span> <span class="n">fgain</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fgain</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># It&#39;s possible the initial perturbation disturbs the optimizer enough to cause this behavior</span>
                     <span class="k">pass</span>
                 <span class="k">else</span><span class="p">:</span>

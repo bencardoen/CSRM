@@ -198,11 +198,7 @@
         <span class="n">selectedsamples</span><span class="p">,</span> <span class="n">buf</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">targetcount</span><span class="p">:</span>
             <span class="n">selectedsamples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span><span class="o">.</span><span class="n">getArchived</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_communicationsize</span><span class="p">)</span>
-            <span class="c1"># logger.info(&quot;Process {} :: Got from algorithm {} &quot;.format(self.pid, len(selectedsamples) ))</span>
-            <span class="c1"># logger.info(&quot;Process {} :: Got from algorithm {} &quot;.format(self.pid, [t.getFitness() for t in selectedsamples] ))</span>
             <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spreadpolicy</span><span class="o">.</span><span class="n">spread</span><span class="p">(</span><span class="n">selectedsamples</span><span class="p">,</span> <span class="n">targetcount</span><span class="p">)</span>
-        <span class="c1">#     logger.info(&quot;Process {} :: Sendbuffer {} &quot;.format(self.pid, [[t.getFitness() for t in b] for b in buf] ))</span>
-        <span class="c1"># logger.info(&quot;Process {} :: Sending from {} --&gt;  [{}] --&gt; {}&quot;.format(self.pid, self.pid, len(selectedsamples), targets))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">communicator</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">waitForSendRequests</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">targets</span><span class="p">):</span>
@@ -313,6 +309,9 @@
         <span class="c1">#logger.info(&quot;Topology = \n{}&quot;.format(self._topo))</span>
 
 <div class="viewcode-block" id="SequentialPGP.executeAlgorithm"><a class="viewcode-back" href="../../gp.html#gp.parallelalgorithm.SequentialPGP.executeAlgorithm">[docs]</a>    <span class="k">def</span> <span class="nf">executeAlgorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Main driver for the algorithm.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_phases</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">process</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="p">):</span>
                 <span class="n">process</span><span class="o">.</span><span class="n">executePhase</span><span class="p">()</span>
@@ -338,6 +337,8 @@
 <span class="sd">        From all processes, get summarized results.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">summarizeResults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Y</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="p">]</span></div></div>
+
+<span class="c1"># Factored out function, used by both SQ and Parallel.</span>
 
 
 <div class="viewcode-block" id="reportOutput"><a class="viewcode-back" href="../../gp.html#gp.parallelalgorithm.reportOutput">[docs]</a><span class="k">def</span> <span class="nf">reportOutput</span><span class="p">(</span><span class="n">processes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">outputfolder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="kc">None</span><span class="p">,):</span>

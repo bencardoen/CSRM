@@ -547,4 +547,5 @@ class ABC(Optimizer):
         bestsource = self.sources[self.best[0]]
         return {"cost":bestsource.cost, "solution":bestsource.current[:]}
 
+
 optimizers = {"pso": PSO, "de": DE, "none":PassThroughOptimizer, "abc":ABC}
