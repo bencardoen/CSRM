@@ -24,9 +24,9 @@ The subexpression 4 + sin(0.3) is detected and folded into the constant 4.26.
 We should not stop there, since f can still be a constant expression if $\forall i :  x_i < 4.26$. To verify this we need to evaluate f on all i datapoints. In contrast, the constant subtree detection code needs only 1 evaluation. Even if we should evaluate f for all i, this will not guarantee us that f is indeed a constant expression. All this check then proves is that for all i in the training data, f is constant. The testing data holds new values, for which f may or may not be constant. We conclude that this edge case cannot be prevented from occurring.
 Another similar case occurs in expressions of the form 
 \[
-f(x, y, z) = \tan(y) * \sqrt{x/x}
+f(x, y) = \tan(y) * \sqrt{x/x}
 \]
-In this reduced example the node $\sqrt{x/x}$ is simply $\sqrt{1}$. Outside of this example, detecting such cases is non trivial. There is clear benefit to do so, despite their low occurrence, if x's domain includes 0 this valid tree is never generated because it leads to division by zero in a single datapoint. One way to solve this is to use mathematical software to simplify the expressions, and then convert them back to tree representations. The cost of doing this should outweigh the benefit of applying it. It is not clear how frequent such cases are in real world data. % link future work
+In this reduced example the node $\sqrt{x/x}$ is simply $\sqrt{1}$. Outside of this example, detecting such cases is non trivial. There is clear benefit to do so, despite their low occurrence: if x's domain includes 0 this tree is never generated because it leads to division by zero in a single datapoint. One way to solve this is to use mathematical software to simplify the expressions, and then convert them back to tree representations. Applying this step should be based on the cost versus benefit and the frequency of such occurrences. % link future work
 \paragraph{Conclusion}
 Constant detection and folding mitigate some of the side effects of the constant optimization problem, they do not lead to a more efficient finding of the 'right' constant values. For this we need a continuous optimizer, algorithm designed specifically to optimize real valued problems.
 \subsection{Optimizers}

@@ -79,7 +79,7 @@ def readVariables(filename, featurecount, samplecount):
             return decoded
     except IOError as e:
         logger.error("Cannot decode data file")
-    return decoded
+        return None
 
 
 def rmtocm(lst):

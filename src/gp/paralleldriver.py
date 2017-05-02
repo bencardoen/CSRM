@@ -213,10 +213,11 @@ if __name__ == "__main__":
     if args.expecteddatafile:
         logger.info("Reading expected data")
         Y = readVariables(args.expecteddatafile, 1 , c.datapointcount)
-        Y = Y[0]
+        logger.info("Y is {}".format(Y))
         if Y is None:
             logger.error("Data decoding failed!!")
             exit(0)
+        Y = Y[0]
 
     if args.archiveinputfile:
         logger.info("Using seedfile")

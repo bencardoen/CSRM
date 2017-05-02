@@ -64,6 +64,15 @@ class TreeTest(unittest.TestCase):
         t.makeLeaf(Variable([0.844], 0), r, constant=Constant(-0.54723748542))
         t.printToDot(outputfolder+"example_embedded.dot")
 
+    def testPrint(self):
+        expr = "( ( min( ( ( x0 * x0 ) ** ( exp( x0 ) ) ), ( ( ( max( ( tanh( ( x0 + 0.8361181581345928 ) ) ), ( cos( ( cos( x0 ) ) ) ) ) ) / ( sqrt( ( x0 / x0 ) ) ) ) + ( tan( ( ( sqrt( ( x1 + x0 ) ) ) ** 0.7694639347116258 ) ) ) ) ) ) - ( ( tan( ( sqrt( x0 ) ) ) ) * ( ( ln( x0 ) ) / ( sqrt( x0 ) ) ) ) )"
+        dcount = 2
+        vcount = 5
+        variables = generateVariables(vcount, dcount, 0)
+        t = Tree.createTreeFromExpression(expr, variables=variables)
+        t.printToDot(outputfolder+"best.dot")
+
+
     def testIsLeaf(self):
         t = Tree()
         root = t.makeInternalNode(plus, None, None)

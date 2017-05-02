@@ -209,7 +209,6 @@ Possible disadvantages are :
 \item Interpretation of the results can be needed in order to make the decision to prune features.
 \end{itemize}
 We will investigate this approach in our use case in  \ref{secexperiments}.
-% add diagram
 The following diagram illustrates a DOE hypercube design using our tool and a simulator. \\
 \begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\footnotesize}]
 \node (start) [startstop] {Start};
@@ -220,20 +219,6 @@ The following diagram illustrates a DOE hypercube design using our tool and a si
 \node (srtool) [process, below of=x] {SR Tool};
 \node (expressions) [process, below of=srtool] {Expressions};
 \node (analyze) [process, below of=datapoints] {Analyze};
-%\node (phase) [decision, below of=start, yshift=-0.5cm] {Phase $<$ Phases};
-%\node (init) [process, below of=phase, yshift=-1cm] {0.0 Initialize};
-%\node (gen) [process, right of=init, xshift=4cm] {0.1 Generate random};
-%\node (while) [decision, below of=init, yshift=-1.5cm, align=center] {1. \\ Generation \\ $<$ \\ Generations }; % stopcondition?
-%\node (eval) [process, below of=while, yshift=-1.5cm] {2. Evaluate Population};
-%\node (select) [process, below of=eval] {3. Select};
-%\node (evolve) [process, below of=select] {4. Evolve};
-%\node (mutate) [process, right of=evolve, xshift=4cm, yshift = + 1 cm] {4.1 Mutate};
-%\node (crossover) [process, below of=mutate ] {4.2 Crossover};
-%\node (update) [process, below of=evolve] {5. Update Population};
-%\node (archive) [process, right of=while, xshift=4cm] {0.2 Archive};
-%\node (external) [process, right of=archive, xshift=4cm] {0.3 External};
-%\node (optimizea) [process, below of=archive] {6.1 Optimize};
-%\node (optimizet) [process, below of=update] {6.2 Optimize};
 
 \draw [arrow] (featureset) -- +(+2,0) |-(x) node[near start,sloped,above]{};
 \draw [arrow] (start) --(featureset);
@@ -247,22 +232,48 @@ The following diagram illustrates a DOE hypercube design using our tool and a si
 \draw [arrow] (expressions)-- +(-2, 0) |- (analyze) node[near start,sloped,above, anchor=south] {};
 \draw [arrow] (analyze)-- +(-2, 0) |- (featureset) node[near start,sloped,above, anchor=south] {};
 \draw [arrow] (analyze)-- +(-2, 0) |- (datapoints) node[near start,sloped,above, anchor=south] {reduces/expands};
-
-%\draw [dashed, ->] (gen) -- node[anchor=south]{seeds}(init);
-%\draw [dashed, ->] (archive) -- node[anchor=south]{seeds}(init);
-%\draw [dashed, <->] (update) -- node[anchor=east]{optional}(optimizet);
-%\draw [dashed, <->] (archive) -- node[anchor=east]{optional}(optimizea);
-%\draw [dashed, <->] (external) -- node[anchor=south]{optional}(archive);
-%\draw [arrow] (archive)-- +(2,0) |- (phase) node[near start,sloped,above] {};
-%
-%\draw [arrow] (update)-- +(-2,0) |- (while) node[near start,sloped,above] {};
 \end{tikzpicture}
 
 \subsection{Statistics and visualization}
 Stochastic algorithms are notoriously hard to debug. By virtue of the problem statement we do not know whether the rendered solution is what is expected. The size of the search space makes detecting edge cases impossible. In addition the algorithm functions as a black box, where output is presented to the user without a clear trace indicating how or why this output was obtained. Both for developer and practitioner insight into the algorithms inner workings is vital. 
 Our tool provides a wealth of runtime statistics ranging from fitness values per expression for each point in the execution, convergence behavior over time, depth and complexity of the expressions, cost of evaluations, effectiveness of operators, correlation between training en test fitness values and more. These statistics can be saved to disk for later analysis, or displayed in plots in a browser. Using this information the user can tune the parameters of the algorithm (e.g. overfitting due to an excessively large number of phases), the developer can look at how effective new modifications are (e.g. new mutation operator) and so on.
-It is even possible to trace the entire run of the algorithm step by step by saving the expressions in tree form, displayed in an SVG image rendered by Graphviz \cite{graphviz}.
+It is even possible to trace the entire run of the algorithm step by step by saving the expressions in tree form, displayed in an SVG image rendered by Graphviz \cite{graphviz}. In Figure \ref{fig:viz} a selection of the collected statistics on a testfunction is shown. The third testproblem was used with a depth in [4,10], 30 generations, populationsize 30, and 4 phases.
 % Add examples of visualization here
+ \begin{figure}
+    \centering
+    \begin{subfigure}{0.5\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/viz_complexity.png}
+        \caption{Scaled complexity over generations.}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/viz_fitness.png}
+        \caption{Fitness values over generations.}
+    \end{subfigure}
+        \begin{subfigure}{0.5\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/viz_constantfoldingtrend.png}
+        \caption{Constant folding savings.}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/viz_meancost.png}
+        \caption{Mean evaluation cost.}
+    \end{subfigure}
+        \begin{subfigure}{0.5\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/viz_operatorgaintrend.png}
+        \caption{Operator gain.}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/viz_operatorsuccessratetrend.png}
+        \caption{Operator success rate.}
+    \end{subfigure}
+    \caption{Selection of visualizations generated by CSRM.}
+    \label{fig:viz}
+    \end{figure}
 
 \subsection{Conclusion}
 In this section we have covered in detail the design of the CSRM tool, highlighting the choices made. 
