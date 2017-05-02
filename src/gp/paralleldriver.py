@@ -87,7 +87,7 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
         logger.info("Starting Sequential implementation")
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth, optimizer = config.optimizer, optimizestrategy=config.optimizestrategy, archivefile=config.archivefile)
     algo.executeAlgorithm()
-    #logger.info("Writing output to folder {}".format(outfolder))
+
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)
     logger.info("Benchmark complete for {}".format(pid))
 
@@ -111,28 +111,27 @@ if __name__ == "__main__":
     logger.setLevel(logging.INFO)
     logging.disable(logging.DEBUG)
     parser = argparse.ArgumentParser(description='Start parallel GPSR')
-    parser.add_argument('-t', '--topology', help='space separated ids of instances')
+    parser.add_argument('-t', '--topology', help='topology name : one of "grid, tree, none, randomstatic"')
     parser.add_argument('-c', '--processcount', type=int, help='Number of processes for sequential run')
     parser.add_argument('-g', '--generations', type=int, help='Number of generations')
     parser.add_argument('-f', '--phases', type=int, help='Number of phases')
     parser.add_argument('-o', '--outputfolder', help="Folder to write data to")
-    parser.add_argument('-v', '--displaystats', action='store_true', help="Wether to dispay convergence statistics for each process")
-    parser.add_argument('-p', '--population', type=int, help="Population per instance")
-    parser.add_argument('-m', '--maxdepth', type=int, help="Max depth of any tree")
-    parser.add_argument('-i', '--initialdepth', type=int, help="initialdepth depth of any tree")
+    parser.add_argument('-v', '--displaystats', action='store_true', help="Wether to display convergence statistics for each process")
+    parser.add_argument('-p', '--population', type=int, help="Population per instance.")
+    parser.add_argument('-m', '--maxdepth', type=int, help="Max depth of any tree.")
+    parser.add_argument('-i', '--initialdepth', type=int, help="initialdepth depth of any tree.")
     parser.add_argument('-d', '--datapointcount', type=int, help="Number of datapoints to operate on. ")
-    parser.add_argument('-q', '--featurecount', type=int, help="Number of features to generate or read. ")
-    parser.add_argument('-s', '--communicationsize', type=int, help="Nr of samples requested from an instance to distribute.")
-    parser.add_argument('-e', '--expressionid', type=int, help="Nr of expression to test")
-    parser.add_argument('-a', '--archiveinputfile', type=str, help="Use incremental mode, read stored expressions from a previous run in *archivefile*")
+    parser.add_argument('-q', '--featurecount', type=int, help="Number of features to generate or read.")
+    parser.add_argument('-s', '--communicationsize', type=int, help="Number of samples requested from an instance to communicate.")
+    parser.add_argument('-e', '--expressionid', type=int, help="Expression number to test (0-14)")
+    parser.add_argument('-a', '--archiveinputfile', type=str, help="Use incremental mode, read stored expressions from a previous run in *archivefile* Do NOT read in expressions with a featurecount higher than -q <?>")
     parser.add_argument('-k', '--hybrid', type=str, help="Use a hybrid optimizer")
     parser.add_argument('-j', '--hybridstrategy', type=int, help="Set the hybrid optimizer strategy")
-    parser.add_argument('-x', '--inputdatafile', type=str, help="A file with input data in csv.")
-    parser.add_argument('-y', '--expecteddatafile', type=str, help="A file with expected data in csv.")
+    parser.add_argument('-x', '--inputdatafile', type=str, help="A file with input data in csv. (1 line of floating point values per feature)")
+    parser.add_argument('-y', '--expecteddatafile', type=str, help="A file with expected data in csv (1 line of floating point values).")
     parser.add_argument('-r', '--dataranges', type=str, help="A string of comma separated values with min,max for each variable. E.g. 0,1,0,1,2,3 for 3 variables.")
 
     args = parser.parse_args()
-    #print(args)
     topo = None
     if args.topology is not None:
         toponame = args.topology
@@ -141,7 +140,6 @@ if __name__ == "__main__":
             exit(0)
         else:
             topo = topologies[toponame]
-            logger.info("Chosen topology {}".format(topo))
 
     processcount = 1
     if isMPI():
@@ -155,7 +153,7 @@ if __name__ == "__main__":
             logger.error("No process count specified, ABORTING!")
             exit(0)
     outputfolder = "../output/"
-    logger.info("Output folder = {}".format(args.outputfolder))
+    logger.info("Output folder argument = {}".format(args.outputfolder))
     if args.outputfolder:
         outputfolder = args.outputfolder
         if outputfolder[-1] != '/':
@@ -197,11 +195,15 @@ if __name__ == "__main__":
         else:
             logger.error("No such expression!")
             raise ValueError
+
+    # The remainder of the parameters don't need special cases, fold the code.
     updateConfig(c, ["phases", "maxdepth", "initialdepth", "datapointcount", "communicationsize", "archiveinputfile"], args)
 
     if args.featurecount:
         logger.info("Using {} features".format(args.featurecount))
         c.variablepoint = args.featurecount
+
+    # Data in/out
     X = None
     if args.inputdatafile:
         logger.info("Reading input data")
@@ -246,9 +248,12 @@ if __name__ == "__main__":
             logger.error("Ranges object has invalid length {} for featurecount {}".format(len(ranges), c.variablepoint))
             exit(0)
         c.ranges = ranges
-        #logger.info("Parsed ranges is {}".format(ranges))
 
+    # Finalize
     logger.info("Config is {} ".format(c.__dict__.items()))
+
     outputfolder += c.concatValues() + "/"
+    logger.info("Creating outputfolder {} if it doesn't exist.".format(outputfolder))
     os.makedirs(outputfolder, exist_ok=True)
+
     runBenchmark(c, topo, processcount, outfolder=outputfolder, X=X, Y=Y)
