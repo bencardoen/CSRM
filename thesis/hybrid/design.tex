@@ -2,6 +2,7 @@ In this section we will detail the design of our tool, the algorithm and its par
 \subsection{Algorithm}
 \subsubsection{Input and output}
 The algorithm accepts an X = n x k matrix of input data, and an Y = 1 x k  vector of expected data. It will evolve expressions that result, when evaluated on X, in an 1 x k vector Y' that approximates Y. N is the number of features, or parameters, the expression can use. K is the number of datapoints per feature. The algorithm makes no assumptions on the domain or range of the expressions or data set. While domain specific knowledge can be of great value, in real world situations such data is not always known.
+\begin{figure}\label{fig:controlflow}
 \subsubsection{Control flow}
 \begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\footnotesize}]
 \node (start) [startstop] {Start};
@@ -42,8 +43,28 @@ The algorithm accepts an X = n x k matrix of input data, and an Y = 1 x k  vecto
 
 \draw [arrow] (update)-- +(-2,0) |- (while) node[near start,sloped,above] {};
 \end{tikzpicture}
-% High level overview
-% UML
+\caption{CSRM control flow.}
+\end{figure}
+\subsubsection{Entities}
+We will describe briefly the important entities in our design. In Figure \ref{fig:uml} the architecture of our tool is shown. Tooling such as IO, statistics and plotting is left out here for clarity. The interested reader is referred to the source code documentation.
+\paragraph{Algorithm}
+The algorithm hierarchy extends each instance with new behavior, only overriding those functions needed. Code reuse is maximized here by the usage of hook functions, which in the superclasses result in a noop operation. An example of this is the evolve function, by and large the most complex function of the algorithm. By using hooks such as \textit{requireMutation()} this function can remain in the superclass, and the subclass need only implement the hook.
+\paragraph{Tree}
+The Tree and Node classes represent the main data structure of CSRM's population. The Tree is comprised of Node objects, each of which holds an optional constant weight. Leaves are either features (VariableNode) or constants. 
+In \ref{subsectree} we go in depth into the design choices made for this representation.
+The Tree class holds a few utility functions, for example to create trees from an expression using a parser in the tool module.
+Functionality needed by the mutation and crossover operators is present here as well. Of note are both construction functions, which allow for efficient generation of random trees. In \ref{subsubinvalidexpressions} we will cover in depth the problem solved here.
+
+\paragraph{Optimizer}
+CSRM provides an interface to continuous optimizers. In section \ref{secconstopt} we will go deeper into the specific algorithms used. Each algorithm shares a population, instances of which can be subclassed if needed. This approach allows us to reuse a large part of the code between algorithms. For convenience a stub optimizer is added. The optimization algorithms share configuration parameters, and encapsulate those that are distinct to their specific nature.
+% Distributed aspect in distributed paper
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/umldistributed.png}
+    \caption{UML of CSRM.}
+    \label{fig:uml}
+\end{figure}
+
 
 \subsubsection{Implementation}
 Our tool is implemented in Python. The language offers portability, access to rich libraries and fast development cycles. The disadvantages are speed and memory usage compared with compiled languages (e.g. C++) or newer scripting languages (e.g Julia). % ref julia.
@@ -140,7 +161,7 @@ At the end of a phase we store the j best expressions out of the population. J i
 While there are numerous archiving strategies described in literature, we use a simple elitist approach. This means that there is no guarantee that the best j samples of phase i are retained, if they have fitness values lower than those present in the archive and the archive has no more empty slots, they will be ignored.
 This leads us to the size of the archive. While no exact optimal value for this exists, in order to function as memory between phases it should be similar in size to the amount of phases. The j parameter will influence this choice as well.
 
-\subsection{Representation and data structures}
+\subsection{Representation and data structures}\label{subsectree}
 \subsubsection{Expression}
 We use a tree representation for an arithmetic expression, where each internal node represent a base function (unary or binary), and each leaf either a feature or a constant.
 
@@ -155,15 +176,15 @@ A problem with this set is the varying domain of each, why may or may not corres
 
 \paragraph{Constants}
 Constants are fixed values in leaves in the tree. The representation also allows for multiplicative weights for each node, which can be used to optimize the final solution. In contrast to the base functions with a limited set to choose from, constants have the entire floating point range at their disposal. The probability of selecting a 'right' value is nearly non existent, and domain information is lacking for these constants, it depends on the entire subtree holding the constant. We select a constant from a small range and allow the algorithm to recombine these constants later to larger values. This limiting of the search space can lead to the algorithm converging faster to a suboptimal solution.
-% TODO reference main explanation of const optimization problem
 The constants are reference objects in the tree, and so can be accessed and modified in place by an optimizer.
 
 \paragraph{Features}
 Features are represented as an object holding a reference to a set of input values, and always occur as leaves. The choice for a random leaf is evenly distributed between constants and features.
 
 \subsubsection{Population}
-The population of trees is kept in a sorted dictionary, where the key is the fitness value and the value is a reference to the tree representing the expression. 
+The population of trees is kept in a sorted set, where the key is the fitness value and the value is a reference to the tree representing the expression.  Sorted datastructures are notably lacking from Python, we use the sortedcontainers module which provides sorted datastructures that are designed with performance in mind. % todo ref 
 This representation allows for fast access in selecting a (sub)set of fittest trees. It also allows for an O(1) check if we already have an equivalent solution, a tree with a fitness score which we already have in the population. This allows our diversity approach mentioned in \ref{subsubdiversity}.
+In Figure \ref{fig:uml} we see that the actual data structure used as population is interchangeable. If duplicate fitness values are allowed, and membership testing is no longer needed, a sorted list could be used instead.
 
 \subsection{Parameters}
 In this section we briefly list the main parameters of the algorithm and their effects on convergence, runtime and complexity.
@@ -190,7 +211,7 @@ If the archive size is less than the population size, new trees will always be i
 The user can provide the algorithm with input data, or can specify a range from which to sample the input data. In addition, the ratio between training and testing data can be adjusted. Care should be taken in tuning this value. A low ratio will increase the probability that evolved solutions are invalid on the test data, while a high ratio will lead to overfitting.
 
 \subsubsection{Domain}
-Knowing the domain of the problem can significantly reduce the time needed to converge to a solution. In our implementation we assume no domain knowledge. While this increases the complexity of obtaining a good solution, it also makes for a more fair evaluation of the algorithm and optimizations used. 
+Domain specific knowledge can significantly reduce the time needed to converge to a solution. In our implementation we assume no domain knowledge. While this increases the complexity of obtaining a good solution, it also makes for a more fair evaluation of the algorithm and optimizations used. % ref free lunch
 
 \subsection{Incremental support}
 Our tool support incremental operation. The user can provide seeds, expressions that are known or assumed to be good initial approximations. The algorithm writes out the best solutions obtained in an identical format. By combining this the user can create a Design Of Experiment (DOE) setup using the algorithm. As a use case, suppose the user wants to apply symbolic regression on the output of an expensive simulation. The simulator has k features or parameters, each with a different domain and j datapoints. The user wants insights into the correlation of the parameters. 
@@ -210,6 +231,7 @@ Possible disadvantages are :
 \end{itemize}
 We will investigate this approach in our use case in  \ref{secexperiments}.
 The following diagram illustrates a DOE hypercube design using our tool and a simulator. \\
+\begin{figure}\label{fig:incremental}
 \begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\footnotesize}]
 \node (start) [startstop] {Start};
 \node (featureset) [process, below of=start] {Features};
@@ -232,7 +254,10 @@ The following diagram illustrates a DOE hypercube design using our tool and a si
 \draw [arrow] (expressions)-- +(-2, 0) |- (analyze) node[near start,sloped,above, anchor=south] {};
 \draw [arrow] (analyze)-- +(-2, 0) |- (featureset) node[near start,sloped,above, anchor=south] {};
 \draw [arrow] (analyze)-- +(-2, 0) |- (datapoints) node[near start,sloped,above, anchor=south] {reduces/expands};
+
 \end{tikzpicture}
+\caption{Incremental DOE using CSRM and a simulator.}
+\end{figure}
 
 \subsection{Statistics and visualization}
 Stochastic algorithms are notoriously hard to debug. By virtue of the problem statement we do not know whether the rendered solution is what is expected. The size of the search space makes detecting edge cases impossible. In addition the algorithm functions as a black box, where output is presented to the user without a clear trace indicating how or why this output was obtained. Both for developer and practitioner insight into the algorithms inner workings is vital. 

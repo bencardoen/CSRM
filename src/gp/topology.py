@@ -138,8 +138,8 @@ class TreeTopology(Topology):
     Tree structure.
 
     Each node sends to its children. Leaves send to None.
-    This is a full binary tree.
-    For N nodes, the tree has (N-1) links, with no cycling dependencies.
+    This is a binary tree.
+    For N nodes, the tree has (N-1) links, with no cyclic dependencies.
     Communication overhead is minimized, while still allowing for diffusion.
     With each node generating independently, the pipeline effect is largely avoided.
     """
