@@ -152,11 +152,7 @@ class ParallelGP():
         selectedsamples, buf = [], []
         if targetcount:
             selectedsamples = self.algorithm.getArchived(self._communicationsize)
-            # logger.info("Process {} :: Got from algorithm {} ".format(self.pid, len(selectedsamples) ))
-            # logger.info("Process {} :: Got from algorithm {} ".format(self.pid, [t.getFitness() for t in selectedsamples] ))
             buf = self.spreadpolicy.spread(selectedsamples, targetcount)
-        #     logger.info("Process {} :: Sendbuffer {} ".format(self.pid, [[t.getFitness() for t in b] for b in buf] ))
-        # logger.info("Process {} :: Sending from {} -->  [{}] --> {}".format(self.pid, self.pid, len(selectedsamples), targets))
         if self.communicator:
             self.waitForSendRequests()
             for index, target in enumerate(targets):
@@ -267,6 +263,9 @@ class SequentialPGP():
         #logger.info("Topology = \n{}".format(self._topo))
 
     def executeAlgorithm(self):
+        """
+        Main driver for the algorithm.
+        """
         for j in range(self._phases):
             for i, process in enumerate(self._processes):
                 process.executePhase()
@@ -292,6 +291,8 @@ class SequentialPGP():
         From all processes, get summarized results.
         """
         return [p.summarizeResults(self._X, self._Y) for p in self._processes]
+
+# Factored out function, used by both SQ and Parallel.
 
 
 def reportOutput(processes, X, Y, save=False, display=False, outputfolder=None, pid=None,):

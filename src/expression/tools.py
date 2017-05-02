@@ -196,6 +196,9 @@ def generateVariables(varcount: int, datacount: int, seed: int, sort=False, lowe
 
 
 def getNormal(seed, mean, size):
+    """
+    Get a value in a normal distribution with given seed, around a mean and with size interpreted as scale (stddev).
+    """
     assert(seed is not None)
     #logger.info("Getting normal ")
     numpy.random.seed(int(seed))
@@ -267,6 +270,9 @@ def scaleTransformation(elements, lower=-1, upper=1):
 
 
 def getRandom(seed=None):
+    """
+    Wrapper call to return a RNG that follows the python random interface.
+    """
     rng = random.Random()
     if seed is not None:
         rng.seed(seed)
@@ -299,6 +305,9 @@ def rootmeansquarenormalized(actual, expected):
 
 
 def equality(actual, expected):
+    """
+    First failure check between actual, expected.
+    """
     for a, b in zip(actual, expected):
         if abs(a-b) > 0.000001:
             return False
@@ -306,6 +315,9 @@ def equality(actual, expected):
 
 
 def placeholder(actual, expected):
+    """
+    Test function for pearson r.
+    """
     # if equality(actual, expected):
     #     return 1
     if numpy.std(actual) == 0 or numpy.std(expected) == 0:
@@ -492,6 +504,9 @@ def permutate(lst, seed=None):
 
 
 def flatten(nestedlist):
+    """
+    Flatten a list recursively.
+    """
     result = []
     for x in nestedlist:
         if isinstance(x, list):
@@ -502,6 +517,9 @@ def flatten(nestedlist):
 
 
 def frequencyTable(nestedvalues):
+    """
+    Absolute frequency of v in nestedvalues (can be nested).
+    """
     f = {}
     nv = flatten(nestedvalues)
     for v in nv:
