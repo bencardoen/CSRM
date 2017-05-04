@@ -85,9 +85,6 @@ We use a solution set of 50, a population of 25 employed particles, 25 onlookers
 
 % TODO
 \subsubsection{PSO}
-% What is it
-% Why DE
-% How Configure it
 Particle Swarm Optimization \cite{PSO} is one of the oldest population based metaheuristics. It consists of n particles that share information with each other about the global best solution.
 
 \paragraph{Algorithm}
@@ -103,9 +100,10 @@ Finally the global best is recorded.
 
 \subparagraph{Modification}\label{subppsomodification}
 The algorithm updates all particles in sequence, then records the new global best.
+Let d be the dimension of the problem, or in our case the number of constants in the tree to optimize.
 The velocity v at iteration i of a particle is updated using:
 \[
-v_{i+1} = w_i * v_i + C_1 * (p_i - g_i) * R_1 + C_2 * (p_i - G_i) * R_2.
+v_{i+1 j} = w_i * v_{ij} + C_1 * (p_{ij} - g_{ij}) * R_1 + C_2 * (p_{ij} - G_{ij}) * R_2 \forall j in [0, d)
 \]
 with
 \begin{itemize}
@@ -124,16 +122,18 @@ Without the inertia weight PSO has issues with velocity explosion, the velocity 
 \\
 The position is updated using :
 \[
-x_{i+1} = x_i + v_i
+x_{i+1}{j} = x_{ij} + v_{ij} \forall j in [0, d)
 \]
 The $R_1$ and $R_2$ parameters make the modification stochastic, they introduce perturbations in the calculation. These changes have the benefit that they can break non optimal behavior resulting from the deterministic calculation. If there is a suboptimal best value (local or global) that leads to a too strong attraction, forcing premature convergence, we can with a certain probability escape from such a value by perturbing the velocity calculation. The C constants determine how strong the effect is of respectively the local best (of the particle) and the global best (of the swarm).
 After all particles are updated, the new global best is recorded for the next iteration.
 
 \subparagraph{Selection}
-An interesting difference with other algorithms is that the position is always updated, whether it improves the fitness or not. The local best records the best known position, but the particle is allowed to visit positions with lower fitness values. This allows it to escape local optima. The global best is obviously only updated with an improved value. The comparison is strict, meaning that only a better value can become the new global best. This may not seem significant, but allowing equality updates can actually benefit an optimization process. To see this it helps to view the fitness domain as a landscape with troughs, valleys and heights. Allowing for equality updates allows the global best to move despite no apparent improvement in fitness. This allows it to cross areas where no gradient is observed, for example between two peaks where the lower one is a local optima. 
+An interesting difference with other algorithms is that the position is always updated, whether it improves the fitness or not. The local best records the best known position, but the particle is allowed to visit positions with lower fitness values. This allows it to escape local optima. The global best is obviously only updated with an improved value. The comparison is strict, meaning that only a better value can become the new global best. This may not seem significant, but allowing equality updates can actually benefit an optimization process. To see this it helps to view the fitness domain as a landscape with troughs, valleys and heights. Allowing for equality updates allows the global best to move despite no apparent improvement in fitness. In this analogy we represent a (sub) optimal value with low points in the landscape.
+This allows it to cross areas where no gradient is observed, for example between two low points where the lower one is a local optima. 
 
 \paragraph{Cost}
-With a population size of n, the algorithm requires n fitness evaluations per iteration. The computational cost of updating the velocity and position is small given the evaluation cost of an expression tree over several datapoints. In our implementation we will halt the algorithm if it can't improve the global best after k/2 iterations, where k is the maximum number of iterations it can execute. The total cost in fitness evaluations is therefore O(nk).
+With a population size of n, the algorithm requires n fitness evaluations per iteration. The computational cost of updating the velocity and position is small given the evaluation cost of an expression tree over several datapoints. However, it is linear in d, the number of dimensions. If the tree increases in size, the number of constants can increase in the worst case exponentially. On average due to the construction algorithm we expect that half the leaves in the tree are constants. Given our discussion of the constant folding algorithm we know that a full binary is unlikely, so the number of constant nodes is equally unlikely to increase exponentially, but will nonetheless scale poorly.
+In our implementation we will halt the algorithm if it can't improve the global best after k/2 iterations, where k is the maximum number of iterations it can execute. The initialization stage adds another n evaluations, in addition to n per iteration. The total cost in fitness evaluations is therefore n(k+1), resulting in a worst case evaluation complexity of O(nk).
 
 \paragraph{Configuration}
 This overview gives the values of each parameter used in CSRM's PSO implementation.
@@ -146,11 +146,47 @@ This overview gives the values of each parameter used in CSRM's PSO implementati
 % List parameters in CSRM.
 % Link to PSO tutorial
 
-
 \subsubsection{DE}
+Differential Evolution is a vector based optimization algorithm, or rather as the name implies, it operates by computing the difference between particles. 
 % What is it
 % Why DE
 % How Configure it
 \paragraph{Algorithm}
+The algorithm has a population of n vectors, similar to the other algorithms it holds a linear set of values to optimize, one per dimension.  
+% use DE notation.
+\subparagraph{Initialization}
+Similar to our approach in initialization PSO, we perturb a known (sub) optimal solution. A vector holds its current values, and the best value. 
+\subparagraph{Modification}
+Each iteration the algorithm processes all vectors. For each vector x, three distinct randomly selected vectors are selected (with replacement). From these 3 vectors a new 'mutated' vector is obtained:
+\[
+\vec{v} = \vec{w} + F (\vec{y} - \vec{z})
+\]
+With w,y,z randomly chosen and not equal to x.\\
+From this step the algorithm lends its name. The F factor influences the effect of the difference. 
+Then we apply a crossover operation, using vectors x and v and probability parameter Cr.
+We select a random index j with $ j \in [0, \vert x \vert)$. We then create a new vector u:
+\[
+u_i = k_i \forall i \in [0, \vert x \vert
+\]
+and $k_i$ equal to 
+\[   \left\{
+\begin{array}{ll}
+      v_i & i = j \lor r < Cr \\
+      x_i & i \neq j \land r \geq Cr \\
+\end{array} 
+\right.
+\]
+\subparagraph{Selection}
+For a given selected vector $\vec{x}$ and created vector $\vec{u}$ we now test if $\vec{x}$ is a better candidate than $\vec{u}$, in other words has a lower or equal fitness value. Note the distinction here with PSO, the equality test allows DE vectors to cross areas without a gradient. If f($\vec{u}$) <= $\vec{x}$ the vector is replaced with $\vec{u}$. The global and local best are updated as well. A difference with PSO is that a PSO particle changes regardless of fitness value, whereas in DE the modification is only committed if a better or equal fitness value is obtained. The first approach allows an optimization algorithm to break free from local optima. DE uses the random selection of other vectors to create a similar effect. If we use the landscape analogy, as long as at least one DE vector is outside a depression in the landscape, but all the others are converging to the suboptimal minimum, DE has a probability to escape a local optima. Unlike PSO DE (in our configuration) does not use the global best in its calculations, sharing of information is completely distributed over the vectors.
+\paragraph{Cost}
+For each vector 3 other vectors are used, or restated we create 2 new vectors. Similar to PSO these calculations have a complexity linear in d, the dimensionality of the problem. The fitness function is called once per iteration per vector. Compared to PSO we therefore have the exact same evaluation complexity of O(nk).
 
 \paragraph{Configuration}
+CSRM uses a DE/rand/2/bin configuration. The DE/x/y/z notation reflects its main configuration, where x is the vector perturbed, y is the vectors used in the differential step and z is the crossover operation (binomial). This configuration is referenced \cite{DE} as one of the most competitive for multimodal problems with good convergence to the global optimum. Since we start from a probable local optimum the choice for a random vector instead of the global best vector also helps avoid premature convergence.
+This overview gives the values of each parameter used in CSRM's DE implementation.
+\begin{itemize}
+\item F = 0.6 : F should be in [0.4, 1] Large F values favor exploration, whereas small F values favor exploitation. The value of 0.6 is reported as good starting value. In our problem domain we already have a (sub) optimal solution which we wish to improve, so the risk of premature convergence is high, hence the bias to exploration. 
+\item Cr = 0.1 : The Cr values should be in [0,0.2] for separable functions, and [0.9, 1] for non separable functions. We cannot assume dependency between the constants, and therefore use a value of 0.1. This results in DE focussing alongside the axes of each dimension in its search trajectory. 
+\end{itemize}
+Compared to PSO DE has a low parameter count, and the optimal values for these parameters can be found in literature \cite{DESurveyLatest}. The population size should be t * d with t in [2, 10]. Since we do not know d in advance, and to keep the comparison fair we set the population at 50, allowing for optimal values for up to 25 dimensions (constants).
+While DE has a small set of parameters, their effect is still quite pronounced. There exists implementations of DE that use self adapting parameters, but this is beyond our scope. It should be noted that CSRM's optimizer has a very small optimization budget (in evaluation cost) and each new problem has potentially new characteristics. We therefore chose for the most robust values and configuration.
