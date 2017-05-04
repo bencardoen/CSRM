@@ -9,51 +9,148 @@ Using the checking procedure in the initialization, a tree marked as a constant 
 It is still possible to create constant expressions by applying mutation and crossover. If the left subtree of a node is a constant expression, and the right is not constant, but this right is replaced by either mutation or crossover with a constant expression then the node becomes a constant expression. The mutation operator will not generate constant subtrees, so this leaves only crossover. Our tool does not prevent constant expressions from forming in this way, the evaluation following crossover will remove the constant expressions immediately.
 \subsubsection{Folding}
 % Future work : fold the multipliers
+
 \paragraph{Constant subtree problem}
 A tree can contain subtrees that represent constant expressions. This is an immediate effect of the GP algorithm trying to evolve the correct constant. This can lead to large subtrees that can be represented by a single node. Nodes used in such a constant subtree are not available for base functions. They waste memory and evaluation cost, without their presence the tree could become a fitter instance. We will evaluate these effects in the experiments section.
+
 \paragraph{Constant subtree folding}
 It is possible to use a depth sensitive objective function to try to mitigate this effect, but a more direct approach is replacing the subtrees.
 Using the previous constant expression detection technique we can collect all constant subtrees from a tree. We evaluate each subtree, and replace it with the constant value it represents. This leads to a saving nodes, possibly in depth. These savings can have an effect on the convergence as well. Mutation and crossover will no longer operate on constant subtrees, and the iterations and place in the tree that becomes available can be used to improve the tree.
 Constant folding requires an O(n) detection check, since the entire tree needs to be traversed. The folding operation itself is at worst O(n), if the entire tree is constant.
+% Figure
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/prefold.png}
+    \caption{Tree before subtree folding.}
+    \label{fig:prefold}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/postfold.png}
+    \caption{Tree after subtree folding.}
+    \label{fig:postfold}
+\end{figure}
+
 \paragraph{Edge cases}
+In Figure \ref{fig:postfold} we the effect of applying the constant subtree folding. 
 There are subtle edge cases that can't be detected using the above method. Consider the tree representing the expression
 \[
 f(x) = \max(x, 4 + \sin(0.3)) 
 \]
+% Link to image
 The subexpression 4 + sin(0.3) is detected and folded into the constant 4.26. 
-We should not stop there, since f can still be a constant expression if $\forall i :  x_i < 4.26$. To verify this we need to evaluate f on all i datapoints. In contrast, the constant subtree detection code needs only 1 evaluation. Even if we should evaluate f for all i, this will not guarantee us that f is indeed a constant expression. All this check then proves is that for all i in the training data, f is constant. The testing data holds new values, for which f may or may not be constant. We conclude that this edge case cannot be prevented from occurring.
+We should not stop there, since f can still be a constant expression if $\forall i :  x_i < 4.26$. To verify this we need to evaluate f on all i datapoints. In contrast, the constant subtree detection code needs only 1 evaluation. In the figure we see a similar case in the right subtree, for the first value of $x_0$ the right subtree is indeed constant. 
+Even if we should evaluate f for all i, this will not guarantee us that f is indeed a constant expression. All this check then proves is that for all i in the training data, f is constant. The testing data holds new values, for which f may or may not be constant. We conclude that this edge case cannot be prevented from occurring.
 Another similar case occurs in expressions of the form 
 \[
 f(x, y) = \tan(y) * \sqrt{x/x}
 \]
-In this reduced example the node $\sqrt{x/x}$ is simply $\sqrt{1}$. Outside of this example, detecting such cases is non trivial. There is clear benefit to do so, despite their low occurrence: if x's domain includes 0 this tree is never generated because it leads to division by zero in a single datapoint. One way to solve this is to use mathematical software to simplify the expressions, and then convert them back to tree representations. Applying this step should be based on the cost versus benefit and the frequency of such occurrences. % link future work
+In this reduced example the node $\sqrt{x/x}$ is simply $\sqrt{1}$. Outside of this example, detecting such cases is non trivial. There is clear benefit to do so, despite their low occurrence: if the domain of x includes 0 this tree is never generated because it leads to division by zero in a single datapoint. Discarding this expression is however not needed, since $\sqrt{1}$ is a valid subexpression. One way to solve this is to use mathematical software to simplify the expressions, and then convert them back to tree representations. Applying this step should be based on the cost versus benefit and the frequency of such occurrences. 
+% link future work
+
 \paragraph{Conclusion}
 Constant detection and folding mitigate some of the side effects of the constant optimization problem, they do not lead to a more efficient finding of the 'right' constant values. For this we need a continuous optimizer, algorithm designed specifically to optimize real valued problems.
+
 \subsection{Optimizers}
+
 \paragraph{Hybridizing GP}
 Using a real valued optimizer in combination with GP is a known solution \cite{GEDE, GPConst}.
 Which algorithm to combine is a difficult question. To our knowledge there is no comparison made between optimizaton algorithms to find out which is a better fit to combine with GP. 
+
 \paragraph{Problem statement}
 Given a tree with k constant leaves (since all constant subtrees are folded), we would like to find the most optimal values for those constants resulting in a lower (better) fitness. 
+It is vital to perform the constant folding step before optimization takes place. Suppose a given tree has on average k constants, which after folding become j with j $<=$ k. Without folding the optimizer has to solve a k dimensional optimization problem, whereas after folding the problem is only j dimensional. The underlying problem only has j dimensions, so this step is a necessity.
+
 \paragraph{Initialization}
 In most optimization problems the initial solution is not known, only the problem domain and an objective function. The problem we face here does have an initial solution, namely that generated by GP. Instead of choosing random points in the search space, we therefore opt by perturbing this initial solution. An immediate problem here is that the optimizer may simply converge on the initial solution. This risk can be high, given that GP already has evolved it as a suboptimal solution. 
 The problem faced by the population initialization step \ref{subsubinvalidexpressions} reappears here. We could pick random values in the search space, but these are likely to generate invalid trees. We need a balance between exploration and exploitation here. 
+
 \paragraph{Domain}
 Each tree instance has a completely different domain for each constant. We cannot therefore guide the optimizer with domain specific knowledge. This also reflects in the choice of parameters for the optimizer, which will have to be suboptimal for specific problem instances as we want them to work on the largest set of problems.
+
 \paragraph{Comparison and configuration}
 In order to keep the comparison between the algorithms fair they are each configured as similar as is possible. Since they are all population based, and given a maximum number of iterations, all three share these same parameter values. Each application of the algorithm has a significant cost in comparison with the main GP algorithm. In a single iteration with population p, the GP algorithm is likely to perform 2n evaluations (mutation and crossover). If we give the optimizer a population of m and q iterations, it will execute at most in the order of  m x q evaluations. Based on \cite{PSO} we use a default population of 50, and 50 iterations. This means the cost of the optimizer will quickly dominate that of the main GP algorithm, depending on when and on what we apply it.
+
 \subsubsection{ABC}
+% What is it
+% Why DE
+% How Configure it
 Artificial Bee Colony \citep{ABC} is a relative new nature inspired optimization algorithm. It is not limited to continuous optimization, and has even been used for symbolic regression itself \cite{ABCSR}. One of its key advantages over other algorithms is a lower parameter count. Optimal values for an optimization algorithm have a large impact on its convergence behavior, so much so that other optimizers can be required to find the parameters of an optimizer. With a small parameter set finding optimal values becomes easier. Finding optimal values for these parameters is quite often related to the problem domain, and as we have seen each instance here will have a new domain. ABC is good at exploration (thanks to the scouting phase) though sometimes lacking in exploitation. To resolve this ABC can be combined with more exploitative algorithms \citep{ABCPSO}.
+
 \paragraph{Algorithm}
 ABC is a population based algorithm, using 3 distinct phases per iteration. We will refrain from using the nature analogy in describing the algorithm as it is quite often inappropriate. The algorithm maintains a set of potential solutions and a population of particles. Each particle is either employed, onlooker, or scout. An employed particle perturbs a known solution, and if an improvement in fitness is obtained replaces the old solution. If this fails a preset number of iterations, the solution is discarded and a new one scouted. Scouting in this context is generating a new potential solution. After the employed phase the onlooking particles decide, based on a fitness weighted probability, which solutions shoud be further optimized. In contrast to the employed particles they swap out solutions each iterations, whereas an employed particle is linked to a single solution. Finally exhausted solutions are replaced by scouted solutions.
+
 \paragraph{Configuration}
 We use a solution set of 50, a population of 25 employed particles, 25 onlookers and a single scout. These parameters are suggested in \citep{ABC}. A higher scout value is not warranted, since we already have a good starting point. More exploration would also result in the initialization problem dominating the runtime cost of the optimizer. 
-\paragraph{Psuedo code}
+
 % TODO
 \subsubsection{PSO}
-Particle Swarm Optimization \cite{PSO} is one of the oldest population based metaheuristics. 
+% What is it
+% Why DE
+% How Configure it
+Particle Swarm Optimization \cite{PSO} is one of the oldest population based metaheuristics. It consists of n particles that share information with each other about the global best solution.
+
 \paragraph{Algorithm}
+\subparagraph{Initialization}
 Each particle is assigned a n dimensional position in the search space, in our application a perturbed instance of the constant values we wish to optimize. A particle's position is updated using its velocity. This last is influenced by information from the global best and the local best. The concept of inertia is used to prevent velocity explosion \cite{PSOExplosion}.
+Each particle is given a random location at start. In our application we already have an (sub)optimal solution, the constant values in the tree instances have been evolved by the GP algorithm. Rather than pick random values, we perturb the existing solution. This is a difficult trade-off. If the perturbation is not large enough the optimizer will simply converge on the known solution. If we perturb too greatly the risk for invalid solutions increases, rendering a large selection of the population invalid. We can initialize the population with n perturbed solutions or with n-1 with the initial value remaining intact. The n-1 solution is useful to test the algorithm, ideally the swarm will converge on the known best value. When applying the optimizer the n-perturbation approach is used, minimizing the risk for premature convergence.
+CSRM multiplies each constant with a random value in [0,1].
+Each particle is assigned a small but non-zero velocity. The reason for this is again avoiding premature convergence. Without this velocity all particles are immediately attracted to the first global best. While attraction to this value is desired, it should not dominate the population. The small value of the initial velocity once again reflects an empirical discovered balance between exploration and exploitation.
+Each particle is assigned an inertiaweight. % ref inertia 
+This value is one approach to combat the velocity explosion problem, which we will cover in \ref{subppsomodification}. 
+Finally the global best is recorded. 
+
+
+\subparagraph{Modification}\label{subppsomodification}
+The algorithm updates all particles in sequence, then records the new global best.
+The velocity v at iteration i of a particle is updated using:
+\[
+v_{i+1} = w_i * v_i + C_1 * (p_i - g_i) * R_1 + C_2 * (p_i - G_i) * R_2.
+\]
+with
+\begin{itemize}
+\item $v_i$ Current velocity
+\item $p_i$ Current position (set of constant values)
+\item $g_i$ Local best
+\item $G_i$ Global best
+\item $C_1$ Constant weight influencing the effect the local best has on the velocity.
+\item $C_2$ Constant weight influencing the effect the global best has on the velocity.
+\item $w_i$ Inertia weight simulating physical inertia.
+\item $R_1$ Random value perturbing the effect the local best has on the velocity.
+\item $R_2$ Random value perturbing the effect the global best has on the velocity.
+\end{itemize}
+Without the inertia weight PSO has issues with velocity explosion, the velocity has a tendency to increase to large values. This increases the distance between particles, but more importantly is far more likely to generate positions that are no longer inside the domain of one or more of the dimensions. Inertia weighting will dampen this effect. % Reference inertia values.
+% Inertia.
+\\
+The position is updated using :
+\[
+x_{i+1} = x_i + v_i
+\]
+The $R_1$ and $R_2$ parameters make the modification stochastic, they introduce perturbations in the calculation. These changes have the benefit that they can break non optimal behavior resulting from the deterministic calculation. If there is a suboptimal best value (local or global) that leads to a too strong attraction, forcing premature convergence, we can with a certain probability escape from such a value by perturbing the velocity calculation. The C constants determine how strong the effect is of respectively the local best (of the particle) and the global best (of the swarm).
+After all particles are updated, the new global best is recorded for the next iteration.
+
+\subparagraph{Selection}
+An interesting difference with other algorithms is that the position is always updated, whether it improves the fitness or not. The local best records the best known position, but the particle is allowed to visit positions with lower fitness values. This allows it to escape local optima. The global best is obviously only updated with an improved value. The comparison is strict, meaning that only a better value can become the new global best. This may not seem significant, but allowing equality updates can actually benefit an optimization process. To see this it helps to view the fitness domain as a landscape with troughs, valleys and heights. Allowing for equality updates allows the global best to move despite no apparent improvement in fitness. This allows it to cross areas where no gradient is observed, for example between two peaks where the lower one is a local optima. 
+
+\paragraph{Cost}
+With a population size of n, the algorithm requires n fitness evaluations per iteration. The computational cost of updating the velocity and position is small given the evaluation cost of an expression tree over several datapoints. In our implementation we will halt the algorithm if it can't improve the global best after k/2 iterations, where k is the maximum number of iterations it can execute. The total cost in fitness evaluations is therefore O(nk).
+
 \paragraph{Configuration}
+This overview gives the values of each parameter used in CSRM's PSO implementation.
+\begin{itemize}
+\item $C_1$ 2 % link paper
+\item $C_2$ 2
+\item $w_i = \frac{1 + r}{2}$ with r random in [0,1]
+\item $R_1, R_2$ r with r random in [0,1]
+\end{itemize}
+% List parameters in CSRM.
 % Link to PSO tutorial
+
+
 \subsubsection{DE}
+% What is it
+% Why DE
+% How Configure it
+\paragraph{Algorithm}
+
+\paragraph{Configuration}

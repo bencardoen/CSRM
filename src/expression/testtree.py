@@ -733,6 +733,20 @@ class TreeTest(unittest.TestCase):
                 self.assertTrue(nd == 0)
             self.assertEqual(ndp, dp)
 
+    def testCTFold(self):
+        dpoint = 5
+        vcount = 5
+        vs = generateVariables(vcount, dpoint, seed=0)
+        expr = " ((x1+7 * x3) + (-0.98 * tanh( cos( 4.5 ) ) ) * min( sin(0.134), max(sqrt(x0/x0), abs(sin(1.04 + 2.10))) ) )"
+        #abs(x0,sin (1.04 + 2.10) )
+        #( tan(0.173) + 24.7 ) , abs( x0, sin (1.04 + 2.10) )))
+        t = Tree.createTreeFromExpression(expr, vs)
+        Y = t.evaluateAll()
+        oldd = t.getDepth()
+        t.printToDot("prefold.dot")
+        gain = t.doConstantFolding()
+        t.printToDot("postfold.dot")
+
     def testBenchmarks(self):
         dpoint = 5
         vcount = 5
