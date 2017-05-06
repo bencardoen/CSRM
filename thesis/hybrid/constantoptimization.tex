@@ -103,7 +103,7 @@ The algorithm updates all particles in sequence, then records the new global bes
 Let d be the dimension of the problem, or in our case the number of constants in the tree to optimize.
 The velocity v at iteration i of a particle is updated using:
 \[
-v_{i+1 j} = w_i * v_{ij} + C_1 * (p_{ij} - g_{ij}) * R_1 + C_2 * (p_{ij} - G_{ij}) * R_2 \forall j in [0, d)
+v_{i+1 j} = w_i * v_{ij} + C_1 * (p_{ij} - g_{ij}) * R_1 + C_2 * (p_{ij} - G_{ij}) * R_2 \forall j \in [0, d)
 \]
 with
 \begin{itemize}
@@ -124,12 +124,12 @@ The position is updated using :
 \[
 x_{i+1}{j} = x_{ij} + v_{ij} \forall j in [0, d)
 \]
-The $R_1$ and $R_2$ parameters make the modification stochastic, they introduce perturbations in the calculation. These changes have the benefit that they can break non optimal behavior resulting from the deterministic calculation. If there is a suboptimal best value (local or global) that leads to a too strong attraction, forcing premature convergence, we can with a certain probability escape from such a value by perturbing the velocity calculation. The C constants determine how strong the effect is of respectively the local best (of the particle) and the global best (of the swarm).
+The $R_1$ and $R_2$ parameters make the modification stochastic, they introduce perturbations in the calculation. These changes have the benefit that they can break non optimal behavior resulting from the deterministic calculation. If there is a suboptimal best value (local or global) that leads to a too strong attraction and thus forcing premature convergence, we can with a certain probability escape from such a value by perturbing the velocity calculation. The C constants determine how strong the effect is of respectively the local best and the global best. This reflects the balance between exploration and exploitation respectively, where a particle is influenced more by its own information or that of the swarm.
 After all particles are updated, the new global best is recorded for the next iteration.
 
 \subparagraph{Selection}
 An interesting difference with other algorithms is that the position is always updated, whether it improves the fitness or not. The local best records the best known position, but the particle is allowed to visit positions with lower fitness values. This allows it to escape local optima. The global best is obviously only updated with an improved value. The comparison is strict, meaning that only a better value can become the new global best. This may not seem significant, but allowing equality updates can actually benefit an optimization process. To see this it helps to view the fitness domain as a landscape with troughs, valleys and heights. Allowing for equality updates allows the global best to move despite no apparent improvement in fitness. In this analogy we represent a (sub) optimal value with low points in the landscape.
-This allows it to cross areas where no gradient is observed, for example between two low points where the lower one is a local optima. 
+This allows it to cross areas where a zero gradient is observed, for example between two low points where the lower one is a local optima. 
 
 \paragraph{Cost}
 With a population size of n, the algorithm requires n fitness evaluations per iteration. The computational cost of updating the velocity and position is small given the evaluation cost of an expression tree over several datapoints. However, it is linear in d, the number of dimensions. If the tree increases in size, the number of constants can increase in the worst case exponentially. On average due to the construction algorithm we expect that half the leaves in the tree are constants. Given our discussion of the constant folding algorithm we know that a full binary is unlikely, so the number of constant nodes is equally unlikely to increase exponentially, but will nonetheless scale poorly.
@@ -138,13 +138,16 @@ In our implementation we will halt the algorithm if it can't improve the global 
 \paragraph{Configuration}
 This overview gives the values of each parameter used in CSRM's PSO implementation.
 \begin{itemize}
-\item $C_1$ 2 % link paper
-\item $C_2$ 2
-\item $w_i = \frac{1 + r}{2}$ with r random in [0,1]
+\item $C_1$ = 2 
+\item $C_2$ = 2 : Setting both to 2 is recommended as the most generic approach \cite{PSOParameter}.
+\item $w_i = \frac{1 + r}{2}$ with r random in [0,1] : In early implementation the inertia weight was kept constant \cite{PSOInertiaShi} There are a large number of strategies for an inertia weight. Dynamically decreasing inertia may improve convergence significantly. 
+We opt for a random inertia weight as it has been shown \cite{PSOInertia} to lead to faster convergence. Since our use case requires fast convergence on very limited iterations, this strategy is clearly favored.
+
 \item $R_1, R_2$ r with r random in [0,1]
+\item population = 50 : PSO is not sensitive to populations larger than this value, providing a robust default value. \cite{SwarmIntelligence}
 \end{itemize}
-% List parameters in CSRM.
-% Link to PSO tutorial
+CSRM's optimizer does not set constraints on the domain of each constant, it is different for each problem instance. 
+Finding the domain of a constant in the expression tree requires a domain analysis of the expression tree. With features in the tree involved, finding the exact domain is infeasible, given that some of the datapoints are unknown. It is therefore possible that a particle obtains values outside the valid domain of one or more constants, resulting in an invalid expression tree. This will result in the particle temporarily no longer contributing to the search process.
 
 \subsubsection{DE}
 Differential Evolution is a vector based optimization algorithm, or rather as the name implies, it operates by computing the difference between particles. 

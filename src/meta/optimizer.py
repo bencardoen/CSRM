@@ -335,7 +335,7 @@ class PSO(Optimizer):
 
     @property
     def rone(self):
-        return self.rng.random()
+        return self.rng.uniform(0,1)
 
     def determineBest(self):
         ob1 = self.bestparticle
@@ -349,7 +349,7 @@ class PSO(Optimizer):
 
     @property
     def rtwo(self):
-        return self.rng.random()
+        return self.rng.uniform(0,1)
 
     def doIteration(self):
         for p in self.particles:
