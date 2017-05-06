@@ -77,7 +77,7 @@ The goal of the algorithm is to find f' such that
 \[Y = f(X)\]
 \[Y' = f'(X)\]
 \[dist(Y, Y') = e\]
-e is minimal.\\
+results in e minimal.\\
 Not all distance functions are equally well suited for this purpose. A simple root mean squared error (RMSE) function has the issue of scale, the range of this function is [0, +$\infty$), which makes comparison problematic, especially if we want to combine it with other objective functions. A simple linear weighted sum requires that all terms use the same scale. 
 Normalization of RMSE is an option, however there is no single recommended approach to obtain this NRMSE. \\
 In this work we use a distance function based on the Pearson Correlation Coefficient. Specifically, we define 

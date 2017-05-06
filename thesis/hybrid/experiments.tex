@@ -16,8 +16,37 @@
 \subsection{Constant optimization}
 We look at the effect constant optimization using different algorithms has on different configurations of the tool. The measures used in the comparison are best fitness on training and test data, mean fitness on training and test data, and optimization cost.
 
-\subsection{Test problem}
-% Run a few test problems to check convergence is possible.
+\subsubsection{Test problem}
+To verify our implementation for the optimizers we use a simple test problem and observe for each optimizer if it is able to optimize this instance to a known optimal value.
+\[
+f(x_0, x_1, x_2) = 1 + x_1 * \sin (5+x_2) * x_0 + (17 + \sin (233+9))
+\]
+We give each optimizer a population of 50, 50 iterations and compare the results for 10 runs, displaying best value obtained, mean, and standard deviation of the fitness values compared to the known best value.
+\paragraph{Best fitness}
+%With a minimum fitness value of 2.22 e-16 DE outperforms the other optimizer with several orders of magnitude. We see 
+In Figure \ref{fig:testproblembest} we see that DE outperforms PSO and ABC with several orders of magnitude. The best fitness value obtained was 2.22 e-16. As smaller but significant difference is present between PSO and ABC. This result is somewhat expected, as ABC has a reputation for favoring exploration of exploitation. We gave ABC a higher number of employed to balance this behavior, but the general tendency is still present. From our previous discussion \ref{psocost},\ref{decost},\ref{abccost} we can conclude that for this test problem DE is clearly preferable as it obtains the best result at minimum cost. ABC has almost double the cost compared to PSO and DE, with PSO and DE having an equal cost in evaluations. The results on this testproblem do not necessarily mean that in the application of the three optimizers the results will be identical. Here we have a known optimal solution and want to observe how fast the optimizers converge to it. When we optimize evolved expressions we do not know what the optimal solution is. The problem statement is different, and so the convergence behavior is likely to differ as well. In Figures \ref{fig:testproblemmean} and \ref{fig:testproblemsd} we see that both the mean and standard deviation follow the same pattern as seen for the minimum fitness value with DE leading the others by several orders of magnitude. With all three distributions behaving similarly, this result provides a more solid foundation for our conclusions that for this problem DE is indeed the better optimizer.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/testproblem_bestfitness.png}
+    \caption{Logarithmic value of best fitness for each optimizer.}
+    \label{fig:testproblembest}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/testproblem_meanfitness.png}
+    \caption{Logarithmic scaled mean fitness for each optimizer.}
+    \label{fig:testproblemmean}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/testproblem_sdfitness.png}
+    \caption{Logarithmic scaled standard deviation fitness for each optimizer.}
+    \label{fig:testproblemsd}
+\end{figure}
+
+\subsubsection{Benchmark Problems}
+% List benchmark functions
+% And reference them
 
 \subsubsection{2 Phases}
 \paragraph{Fitness}

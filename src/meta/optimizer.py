@@ -444,7 +444,7 @@ class ABC(Optimizer):
         self.scouts = self.populationcount // 2
         self.c = 0.75
         self.original = [c.getValue() for c in particle.getValuedConstants()]
-        self.sources = [ABCSolution(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1, limit = self.c *self.onlookers / 2) for i in range(self.populationcount)]
+        self.sources = [ABCSolution(copyObject(particle), self.rng, Y=expected, distancefunction=distancefunction, particlenr=i if not testrun else i+1, limit = self.c * self.onlookers / 2) for i in range(self.populationcount)]
         self.sumfit = None
         self.D = self.sources[0].D
         self.fitnessweights = None
