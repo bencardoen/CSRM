@@ -11,7 +11,7 @@ It is still possible to create constant expressions by applying mutation and cro
 % Future work : fold the multipliers
 
 \paragraph{Constant subtree problem}
-A tree can contain subtrees that represent constant expressions. This is an immediate effect of the GP algorithm trying to evolve the correct constant. This can lead to large subtrees that can be represented by a single node. Nodes used in such a constant subtree are not available for base functions. They waste memory and evaluation cost, without their presence the tree could become a fitter instance. We will evaluate the size of these effects in the experiments section.
+A tree can contain subtrees that represent constant expressions. This is an immediate effect of the GP algorithm trying to evolve the correct constant. This can lead to large subtrees that can be represented by a single node. Nodes used in such a constant subtree are not available for base functions. They waste memory and evaluation cost, without their presence the tree could become a fitter instance. 
 
 \paragraph{Constant subtree folding}
 It is possible to use a depth sensitive objective function to try to mitigate this effect, but a more direct approach is replacing the subtrees.

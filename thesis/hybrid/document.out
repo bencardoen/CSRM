@@ -53,19 +53,18 @@
 \BOOKMARK [2][-]{subsection.5.2}{Operators}{section.5}% 53
 \BOOKMARK [2][-]{subsection.5.3}{Constant Folding}{section.5}% 54
 \BOOKMARK [3][-]{subsubsection.5.3.1}{Savings}{subsection.5.3}% 55
-\BOOKMARK [3][-]{subsubsection.5.3.2}{Effect on convergence}{subsection.5.3}% 56
-\BOOKMARK [2][-]{subsection.5.4}{Constant optimization}{section.5}% 57
-\BOOKMARK [3][-]{subsubsection.5.4.1}{Test problem}{subsection.5.4}% 58
-\BOOKMARK [3][-]{subsubsection.5.4.2}{Optimizer experiments setup}{subsection.5.4}% 59
-\BOOKMARK [3][-]{subsubsection.5.4.3}{Measures}{subsection.5.4}% 60
-\BOOKMARK [3][-]{subsubsection.5.4.4}{2 Phases}{subsection.5.4}% 61
-\BOOKMARK [3][-]{subsubsection.5.4.5}{5 Phases}{subsection.5.4}% 62
-\BOOKMARK [3][-]{subsubsection.5.4.6}{10 Phases}{subsection.5.4}% 63
-\BOOKMARK [3][-]{subsubsection.5.4.7}{Cost}{subsection.5.4}% 64
-\BOOKMARK [2][-]{subsection.5.5}{Conclusion}{section.5}% 65
-\BOOKMARK [3][-]{subsubsection.5.5.1}{Operator cooling schedule}{subsection.5.5}% 66
-\BOOKMARK [3][-]{subsubsection.5.5.2}{Constant folding}{subsection.5.5}% 67
-\BOOKMARK [3][-]{subsubsection.5.5.3}{Optimizers}{subsection.5.5}% 68
-\BOOKMARK [1][-]{section.6}{Related Work}{}% 69
-\BOOKMARK [1][-]{section.7}{Conclusion}{}% 70
-\BOOKMARK [1][-]{section.8}{Future work}{}% 71
+\BOOKMARK [2][-]{subsection.5.4}{Constant optimization}{section.5}% 56
+\BOOKMARK [3][-]{subsubsection.5.4.1}{Test problem}{subsection.5.4}% 57
+\BOOKMARK [3][-]{subsubsection.5.4.2}{Optimizer experiments setup}{subsection.5.4}% 58
+\BOOKMARK [3][-]{subsubsection.5.4.3}{Measures}{subsection.5.4}% 59
+\BOOKMARK [3][-]{subsubsection.5.4.4}{2 Phases}{subsection.5.4}% 60
+\BOOKMARK [3][-]{subsubsection.5.4.5}{5 Phases}{subsection.5.4}% 61
+\BOOKMARK [3][-]{subsubsection.5.4.6}{10 Phases}{subsection.5.4}% 62
+\BOOKMARK [3][-]{subsubsection.5.4.7}{Cost}{subsection.5.4}% 63
+\BOOKMARK [2][-]{subsection.5.5}{Conclusion}{section.5}% 64
+\BOOKMARK [3][-]{subsubsection.5.5.1}{Operator cooling schedule}{subsection.5.5}% 65
+\BOOKMARK [3][-]{subsubsection.5.5.2}{Constant folding}{subsection.5.5}% 66
+\BOOKMARK [3][-]{subsubsection.5.5.3}{Optimizers}{subsection.5.5}% 67
+\BOOKMARK [1][-]{section.6}{Related Work}{}% 68
+\BOOKMARK [1][-]{section.7}{Conclusion}{}% 69
+\BOOKMARK [1][-]{section.8}{Future work}{}% 70
