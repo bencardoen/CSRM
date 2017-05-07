@@ -111,7 +111,7 @@ def writePlotsCSV(res, name):
                     pi = inv["PassThroughOptimizer"][measure][expression]
                     values[i] = pi - vi # 0.2 - 0.1 = 0.1
                 for j, v in enumerate(values):
-                    f.write(str(v))
+                    f.write("{0: 1.3e}".format(v))
                     if j != len(values):
                         f.write(',')
                 f.write("\n")
