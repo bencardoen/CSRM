@@ -495,6 +495,7 @@ class GPAlgorithm():
         """
         Apply a metaheuristic to the selection (in place).
         """
+        logger.info("Optimizing")
         totalnodes = sum([t.nodecount for t in selected])
         gain = {"nodecount":totalnodes}
         gain["foldingsavings"] = sum(t.doConstantFolding() for t in self._population)
@@ -704,7 +705,7 @@ class BruteCoolingElitist(BruteElitist):
         super().__init__(X, Y, popsize, maxdepth, fitnessfunction, generations, seed=seed, phases=phases, archivesize=archivesize, initialdepth=initialdepth, skipconstantexpressions=skipconstantexpressions, archivefile=archivefile)
         self.optimizer = optimizer
         self.optimizestrategy = optimizestrategy if optimizestrategy is not None else -1
-        logger.info("optimizestrategy {}".format(self.optimizestrategy))
+        logger.info("optimizestrategy {} from parameter {}".format(self.optimizestrategy, optimizestrategy))
 
     @property
     def depthcooling(self):
@@ -734,11 +735,13 @@ class BruteCoolingElitist(BruteElitist):
         Will apply constant folding to make the optimizing step more efficient.
         :returns gain: statistics object recording gains.
         """
-        #logger.info("Running optimizer")
         totalnodes = sum([t.nodecount for t in selected])
         gain = {"nodecount":totalnodes, "optimizercost":0, "fitnessgains":[0 for t in selected], "fitnessgainsrelative":[0 for t in selected], "foldingsavings":0}
         j = 0
-        gain["foldingsavings"] = sum( [t.doConstantFolding() for t in selected])
+        if self.optimizestrategy > -2:
+            gain["foldingsavings"] = sum( [t.doConstantFolding() for t in selected])
+        else:
+            gain["foldingsavings"] = 0
         if self.optimizer and self.optimizestrategy > 0:
             #logger.info("Using optimizer with strategy {}".format(self.optimizestrategy))
             for t in selected:
