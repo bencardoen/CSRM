@@ -6,6 +6,7 @@
 #https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 #      Author: Ben Cardoen
 
+
 def generate(points, minimum, maximum):
     diff = maximum - minimum
     stepsize = diff / points
@@ -81,9 +82,26 @@ def reverseMapping(mapping):
     return result
 
 
+# IGNORE all other code, and only look at this function
+def iterateDesign(design, parameters):
+    print("\nHi Elise, add your code here please :) \n")
+    print("I have {} as parameters (in order)".format(parameters))
+    print("Looks like I have {} values per parameter".format(len(design[0])))
+    for index, value in enumerate(design):
+        print("Doing hideously complex task with {} ".format(value))
+        # I'm guessing that this is where you will write
+        # stride -value
+
+        # if you need access to each value, and no amount of alcohol suffices to grasp my cryptic use of datastructures
+        # for position, parametername in enumerate(parameters):
+        #     print("\tYep, looks like {} has {} for value ".format(parametername, value[position]))
+    print("And while you wait, the answer is 42.")
+
+
 parameters = {"R0":(12,20), "Seed":(1,500), "Immunity":(0.75, 0.95)}
 paramtoindex = {"R0":0, "Seed":1,"Immunity":2}
 indextoparam = reverseMapping(paramtoindex)
+
 
 
 if __name__=="__main__":
@@ -97,3 +115,4 @@ if __name__=="__main__":
     design = readSpec("Design30.spec", len(parameters))
     completed = mergeDesign(orderedvalues, design, len(parameters))
     writeDesign(completed, indextoparam, "design.txt")
+    iterateDesign(completed, indextoparam)
