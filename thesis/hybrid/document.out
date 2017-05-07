@@ -56,11 +56,12 @@
 \BOOKMARK [3][-]{subsubsection.5.3.2}{Effect on convergence}{subsection.5.3}% 56
 \BOOKMARK [2][-]{subsection.5.4}{Constant optimization}{section.5}% 57
 \BOOKMARK [3][-]{subsubsection.5.4.1}{Test problem}{subsection.5.4}% 58
-\BOOKMARK [3][-]{subsubsection.5.4.2}{Benchmark Problems}{subsection.5.4}% 59
-\BOOKMARK [3][-]{subsubsection.5.4.3}{2 Phases}{subsection.5.4}% 60
-\BOOKMARK [3][-]{subsubsection.5.4.4}{5 Phases}{subsection.5.4}% 61
-\BOOKMARK [3][-]{subsubsection.5.4.5}{10 Phases}{subsection.5.4}% 62
-\BOOKMARK [2][-]{subsection.5.5}{Conclusion}{section.5}% 63
-\BOOKMARK [1][-]{section.6}{Related Work}{}% 64
-\BOOKMARK [1][-]{section.7}{Conclusion}{}% 65
-\BOOKMARK [1][-]{section.8}{Future work}{}% 66
+\BOOKMARK [3][-]{subsubsection.5.4.2}{Optimizer experiments setup}{subsection.5.4}% 59
+\BOOKMARK [3][-]{subsubsection.5.4.3}{Measures}{subsection.5.4}% 60
+\BOOKMARK [3][-]{subsubsection.5.4.4}{2 Phases}{subsection.5.4}% 61
+\BOOKMARK [3][-]{subsubsection.5.4.5}{5 Phases}{subsection.5.4}% 62
+\BOOKMARK [3][-]{subsubsection.5.4.6}{10 Phases}{subsection.5.4}% 63
+\BOOKMARK [2][-]{subsection.5.5}{Conclusion}{section.5}% 64
+\BOOKMARK [1][-]{section.6}{Related Work}{}% 65
+\BOOKMARK [1][-]{section.7}{Conclusion}{}% 66
+\BOOKMARK [1][-]{section.8}{Future work}{}% 67

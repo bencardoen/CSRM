@@ -1,6 +1,7 @@
 import json
 import os
 import numpy
+from math import log
 
 resultfile = "Collected results for all processes"
 
@@ -109,7 +110,17 @@ def writePlotsCSV(res, name):
                 for i, expression in enumerate(expressions):
                     vi = inv[algorithm][measure][expression]
                     pi = inv["PassThroughOptimizer"][measure][expression]
-                    values[i] = pi - vi # 0.2 - 0.1 = 0.1
+                    if vi == 0:
+                        if pi == 0:
+                            values[i] = 1
+                        else:
+                            values[i] = -log(pi, 10)
+
+                    else:
+                        values[i] = pi / vi
+                    #     values[i] = vi
+                    # values[i] = pi - vi # 0.2 - 0.1 = 0.1
+
                 for j, v in enumerate(values):
                     f.write("{0: 1.3e}".format(v))
                     if j != len(values):
@@ -138,6 +149,8 @@ if __name__=="__main__":
                 tf = getValue(q, "last_fitness")
                 ff = getValue(q, "fitness")
                 trainingfitness[op] = tf[0]
+                print("balh")
+                assert(min(tf) == tf[0])
                 fullfitness[op] = ff[0]
                 meantrainingfitness[op] = numpy.mean(tf[0:5])
                 meanfullfitness[op] = numpy.mean(ff[0:5])
