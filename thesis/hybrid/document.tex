@@ -9,7 +9,9 @@
 \usepackage[pdftex]{hyperref}
 \usepackage[numbers]{natbib}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{subcaption}
+\usepackage{amsfonts}
 \usepackage{float}
 \usepackage{graphicx}
 
@@ -21,7 +23,7 @@
 
 
 
-\title{Convergence of symbolic regression using metaheuristics
+\title{Convergence of distributed symbolic regression using metaheuristics
     }
 \author{
     %	\begin{tabular}{cccc}
@@ -39,10 +41,14 @@
     \input{introduction.tex}
     \section{Design}\label{secdesign}
     \input{design.tex}
+    \section{Distributed SR}\label{distributed}
+    \input{distributed.tex}
     \section{Constant optimization}\label{secconstopt}
     \input{constantoptimization.tex}
     \section{Experiments}\label{secexperiments}
     \input{experiments.tex}
+    \section{Use Case}\label{secexperiments}
+    \input{usecase.tex}
     \section{Related Work}
     \input{relatedwork.tex}
     \section{Conclusion}
