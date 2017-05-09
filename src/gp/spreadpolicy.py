@@ -7,6 +7,7 @@
 #      Author: Ben Cardoen
 
 import logging
+from expression.tools import getRandom
 logger = logging.getLogger('global')
 
 
@@ -14,7 +15,7 @@ class DistributeSpreadPolicy:
     def spread(buf, n):
         """
         Divide buffer over n parts, with the last part taking a remainder.
-        
+
         If len buffer <= n, return n instances of buffer
         """
         bl = len(buf)
@@ -25,9 +26,9 @@ class DistributeSpreadPolicy:
             assert(len(bf) == n)
             return bf
         else:
-            return [buf for _ in range(n)] # list of 3 references, but the contents are copied in any case
+            return [buf[:] for _ in range(n)]
 
 
 class CopySpreadPolicy:
     def spread(buf, n):
-        return [buf for _ in range(n)]
+        return [buf[:] for _ in range(n)]

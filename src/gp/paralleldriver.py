@@ -80,7 +80,7 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
     if isMPI():
         logger.info("Starting MPI Parallel implementation")
         Xk, Yk = getKSamples(X, Y, samplecount, rng=None, seed=pid)
-        g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth, optimizer=config.optimizer, optimizestrategy=config.optimizestrategy, archive=config.archivefile)
+        g = BruteCoolingElitist(Xk, Yk, popsize=population, maxdepth=depth, fitnessfunction=_fit, seed=pid, generations=generations, phases=phases, archivesize=archivesize, initialdepth=initialdepth, optimizer=config.optimizer, optimizestrategy=config.optimizestrategy, archivefile=config.archivefile)
         g.pid = pid
         algo = ParallelGP(g, X, Y, communicationsize=commsize, topo=t, pid=pid, Communicator=comm)
     else:
