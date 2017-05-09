@@ -16,7 +16,12 @@ class DistributeSpreadPolicy:
         """
         Divide buffer over n parts, with the last part taking a remainder.
 
-        If len buffer <= n, return n instances of buffer
+        If len buffer <= n, return n instances of buffer.
+        E.g.
+            buf = [a, b, c], n = 4 -> [[a,b,c]*4]
+            buf = [a, b, c], n = 2 -> [[a,b],[c]]
+            buf = [a, b, c, d], n = 2 -> [[a,b],[c, d]]
+        :return list: list of lists, each sublist n long.
         """
         bl = len(buf)
         d, m = divmod(bl, n)

@@ -2,8 +2,8 @@ In this section we will detail the design of our tool, the algorithm and its par
 \subsection{Algorithm}
 \subsubsection{Input and output}
 The algorithm accepts a matrix X = n x k of input data, and a vector Y = 1 x k of expected data. It will evolve expressions that result, when evaluated on X, in an 1 x k vector Y' that approximates Y. N is the number of features, or parameters, the expression can use. K is the number of datapoints. The algorithm makes no assumptions on the domain or range of the expressions or data set. While domain specific knowledge can be of great value, in real world situations such data is not always known. We aim to make a tool that operates under this uncertainty.
-\begin{figure}\label{fig:controlflow}
 \subsubsection{Control flow}
+\begin{figure}\label{fig:controlflow}
 \begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\footnotesize}]
 \node (start) [startstop] {Start};
 \node (phase) [decision, below of=start, yshift=-0.5cm] {Phase $<$ Phases};

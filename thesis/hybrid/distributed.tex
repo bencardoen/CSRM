@@ -29,33 +29,36 @@ In general would like the processes to share information in order to accelerate 
 The topology will determine the synchronization between processes, and the balance between diffusion and concentration.
 \paragraph{Synchronization}
 Synchronization between the processes will play an important role. While it won't directly influence convergence, it will constrain the runtime performance of the entire group. If we denote $S_i$ and $T_i$ as the set of processes that are sources and targets respectively for process i, we would like $S_i$ minimal. The message processing code will have to wait for the slowest processes in $S_i$ before continuing. Without asynchronous communication i would have to wait even longer, with the slowest process blocking the receipt of messages from the other processes. Synchronization implies that i cannot send until its receiving stage has completed. If $S_i \cap T_i \neq \emptyset$ we have a cyclic dependency which can introduce deadlock in the implementation. By extension, if there is a cycle in the topology between any i, j processes this deadlock is a real risk. Dealing with this in the communication code is non trivial. We will show in section \ref{subasync} how CSRM is able to deal efficiently with cycles in the topologies that it implements. Even with deadlock solved or prevented, cycles will introduce a tendency for the the processes to serialize on the slowest process in the node. The time spent waiting in the communication stage is lost to the convergence process. We will show how this is mitigated in our implementation.
+
 \subsubsection{Grid}
-This topology arranges a set of k processes in a square 2D grid. Each process is connected with the neighbouring processes, respectively up, down, left and right. Some variations include diagonal links, or create 3 or higher dimensional meshes. The general idea behind the grid is unchanged in those configurations. 
+This topology arranges a set of k processes in a square 2D grid. Each process is connected with the neighbouring processes, respectively up, down, left and right. Some variations include diagonal links, or create 3 or higher dimensional meshes. The general idea behind the grid remains invariant in those configurations. 
 A grid connects all processes, allowing for diffusion of the best solution to each individual process. The key observation here is that diffusion is gradual. While a process has an immediate neighbourhood, reaching all processes takes a variable amount of communication links. Diffusion of a dominating solution will take time, and if the solution is suboptimal this time allows the other processes to evolve their own optimal solutions thereby preventing premature convergence. This risk is only mitigated by gradual diffusion, not eliminated. Elimination is only possible in the extreme case by an absence of communication or in a more advanced configuration the usage of cliques. 
 Nodes on the borders of the grid communicate with their counterparts at the mirrored side of the grid. This ensures that the communication process is symmetric. CSRM supports both square grids, where k is square of natural number, or incomplete squares. 
-If $\sqrt{k} \neq n $ for some $n \in \mathbb{N}$ we create a grid that would fit j processes where $ \min(j) > k \forall j \in \mathbb{N} \land \sqrt{j} = n$. This grid is filled row by row with k processes. This configuration should be avoided, as the communication pattern will not always be symmetrical. It is implemented to allow for a fair comparison with other topologies where the processcount is not a square. 
-% TODO Figure.
+If $\sqrt{k} \neq n $ for some $n \in \mathbb{N}$ we create a grid that would fit j processes where $ \min(j) > k \forall j \in \mathbb{N} \land \sqrt{j} = n$. This grid is filled row by row with k processes. This configuration should be avoided, as the communication pattern will not always be symmetrical. It is implemented to allow for a fair comparison with other topologies where the processcount is not a square. In Figure \ref{fig:topologies}\subref{subfig:grid} we see the communication patterns in a grid with 9 processes.
+
 \paragraph{Cost}
 The communication cost for k processes in a single iteration, with m messages sent per exchange, is in our configuration 4km.
 The synchronization constraints are high, all processes are interdependent (directly or at most $\sqrt{k}$ links removed).
 Lookup of targets is statically determined, at configuration each parallel process is given a simple integer indexed mapping, and the symmetry of the mapping simplifies the lookup code.
 \subsubsection{Wheel}
-A wheel, or circle topology connects all processes with a single link shared between each source and target. Diffusion is slower than with a grid, with k processes it takes k-1 messages to reach all processes. Some variations introduce a 'hub', with spokes reaching out the circle itself, completing the wheel analogy. CSRM implements this topology as a simple circle. A spoked wheel topology, if the hub has bidirectional communication with all processes, has a maximum distance of 2 between all processes offering fast diffusion. Without a hub but bidirectional links the maximum distance is k/2.
+A wheel, or circle topology connects all processes with a single link shared between each source and target. Diffusion is slower than with a grid, with k processes it takes k-1 messages to reach all processes. Some variations introduce a 'hub', with spokes reaching out the circle itself, completing the wheel analogy. CSRM implements this topology as a simple circle. A spoked wheel topology, if the hub has bidirectional communication with all processes, has a maximum distance of 2 between all processes offering fast diffusion. Without a hub but with bidirectional links the maximum distance is k/2. A unidirectional variant is shown in Figure \ref{fig:topologies}\subref{subfig:wheel}.
 \paragraph{Cost}
 For k processes with m messages sent per exchange, the communication cost is km. This is a static configuration, with symmetric lookup. A circle forms a cycle, resulting in high synchronization constraints. The variant with hub and spokes introduces even higher synchronization constraints. At a doubling of message cost the doubly linked circle has an significantly higher synchronization cost than the singly linked variant. 
 % Figure
 \subsubsection{Random}
 In a random topology a process picks a random target for its messages. We can either configure it to do so statically, such that the target remains invariant at runtime, or select a new target each iteration. The number of targets is variable as well. CSRM implements all variants, allowing for both dynamic and static random topologies with a variable amount of targets per sending process. The idea behind a random topology is avoiding patterns that are present in the structured topologies. If such a pattern leads to premature convergence, poor synchronization or fails to gain from the exchange of information between the processes there exists a possibility that a random approach can work. The downside is that we do not know what the maximum distance is between two processes, or even if they are connected. There can cliques in the topology, or cycles. Avoiding these, or detecting them requires more complex code than a simple random assignment of targets. By increasing the number of targets we decrease the possibility of cliques, and will minimize eventually the distance between two processes, at the cost of increased overhead.
-CSRM does not enforce constraints such as clique or cycle forming in its random topologies.
+CSRM does not enforce constraints such as clique or cycle forming in its random topologies. In Figure \ref{fig:topologies}\subref{subfig:clique} we see how a clique of cycles created by a random static configuration. A configuration with 2 links per process is shown in Figure \ref{fig:topologies}\subref{subfig:randomstatic}.
 \paragraph{Cost}
 The cost for a singly linked random static topology of k processes with m processed per exchange is clearly km. Synchronization constraints are unknown, and would have to be resolved by the processes. Cyclic dependencies between the processes are likely.
 The lookup code for a static configuration is simple, symmetric and fast. For a dynamic configuration the lookup is simple, but only symmetric at single points in time. This observation is important because the virtual time of a process will diverge from that of the other processes. By allowing a dynamic configuration we introduce a new type of synchronization constraint. In CSRM processes have a copy of the global topology, but this is no longer immutable. In order to resolve sources the process has to know the virtual time of the other processes. The topology remains deterministic, the seed used is identical between each process. Synchronization is highly complex in a random dynamic topology as cycles and cliques vary over time.
 % Figure
 \subsubsection{Tree}
 We introduce a binary tree topology. The links are unidirectional, with a single root and a given depth. The processcount should ideally be $k = 2^{d+1} -1$ for some $d > 0 \in \mathbb{N}$ to create full binary tree. This is not a hard constraint, with values not satisfying we construct a tree of depth $ d =\lfloor\log_2{k}\rfloor$ and fill the last level left to right until all processes are assigned a position. Communication is unidirectional, from the root to the leaves. This topology is free from cliques or cycles. The leaves act as sinks, while the root is a source. Lookup is fast, static and symmetric. Each process, except the leaves has at most two targets, and one source (except the root). The tree topology offers a structured balance between diffusion and concentration. The distance between two processes range from 1 to $\log_2{k}$. In the case of leaves the distance is infinite. Note that depending on the communication strategy, each subtree behaves as a sink, and will not diffuse information.
-A variant on this topology is a singly linked list, where the maximum distance is k. The problem with this topology is that its diffusion scales linearly with k.
+A variant on this topology is a singly linked list, where the maximum distance is k. The problem with this topology is that its diffusion scales linearly with k. The full binary tree configuration is shown in Figure \ref{fig:topologies}\subref{subfig:tree}.
 \paragraph{Cost}
-For k processes and m messages per exchange, we have km messages exchanged. Synchronization overhead is minimal, there are no cycles and a process is influenced at most by $\log_2{k}$ other processes and influences at most k-1. With the exception of a disconnected topology the tree topology allows for a high speedup compared with grid, random and circle. 
+For k processes and m messages per exchange, we have (k-1)m messages exchanged. Synchronization overhead is minimal, there are no cycles and a process is influenced at most by $\log_2{k}$ other processes and influences at most k-1. With the exception of a disconnected topology the tree topology allows for a high speedup compared with grid, random and circle. 
+The tree topology offers a structured alternative to the grid topology, with a staggered diffusion pattern. The tree topology saves a factor 4 in messaging cost compared to the grid topology. While this factor is constant, its effects are significant. 
+For the same messaging cost a process in a grid topology can send trees of depth d, whereas in the tree topology it can send trees of depth d+2. This difference in depth allows for more expressive trees and can result in higher fitness value for the same communication cost. The disadvantage is that total diffusion is no longer possible.
 %Figure
 \subsubsection{Disconnected}
 The disconnected topology has zero diffusion and an infinite distance between processes. The only applications of this topology are in cases where premature convergence due to diffusion is known in advance and can for some reason not be mitigated, and as a comparison with the other topologies in order to measure memory and synchronization cost. 
@@ -65,15 +68,49 @@ Cost is near zero, no messages are sent nor is any synchronization needed. In pr
 \subsection{Asynchronous communication}\label{subasync}
 We have to tackle deadlock and synchronization delay in our parallel implementation. We will first describe the interaction between the processes and using this context demonstrate our solution.
 \paragraph{Control flow}
-% TODO control flow parallel image
-A parallel process in our implementation executes a single phase of the algorithm, then collects at most m of its fittest expressions from its archive.
+
+A parallel process in our implementation executes a single phase of the algorithm, then collects at most m of its fittest expressions from its archive. The flow control of a parallel SR process is shown in Figure \ref{fig:parallelflow}.
 The set of target processes is resolved using the topology, and then the m messages are send to the targets. 
 After the sending stage the process looks up its sources using the topology, and waits for messages from those sources. 
 After receiving the messages are decoded into solutions which are passed to the algorithm for its next phase.
+
+\begin{figure}
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\footnotesize}]
+\node (start) [startstop] {Start};
+\node (phase) [decision, below of=start, yshift=-0.5cm] {Phase $<$ Phases};
+\node (execute) [process, below of=phase, yshift=-1cm] {0. Execute phase};
+\node (collect) [process, below of=execute] {1. Collect m best expressions};
+\node (lookup) [process, below of=collect] {2. Lookup targetset T};
+\node (spread) [process, below of=lookup] {3. Distribute m over T using policy};
+\node (check) [process, below of=spread] {4.0 Wait until all messages from previous phase have been received};
+\node (send) [process, below of=check] {4.1 Send m to t $\in$ T asynchronously};
+\node (lookups) [process, below of=send ] {5 Lookup sourceset S};
+\node (receive) [process, below of=lookups ] {6 Wait for receipt for s $\in$ S};
+\node (seed) [process, below of=receive ] {7 Reseed algorithm using received messages};
+
+\draw [arrow] (start) -- (phase);
+\draw [arrow] (phase) -- (execute);
+\draw [arrow] (execute) -- (collect);
+\draw [arrow] (collect) -- (lookup);
+\draw [arrow] (lookup) -- (spread);
+\draw [arrow] (spread) -- (check);
+\draw [arrow] (check) -- (send);
+\draw [arrow] (send) -- (lookups);
+\draw [arrow] (lookups) -- (receive);
+\draw [arrow] (receive) -- (seed);
+\draw [arrow] (seed)-- +(2,0) |- (phase) node[near start,sloped,above] {};
+\end{tikzpicture}
+\caption{Parallel control flow.}
+\label{fig:parallelflow}
+\end{figure}
+
+
 \paragraph{Waiting for messages}
 If the process does not wait for messages from the other processes the convergence behavior of the entire group becomes extremely hard to predict. In most platforms there are no hard guarantees about inter process scheduling. We can end up in extreme cases with a single process only sending and never consuming messages. This would break the intention of any structured topology. While this is an extreme example, even in average causes an extra level of non determinism is introduced without there being an explicit need for it. In addition, not waiting for messages requires that messages are collected by the parallel framework, and this can lead to internal buffers varying strongly in size. The sending code would have to be asynchronous as well. We will show another approach where the deterministic execution of the parallel metaheuristic is retained. This does not imply that the process itself is no longer stochastic, only that we are guaranteed that our designed communication pattern is strictly adhered to.
+
 \paragraph{Deadlock}
 From our previous discussion we know that deadlock is a risk if there are cycles in the topology. Since each process has full knowledge of the topology (except in a random dynamic topology) it is possible to write an implementation that solves deadlock by ordering the sending an receiving of the messages. Suppose A waits for B, and B for A in the most simple example. A simple solution of A sending to B, B receiving from A, then B sending to A and A receiving from B would break the deadlock. This simple interleaving solution is not unique, but the priority is not important here. As long as the deadlock is broken the processes can continue. There are 2 serious issues with this approach. First, this approach serializes concurrent processes. This is detrimental to any speedup we were hoping to achieve. Second, the implementation becomes more complex. The order of calls is no longer statically defined, we need an algorithm that acts as a central coordinator between any group of processes in a cycle, computes a solution, and executes that solution in order. We cannot directly invoke operations on other processes, so the only solution is to execute the coordinating algorithm in parallel on all processes if they detect that they are a member of a cycle. Each process will then know when it can send an receive based on the computed order. While this solves deadlock, we still end up with a serialized execution and the communication code becomes far more complex than a simple sequential sending and receiving call.
+
 \subparagraph{Asynchronous solution}
 CSRM instead opts for an asynchronous sending of messages in order to resolve deadlock and mitigate the serialization. Cycle detection is no longer needed. 
 A process executes a phase, then looks up its targets for messages. Instead of sending the messages with a blocking call to the framework, the sending process now allocates a buffer and send each set of messages to its target with an asynchronous call. It stores future object that can later be checked to verify if the receiving process has executed its mirror receive call. 
@@ -82,23 +119,73 @@ Next the process calls receive for each of its sources. This is a blocking call,
 In the worst case our process waits until the source has stopped its own sending calls, but due to its asynchronous nature this process is quite fast. The order of sources is again no longer a risk for deadlock. After receiving all messages the process continues its execution as before.
 Each process still has the allocated buffers and callback objects from its send operation. The buffers cannot be deallocated as long as the receiving process has not acknowledged receipt of the contents. In order to check this we invoke the future objects, but care must be taken here. Calling the futures for each receiving process results in a blocking call. If we time this operation incorrectly we simply have deadlock all over again. The latest a process can wait is that point in time where the send buffers are needed again, which is in the next iteration. As soon as a process enter the sending phase, the first operation it executes is waiting on the future objects. After each returning call the corresponding buffer is cleared for reuse. 
 It should be clear that this approach does not simply delays deadlock but prevents it from occurring. The asynchronous approach allows the processes to interleave in any order that breaks the deadlock. Instead of an explicit algorithm, we simply let each cycle of processes resolve the deadlock in their own optimal sequence. Finally note that the receive call returns immediately once the framework has registered the corresponding send call, it is not directly waiting on the sending process.
-% Explain buffers and futures.
+
 \paragraph{Synchronization delay}
 We know from our discussion that the execution time of a single phase will vary per process, and even between phases for a single process. The receiving of messages is a synchronization point between processes, but not a strict one as the sending process will only wait for receipt in the next phase. This means that a process will only be waiting on any other process after completion of a phase. If we introduce drift as the virtual time difference between processes, in order for processes to delay each other the drift would have to be greater than the execution time of a single phase. A strict serialization effect is therefore not possible. What we introduce with this implementation is latency buffer equal to the runtime of the next phase. The time to execute a phase, while variable, will still be on average far greater than the time needed to communicate results. One of our aims in distributing SR is obtaining a speedup by, amongst other things, finding a balance between phase runtime and communication time.
+
 \paragraph{Future improvements}
 If we allocate a buffer per communication phase, we can wait even longer before invoking future objects. This means we can leave a configurable amount of phases before we wait on the receipt of messages. The downside of this approach is that the memory constraints for each process now signficantly increase from m to pm where p is the number of phases we opt to wait.
 The receive call is executed in sequence for the list of sources in the target process. In order to minimize delay even further we could execute this call asynchronously as well. Extra code would need to be introduced to handle the possible non deterministic behavior this introduces. The order in which the messages are received can influence the algorithm. When the archive is seeded with these external expressions we drop any expressions with identical fitness values. There is thus a risk that by varying the order we introduce non determinism in our results. This can be resolved in the receiving code by preallocating the buffer for all sources and after all asynchronous receive calls storing the messages in the same order of the sources list. 
 Asynchronous receiving is not implemented in CSRM.
+
 \subsection{Communication strategies}
 If the process has j targets, and the algorithm is configured to distribute the m best solutions, we can use several approaches to send those to their targets. We can spread m over j, using a random, interleaving, slicing or any other type of sampling technique. An alternative is copying m j times so that each target receives m messages.
 CSRM has a Spreadpolicy interface that hides the implementation of this behavior for the processes. CSRM defaults to a slicing policy. If we have m messages to distribute over j targets, we will sequentially assign each of the j process $ \lfloor{m/j}\rfloor $ messages.
 This policy is efficient as it avoids copying but has a direct effect on the diffusion between the processes. First of all the value of m should be chosen with the topology in mind. If m = 2 in a grid topology, each process will only send and receive 2 messages, not 4. This will alter the diffusion pattern. For a tree topology m should be 2 as well, else we create a symmetric series of cliques, which, while elegant, will unlikely be intended. If we use a copy policy the value of m can be as low as 1. For random topologies m depends on the parameter determining the number of targets. In our circle topology m = 1 is sufficient for both policies.
 
-\subsection{K fold sampling}
-% What is it ?
-% How do we use it ?
-% Why use it here ?
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.5\textwidth}\label{subfig:grid}
+	    \centering
+        \includegraphics[width=0.6\linewidth]{figures/grid.png}
+        \caption{Grid topology with k = 9.}
+    \end{subfigure}
+    \begin{subfigure}{0.5\textwidth}\label{subfig:wheel}
+	    \centering
+        \includegraphics[width=0.6\linewidth]{figures/wheel.png}
+        \caption{Circle topology with k = 6.}
+    \end{subfigure}
+    \begin{subfigure}{0.5\textwidth}\label{subfig:tree}
+    \centering
+        \includegraphics[width=0.6\linewidth]{figures/tree.png}
+        \caption{Tree topology with k = 7}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}\label{subfig:randomstatic}
+	    \centering
+		\includegraphics[width=0.6\linewidth]{figures/random.png}
+		\caption{Random topology with 2 outgoing links per process, k = 5.}
+    \end{subfigure}
+	\begin{subfigure}{0.5\textwidth}\label{subfig:clique}
+    		\centering
+        \includegraphics[width=0.6\linewidth]{figures/clique.png}
+        \caption{Random topology resulting in cliques of cycles, k = 5.}
+    \end{subfigure}%
+    \caption{Selection of visualizations generated by CSRM.}
+    \label{fig:topologies}
+\end{figure}
+
+\subsection{Integrating K fold validation}
+\subsubsection{Predictive capability}
+In SR we try to find an expression that, based on some distance function, fits input data as close as possible to expected data. If we do not use test data to score the resulting expression, the result of overfitting is very real. Not only is it possible that the expression fits the new data points from the test set poorly, the new datapoints may fall outside the domain of the generated expression. By scoring the expression on unknown data we measure its predictive capability $P_{sr}$. In sequential mode, CSRM evolves an expression on training data, then scores the expression on the full data. We record the correlation between the fitness on the training data and the fitness on the full data in order to measure, over generations and phases, the convergence process. We would like to have an answer to the question : How does $P_{sr}$ of the SR process evolve over time?\\
+This question is vital to a practitioner. If we have an indication that prediction is no longer increasing, or even decreasing we should halt the process. On the other hand if we see that a linear increase is still present we can opt for extending the runtime of the algorithm. Conventional validation, as described here, can be replaced with cross validation in order to obtain a more accurate measure for $P_{sr}$.
+
+\paragraph{Cross validation}
+Several approaches in cross validation exist. We distinguish between exhaustive and non-exhaustive methods. The first uses all possible combinations of training and test data to obtain the maximum amount of information of $P_{sr}$. Its disadvantage is a high computational cost, although this can still be linear in the length of the dataset if we omit only  a single datapoint per selection from the dataset. We will focus on k-fold cross validation (KCV), a non exhaustive validation technique. 
+In KCV we split the data over k samples, then use k-1 of those as the training data and one as the testing (validation data. The process is repeated k times, to obtain a full coverage. Even though this approach is non-exhaustive it would still require k repeats of the entire algorithm.
+
+\subsubsection{Parallelization}
+
+\paragraph{Applying k fold cross validation}
+With the distributed implementation of SR we can avoid the factor k increase required for k fold cross validation. CSRM can, as we have shown, run n instances of the algorithm in parallel. Those instances can cooperate by exchanging their current best solutions, possibly accelerating the convergence of the entire process. Instead of translating our sequential approach to the distributed approach and giving each process the same training data, we can approximate k fold cross validation without the linear increase in runtime. We don't implement full k fold cross validation, but mimic the process. For a dataset of length d, k fold will split it into k equal sized sections of s=d/k. Each training set thus has (k-2)s overlapping datapoints. The value of k determines the effect of the outcome to a large extent. We would like to keep the overlap above a certain treshold, insensitive to k. If the overlap is too small the probability of highly fit expressions proving to be invalid on the validation data becomes too large. 
+
+\paragraph{Approach}
+With k processes running in parallel, and d datapoints, we give each process a random sample of size r*d with $r \in [0,1]$. In practice we use r=0.8. This is the same approach as used in our sequential implementation. The difference now is that each process is given a different trainingset of size r*d, with a stochastic defined overlap treshold. Each process uses its own distinct trainingset to evolve expressions from and the end of execution scores its population on the training, and the full data set. Each process uses a different seed for its random number generators, so we have k processes working on a different area of the search space, but there is enough shared information to make the results of each individual process relevant to each other. 
+The probability that any two trainingsets share a single datapoint is $r^2$. This probability is invariant to k, the number of processes. So for any two communicating processes, regardless of the topology or validation process, the ratio of shared data points is constant. When two processes exchange their best expression, the new expression is scored using the receiving process' training data set. The invalid expression problem is not only present at the end of the algorithm, it is also a vital factor during the communication between the processes. If process A evolves an expression that has a high probability of being invalid on process B's trainingset, the possible gain we have in sharing that expression evaporates. By establishing a constant treshold we can mitigate this risk and still gain the effects from the validation process.
+The choice of concurrent processes is not free in practice, it is determined by the available hardware and the topology. Our validation approach is insensitive to this value. 
+% Figure
+
 \subsection{Conclusion}
-We have covered our distributed design and implementation and highlighted the issues that drove our choices. 
+We have covered our distributed design and implementation and highlighted the issues that drove our choices. CSRM offers the practitioner several topologies each with its strengths and weaknesses. 
 With a wealth of topologies and configurations we also increase the dimensions of the parameter optimization problem. In the experiments we will evaluate some, but not all parameter choices. 
 Our implementation can easily be extended with more topologies or policies without risking deadlock or serialization.
+Our validation approach in parallel CSRM allows an approximation of k fold cross validation without increasing the runtime cost by a factor k. The validation is insensitive to the number of processes and finds a balance between generating predictive expressions while minimizing the occurrence of invalid expressions.
