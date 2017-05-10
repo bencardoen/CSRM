@@ -182,6 +182,7 @@ class RandomDynamicTopology(RandomStaticTopology):
     Variation on Static, on demand a new mapping is calculated.
     """
 
+    # TODO modify lookup code in pgp to handle time invariant.
     def __init__(self, size:int, rng=None, seed=None):
         super().__init__(size, rng=rng, seed=seed)
 
