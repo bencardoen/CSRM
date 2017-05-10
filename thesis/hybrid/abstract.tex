@@ -1,8 +1,11 @@
 % Link to simulation
 Symbolic regression (SR) fits a symbolic expression to a set of expected values.
-Amongst its advantages over other techniques is the ability for a practitioner to interpret the resulting expression, determine important features by their usage in the expression, and an insight into the behavior of the resulting model (e.g. continuity, derivatives, extrema).
-SR combines a discrete combinatoric problem (combining base functions) with a continuous optimization problem (selecting and mutating constants).
-One of the main algorithms used in SR is Genetic Programming (GP). The convergence characteristics of SR using GP is still an open issue.
+Amongst its advantages over other techniques is the ability for a practitioner to interpret the resulting expression, determine important features by their usage in the expression, and insights into the behavior of the resulting model such as continuity, derivatives, extrema.
+SR combines a discrete combinatoric problem, combining base functions, with the continuous optimization problem of selecting and mutating real valued constants.
+One of the main algorithms used in SR is Genetic Programming (GP). The convergence characteristics of SR using GP are still an open issue.
 The continuous aspect of the problem has traditionally been an issue in GP based symbolic regression. This paper will study convergence of a GP-SR implementation on selected use cases known for bad convergence.
 We introduce modifications to the classical mutation and crossover operators and observe their effects on convergence. 
-The constant optimization problem is studied using a two phase approach. We apply a variation on constant folding in the GP algorithm and evaluate its effects. The hybridization of GP with 3 metaheuristics (Differential Evolution, Artificial Bee Colony, Particle Swarm Optimization) is studied. 
+The constant optimization problem is studied using a two phase approach. We apply a variation on constant folding in the GP algorithm and evaluate its effects. The hybridization of GP with 3 metaheuristics (Differential Evolution, Artificial Bee Colony, Particle Swarm Optimization) are evaluated. 
+% Add distributed
+% Add sampling and validation
+% Add use case
