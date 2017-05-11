@@ -241,9 +241,10 @@ The following diagram illustrates a DOE hypercube design using our tool and a si
 \node (start) [startstop] {Start};
 \node (featureset) [process, below of=start] {Features};
 \node (datapoints) [process, below of=featureset] {Datapoints};
-\node (x) [process, right of= datapoints,xshift=4cm, yshift=1cm] {X};
+\node (x) [process, right of= datapoints,xshift=4cm, yshift=1.5cm] {X};
 \node (simulator) [process, right of=x, xshift=4cm] {Simulator};
-\node (srtool) [process, below of=x] {SR Tool};
+\node (srtool) [process, below of=x] {CSRM};
+\node (y) [process, below of=simulator] {Y};
 \node (expressions) [process, below of=srtool] {Expressions};
 \node (analyze) [process, below of=datapoints] {Analyze};
 
@@ -252,9 +253,12 @@ The following diagram illustrates a DOE hypercube design using our tool and a si
 \draw [arrow] (datapoints) -- +(+2,0) |-(x) node[near start,sloped,above]{};
 \draw [arrow] (x) --node[anchor=south]{input}(simulator);
 \draw [arrow] (x) --(srtool);
-\draw [arrow] (simulator) -- (srtool)node[anchor=south]{Y};
-\draw [arrow] (srtool) --node[anchor=east]{generates}(expressions);
-\draw [arrow] (expressions)-- +(+2,0) |- (srtool) node[near start,sloped,below, anchor=south] {seeds};
+\draw [arrow] (y) --(srtool);
+\draw [arrow] (simulator) --(y);
+%\draw [arrow] (simulator) -- +(0,-2) |-(srtool) node[near start,sloped,below]{Y};
+%\draw [arrow] (simulator) -- (srtool)node[anchor=east]{Y};
+\draw [arrow] (srtool) --node[anchor=east]{}(expressions);
+\draw [arrow] (expressions)-- +(-2,0) |- (srtool) node[near start,sloped,below, anchor=south] {seeds};
 \draw [arrow] (expressions)-- +(-2, 0) |- (analyze) node[near start,sloped,above, anchor=south] {};
 \draw [arrow] (expressions)-- +(-2, 0) |- (analyze) node[near start,sloped,above, anchor=south] {};
 \draw [arrow] (analyze)-- +(-2, 0) |- (featureset) node[near start,sloped,above, anchor=south] {};

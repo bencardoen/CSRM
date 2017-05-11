@@ -73,12 +73,13 @@ We introduce a binary tree topology. The links are unidirectional, with a single
 A variant on this topology is a singly linked list, where the maximum distance is k. The problem with this topology is that its diffusion scales linearly with k. The full binary tree configuration is shown in Figure \ref{fig:topologies}\subref{subfig:tree}.
 
 \paragraph{Cost}
-For k processes and m messages per exchange, we have (k-1)m messages exchanged. Synchronization overhead is minimal, there are no cycles and a process is influenced at most by $\log_2{k}$ other processes and influences at most k-1. With the exception of a disconnected topology the tree topology allows for a high speedup compared with grid, random and circle. 
-The tree topology offers a structured alternative to the grid topology, with a staggered diffusion pattern. The tree topology saves a factor 4 in messaging cost compared to the grid topology. While this factor is constant, its effects are significant. 
+For k processes and m messages per exchange, we have (k-1)m messages exchanged. Synchronization overhead is minimal, there are no cycles and a process is influenced at most by $\log_2{k}$ other processes and influences at most k-1. With the exception of a disconnected topology the tree topology allows for the fastest speedup compared with grid, random and circle. 
+The tree topology offers a structured alternative to the grid topology, with a staggered diffusion pattern. 
+The tree topology saves a factor 4 in messaging cost compared to the grid topology. While this factor is constant, its effects are significant. 
 For the same messaging cost a process in a grid topology can send trees of depth d, whereas in the tree topology it can send trees of depth d+2. This difference in depth allows for more expressive trees that can result in higher fitness value for the same communication cost. The disadvantage is that total diffusion is no longer possible.
 
 \subsubsection{Disconnected}
-The disconnected topology has zero diffusion and an infinite distance between processes. The only applications of this topology are in cases where premature convergence due to diffusion is known in advance and can for some reason not be mitigated, and as a comparison with the other topologies in order to measure memory and synchronization cost. 
+The disconnected topology has zero diffusion and an infinite distance between processes. The only applications of this topology are in cases where the risk for premature convergence due to diffusion is high and can for some reason not be mitigated. Secondly it can serve as a comparison with the other topologies in order to measure the diffusion effect, memory and synchronization cost. 
 
 \paragraph{Cost}
 Cost is near zero, no messages are sent nor is any synchronization needed. In practice the collecting of all results will still have to be done by either an elected process or a process statically assigned as collector. This holds true for all topologies.
@@ -163,7 +164,7 @@ This figure demonstrates our deadlock resolution method. If the send call would 
 
 \paragraph{Future improvements}
 If we allocate a buffer per communication phase, we can wait even longer before invoking future objects. This means we can leave a configurable amount of phases before we wait on the receipt of messages. The downside of this approach is that the memory constraints for each process now signficantly increase from m to pm where p is the number of phases we opt to wait.
-The receive call is executed in sequence for the list of sources in the target process. In order to minimize delay even further we could execute this call asynchronously as well. Extra code would need to be introduced to handle the possible non deterministic behavior this introduces. The order in which the messages are received can influence the algorithm. When the archive is seeded with these external expressions we drop any expressions with identical fitness values. There is thus a risk that by varying the order we introduce non determinism in our results. This can be resolved in the receiving code by preallocating the buffer for all sources and after all asynchronous receive calls storing the messages in the same order of the sources list. 
+The receive call is executed in sequence for the list of sources in the target process. In order to minimize delay even further we could execute this call asynchronously as well. Extra code would need to be introduced to handle the non deterministic behavior this introduces. The order in which the messages are received can influence the algorithm. When the archive is seeded with these external expressions we drop any expressions with identical fitness values. There is thus a risk that by varying the order we introduce non determinism in our results. This can be resolved in the receiving code by preallocating the buffer for all sources and after all asynchronous receive calls storing the messages in the same order of the sources list. 
 Asynchronous receiving is not implemented in CSRM.
 
 \subsection{Communication strategies}
