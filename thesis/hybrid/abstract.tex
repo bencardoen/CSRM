@@ -6,6 +6,7 @@ One of the main algorithms used in SR is Genetic Programming (GP). The convergen
 The continuous aspect of the problem has traditionally been an issue in GP based symbolic regression. This paper will study convergence of a GP-SR implementation on selected use cases known for bad convergence.
 We introduce modifications to the classical mutation and crossover operators and observe their effects on convergence. 
 The constant optimization problem is studied using a two phase approach. We apply a variation on constant folding in the GP algorithm and evaluate its effects. The hybridization of GP with 3 metaheuristics (Differential Evolution, Artificial Bee Colony, Particle Swarm Optimization) are evaluated. 
-% Add distributed
-% Add sampling and validation
-% Add use case
+In this work we will use a distributed GP-SR implementation to evaluate the effect of topologies on the convergence of the algorithm.
+We introduce and evaluate a topology with the aim of finding a new balance between diffusion and concentration.
+We introduce a variation of k-fold cross validation to estimate how accurate a generated solution is in predicting unknown datapoints. This validation technique is implemented in parallel in the algorithm combining both the advantages of the cross validation with the increase in covered search space for each instance.
+We validate our work on several test problems and a real world use case.

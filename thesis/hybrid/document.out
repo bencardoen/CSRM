@@ -7,87 +7,88 @@
 \BOOKMARK [3][-]{subsubsection.3.2.2}{Interpreting results}{subsection.3.2}% 7
 \BOOKMARK [3][-]{subsubsection.3.2.3}{Applications}{subsection.3.2}% 8
 \BOOKMARK [2][-]{subsection.3.3}{Convergence}{section.3}% 9
-\BOOKMARK [2][-]{subsection.3.4}{Metaheuristics}{section.3}% 10
-\BOOKMARK [2][-]{subsection.3.5}{Genetic Programming}{section.3}% 11
-\BOOKMARK [2][-]{subsection.3.6}{Constant optimization problem}{section.3}% 12
-\BOOKMARK [2][-]{subsection.3.7}{Distributed}{section.3}% 13
-\BOOKMARK [1][-]{section.4}{Design}{}% 14
-\BOOKMARK [2][-]{subsection.4.1}{Algorithm}{section.4}% 15
-\BOOKMARK [3][-]{subsubsection.4.1.1}{Input and output}{subsection.4.1}% 16
-\BOOKMARK [3][-]{subsubsection.4.1.2}{Control flow}{subsection.4.1}% 17
-\BOOKMARK [3][-]{subsubsection.4.1.3}{Entities}{subsection.4.1}% 18
-\BOOKMARK [3][-]{subsubsection.4.1.4}{Implementation}{subsection.4.1}% 19
-\BOOKMARK [2][-]{subsection.4.2}{Fitness}{section.4}% 20
-\BOOKMARK [3][-]{subsubsection.4.2.1}{Distance function}{subsection.4.2}% 21
-\BOOKMARK [3][-]{subsubsection.4.2.2}{Diversity}{subsection.4.2}% 22
-\BOOKMARK [3][-]{subsubsection.4.2.3}{Predictive behavior}{subsection.4.2}% 23
-\BOOKMARK [3][-]{subsubsection.4.2.4}{Convergence limit}{subsection.4.2}% 24
-\BOOKMARK [2][-]{subsection.4.3}{Initialization}{section.4}% 25
-\BOOKMARK [3][-]{subsubsection.4.3.1}{Invalid expressions}{subsection.4.3}% 26
-\BOOKMARK [2][-]{subsection.4.4}{Evaluation and cost}{section.4}% 27
-\BOOKMARK [2][-]{subsection.4.5}{Evolution}{section.4}% 28
-\BOOKMARK [3][-]{subsubsection.4.5.1}{Mutation}{subsection.4.5}% 29
-\BOOKMARK [3][-]{subsubsection.4.5.2}{Crossover}{subsection.4.5}% 30
-\BOOKMARK [2][-]{subsection.4.6}{Selection}{section.4}% 31
-\BOOKMARK [2][-]{subsection.4.7}{Archiving}{section.4}% 32
-\BOOKMARK [2][-]{subsection.4.8}{Representation and data structures}{section.4}% 33
-\BOOKMARK [3][-]{subsubsection.4.8.1}{Expression}{subsection.4.8}% 34
-\BOOKMARK [3][-]{subsubsection.4.8.2}{Population}{subsection.4.8}% 35
-\BOOKMARK [2][-]{subsection.4.9}{Parameters}{section.4}% 36
-\BOOKMARK [3][-]{subsubsection.4.9.1}{Depth}{subsection.4.9}% 37
-\BOOKMARK [3][-]{subsubsection.4.9.2}{Population size}{subsection.4.9}% 38
-\BOOKMARK [3][-]{subsubsection.4.9.3}{Phases and generations}{subsection.4.9}% 39
-\BOOKMARK [3][-]{subsubsection.4.9.4}{Samples}{subsection.4.9}% 40
-\BOOKMARK [3][-]{subsubsection.4.9.5}{Domain}{subsection.4.9}% 41
-\BOOKMARK [2][-]{subsection.4.10}{Incremental support}{section.4}% 42
-\BOOKMARK [2][-]{subsection.4.11}{Statistics and visualization}{section.4}% 43
-\BOOKMARK [2][-]{subsection.4.12}{Conclusion}{section.4}% 44
-\BOOKMARK [1][-]{section.5}{Distributed SR}{}% 45
-\BOOKMARK [2][-]{subsection.5.1}{Approaches}{section.5}% 46
-\BOOKMARK [2][-]{subsection.5.2}{Distributed SR}{section.5}% 47
-\BOOKMARK [2][-]{subsection.5.3}{Topology}{section.5}% 48
-\BOOKMARK [3][-]{subsubsection.5.3.1}{Grid}{subsection.5.3}% 49
-\BOOKMARK [3][-]{subsubsection.5.3.2}{Wheel}{subsection.5.3}% 50
-\BOOKMARK [3][-]{subsubsection.5.3.3}{Random}{subsection.5.3}% 51
-\BOOKMARK [3][-]{subsubsection.5.3.4}{Tree}{subsection.5.3}% 52
-\BOOKMARK [3][-]{subsubsection.5.3.5}{Disconnected}{subsection.5.3}% 53
-\BOOKMARK [2][-]{subsection.5.4}{Asynchronous communication}{section.5}% 54
-\BOOKMARK [2][-]{subsection.5.5}{Communication strategies}{section.5}% 55
-\BOOKMARK [2][-]{subsection.5.6}{Exploiting parallelism for validation}{section.5}% 56
-\BOOKMARK [3][-]{subsubsection.5.6.1}{Predictive capability}{subsection.5.6}% 57
-\BOOKMARK [3][-]{subsubsection.5.6.2}{Parallelization}{subsection.5.6}% 58
-\BOOKMARK [2][-]{subsection.5.7}{Conclusion}{section.5}% 59
-\BOOKMARK [1][-]{section.6}{Constant optimization}{}% 60
-\BOOKMARK [2][-]{subsection.6.1}{Constant Optimization}{section.6}% 61
-\BOOKMARK [3][-]{subsubsection.6.1.1}{Initialization revisited}{subsection.6.1}% 62
-\BOOKMARK [3][-]{subsubsection.6.1.2}{Folding}{subsection.6.1}% 63
-\BOOKMARK [2][-]{subsection.6.2}{Optimizers}{section.6}% 64
-\BOOKMARK [3][-]{subsubsection.6.2.1}{ABC}{subsection.6.2}% 65
-\BOOKMARK [3][-]{subsubsection.6.2.2}{PSO}{subsection.6.2}% 66
-\BOOKMARK [3][-]{subsubsection.6.2.3}{DE}{subsection.6.2}% 67
-\BOOKMARK [1][-]{section.7}{Experiments}{}% 68
-\BOOKMARK [2][-]{subsection.7.1}{Benchmark problems}{section.7}% 69
-\BOOKMARK [3][-]{subsubsection.7.1.1}{Problems}{subsection.7.1}% 70
-\BOOKMARK [2][-]{subsection.7.2}{Operators}{section.7}% 71
-\BOOKMARK [2][-]{subsection.7.3}{Constant Folding}{section.7}% 72
-\BOOKMARK [3][-]{subsubsection.7.3.1}{Savings}{subsection.7.3}% 73
-\BOOKMARK [2][-]{subsection.7.4}{Constant optimization}{section.7}% 74
-\BOOKMARK [3][-]{subsubsection.7.4.1}{Test problem}{subsection.7.4}% 75
-\BOOKMARK [3][-]{subsubsection.7.4.2}{Optimizer experiments setup}{subsection.7.4}% 76
-\BOOKMARK [3][-]{subsubsection.7.4.3}{Measures}{subsection.7.4}% 77
-\BOOKMARK [3][-]{subsubsection.7.4.4}{2 Phases}{subsection.7.4}% 78
-\BOOKMARK [3][-]{subsubsection.7.4.5}{5 Phases}{subsection.7.4}% 79
-\BOOKMARK [3][-]{subsubsection.7.4.6}{10 Phases}{subsection.7.4}% 80
-\BOOKMARK [3][-]{subsubsection.7.4.7}{Cost}{subsection.7.4}% 81
-\BOOKMARK [2][-]{subsection.7.5}{Conclusion}{section.7}% 82
-\BOOKMARK [3][-]{subsubsection.7.5.1}{Operator cooling schedule}{subsection.7.5}% 83
-\BOOKMARK [3][-]{subsubsection.7.5.2}{Constant folding}{subsection.7.5}% 84
-\BOOKMARK [3][-]{subsubsection.7.5.3}{Optimizers}{subsection.7.5}% 85
-\BOOKMARK [1][-]{section.8}{Use Case}{}% 86
-\BOOKMARK [2][-]{subsection.8.1}{Problem statement}{section.8}% 87
-\BOOKMARK [2][-]{subsection.8.2}{Design of Experiment}{section.8}% 88
-\BOOKMARK [2][-]{subsection.8.3}{Incremental support}{section.8}% 89
-\BOOKMARK [2][-]{subsection.8.4}{Results}{section.8}% 90
-\BOOKMARK [1][-]{section.9}{Related Work}{}% 91
-\BOOKMARK [1][-]{section.10}{Conclusion}{}% 92
-\BOOKMARK [1][-]{section.11}{Future work}{}% 93
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Measures}{subsection.3.3}% 10
+\BOOKMARK [2][-]{subsection.3.4}{Metaheuristics}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.5}{Genetic Programming}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.6}{Constant optimization problem}{section.3}% 13
+\BOOKMARK [2][-]{subsection.3.7}{Distributed}{section.3}% 14
+\BOOKMARK [1][-]{section.4}{Design}{}% 15
+\BOOKMARK [2][-]{subsection.4.1}{Algorithm}{section.4}% 16
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Input and output}{subsection.4.1}% 17
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Control flow}{subsection.4.1}% 18
+\BOOKMARK [3][-]{subsubsection.4.1.3}{Entities}{subsection.4.1}% 19
+\BOOKMARK [3][-]{subsubsection.4.1.4}{Implementation}{subsection.4.1}% 20
+\BOOKMARK [2][-]{subsection.4.2}{Fitness}{section.4}% 21
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Distance function}{subsection.4.2}% 22
+\BOOKMARK [3][-]{subsubsection.4.2.2}{Diversity}{subsection.4.2}% 23
+\BOOKMARK [3][-]{subsubsection.4.2.3}{Predictive behavior}{subsection.4.2}% 24
+\BOOKMARK [3][-]{subsubsection.4.2.4}{Convergence limit}{subsection.4.2}% 25
+\BOOKMARK [2][-]{subsection.4.3}{Initialization}{section.4}% 26
+\BOOKMARK [3][-]{subsubsection.4.3.1}{Invalid expressions}{subsection.4.3}% 27
+\BOOKMARK [2][-]{subsection.4.4}{Evaluation and cost}{section.4}% 28
+\BOOKMARK [2][-]{subsection.4.5}{Evolution}{section.4}% 29
+\BOOKMARK [3][-]{subsubsection.4.5.1}{Mutation}{subsection.4.5}% 30
+\BOOKMARK [3][-]{subsubsection.4.5.2}{Crossover}{subsection.4.5}% 31
+\BOOKMARK [2][-]{subsection.4.6}{Selection}{section.4}% 32
+\BOOKMARK [2][-]{subsection.4.7}{Archiving}{section.4}% 33
+\BOOKMARK [2][-]{subsection.4.8}{Representation and data structures}{section.4}% 34
+\BOOKMARK [3][-]{subsubsection.4.8.1}{Expression}{subsection.4.8}% 35
+\BOOKMARK [3][-]{subsubsection.4.8.2}{Population}{subsection.4.8}% 36
+\BOOKMARK [2][-]{subsection.4.9}{Parameters}{section.4}% 37
+\BOOKMARK [3][-]{subsubsection.4.9.1}{Depth}{subsection.4.9}% 38
+\BOOKMARK [3][-]{subsubsection.4.9.2}{Population size}{subsection.4.9}% 39
+\BOOKMARK [3][-]{subsubsection.4.9.3}{Phases and generations}{subsection.4.9}% 40
+\BOOKMARK [3][-]{subsubsection.4.9.4}{Samples}{subsection.4.9}% 41
+\BOOKMARK [3][-]{subsubsection.4.9.5}{Domain}{subsection.4.9}% 42
+\BOOKMARK [2][-]{subsection.4.10}{Incremental support}{section.4}% 43
+\BOOKMARK [2][-]{subsection.4.11}{Statistics and visualization}{section.4}% 44
+\BOOKMARK [2][-]{subsection.4.12}{Conclusion}{section.4}% 45
+\BOOKMARK [1][-]{section.5}{Distributed SR}{}% 46
+\BOOKMARK [2][-]{subsection.5.1}{Approaches}{section.5}% 47
+\BOOKMARK [2][-]{subsection.5.2}{Distributed SR}{section.5}% 48
+\BOOKMARK [2][-]{subsection.5.3}{Topology}{section.5}% 49
+\BOOKMARK [3][-]{subsubsection.5.3.1}{Grid}{subsection.5.3}% 50
+\BOOKMARK [3][-]{subsubsection.5.3.2}{Wheel}{subsection.5.3}% 51
+\BOOKMARK [3][-]{subsubsection.5.3.3}{Random}{subsection.5.3}% 52
+\BOOKMARK [3][-]{subsubsection.5.3.4}{Tree}{subsection.5.3}% 53
+\BOOKMARK [3][-]{subsubsection.5.3.5}{Disconnected}{subsection.5.3}% 54
+\BOOKMARK [2][-]{subsection.5.4}{Asynchronous communication}{section.5}% 55
+\BOOKMARK [2][-]{subsection.5.5}{Communication strategies}{section.5}% 56
+\BOOKMARK [2][-]{subsection.5.6}{Exploiting parallelism for validation}{section.5}% 57
+\BOOKMARK [3][-]{subsubsection.5.6.1}{Predictive capability}{subsection.5.6}% 58
+\BOOKMARK [3][-]{subsubsection.5.6.2}{Parallelization}{subsection.5.6}% 59
+\BOOKMARK [2][-]{subsection.5.7}{Conclusion}{section.5}% 60
+\BOOKMARK [1][-]{section.6}{Constant optimization}{}% 61
+\BOOKMARK [2][-]{subsection.6.1}{Constant Optimization}{section.6}% 62
+\BOOKMARK [3][-]{subsubsection.6.1.1}{Initialization revisited}{subsection.6.1}% 63
+\BOOKMARK [3][-]{subsubsection.6.1.2}{Folding}{subsection.6.1}% 64
+\BOOKMARK [2][-]{subsection.6.2}{Optimizers}{section.6}% 65
+\BOOKMARK [3][-]{subsubsection.6.2.1}{ABC}{subsection.6.2}% 66
+\BOOKMARK [3][-]{subsubsection.6.2.2}{PSO}{subsection.6.2}% 67
+\BOOKMARK [3][-]{subsubsection.6.2.3}{DE}{subsection.6.2}% 68
+\BOOKMARK [1][-]{section.7}{Experiments}{}% 69
+\BOOKMARK [2][-]{subsection.7.1}{Benchmark problems}{section.7}% 70
+\BOOKMARK [3][-]{subsubsection.7.1.1}{Problems}{subsection.7.1}% 71
+\BOOKMARK [2][-]{subsection.7.2}{Operators}{section.7}% 72
+\BOOKMARK [2][-]{subsection.7.3}{Constant Folding}{section.7}% 73
+\BOOKMARK [3][-]{subsubsection.7.3.1}{Savings}{subsection.7.3}% 74
+\BOOKMARK [2][-]{subsection.7.4}{Constant optimization}{section.7}% 75
+\BOOKMARK [3][-]{subsubsection.7.4.1}{Test problem}{subsection.7.4}% 76
+\BOOKMARK [3][-]{subsubsection.7.4.2}{Optimizer experiments setup}{subsection.7.4}% 77
+\BOOKMARK [3][-]{subsubsection.7.4.3}{Measures}{subsection.7.4}% 78
+\BOOKMARK [3][-]{subsubsection.7.4.4}{2 Phases}{subsection.7.4}% 79
+\BOOKMARK [3][-]{subsubsection.7.4.5}{5 Phases}{subsection.7.4}% 80
+\BOOKMARK [3][-]{subsubsection.7.4.6}{10 Phases}{subsection.7.4}% 81
+\BOOKMARK [3][-]{subsubsection.7.4.7}{Cost}{subsection.7.4}% 82
+\BOOKMARK [2][-]{subsection.7.5}{Conclusion}{section.7}% 83
+\BOOKMARK [3][-]{subsubsection.7.5.1}{Operator cooling schedule}{subsection.7.5}% 84
+\BOOKMARK [3][-]{subsubsection.7.5.2}{Constant folding}{subsection.7.5}% 85
+\BOOKMARK [3][-]{subsubsection.7.5.3}{Optimizers}{subsection.7.5}% 86
+\BOOKMARK [1][-]{section.8}{Use Case}{}% 87
+\BOOKMARK [2][-]{subsection.8.1}{Problem statement}{section.8}% 88
+\BOOKMARK [2][-]{subsection.8.2}{Design of Experiment}{section.8}% 89
+\BOOKMARK [2][-]{subsection.8.3}{Incremental support}{section.8}% 90
+\BOOKMARK [2][-]{subsection.8.4}{Results}{section.8}% 91
+\BOOKMARK [1][-]{section.9}{Related Work}{}% 92
+\BOOKMARK [1][-]{section.10}{Conclusion}{}% 93
+\BOOKMARK [1][-]{section.11}{Future work}{}% 94

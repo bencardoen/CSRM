@@ -12,9 +12,10 @@ It is still possible to create constant expressions by applying mutation and cro
 
 \paragraph{Constant subtree problem}
 A tree can contain subtrees that represent constant expressions. This is an immediate effect of the GP algorithm trying to evolve the correct constant. This can lead to large subtrees that can be represented by a single node. Nodes used in such a constant subtree are not available for base functions. They waste memory and evaluation cost, without their presence the tree could become a fitter instance. 
+There is a counterargument to be made here: parts of a constant subtree can help evolve constants faster than a pure random selection. It is possible that folding such subtrees leads to slightly lower fitness values.
 
 \paragraph{Constant subtree folding}
-It is possible to use a depth sensitive objective function to try to mitigate this effect, but a more direct approach is replacing the subtrees.
+We can use a depth sensitive objective function to try to mitigate this effect, but a more direct approach is replacing the subtrees.
 Using the previous constant expression detection technique we can collect all constant subtrees from a tree. We evaluate each subtree, and replace it with the constant value it represents. This leads to savings in nodes and possibly a reduction in depth. These savings can have an effect on the convergence as well. Mutation and crossover will no longer operate on constant subtrees, and the iterations and place in the tree that becomes available can be used to improve the fitness of the tree.
 Constant folding requires an O(n) detection check, since the entire tree needs to be traversed. The folding operation itself is at worst O(n), if the entire tree is constant.
 % Figure
@@ -224,7 +225,7 @@ CSRM uses a DE/rand/2/bin configuration. The DE/x/y/z notation reflects its main
 This overview gives the values of each parameter used in CSRM's DE implementation.
 \begin{itemize}
 \item F = 0.6 : F should be in [0.4, 1] Large F values favor exploration, whereas small F values favor exploitation. The value of 0.6 is reported as good starting value. In our problem domain we already have a (sub) optimal solution which we wish to improve, so the risk of premature convergence is present, hence the small bias for exploration. 
-\item Cr = 0.1 : The Cr values should be in [0,0.2] for separable functions, and [0.9, 1] for non separable functions. We cannot assume dependency between the constants, and therefore use a value of 0.1. This results in DE focussing alongside the axes of each dimension in its search trajectory. 
+\item Cr = 0.1 : The Cr values should be in [0,0.2] for separable functions, and [0.9, 1] for non separable functions. We cannot assume dependency between the constants, and therefore use a value of 0.1. This results in DE focussing along the axes of each dimension in its search trajectory. 
 \end{itemize}
 Compared to PSO DE has a low parameter count, optimal values for these parameters can be found in literature \cite{DESurveyLatest}. The population size should be t * d with t in [2, 10]. Since we do not know d in advance, and to keep the comparison fair we set the population at 50, allowing for optimal values for up to 25 dimensions (constants).
 While DE has a small set of parameters, their effect is still quite pronounced. There exists implementations of DE that use self adapting parameters, but this is beyond our scope. It should be noted that CSRM's optimizer has a very small optimization budget (in evaluation cost) and each new problem has potentially new characteristics. We therefore chose for the most robust values and configuration.

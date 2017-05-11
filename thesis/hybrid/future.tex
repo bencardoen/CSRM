@@ -1,0 +1,25 @@
+\paragraph{Extending constant optimization}
+\subparagraph{Linear weight optimization}
+The constant optimization step applied in our tool has been limited to simple constants in the expression. The tree representing the expression stores a hidden constant for each node that can act as linear weights. We can extend the constant optimization step to include these constants. The advantage is that the expression can be optimized to a greater extent. The disadvantage is the high increase in computation cost. Each constant represents a dimension for the constant optimizer. From our discussion we know that a high dimensionality has a serious impact on the complexity of the optimization step.
+\subparagraph{Extending folding}
+Using the linear weights representation we could further simplify trees when applying constant folding. The following simple expression
+\[
+f(x) = \sin( \pi \frac{\tan(x)}{2})
+\]
+is represented using a tree with 7 nodes. If we extract $\frac{\pi}{2}$ as a linear weight for the $\tan$ node the tree is reduced to three nodes. The expression is invariant, but the representation is far more compact.
+\[
+f(x) = \sin( \frac{\pi}{2} \tan(x))
+\]
+Detecting and folding such cases is non trivial for more complex expressions.
+
+\paragraph{Distributed set of optimizers}
+We can replace GP with several other combinatorial optimization algorithms and compare convergence. From recent literature we know that ACO, GE and ABC have been used. Using our distributed architecture it would be possible to give each process a different optimization algorithm. This has two advantages. It allows for comparison of different optimization algorithms within the same framework. It would also make the SR tool more robust. Each optimization algorithm has its strengths and weaknesses. We know from the NFL theorem that no optimization algorithm is optimal for all optimization problem instances. A cooperative set of optimizations algorithms could offer an optimal solution for all problem instances by balancing the disadvantages and advantages of each algorithm.
+
+\paragraph{Base functions}
+In this work we have seen how large the impact is from invalid expression on the runtime of the algorithm. If we use a set of base functions where the domain is identical for each, for example the Chebyshev polynomials, and rescale our input set then we could largely avoid the initialization issue.
+
+\paragraph{Policies}
+This work can be extended by several policies. The spreading policies in the topology can be extended with random sampling, new trends in archiving can be applied to the algorithm and the mutation and crossover operators can be similarly extended. 
+
+\paragraph{Hyperheuristics}
+Our distributed SR algorithms has a large parameter space, most of which influence convergence. Their optimal values can be problem dependent, correlated to each other and are in general unknown. Optimizing these values requires a new optimization algorithm. Another alternative is a self optimizing variant that uses statistics collected at runtime to modify the parameters in order to find more optimal values.

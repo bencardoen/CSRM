@@ -77,7 +77,7 @@ The goal of the algorithm is to find f' such that
 \[Y = f(X)\]
 \[Y' = f'(X)\]
 \[dist(Y, Y') = e\]
-results in e minimal.\\
+results in e minimal. F is the process we wish to model or approximate with f'.\\
 Not all distance functions are equally well suited for this purpose. A simple root mean squared error (RMSE) function has the issue of scale, the range of this function is [0, +$\infty$), which makes comparison problematic, especially if we want to combine it with other objective functions. A simple linear weighted sum requires that all terms use the same scale. 
 Normalization of RMSE is an option, however there is no single recommended approach to obtain this NRMSE. \\
 In this work we use a distance function based on the Pearson Correlation Coefficient. Specifically, we define 
@@ -93,9 +93,10 @@ This function has a range [0,1] which facilitates comparison across domains and 
 The function reflects the aim of the algorithm. We not only want to assign a good (i.e. minimal) fitness value to a model that has a minimal distance, we also want to consider linearity between Y an Y'. 
 
 \subsubsection{Diversity}\label{subsubdiversity}
-Diversity, the concept of maintaining semantically different specimens, is an important aspect in metaheuristics. Concepts such as niching and partitioning are often used to promote this behavior, amongst other reasons to prevent premature convergence or even to promote multimodality.
-Our tool uses a simple measure that mimics the more advanced techniques stated above. It should be clear that for any combination of input and output data, there are a huge set of expressions with an identical fitness value. Such expressions can lead to premature convergence, consider a population of 5 where the 3 best samples all have fitness scores of 0.134. Our tool will aim to prevent retaining expressions that have identical fitness values.
-In contrast, in some metaheuristics \cite{DE} allowing replacement of solutions with identical fitness values (not duplication, but replacement), can actually help avoiding local minima. 
+Diversity, the concept of maintaining semantically different specimens, is an important aspect in metaheuristics. Concepts such as niching and partitioning are often used to promote this behavior, amongst other reasons to prevent premature convergence or even to enable multimodality.
+Our tool uses a simple measure that mimics the more advanced techniques stated above. It should be clear that for any combination of input and output data, there are a huge set of expressions with an identical fitness value. Such expressions can lead to premature convergence where a subset of the fittest expressions all have the same fitness value without introducing new information. Those expressions approximate the same local optimum. Our tool will aim to prevent retaining expressions that have identical fitness values.
+%Some metaheuristics \cite{DE} allow replacement of solutions with identical fitness values as it can help avoid local minima. 
+If the fitness function has a zero gradient surface allowing replacement of solutions based on equal fitness value can help the optimizer to traverse such an area. 
 
 \subsubsection{Predictive behavior}
 The algorithm evaluates expressions based on training data $X_t$. $X_t$ is an n x rk matrix based on the original input matrix X (n x k).
