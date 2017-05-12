@@ -1,36 +1,83 @@
 \subsection{Overview}
+In this work we will study the convergence behavior of Symbolic Regression. The convergence of symbolic regression is still an open problem \cite{SRBaseline, SRAccur, SRAccuracy, FFX}. We will investigate the causes of this and suggest approaches. In particular we tackle the constant optimization problem. We evaluate our approach on a previously introduced set of benchmark problems. We parallelize our approach and evaluate the effect on convergence. Finally we test our implementation on a real world use case and study its convergence.
+In the remainder of this section will give a problem statement, describe the challenges faced and why they are relevant.
+% List sections?
 % What we will discuss and where
-% Solution : I'll know it when I see it
 % Not focussed on what works, but on what doesn't
 % No black box, want to see how fitness evolves.
 
 \subsection{Symbolic Regression}
 % Intro to SR
+Symbolic regression generates an expression that, when evaluated on a set of input points X, approximates an expected output set. This is a minimization problem where we can use as fitness a distance function. The expression is comprised of base functions, constants and features. 
+% Search space dimension
+\subsubsection{Problem hardness}
+For any given input set and output set there are an infinite number of expressions that give the exact expected output. If we have a reasonably small set of base functions, a strict limit on the length of the expression, and a finite range for the constants, the number of expressions that matches the output is still unfeasibly large. The set of approximating expressions that come within a threshold distance is obviously even larger. In general we do not have a starting point for the optimization process, forcing us to use a random sample from the search space as initial values.
+Let B be the set of base functions with $\vert B \vert = k \land k < \infty$ . The feature set F is used provided and will in practice rarely exceed 1e3: $\vert F \vert = f <= 1e3$. 
+If we use $\mathbb{R}$ as the domain for constants we have an infinite search space. Infinite precision floating point numbers have a high performance cost. It is more reasonable to use the IEEE754  double precision floating point standard in order to avoid an infinite search space and to guarantee reasonable performance :  $\vert C \vert = c \sim 2^{64}$.
+\paragraph{Problem representation}
+If we represent an expression as a tree we can describe the size of the search space. Suppose we allow expressions that are represented by trees with depth d. An internal node is base function, a leaf is a feature or a constant. If we limit our base function set to binary and unary functions, a full tree of depth d will have on average N node with N given by:
+\[
+N = \frac{2^{d+1} - 1 + d}{2} = O(2^d)
+\]
+The number of leaves is:
+\[
+L = N - \frac{2^{d} + 1}{2} = O(2^{d-1})
+\]
+The number of internal nodes for a tree of depth d is given by:
+\[
+I = N - L = O(2^{d-1})
+\]
+\paragraph{Size of the search space}\label{searchspace}
+For a full random tree of depth d we need to pick I functions with replacement from B.
+If we select for a leaf with probability $\frac{1}{2}$ a feature or a constant we need to select L/2 constants from C and L/2 from F, both with replacement.
+The total number of trees we can generate with B,C,F and d given is :
+\[
+S = b^I c^{\frac{L}{2}} f^{\frac{L}{2}}
+\]
+Clearly c dominates this expression. While the search space is not infinite, it might as well be given our calculation. For any given input and output set we do not know the 'correct' value of d. We do know the maximum number of features the expression can use, and from this could derive a heuristic to determine the expected value d. If we have k features and expect all of them to be significant, we would need at least 2k leaves, with half being features and half constants. This would give us a minimum depth of $\lceil \log_2{2k} \rceil$. In practice the depth should be greater than this value. We cannot rule out that features will need to be reused by an optimal expression. If a tree is not full the number of leaves will be significantly smaller resulting in a higher minimum depth needed to use all features. We do not know if all features are significant and therefore cannot rule this out. Evolutionary algorithms that evolve these expressions are likely to introduce bloat, subtrees that do not contribute to the fitness value. We have to take this into account if we let f guide our value of d. Suppose we introduce the guide $d = 8 f$ then we can approximate S as :
+\[
+S = b^{2^{8f}} c^{2^{8f-2}} f^{2^{8f-2}}
+\]
+With $ c >> b \land c >> f $
+\[
+S = O(c^{2^f})
+\]
+The size of the search space and lack of information means we can only approximate this problem with a metaheuristic.
+
+\paragraph{Solution}
+We do not know what our solution is. Metaheuristics are typically applied to problem statements where the solution is best described as "I know it when I see it". Only when discovered can we evaluate the worth of a solution. In symbolic regression we could describe our desired solution by requiring that it has a distance 0. This is in and of itself not enough to use in real world applications. We know that the solution will not be unique, so given 2 solutions with an equal distance which do we prefer? The issue of bloat reappears here. Do we prefer simpler expressions above more complex? If h and g both have equal distance but h is continuous and has clearly defined extrema whereas g is discontinuous, is h then a 'better' solution? What happens if we use h and g on unknown data? Do we want only minimum distance or also would like maximum predictive capability? These questions introduce multiobjective fitness functions which use the distance function as only a part of the heuristic driving the algorithm. The diversity between solutions is another aspect that is sometimes a goal in these problem statements. We would like solutions that contain as much unique information as is possible. 
+
 
 \subsubsection{Compared to other techniques}
-% Not a black box, expression can offer insight, use as classifier.
-
-\subsubsection{Interpreting results}
-%
+When a metaheuristic is applied to a problem and returns a solution a practitioner would like to be able to validate the solution. In general we do not want black box behavior, where the algorithm returns a solution and we do not know how this solution was obtained. A symbolic expression offers a more transparent model to a practitioner than for instance a neural network or a trained classifier. The use of mathematical functions allows insight into the behavior of the model which other approach cannot. From the expression we can deduce how features influence each other and which is more significant. Other insights such as continuity and derivation are more difficult to interpret. We cannot assume that the model we wish to approximate with symbolic regression is continuous simply because our best approximation is continuous.
 
 \subsubsection{Applications}
 % Link with simulation
 
 \subsection{Convergence}
 \subsubsection{Measures}
-% Questions for the practitioner
-% Is it an issue, and why
-% measures
-% Accuracy versus convergence
-% The question practitioner puts is ...
+\paragraph{Quality}
+We define the quality of a solution as its fitness value. If we use only the distance function as the fitness value, we can ask the SR tool to return solutions that are at least as fit as a given threshold. This threshold value is hard to set as each problem statement will have different convergence characteristics. In order to use this approach the fitness function should have a finite range with a defined scale. 
+\paragraph{Convergence rate}
+A practitioner would like to know how long it would take for an SR algorithm to find solutions of a given quality. It is equally important to know how convergence behaves over time. Suppose we have a fitness function with range [0,1] with 0 optimal. The SR tool evolves g generations and the tool and finds a solution with fitness 1e-12. A practitioner would like to know how the increase in generations would reflect on the decrease in fitness. We would like to be able to answer the question : "How many generations are needed to improve fitness by an order of magnitude?". Current implementations in SR are unable to answer these questions. It is possible to track convergence over time and based on this extrapolate future behavior. CSRM offers the user such insights by visualizing the convergence rate amongst other statistics. This will always be an approximation.
+
+\paragraph{Accuracy}
+If we know that there exists a single global optimal solution, we can define accuracy as a distance measure. We score each solution the algorithm evolves based on the distance to the known optimal solution. Accuracy measures the algorithm's capability to approximate a known solution. 
 
 \subsection{Metaheuristics}
 
-\subsection{Genetic Programming}
+\subsubsection{Combinatorial versus continuous}
+
+\subsubsection{Continuous optimizers}
+% list ABC, DE, PSO and why these apply
+
+\subsubsection{Genetic Programming}
+% Combinatorial but not exclusive.
 % Overview of GP and how GP can be applied to SR
 % What is it, why GP, alternatives (use them for related work
 
 \subsection{Constant optimization problem}
+From \ref{searchspace} we know that selecting the 'right' constant value to use in the tree is very hard. The probability of selecting at random a constant even close to an optimal value is extremely small. We can mitigate this by constricting the range of constants. Constant values from a small range can be used by base functions to generate far greater values. We are using subexpressions to help generate the 'right' constant value. This is something an evolutionary algorithm will tend to do by itself. It will try to approximate a constant by combining a few constants with base functions. The problem with this approach is that it is time and space inefficient. The entire subtree can be replaced by a single constant, and it requires a significant amount of generations to generate the subtree. One approach is to hand over the constant optimization problem to a continuous optimizer and leave the selection of the base functions to the combinatorial optimizer. In section \ref{secconstopt} we will cover this problem in detail.
 % Describe it shortly
 
 \subsection{Distributed}

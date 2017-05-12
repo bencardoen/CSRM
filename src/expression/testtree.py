@@ -290,12 +290,12 @@ class TreeTest(unittest.TestCase):
         """
         rng = getRandom(0)
         variables = [Variable([10, 11],0),Variable([3, 12],0),Variable([9, 12],0),Variable([8, 9],0)]
-        left = Tree.makeRandomTree(variables, depth=6, rng=rng)
+        left = Tree.makeRandomTree(variables, depth=4, rng=rng)
         left.printToDot(outputfolder+"t13LeftBefore.dot")
 
         ld = left.getDepth()
 
-        right = Tree.makeRandomTree(variables, depth=6, rng=rng)
+        right = Tree.makeRandomTree(variables, depth=4, rng=rng)
         right.printToDot(outputfolder+"t13RightBefore.dot")
 
         rd = right.getDepth()
