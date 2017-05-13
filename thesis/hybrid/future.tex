@@ -23,3 +23,6 @@ This work can be extended by several policies. The spreading policies in the top
 
 \paragraph{Hyperheuristics}
 Our distributed SR algorithms has a large parameter space, most of which influence convergence. Their optimal values can be problem dependent, correlated to each other and are in general unknown. Optimizing these values requires a new optimization algorithm. Another alternative is a self optimizing variant that uses statistics collected at runtime to modify the parameters in order to find more optimal values.
+
+\paragraph{Random distributions}
+The choice of random distribution in a stochastic algorithm such as most metaheuristics influences the convergence greatly. From generating initial values to perturbing known solutions, selecting target for evolutionary operators, selecting communication partners and so on. The distribution used will have a definite effect on the exploration/exploitation balance in the algorithm. Recent work uses new distributions such as Levy \citep{ABCLevy} to improve convergence of metaheuristcs. This remains an interesting and open subproblem for symbolic regression. 

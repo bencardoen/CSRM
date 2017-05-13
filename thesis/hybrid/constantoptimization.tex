@@ -1,14 +1,20 @@
 \subsection{Constant Optimization} \label{subconstantoptimization}
-Selecting base functions is a combinatoric, discrete problem. Selecting the right constants to use is a continuous problem, that GP tries to solve with a combinatoric approach. There are several aspects to this issue, we will go over each individually and show our approach.
+Selecting base functions is a combinatoric, discrete problem. Selecting the right constants to use is a continuous problem, that GP tries to solve with a combinatoric approach. There are several aspects to this issue, we will go over each individually and show our approach. 
+
+\subsubsection{Restricting the search space}
+From section \ref{searchspace} we know that the size of the constant set dominates the size of the search space. We intentionally restrict this set to [0,1]. This reduces the size of c from $2^64$ to $2^23$. This restriction in range does not prevent larger constants from being evolved. The algorithm will evolve subtrees combining base functions with constants in order to approximate the desired values. Selection [0,1] as the reduced range is a logical choice given that floating point numbers have the highest density in this range. Despite the significant reduction in size of c, it still dominates the search space size.
+
 \subsubsection{Initialization revisited}
 During initialization it is possible that a generated tree represents a constant expression. Such an expression is only a valid approximation if no feature has an influence on Y, which is an unlikely edge case. A constant expression is of no use to the algorithm, but without measures to prevent or remove these they will still be formed. Ideally such an expression will have a worse fitness value than non constant expressions, and will be eventually filtered out. Since detecting a constant expression is feasible in worst case O(n) with n the number of nodes in the tree, a more efficient approach is preventing constant expressions from being generated. 
+
 \paragraph{Constant expression detection}
 An expression is a constant expression if all its children are constant expressions. As a base case, a leaf node is a constant expression if it is not a feature. This problem statement allows us to define a recursive algorithm to detect constant expressions. It should be noted that its complexity is O(n) only in the worst case, when the tree is a constant expression. Upon detecting a non constant subtree, the algorithm returns early without a full traversal. 
+
 \paragraph{Preventing constant expressions}
 Using the checking procedure in the initialization, a tree marked as a constant expression is not allowed in the initialization procedure.
 It is still possible to create constant expressions by applying mutation and crossover. If the left subtree of a node is a constant expression, and the right is not, and this right is replaced by either mutation or crossover with a constant expression then the tree becomes a constant expression. The mutation operator will not generate constant subtrees, so this leaves only crossover. Our tool does not prevent constant expressions from forming in this way, the evaluation following crossover will filter out the constant expressions using evolutionary pressure.
+
 \subsubsection{Folding}
-% Future work : fold the multipliers
 
 \paragraph{Constant subtree problem}
 A tree can contain subtrees that represent constant expressions. This is an immediate effect of the GP algorithm trying to evolve the correct constant. This can lead to large subtrees that can be represented by a single node. Nodes used in such a constant subtree are not available for base functions. They waste memory and evaluation cost, without their presence the tree could become a fitter instance. 
