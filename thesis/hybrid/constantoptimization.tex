@@ -22,7 +22,7 @@ There is a counterargument to be made here: parts of a constant subtree can help
 
 \paragraph{Constant subtree folding}
 We can use a depth sensitive objective function to try to mitigate this effect, but a more direct approach is replacing the subtrees.
-Using the previous constant expression detection technique we can collect all constant subtrees from a tree. We evaluate each subtree, and replace it with the constant value it represents. This leads to savings in nodes and possibly a reduction in depth. These savings can have an effect on the convergence as well. Mutation and crossover will no longer operate on constant subtrees, and the iterations and place in the tree that becomes available can be used to improve the fitness of the tree.
+Using the previous constant expression detection technique we can collect all constant subtrees from a tree. We evaluate each subtree, and replace it with the constant value it represents. 
 Constant folding requires an O(n) detection check, since the entire tree needs to be traversed. The folding operation itself is at worst O(n), if the entire tree is constant.
 % TODO subfigure
 \begin{figure}
@@ -37,6 +37,10 @@ Constant folding requires an O(n) detection check, since the entire tree needs t
     \caption{Tree after subtree folding.}
     \label{fig:postfold}
 \end{figure}
+\subparagraph{Analysis}
+This leads to savings in nodes and possibly a reduction in depth. These savings can have an effect on the convergence as well. Mutation and crossover will no longer operate on constant subtrees, and the iterations and place in the tree that becomes available can be used to improve the fitness of the tree. These two advantages are intuitive and expected. There is also a counterintuitive disadvantage to constant folding. A constant subtree is the algorithm's attempt at evolving a single constant. In constant folding we assume that the subtree only holds the information needed to represent this single constant, and therefore is more efficiently represented by that single constant. This is not true. A constant subtree with depth d represents between d and $2^{d+1}-1$ constants. Each leaf is by definition a constant. Each internal node is the root of a constant subtree. Each of those represents a new constant, which is eventually combined to the root of the largest constant subtree. Removing the entire subtree by folding it into a single constant can actually lead to worse fitness. To see this we need to look at constant subtrees as a set of discovered constants. The GP algorithm has 2 ways to generate a constant : crossover and mutation. Mutation will generate a subtree and replace it in an existing tree. In order to generate a constant a constant subtree will need to be generated. This process is unaffected by folding. What is affected is when the mutation target node is a node in a constant subtree. Mutation is able to generate far more complex expressions than a single selection of a constant leaf node is able to do, it is evolving the existing subtree. If we apply constant folding mutation can only replace the existing constant with a new one. The probability of this new value having better fitness is lower compared to mutation the subtree that represents the constant. 
+In crossover the effect is even stronger. The constant subtrees of a tree form a library of constants from which crossover can select and combine to form a new one. Given the exponential number of constants represented by such a subtree it is clear that expressive power of crossover without constant folding is greater than with constant folding applied. 
+% Figure
 
 \paragraph{Edge cases}
 In Figure \ref{fig:postfold} we see the effect of applying the constant subtree folding. 
@@ -56,7 +60,10 @@ In this reduced example the node $\sqrt{x/x}$ is simply $\sqrt{1}$. Outside of t
 % link future work
 
 \paragraph{Conclusion}
-Constant detection and folding mitigate some of the side effects of the constant optimization problem, they do not lead to a more efficient finding of the 'right' constant values. For this we need a continuous optimizer, an algorithm designed specifically to optimize real valued problems.
+Constant detection and folding mitigate some of the side effects of the constant optimization problem. We have discussed the advantages and the risks of applying constant folding. In general it is still advised to apply constant folding in order to constrain the excessive growth of trees in the population. In section
+\ref{subsecctfold} we will analyse the effect of constant folding.
+Constant folding itself does not solve the constant optimization problem.
+For this we need a continuous optimizer, an algorithm designed specifically to optimize real valued problems.
 
 \subsection{Optimizers}
 
