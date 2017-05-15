@@ -614,6 +614,7 @@ class Tree:
         :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) is allowed but not log(x) with implicit base e
         :bug : 2 * log(3 , 4) is parsed incorrectly
         """
+        logger.info("Reading {}".format(expr))
         pfix = infixToPrefix(tokenize(expr, variables))
         result = Tree()
         if len(pfix) == 1:

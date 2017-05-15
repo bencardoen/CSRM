@@ -93,8 +93,11 @@
 \BOOKMARK [1][-]{section.8}{Use Case}{}% 93
 \BOOKMARK [2][-]{subsection.8.1}{Problem statement}{section.8}% 94
 \BOOKMARK [2][-]{subsection.8.2}{Design of Experiment}{section.8}% 95
-\BOOKMARK [2][-]{subsection.8.3}{Incremental support}{section.8}% 96
-\BOOKMARK [2][-]{subsection.8.4}{Results}{section.8}% 97
-\BOOKMARK [1][-]{section.9}{Related Work}{}% 98
-\BOOKMARK [1][-]{section.10}{Conclusion}{}% 99
-\BOOKMARK [1][-]{section.11}{Future work}{}% 100
+\BOOKMARK [3][-]{subsubsection.8.2.1}{Experiment configuration}{subsection.8.2}% 96
+\BOOKMARK [2][-]{subsection.8.3}{Results}{section.8}% 97
+\BOOKMARK [3][-]{subsubsection.8.3.1}{Fitness improvement}{subsection.8.3}% 98
+\BOOKMARK [3][-]{subsubsection.8.3.2}{Convergence behavior}{subsection.8.3}% 99
+\BOOKMARK [2][-]{subsection.8.4}{Conclusion}{section.8}% 100
+\BOOKMARK [1][-]{section.9}{Related Work}{}% 101
+\BOOKMARK [1][-]{section.10}{Conclusion}{}% 102
+\BOOKMARK [1][-]{section.11}{Future work}{}% 103
