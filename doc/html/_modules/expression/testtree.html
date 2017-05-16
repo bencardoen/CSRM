@@ -336,12 +336,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rng</span> <span class="o">=</span> <span class="n">getRandom</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span><span class="mi">0</span><span class="p">),</span><span class="n">Variable</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span><span class="mi">0</span><span class="p">)]</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">left</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;t13LeftBefore.dot&quot;</span><span class="p">)</span>
 
         <span class="n">ld</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
 
-        <span class="n">right</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">makeRandomTree</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">right</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="n">outputfolder</span><span class="o">+</span><span class="s2">&quot;t13RightBefore.dot&quot;</span><span class="p">)</span>
 
         <span class="n">rd</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
@@ -778,6 +778,20 @@
             <span class="k">if</span> <span class="n">ctexpr</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">nd</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ndp</span><span class="p">,</span> <span class="n">dp</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TreeTest.testCTFold"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testCTFold">[docs]</a>    <span class="k">def</span> <span class="nf">testCTFold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">vcount</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">vs</span> <span class="o">=</span> <span class="n">generateVariables</span><span class="p">(</span><span class="n">vcount</span><span class="p">,</span> <span class="n">dpoint</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="s2">&quot; ((x1+7 * x3) + (-0.98 * tanh( cos( 4.5 ) ) ) * min( sin(0.134), max(sqrt(x0/x0), abs(sin(1.04 + 2.10))) ) )&quot;</span>
+        <span class="c1">#abs(x0,sin (1.04 + 2.10) )</span>
+        <span class="c1">#( tan(0.173) + 24.7 ) , abs( x0, sin (1.04 + 2.10) )))</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">createTreeFromExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">vs</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">evaluateAll</span><span class="p">()</span>
+        <span class="n">oldd</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">getDepth</span><span class="p">()</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="s2">&quot;prefold.dot&quot;</span><span class="p">)</span>
+        <span class="n">gain</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">doConstantFolding</span><span class="p">()</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">printToDot</span><span class="p">(</span><span class="s2">&quot;postfold.dot&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TreeTest.testBenchmarks"><a class="viewcode-back" href="../../expression.html#expression.testtree.TreeTest.testBenchmarks">[docs]</a>    <span class="k">def</span> <span class="nf">testBenchmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">dpoint</span> <span class="o">=</span> <span class="mi">5</span>

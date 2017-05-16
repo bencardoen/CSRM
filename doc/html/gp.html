@@ -824,8 +824,8 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 <dd><p>Bases: <a class="reference internal" href="#gp.topology.Topology" title="gp.topology.Topology"><code class="xref py py-class docutils literal"><span class="pre">gp.topology.Topology</span></code></a></p>
 <p>Tree structure.</p>
 <p>Each node sends to its children. Leaves send to None.
-This is a full binary tree.
-For N nodes, the tree has (N-1) links, with no cycling dependencies.
+This is a binary tree.
+For N nodes, the tree has (N-1) links, with no cyclic dependencies.
 Communication overhead is minimized, while still allowing for diffusion.
 With each node generating independently, the pipeline effect is largely avoided.</p>
 <dl class="method">

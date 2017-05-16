@@ -660,6 +660,7 @@
 <span class="sd">        :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) is allowed but not log(x) with implicit base e</span>
 <span class="sd">        :bug : 2 * log(3 , 4) is parsed incorrectly</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expr</span><span class="p">))</span>
         <span class="n">pfix</span> <span class="o">=</span> <span class="n">infixToPrefix</span><span class="p">(</span><span class="n">tokenize</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">variables</span><span class="p">))</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pfix</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
