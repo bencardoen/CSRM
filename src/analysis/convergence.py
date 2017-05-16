@@ -85,13 +85,10 @@ class Convergence(Plotter):
         for i, run in enumerate(self._convergencestats):
             g, r, o = 0, 0, 0
             for j in run:
-                #logger.info("Generation is {}".format(j["fitnessgains"]))
                 g += sum(j["fitnessgains"])
-                #logger.info("Generation is {}".format(j["fitnessgainsrelative"]))
                 rgs = j["fitnessgainsrelative"]
                 srgs = sum(rgs)
                 r += srgs
-                #logger.info("Generation is {}".format(j["optimizercost"]))
                 o += j["optimizercost"]
             gains.append(g)
             rgains.append(r)
@@ -246,7 +243,6 @@ class SummarizedResults(Plotter):
 
     def plotVariance(self):
         fitness = ([[r['variance_fitness'] for r in self._results]])
-        #logger.info("Variances are {}".format(fitness))
         p = plotDotData(fitness, labelx="Process", labely="Variance", title="Variance Fitness of the last generation calculated on the full data set (sample + test).", xcategorical=True, groupsimilar=True)
         self.addPlot(p)
 
@@ -259,15 +255,12 @@ class SummarizedResults(Plotter):
         featurespre = [list(set(r['features'][0])) for r in self._results]
         featurespre = list(map(lambda x : [y+1 for y in x], featurespre))
         mlen = max( [len(x) for x in featurespre])
-        #logger.info("Features are {}".format(featurespre))
         for i in range(len(featurespre)):
             x = featurespre[i]
             first = x[0]
             lx = len(x)
             x += [first for _ in range(mlen-lx)]
         features = rmtocm(featurespre)
-
-        #logger.info("Features are {}".format(features))
         p = plotDotData(features, labelx="Process", labely="Features", title="Features used in the best solution.", xcategorical=True, groupsimilar=True, ycategorical=True)
         self.addPlot(p)
 
