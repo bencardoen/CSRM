@@ -73,6 +73,16 @@ class TreeTest(unittest.TestCase):
         t.printToDot(outputfolder+"best.dot")
 
 
+    def testPrint30(self):
+        expr = "( ( ( ( cos( ( abs( ( min( x2, 0.9046716652767782 ) ) ) ) ) ) + 0.2692330739385492 ) ** ( ( 2.376041935922096 * ( ln( ( x1 / x2 ) ) ) ) / ( ( abs( ( 0.7082075232918987 * x0 ) ) ) % ( max( 0.8898870280466706, ( max( x0, 0.27443469320601277 ) ) ) ) ) ) ) + ( max( ( max( x1, x1 ) ), ( max( ( ( min( ( tanh( x2 ) ), ( 0.5190657815958853 * x2 ) ) ) + ( min( ( abs( x1 ) ), 0.23397928893351272 ) ) ), ( exp( ( min( 0.3966763285029433, ( x2 - x0 ) ) ) ) ) ) ) ) ) )"
+        dcount = 2
+        vcount = 5
+        variables = generateVariables(vcount, dcount, 0)
+        t = Tree.createTreeFromExpression(expr, variables=variables)
+        t.printToDot(outputfolder+"best30.dot")
+
+
+
     def testIsLeaf(self):
         t = Tree()
         root = t.makeInternalNode(plus, None, None)

@@ -248,7 +248,7 @@ class Tree:
         nodes = self.getNodes()
         for c in nodes:
             if c:
-                logging.debug("Writing {} to dot".format(c))
+                logger.debug("Writing {} to dot".format(c))
                 handle.write( str( id(c) ) + "[label = \"" + str(c) + "\"]" "\n")
         for n in nodes:
             if n:
@@ -614,7 +614,7 @@ class Tree:
         :attention : logarithm is a binary operator : log(x,base), with shorthand ln(x) is allowed but not log(x) with implicit base e
         :bug : 2 * log(3 , 4) is parsed incorrectly
         """
-        logger.info("Reading {}".format(expr))
+        #logger.info("Reading {}".format(expr))
         pfix = infixToPrefix(tokenize(expr, variables))
         result = Tree()
         if len(pfix) == 1:

@@ -358,10 +358,10 @@ class Variable():
         return self._index
 
     def __str__(self):
-        return "x_{}={}".format(self.getIndex(),self.getValue())
+        return "x_{} ".format(self.getIndex())
 
     def __repr__(self):
-        return "x_{}={}".format(self.getIndex(),self.getValue())
+        return "x_{} ".format(self.getIndex())
 
 
 class VariableNode(Node):
