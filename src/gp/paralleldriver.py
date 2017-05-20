@@ -48,6 +48,7 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
     initialdepth= config.initialdepth
     phases= config.phases
     pcount = comm.Get_size() if isMPI() else processcount
+    config.processcount = pcount
     population = config.population
     commsize = config.communicationsize
     archivesize = population

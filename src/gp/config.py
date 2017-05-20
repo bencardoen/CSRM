@@ -28,6 +28,7 @@ class Config:
         self.optimizer = None
         self.optimizestrategy = None
         self.ranges = None
+        self.processcount = 1
         """Optimizer strategy : -1 : None, 0: Only apply to archiving (i.e. best per phase), 0<k<=pop : optimize k best samples per generation."""
 
 
