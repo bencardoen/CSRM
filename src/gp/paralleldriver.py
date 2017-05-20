@@ -22,6 +22,7 @@ from meta.optimizer import optimizers
 import logging
 import webbrowser
 import os
+import time
 logger = logging.getLogger('global')
 
 # Depending on system, mpi4py is either in mpich or global
@@ -87,6 +88,7 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
     else:
         logger.info("Starting Sequential implementation")
         algo = SequentialPGP(X, Y, t.size, population, depth, fitnessfunction=_fit, seed=0, generations=generations, phases=phases, topo=t, archivesize=archivesize, communicationsize=commsize, initialdepth=initialdepth, optimizer = config.optimizer, optimizestrategy=config.optimizestrategy, archivefile=config.archivefile)
+    tstart = time.time()
     algo.executeAlgorithm()
 
     algo.reportOutput(save=True, outputfolder = outfolder, display=display)
@@ -98,6 +100,9 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
             logger.info("Opening results for proces {}".format(pid))
             for i in range(processcount):
                 webbrowser.open('file://' + os.path.realpath(outputfolder+"output_{}.html".format(i)))
+        if pid == 0:
+            tcomp = time.time() - tstart
+            logger.info("Time to completion was {}".format(tcomp))
 
 
 def updateConfig(configobj, attributes, args):

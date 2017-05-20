@@ -434,6 +434,22 @@ The total number of messages sent per phase is then :
 \item Random : 2 * n = 50
 \end{itemize}
 The value of m = 2 for Tree and m = 4 for Grid follows from our discussion in \ref{subsec:commstrategies}. The Random topology in this configuration has a single outgoing link per process, resulting in 2 messages per link. This configuration forms a balance between the different strategies.
+For 25 processes the grid topology is a simple square of 5x5. The tree topology with 25 processes is a non full binary tree with depth 4. The random topology is highly dependent on the seed. In Figure \ref{fig:experimenttopos} we see that in this instance the topology has become a disconnected graph of 3 cycles. This highlights the risk of using a random topology, without extra constraints the characteristics of the communication pattern are unknown and can be undesirable.
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/random25.png}
+        \caption{Random topology for 25 processes with one outgoing link per process.}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/tree25.png}
+        \caption{Tree topology for 25 processes.}
+    \end{subfigure}
+    \caption{Tree and random topologies used in the experiment.}
+    \label{fig:experimenttopos}
+    \end{figure}
 
 \subsubsection{Measures}
 When the experiment ends the best 20 expressions from all processes are collected and scored. We measure in best fitness on the training data, and best fitness on the validated data. As we have seen in % todo ref kfold 
@@ -448,9 +464,42 @@ where f is either the best fitness value or the mean. Then we scale the results 
 \[
 v_{t} = \frac{f_{t}}{f_{tree}}
 \]
+We will compare each topology to the tree topology to make an ordered comparison easier.
+% Overhead
+% Detailed behavior per process
+\subsubsection{Results}
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/distributedbesttraining.png}
+        \caption{Relative gain in best fitness of training data}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/distributedbestvalidated.png}
+        \caption{Relative gain in best fitness on full data.}
+    \end{subfigure}
+        \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/distributedmeantraining.png}
+        \caption{Relative gain in mean fitness on training data.}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/distributedmeanvalidated.png}
+        \caption{Relative gain in mean fitness on full data.}
+    \end{subfigure}
+    \caption{Convergence differences between topologies.}
+    \label{fig:distributedresults}
+    \end{figure}
+In Figure \ref{fig:distributedresults} we see how the topology affects convergence. The first observation we make is that the first 5 testproblems, with exception of the second, all have identical values for best fitness on training and validation data. The processes converged to zero fitness values for these problems, hence the identical results. 
+The training fitness results in Figure \ref{fig:distributedresults}a indicate that the grid and random topology have superior convergence characteristics compared to the tree topology, with grid outperforming random on several testproblems. When we look at the fitness values on the validation data in Figure \ref{fig:distributedresults}b we see a more nuanced result. The grid topology is overall still the best choice, but the random topology has worse results for problems 11 and 12.
+Next we look at the mean fitness values on training and validation data. Interestingly enough for problem 0 both random and grid score far worse than the tree topology. Overall the grid topology is still better for most problems, with the exception of problem 7. Note the similarity in pattern in the results here between training and validation data indicating that the predictive capability of the results is still good. If overfitting would take place we would see a reverse pattern in the results for the validation data.
 \subsection{Conclusion}
 \subsubsection{Operator cooling schedule}
 \subsubsection{Constant folding}
 \subsubsection{Optimizers}
 The experiments with the optimizers highlight several issues. There are a wide number of strategies and parameters that influence the effect of the optimizer. We also see that optimizers can hinder the algorithm in its convergence. This is not a general conclusion, but dependent in part on our design choices and the trade-offs made. If we only optimize the final outcome of the algorithm it is obvious that no fitness regression is possible. Only when we apply optimization in the archiving stage are there subtle effects at play that allow for such edge cases. The cost of applying the optimizers is significant. In our implementation the cost is known beforehand, but the gain is not. This holds true in general for this GP SR algorithm. While we can empirically investigate the convergence of a number of problems, there is no known limit to this process. 
 In general, when the optimizers are used the improvements made are far greater than the loss in edge cases. We have tested 3 distinct algorithms as optimizers in order to test which is best. Unfortunately no such algorithm exists. The NFL theorem \cite{NFL} suggests as much. What we can see is that ABC and DE offer, for our problem set, the best results. Best in this context means the overall highest gain with the lowest losses at an equal cost to the other algorithms. The hardness of the SR problem indicates that, unfortunately, there are an infinite number of problem statements that will have different convergence characteristics. While hybridization of the GP algorithm with other algorithms is a viable strategy, it also substantially increases the number of parameters. 
+\subsubsection{Distributed}

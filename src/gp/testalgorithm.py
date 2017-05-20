@@ -279,6 +279,14 @@ class GPTest(unittest.TestCase):
 
 
 class TopologyTest(unittest.TestCase):
+    def testPrint(self):
+        t = RandomStaticTopology(25, seed=0)
+        t.toDot("rs25.dot")
+        t = TreeTopology(25)
+        t.toDot("tree25.dot")
+        t = VonNeumannTopology(25)
+        t.toDot("grid25.dot")
+
     def testInverse(self):
         size = 4
         rs = RandomStaticTopology(size, seed=5)
