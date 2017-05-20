@@ -86,18 +86,21 @@
 \BOOKMARK [3][-]{subsubsection.7.4.5}{5 Phases}{subsection.7.4}% 86
 \BOOKMARK [3][-]{subsubsection.7.4.6}{10 Phases}{subsection.7.4}% 87
 \BOOKMARK [3][-]{subsubsection.7.4.7}{Cost}{subsection.7.4}% 88
-\BOOKMARK [2][-]{subsection.7.5}{Conclusion}{section.7}% 89
-\BOOKMARK [3][-]{subsubsection.7.5.1}{Operator cooling schedule}{subsection.7.5}% 90
-\BOOKMARK [3][-]{subsubsection.7.5.2}{Constant folding}{subsection.7.5}% 91
-\BOOKMARK [3][-]{subsubsection.7.5.3}{Optimizers}{subsection.7.5}% 92
-\BOOKMARK [1][-]{section.8}{Use Case}{}% 93
-\BOOKMARK [2][-]{subsection.8.1}{Problem statement}{section.8}% 94
-\BOOKMARK [2][-]{subsection.8.2}{Design of Experiment}{section.8}% 95
-\BOOKMARK [3][-]{subsubsection.8.2.1}{Experiment configuration}{subsection.8.2}% 96
-\BOOKMARK [2][-]{subsection.8.3}{Results}{section.8}% 97
-\BOOKMARK [3][-]{subsubsection.8.3.1}{Fitness improvement}{subsection.8.3}% 98
-\BOOKMARK [3][-]{subsubsection.8.3.2}{Convergence behavior}{subsection.8.3}% 99
-\BOOKMARK [2][-]{subsection.8.4}{Conclusion}{section.8}% 100
-\BOOKMARK [1][-]{section.9}{Related Work}{}% 101
-\BOOKMARK [1][-]{section.10}{Conclusion}{}% 102
-\BOOKMARK [1][-]{section.11}{Future work}{}% 103
+\BOOKMARK [2][-]{subsection.7.5}{Distributed}{section.7}% 89
+\BOOKMARK [3][-]{subsubsection.7.5.1}{Experiment setup}{subsection.7.5}% 90
+\BOOKMARK [3][-]{subsubsection.7.5.2}{Measures}{subsection.7.5}% 91
+\BOOKMARK [2][-]{subsection.7.6}{Conclusion}{section.7}% 92
+\BOOKMARK [3][-]{subsubsection.7.6.1}{Operator cooling schedule}{subsection.7.6}% 93
+\BOOKMARK [3][-]{subsubsection.7.6.2}{Constant folding}{subsection.7.6}% 94
+\BOOKMARK [3][-]{subsubsection.7.6.3}{Optimizers}{subsection.7.6}% 95
+\BOOKMARK [1][-]{section.8}{Use Case}{}% 96
+\BOOKMARK [2][-]{subsection.8.1}{Problem statement}{section.8}% 97
+\BOOKMARK [2][-]{subsection.8.2}{Design of Experiment}{section.8}% 98
+\BOOKMARK [3][-]{subsubsection.8.2.1}{Experiment configuration}{subsection.8.2}% 99
+\BOOKMARK [2][-]{subsection.8.3}{Results}{section.8}% 100
+\BOOKMARK [3][-]{subsubsection.8.3.1}{Fitness improvement}{subsection.8.3}% 101
+\BOOKMARK [3][-]{subsubsection.8.3.2}{Convergence behavior}{subsection.8.3}% 102
+\BOOKMARK [2][-]{subsection.8.4}{Conclusion}{section.8}% 103
+\BOOKMARK [1][-]{section.9}{Related Work}{}% 104
+\BOOKMARK [1][-]{section.10}{Conclusion}{}% 105
+\BOOKMARK [1][-]{section.11}{Future work}{}% 106

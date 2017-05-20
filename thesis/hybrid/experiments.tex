@@ -396,8 +396,58 @@ PSO                 & 8.487e+05 & 2.720e-01 & 1.113e+00 & 8.726e-01 & 1.601e+04 
 \end{landscape}
 
 \subsubsection{Cost}
-The cost in terms of evaluations is linear in the number of phases. For each phase, 4 expressions are optimized with O(nk) complexity. In our configuration n=50, k=50. The SR algorithm itself requires O(mg) evaluations per phase, where m is the population (20) and g the generations per phase (20). The question whether or not the cost of the optimizer is worth the gain in fitness is in the end one for the practitioner to answer. There is no guarantee that improvement will take place, but from the results on the above hard problems we can still expect significant improvements up to several orders of magnitude. 
+The cost in terms of evaluations is linear in the number of phases. For each phase, 4 expressions are optimized with O(nk) complexity. In our configuration n=50, k=50. The SR algorithm itself requires O(mg) evaluations per phase, where m is the population (20) and g the generations per phase (20). The question whether or not the cost of the optimizer is worth the gain in fitness is in the end one for the practitioner to answer. There is no guarantee that improvement will take place, but from the results on the above hard problems we can still expect significant improvements up to several orders of magnitude.
 
+\subsection{Distributed}
+We now apply our tool to the testproblems in a distributed setup.
+
+\subsubsection{Experiment setup}
+\begin{itemize}
+\item population : 20
+\item minimum depth : 4
+\item maximum depth : 8
+\item phases : 20
+\item generations per phase : 20
+\item datapoints : 20
+\item range : [1,5]
+\item features : 5
+\item archivesize : 20
+\item expressions to archive per phase : 4
+\item optimization strategy : none
+\item communication size m : 2, 4
+\item topology : Tree, Random, Grid
+\item spreadpolicy : distribute
+\item processes n : 25
+\end{itemize}
+\paragraph{Discussion}
+From section \ref{subsec:commstrategies}
+we know that simply using m for all topologies will lead to unintended communication patterns. We test Tree and Random with m = 2, and Grid with m = 4. This results in the following number of messages per link :
+\begin{itemize}
+\item Grid : 1
+\item Tree : 1
+\item Random : 2
+\end{itemize}
+The total number of messages sent per phase is then :
+\begin{itemize}
+\item Grid : 4 * n = 200
+\item Tree : 1 * n = 25
+\item Random : 2 * n = 50
+\end{itemize}
+The value of m = 2 for Tree and m = 4 for Grid follows from our discussion in \ref{subsec:commstrategies}. The Random topology in this configuration has a single outgoing link per process, resulting in 2 messages per link. This configuration forms a balance between the different strategies.
+
+\subsubsection{Measures}
+When the experiment ends the best 20 expressions from all processes are collected and scored. We measure in best fitness on the training data, and best fitness on the validated data. As we have seen in % todo ref kfold 
+there is a subtle difference here compared to the sequential approach. While each process has a subset of the training and validation data, in the end we score against the full dataset.
+Finally we record the mean fitness values of the best 5 expressions, both on the training and validation data. These are the same measures as used by the optimizer experiment. The mean is restricted to the upper quarter of the population specifically to measure how the best expressions are distributed. This measure records the convergence more accurately as the fittest expressions drive the convergence rate. 
+\paragraph{Calculation}
+The fitness values fluctuate strongly between the test problems and even between topologies. We apply a negative logarithmic scale :
+\[
+f_t = -\log_{10}(f)
+\]
+where f is either the best fitness value or the mean. Then we scale the results relative to the values obtained for the tree topology in order to measure relative gain or loss in orders of magnitude.
+\[
+v_{t} = \frac{f_{t}}{f_{tree}}
+\]
 \subsection{Conclusion}
 \subsubsection{Operator cooling schedule}
 \subsubsection{Constant folding}
