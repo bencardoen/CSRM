@@ -78,34 +78,33 @@
 \BOOKMARK [3][-]{subsubsection.7.2.1}{Problems}{subsection.7.2}% 78
 \BOOKMARK [2][-]{subsection.7.3}{Operators}{section.7}% 79
 \BOOKMARK [3][-]{subsubsection.7.3.1}{Cooling}{subsection.7.3}% 80
-\BOOKMARK [3][-]{subsubsection.7.3.2}{Depth sensitive}{subsection.7.3}% 81
-\BOOKMARK [2][-]{subsection.7.4}{Constant Folding}{section.7}% 82
-\BOOKMARK [3][-]{subsubsection.7.4.1}{Savings}{subsection.7.4}% 83
-\BOOKMARK [2][-]{subsection.7.5}{Constant optimization}{section.7}% 84
-\BOOKMARK [3][-]{subsubsection.7.5.1}{Test problem}{subsection.7.5}% 85
-\BOOKMARK [3][-]{subsubsection.7.5.2}{Optimizer experiments setup}{subsection.7.5}% 86
-\BOOKMARK [3][-]{subsubsection.7.5.3}{Measures}{subsection.7.5}% 87
-\BOOKMARK [3][-]{subsubsection.7.5.4}{2 Phases}{subsection.7.5}% 88
-\BOOKMARK [3][-]{subsubsection.7.5.5}{5 Phases}{subsection.7.5}% 89
-\BOOKMARK [3][-]{subsubsection.7.5.6}{10 Phases}{subsection.7.5}% 90
-\BOOKMARK [3][-]{subsubsection.7.5.7}{Cost}{subsection.7.5}% 91
-\BOOKMARK [2][-]{subsection.7.6}{Distributed}{section.7}% 92
-\BOOKMARK [3][-]{subsubsection.7.6.1}{Experiment setup}{subsection.7.6}% 93
-\BOOKMARK [3][-]{subsubsection.7.6.2}{Measures}{subsection.7.6}% 94
-\BOOKMARK [3][-]{subsubsection.7.6.3}{Results}{subsection.7.6}% 95
-\BOOKMARK [2][-]{subsection.7.7}{Conclusion}{section.7}% 96
-\BOOKMARK [3][-]{subsubsection.7.7.1}{Operator cooling schedule}{subsection.7.7}% 97
-\BOOKMARK [3][-]{subsubsection.7.7.2}{Constant folding}{subsection.7.7}% 98
-\BOOKMARK [3][-]{subsubsection.7.7.3}{Optimizers}{subsection.7.7}% 99
-\BOOKMARK [3][-]{subsubsection.7.7.4}{Distributed}{subsection.7.7}% 100
-\BOOKMARK [1][-]{section.8}{Use Case}{}% 101
-\BOOKMARK [2][-]{subsection.8.1}{Problem statement}{section.8}% 102
-\BOOKMARK [2][-]{subsection.8.2}{Design of Experiment}{section.8}% 103
-\BOOKMARK [3][-]{subsubsection.8.2.1}{Experiment configuration}{subsection.8.2}% 104
-\BOOKMARK [2][-]{subsection.8.3}{Results}{section.8}% 105
-\BOOKMARK [3][-]{subsubsection.8.3.1}{Fitness improvement}{subsection.8.3}% 106
-\BOOKMARK [3][-]{subsubsection.8.3.2}{Convergence behavior}{subsection.8.3}% 107
-\BOOKMARK [2][-]{subsection.8.4}{Conclusion}{section.8}% 108
-\BOOKMARK [1][-]{section.9}{Related Work}{}% 109
-\BOOKMARK [1][-]{section.10}{Conclusion}{}% 110
-\BOOKMARK [1][-]{section.11}{Future work}{}% 111
+\BOOKMARK [2][-]{subsection.7.4}{Constant Folding}{section.7}% 81
+\BOOKMARK [3][-]{subsubsection.7.4.1}{Savings}{subsection.7.4}% 82
+\BOOKMARK [2][-]{subsection.7.5}{Constant optimization}{section.7}% 83
+\BOOKMARK [3][-]{subsubsection.7.5.1}{Test problem}{subsection.7.5}% 84
+\BOOKMARK [3][-]{subsubsection.7.5.2}{Optimizer experiments setup}{subsection.7.5}% 85
+\BOOKMARK [3][-]{subsubsection.7.5.3}{Measures}{subsection.7.5}% 86
+\BOOKMARK [3][-]{subsubsection.7.5.4}{2 Phases}{subsection.7.5}% 87
+\BOOKMARK [3][-]{subsubsection.7.5.5}{5 Phases}{subsection.7.5}% 88
+\BOOKMARK [3][-]{subsubsection.7.5.6}{10 Phases}{subsection.7.5}% 89
+\BOOKMARK [3][-]{subsubsection.7.5.7}{Cost}{subsection.7.5}% 90
+\BOOKMARK [2][-]{subsection.7.6}{Distributed}{section.7}% 91
+\BOOKMARK [3][-]{subsubsection.7.6.1}{Experiment setup}{subsection.7.6}% 92
+\BOOKMARK [3][-]{subsubsection.7.6.2}{Measures}{subsection.7.6}% 93
+\BOOKMARK [3][-]{subsubsection.7.6.3}{Results}{subsection.7.6}% 94
+\BOOKMARK [2][-]{subsection.7.7}{Conclusion}{section.7}% 95
+\BOOKMARK [3][-]{subsubsection.7.7.1}{Operator cooling schedule}{subsection.7.7}% 96
+\BOOKMARK [3][-]{subsubsection.7.7.2}{Constant folding}{subsection.7.7}% 97
+\BOOKMARK [3][-]{subsubsection.7.7.3}{Optimizers}{subsection.7.7}% 98
+\BOOKMARK [3][-]{subsubsection.7.7.4}{Distributed}{subsection.7.7}% 99
+\BOOKMARK [1][-]{section.8}{Use Case}{}% 100
+\BOOKMARK [2][-]{subsection.8.1}{Problem statement}{section.8}% 101
+\BOOKMARK [2][-]{subsection.8.2}{Design of Experiment}{section.8}% 102
+\BOOKMARK [3][-]{subsubsection.8.2.1}{Experiment configuration}{subsection.8.2}% 103
+\BOOKMARK [2][-]{subsection.8.3}{Results}{section.8}% 104
+\BOOKMARK [3][-]{subsubsection.8.3.1}{Fitness improvement}{subsection.8.3}% 105
+\BOOKMARK [3][-]{subsubsection.8.3.2}{Convergence behavior}{subsection.8.3}% 106
+\BOOKMARK [2][-]{subsection.8.4}{Conclusion}{section.8}% 107
+\BOOKMARK [1][-]{section.9}{Related Work}{}% 108
+\BOOKMARK [1][-]{section.10}{Conclusion}{}% 109
+\BOOKMARK [1][-]{section.11}{Future work}{}% 110

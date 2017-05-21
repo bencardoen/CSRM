@@ -6,7 +6,7 @@ An open source \href{https://bitbucket.org/bcardoen/csrm}{repository} holds the 
 \subsection{Benchmark problems}
 Recent work on the convergence of GP-based SR \cite{SRAccur, SRBaseline} featured a set of benchmark problems that pose convergence problems for SR implementations. We reuse these problems in our work in order to study convergence of CSRM's implementation.
 \subsubsection{Problems}
-These problems use at most five features. CSRM does not know which features are used, making the problem harder. In other words it assumes each problem is a function of 5 features which may or may not influence the expected outcome. This is an extra test in robustness for the algorithm, while also testing the algorithm's capability as a classifier. These problems are introduced by \cite{SRBaseline}.
+These problems use at most five features. CSRM does not know which features are used, making the problem harder. In other words it assumes each problem is a function of 5 features which may or may not influence the expected outcome. This is an extra test in robustness for the algorithm, while also testing the algorithm's capability as a classifier. 
 \[
 1.57 + (24.3*x_3)\]
 \[0.23+14.2*\frac{x_3+x_1}{3.0*x_4}
@@ -38,10 +38,10 @@ q = \frac{g_i}{2g}
 \[
 w = \frac{p_i2}{p}
 \]
-R, s are uniformly distributed random numbers in [0,1].
 \[
 m = r < q \land s < w
 \]
+with r, s are uniformly distributed random numbers in [0,1].
 If m is true, we apply mutation. By making this choice stochastic we introduce a measure of tolerance into the schedule. Unlike SA we use a linear combination and not an exponential distribution.
 \paragraph{Configuration}
 \begin{itemize}
@@ -84,13 +84,14 @@ The results of applying the cooling schedule vary over the testproblems. We see 
         \caption{Mutation success rate without cooling schedule.}
     \end{subfigure}
     \caption{Effect of cooling schedule on mutation success rate and gain.}
-    \label{fig:ctfoldproblem1}
+    \label{fig:cooling}
     \end{figure}
-\subsubsection{Depth sensitive}
+In Figure \ref{fig:cooling} we see that both the success rate and gain for mutation are significantly higher over the generations when we apply the cooling schedule. In the final generations we see that without cooling the mutation success rate start to increase slightly, whereas with cooling it sharply decreases. This could indicate that the schedule is no longer effective in the final stages of the algorithm. This shows that the schedule is only a heuristic, and attempts to emulate the knowledge needed in order to warrant a mutation.
+%\subsubsection{Depth sensitive}
 
 
 % Exclusive experiments
-\subsection{Constant Folding}
+\subsection{Constant Folding}\label{subsecfoldingresults}
 \subsubsection{Savings}
 We will analyze the results of our constant subtree folding technique discussed in section \ref{secconstfolding}.
 \paragraph{Configuration}
@@ -129,7 +130,7 @@ The results for constant folding are similar for all testproblems, we select a s
 \subparagraph{Measure}
 If we can collapse j subtrees holding $k_j$ nodes in a tree with n nodes, we define the savings as 
 \[
-s = \frac{\sum_i=0^{j} k_i - 1}{n} * 100
+s = \frac{\sum_{i=0}^{j} k_i - 1}{n} * 100
 \]
 In other words, s is the percentage of nodes with which a tree is reduced in size.
 We calculate the mean for the entire generation of this value.
@@ -564,7 +565,7 @@ where f is either the best fitness value or the mean. Then we scale the results 
 \[
 v_{t} = \frac{f_{t}}{f_{tree}}
 \]
-We will compare each topology to the tree topology to make an ordered comparison easier.
+We will compare each topology to the tree topology.
 \subsubsection{Results}
 \paragraph{Convergence}
 \begin{figure}
@@ -625,14 +626,16 @@ In Figure \ref{fig:distributeddelayresults} we see that the tree topology has a 
 Memory overhead is hard to measure in a language with a garbage collector. We can estimate the overhead by calculating the needed memory in function of depth and topology used.
 Let the depth be constrained by [$d_i, d_m$], with n processes, m communicationsize and a distribution spreading policy. If we let $d_a = \frac{d_i + d_m}{2}$ be the average depth, then the memory requirements on average for each topology are then given by
 \begin{itemize}
-\item Tree : $d_a \frac{m}{2} n$
+\item Tree : $d_a \frac{m}{2} (n-1)$
 \item Random : $d_a \frac{m} n$
 \item Grid : $d_a \frac{m}{4} 4 n$
 \end{itemize}
 M $>=$ 4 for a grid if we use distribute spreading policy. This leads us to an important observation. The Tree topology can communicate expressions with an average depth that is 2 times greater than the one used by the grid with the same memory usage. This factor is important, an increase in depth has an exponential effect on the complexity of the entire algorithm but also allows for more complex solutions. In addition an increased depth tolerates more bloat without losing accuracy. 
 \subsection{Conclusion}
 \subsubsection{Operator cooling schedule}
+We have demonstrated that a cooling schedule for the mutation operator can predict and avoid mutations that are unlikely to improve fitness. This approach has a small effect on convergence but can save computationally expensive operator applications.
 \subsubsection{Constant folding}
+Folding constant subtrees leads savings in the tree representation and prevents forming of ever increasingly large constant subtrees. The effects on convergence are ambiguous, the folding approach can both lead to increase as well as decrease in fitness. This depends highly on the problem and the stage at which folding is applied. 
 \subsubsection{Optimizers}
 The experiments with the optimizers highlight several issues. There are a wide number of strategies and parameters that influence the effect of the optimizer. We also see that optimizers can hinder the algorithm in its convergence. This is not a general conclusion, but dependent in part on our design choices and the trade-offs made. If we only optimize the final outcome of the algorithm it is obvious that no fitness regression is possible. Only when we apply optimization in the archiving stage are there subtle effects at play that allow for such edge cases. The cost of applying the optimizers is significant. In our implementation the cost is known beforehand, but the gain is not. This holds true in general for this GP SR algorithm. While we can empirically investigate the convergence of a number of problems, there is no known limit to this process. 
 In general, when the optimizers are used the improvements made are far greater than the loss in edge cases. We have tested 3 distinct algorithms as optimizers in order to test which is best. Unfortunately no such algorithm exists. The NFL theorem \cite{NFL} suggests as much. What we can see is that ABC and DE offer, for our problem set, the best results. Best in this context means the overall highest gain with the lowest losses at an equal cost to the other algorithms. The hardness of the SR problem indicates that, unfortunately, there are an infinite number of problem statements that will have different convergence characteristics. While hybridization of the GP algorithm with other algorithms is a viable strategy, it also substantially increases the number of parameters. 
