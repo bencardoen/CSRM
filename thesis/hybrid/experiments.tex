@@ -1,7 +1,9 @@
+\subsection{Reproducability}
+All benchmarks were performed on a Intel Xeon E5 2697 processor with 64GB Ram, with Ubuntu 16.04 LTS, kernel 4.4.0 as operating system.
+CSRM is implemented using Python3, the test system uses Python 3.5. 
+The experiments use a fixed seed in order to guarantee determinism. Where relevant the configuration is given. 
+An open source \href{https://bitbucket.org/bcardoen/csrm}{repository} holds the project's source code, benchmark scripts, analysis code and plots. The project dependencies are minimal making the project portable across any system that has a working Python3 implementation and pip as an installation manager. In order to run distributed the project requires an MPI implementation, which is available for most platforms.
 \subsection{Benchmark problems}
-% USE gp grid parameters
-% Experiments
-% shared experiments
 Recent work on the convergence of GP-based SR \cite{SRAccur, SRBaseline} featured a set of benchmark problems that pose convergence problems for SR implementations. We reuse these problems in our work in order to study convergence of CSRM's implementation.
 \subsubsection{Problems}
 These problems use at most five features. CSRM does not know which features are used, making the problem harder. In other words it assumes each problem is a function of 5 features which may or may not influence the expected outcome. This is an extra test in robustness for the algorithm, while also testing the algorithm's capability as a classifier. These problems are introduced by \cite{SRBaseline}.
@@ -27,15 +29,113 @@ These problems use at most five features. CSRM does not know which features are 
                     
 
 \subsection{Operators}
-\input{sharedexperiments.tex}
-% Show the effect of cooling
-% Show the effect of depth sensitive
+\subsubsection{Cooling}
+The mutation operator introduces new information in the form of generated subtrees into the population. Mutation ensures exploration, but is an computationally expensive operator. In section \ref{subsubinvalidexpressions} we have discussed the impact on complexity the issue of generating valid expressions has. When we apply mutation we only allow the mutated expression to survive into the next generation if it has a strictly better fitness value. We record the success rate of both mutation and crossover, and their respective gains in fitness. Using this information we discovered that the mutation success rate decreases as the algorithm converges. The change in fitness value introduced by mutation is significant, but for highly fit expressions this change can be to abrupt and lead to worse fitness. We would like to see a shift to exploitation instead of exploration later in the convergence process. While applying mutation without fitness gain will not affect the convergence rate, it will incur significant computational cost. Based on this reasoning we introduce a cooling schedule similar to that used in Simulated Annealing (SA). The schedule tries to predict if mutation is beneficial by a biased random process  based on the current fitness of an expression and its generation. As long as the schedule is correct we will improve the runtime without affecting convergence. If the schedule is too strict we will slow down convergence.
+$P_i$ is defined as the position of expression i in the population, which is ordered on ascending fitness. $G_i$ is the generation for expression i. P and G are the population size and number of generations respectively. The decision whether or not to apply mutation to expression i is then given by :
+\[
+q = \frac{g_i}{2g}
+\]
+\[
+w = \frac{p_i2}{p}
+\]
+R, s are uniformly distributed random numbers in [0,1].
+\[
+m = r < q \land s < w
+\]
+If m is true, we apply mutation. By making this choice stochastic we introduce a measure of tolerance into the schedule. Unlike SA we use a linear combination and not an exponential distribution.
+\paragraph{Configuration}
+\begin{itemize}
+\item population : 20
+\item minimum depth : 4
+\item maximum depth : 10
+\item phases : 20
+\item generations per phase : 20
+\item datapoints : 20
+\item range : [1,5]
+\item features : 5
+\item archivesize : 20
+\item expressions to archive per phase : 4
+\item optimization strategy : none
+\item testproblem : 0
+\end{itemize}
+The results of applying the cooling schedule vary over the testproblems. We see no clear effect on the fitness value so we focus on the intended goal of the cooling schedule, namely reducing the frequency of mutation applications that do not result in a better fitness value. We would like to have some insight into this process as it unfolds over the generations. Using our statistics we can see exactly how the mutation operator behaves over time.
+% figure
+\paragraph{Results}
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/coolinggain.png}
+        \caption{Mutation gain with cooling schedule.}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/coolingrate.png}
+        \caption{Mutation success rate with cooling schedule.}
+    \end{subfigure}
+        \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/noncoolinggain.png}
+        \caption{Mutation gain without cooling schedule.}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/noncoolingrate.png}
+        \caption{Mutation success rate without cooling schedule.}
+    \end{subfigure}
+    \caption{Effect of cooling schedule on mutation success rate and gain.}
+    \label{fig:ctfoldproblem1}
+    \end{figure}
+\subsubsection{Depth sensitive}
+
 
 % Exclusive experiments
-\subsection{Constant Folding}\ref{subsecctfold}
+\subsection{Constant Folding}
 \subsubsection{Savings}
-% Show effect of constant folding savings
-% Explain how, even thoug small, these savings add up, e.g. 1% bloat increases.
+We will analyze the results of our constant subtree folding technique discussed in section \ref{secconstfolding}.
+\paragraph{Configuration}
+\begin{itemize}
+\item population : 20
+\item minimum depth : 4
+\item maximum depth : 10
+\item phases : 20
+\item generations per phase : 20
+\item datapoints : 20
+\item range : [1,5]
+\item features : 5
+\item archivesize : 20
+\item expressions to archive per phase : 4
+\item optimization strategy : none
+\item testproblem : 1
+\end{itemize}
+The results for constant folding are similar for all testproblems, we select a single problem in order to visualize the constant folding  process over time instead of reporting the results at the end.
+% Figure
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/ctfold.png}
+        \caption{Folding savings over generations.}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.8\linewidth]{figures/ctfoldtrend.png}
+        \caption{Folding savings trend over generations (cubic fit).}
+    \end{subfigure}
+    \caption{Constant subtree folding savings over generations for testproblem 1.}
+    \label{fig:ctfoldproblem1}
+    \end{figure}
+\paragraph{Discussion}
+\subparagraph{Measure}
+If we can collapse j subtrees holding $k_j$ nodes in a tree with n nodes, we define the savings as 
+\[
+s = \frac{\sum_i=0^{j} k_i - 1}{n} * 100
+\]
+In other words, s is the percentage of nodes with which a tree is reduced in size.
+We calculate the mean for the entire generation of this value.
+In Figure \ref{fig:ctfoldproblem1} we see that the savings have a high variance, but tend to decrease slightly. On average we expect between 1 and 5 \% in savings. In addition to the savings these results give us an indication as to how the algorithm introduces constant subtrees. If we would not apply the savings we would see an incremental gain in constant subtrees. Even though the gains are relatively small the high number of generations would make this tendency problematic. 
+Constant folding prevents this from occurring, but as we have discussed previously it can also hinder convergence by slowing down the search process for the 'right' constant. Even though a constant subtree can be represented by a single constant, it holds more information than that single constant alone and provides a kind of 'constant repository' that can be used by the operators to more quickly find fitter expressions. On the other hand if the constant subtrees grow so large as to dominate the tree the convergence can be compromised as the tree has no more place left for base functions using features. A delicate balance between the two is required here. In future work we could experiment with such a balance by delaying the constant folding until x generations have passed, instead of our current approach where we apply it after every generation. 
+% add to future work.
 
 \subsection{Constant optimization}
 We look at the effect constant optimization using different algorithms has on different configurations of the tool. The measures used in the comparison are best fitness on training and test data, mean fitness on training and test data, and optimization cost.

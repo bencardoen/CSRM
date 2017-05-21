@@ -14,7 +14,7 @@ An expression is a constant expression if all its children are constant expressi
 Using the checking procedure in the initialization, a tree marked as a constant expression is not allowed in the initialization procedure.
 It is still possible to create constant expressions by applying mutation and crossover. If the left subtree of a node is a constant expression, and the right is not, and this right is replaced by either mutation or crossover with a constant expression then the tree becomes a constant expression. The mutation operator will not generate constant subtrees, so this leaves only crossover. Our tool does not prevent constant expressions from forming in this way, the evaluation following crossover will filter out the constant expressions using evolutionary pressure.
 
-\subsubsection{Folding}
+\subsubsection{Folding}\label{secconstfolding}
 
 \paragraph{Constant subtree problem}
 A tree can contain subtrees that represent constant expressions. This is an immediate effect of the GP algorithm trying to evolve the correct constant. This can lead to large subtrees that can be represented by a single node. Nodes used in such a constant subtree are not available for base functions. They waste memory and evaluation cost, without their presence the tree could become a fitter instance. 
