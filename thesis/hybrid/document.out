@@ -106,5 +106,11 @@
 \BOOKMARK [3][-]{subsubsection.8.3.2}{Convergence behavior}{subsection.8.3}% 106
 \BOOKMARK [2][-]{subsection.8.4}{Conclusion}{section.8}% 107
 \BOOKMARK [1][-]{section.9}{Related Work}{}% 108
-\BOOKMARK [1][-]{section.10}{Conclusion}{}% 109
-\BOOKMARK [1][-]{section.11}{Future work}{}% 110
+\BOOKMARK [2][-]{subsection.9.1}{Symbolic regression compared to other approaches}{section.9}% 109
+\BOOKMARK [2][-]{subsection.9.2}{Algorithms implementing symbolic regression}{section.9}% 110
+\BOOKMARK [2][-]{subsection.9.3}{Constant optimization problem}{section.9}% 111
+\BOOKMARK [2][-]{subsection.9.4}{Genetic programming}{section.9}% 112
+\BOOKMARK [2][-]{subsection.9.5}{Distributed symbolic regression}{section.9}% 113
+\BOOKMARK [2][-]{subsection.9.6}{Accuracy and convergence}{section.9}% 114
+\BOOKMARK [1][-]{section.10}{Conclusion}{}% 115
+\BOOKMARK [1][-]{section.11}{Future work}{}% 116

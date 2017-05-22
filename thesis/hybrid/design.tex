@@ -90,7 +90,7 @@ r = \frac{\sum_{i=0}^{n}{(y_i-E[Y])*(y'_i-E[Y'])}}{\sqrt{\sum_{j=0}^{n}{(y_j-E[Y
 \]
 R has a range of [-1, 1] where 1, -1 indicate linear and negative linear correlation and 0 no correlation.
 This function has a range [0,1] which facilitates comparison across domains and allows combining it with other objective functions.
-The function reflects the aim of the algorithm. We not only want to assign a good (i.e. minimal) fitness value to a model that has a minimal distance, we also want to consider linearity between Y an Y'. 
+The function reflects the aim of the algorithm. We not only want to assign a good (i.e. minimal) fitness value to a model that has a minimal distance, we also want to consider linearity between Y an Y'. The use of the Pearson correlation coefficient as a fitness measure is not new, a variant of this approach is used in \citep{pearson}.
 
 \subsubsection{Diversity}\label{subsubdiversity}
 Diversity, the concept of maintaining semantically different specimens, is an important aspect in metaheuristics. Concepts such as niching and partitioning are often used to promote this behavior, amongst other reasons to prevent premature convergence or even to enable multimodality.

@@ -1,9 +1,31 @@
-% Related in SR
-% Implementations using ACO, ABC, FFX
+% Related work
+\subsection{Symbolic regression compared to other approaches}
+Symbolic regression is one technique that fits a model, given a set of input values, to a known output. Other machine learning techniques such as Neural Networks, Support Vector Machines, Random Forests have the same functionality but where SR distinguishes itself is in the white box nature of the model. The convergence of SR is still an open issue. New approaches such as GPTIPS and FFX \citep{GPTIPS, FFX} in SR focus on multiple linear regression, where a linear combination of base functions is generated. While GPTIPS still uses GP, FFX is completely deterministic and eschews GP.
+In the recent work of \citep{SRlinear} compares SR with these approaches and concludes that while SR can have a slower convergence rate compared to conventional machine learning algorithms, the difference is not that large. SR distinguishes from the other technique by returning a model that allows for understanding and insight into the process we are trying to approximate.
 
-% Distributed SR : has it been done ? 
-% 
+\subsection{Algorithms implementing symbolic regression}
+Even though SR is usually associated with GP, there exists a wide variety of alternative implementations. Metaheuristics typically associated with continuous optimization have been used: ABC \cite{ABCSR}, 
+A non GP approach using elements from Grammatical Evolution (GE) \cite{GE}, several genetic algorithm techniques and continuous optimizers (DE, PSO) has been presented in \citep{AEG} with promising results in terms of convergence rate and accuracy. It uses a simple C-like expression grammar, including relational and conditional operators.
 
-% Accuracy, Convergence, what has been done, benchmark functions
+\subsection{Constant optimization problem}
+Several approaches to the constant optimization problem exist. The traditional solution is generating random constants \citep{GP}. With the size of the search space this remains a slow approach.
+In \citep{GPConstAlter} a structure based approach is reported to improve the random constant generation process of GP. Each constant is represented not by a single leaf node but by an evolving subtree. Apart from improved convergence, this approach also avoids hybridization of the original GP algorithm. There is a similarity with our approach, where we fold constant subtrees instead of evolving these separately. Their approach underlines our statement that evolving subtrees in order to generate constants can be quite effective. 
+In \citep{GPConst} the concept of numeric mutation is introduced where constants are mutated separately from the remainder of the tree. This approach is a domain specific variant of applying a continuous optimizer to the constants. It uses a simple implementation based on a temperature-biased normal distribution, which is inspired by simulated annealing \citep{SA}.
+Another approach is made by using GE to generate constants \citep{GPConstGE}, several grammars are tested that generate and evolve constants.
+Hybridization of GP with continuous optimizers is the approach we use in our work. Examples in the field are hybridization with DE \citep{GPDE} and PSO \citep{SRBaseline}.
 
-%
+
+\subsection{Genetic programming}
+A recent study offers a valuable overview of open issues in genetic programming \citep{GPIssues}. This study lists issues we have encountered such as problem hardness, fitness topology, problem representation, benchmarks, uncertainty regarding the optimal solution, and constant optimization.
+We restrict our work to a simple GP implementation as a baseline for future improvements. Advances such a semantically aware operators \citep {GPSemantics} and modularity are not applied. Modularity started with Koza's \cite{GP} Automatically defined functions (ADF), which allow reuse of partial solutions and thus signficantly increase the expressiveness of a solution without increasing the representation. This concept is further investigated in \citep{GPModularity} where features such as structure modification and recursion are evaluated. In this work it is shown that, with modularity, the size of the representation in GP is no longer bound to the number of features. In our work we do not have modularity so we still have a correlation between range of depth and features.
+\citep{GE}
+\citep{GEDE}
+
+\subsection{Distributed symbolic regression}
+% Parallel metaheuristics
+\cite{parallelmetaheuristics}
+
+\subsection{Accuracy and convergence}
+Accuracy and convergence characteristics for SR are an open issue \citep{SRAccuracy, SRAccur, SRBaseline}. A practitioner would like to have certainty regarding the convergence characteristics and accuracy of SR. Given a problem, she would like upper bounds on both when applying SR to the problem. Without these acceptance of SR as a tool in industry will remain difficult.
+Finding good benchmark problems for GP is an open issue, recent work \citep{GPBenchmarks} attempts at unifying existing benchmarks and defining standards for existing and new benchmark problems. In this work we use the benchmarks introduced by \cite{SRAccuracy} which are referenced as hard problems with poor convergence characteristics, as our aim was to specifically focus on such problems in order to come a nuanced conclusion regarding our approach.
+A measure estimating problem hardness is introduced in \citep{GPHardness}. This measure is able to predict the effectiveness of operators, or conversely, estimate the hardness of the problem. The measure has a theoretical foundation, it allows a practitioner robust insights into the problem. Problem hardness will affect the convergence characteristics of any metaheuristic, with this hardness measure we can analyze convergence and determine if the implementation is at fault or the problem hardness induces poor convergence.
