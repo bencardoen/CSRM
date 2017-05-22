@@ -1,15 +1,7 @@
-% What have we done
 
-% Modular SR tool
-
-% Shown dimensions of constant opt problem
-
-% Hybridized with CT opt
-
-% Distributed
-
-% K fold
-
-% Analysis and visualization
-
-Most of these are nature inspired, but the analogy is not always warranted. It is the author's view that any new metaheuristic
+We have implemented a baseline GP SR tool based on a tree representation that allows for inspection of the convergence process through extensive statistics and visualization. We implemented the classical mutation and crossover operators and applied a cooling schedule to mutation that saves computational cost. 
+The constant generation and optimization problem was tackled using a 2 pronged approach. We apply constant folding to reduce the size of the expression trees. This approach, although it can slow the generation of constants, is vital for the second stage of our approach. We hybridize GP with 3 continuous optimization algorithms and compare the results. We find that, while in general convergence improves, the application of the continuous optimizer should be chosen such that overfitting is not introduced.
+As expected from the NFL theorem no single algorithm was optimal for all problem instances, validating both the test problems we used and the implementation of the algorithm.
+Our tool can be run distributed with a delay tolerance mechanism that mitigates load imbalance between processes. We compared three representative topologies in terms of convergence rate and speedup. The tree topology can be used as an approximation for the grid topology with near linear speedup. 
+The distributed processes approximate K fold cross validation (KCV) in order to avoid overfitted solutions without the high computational cost of KCV. 
+The tool's modular architecture allows it to be extended with new topologies, policies, and even algorithms. 
