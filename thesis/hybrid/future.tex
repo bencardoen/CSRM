@@ -1,6 +1,6 @@
 \paragraph{Extending constant optimization}
-%\subparagraph{Linear weight optimization}
-%The constant optimization step applied in our tool has been limited to simple constants in the expression. The tree representing the expression stores a hidden constant for each node that can act as linear weights. We can extend the constant optimization step to include these constants. The advantage is that the expression can be optimized to a greater extent. The disadvantage is the high increase in computation cost. Each constant represents a dimension for the constant optimizer. From our discussion we know that a high dimensionality has a serious impact on the complexity of the optimization step. 
+\subparagraph{Linear weight optimization}
+The constant optimization step applied in our tool has been limited to simple constants in the expression. The tree representing the expression stores a hidden constant for each node that can act as linear weights. We can extend the constant optimization step to include these constants. The advantage is that the expression can be optimized to a greater extent. The disadvantage is the high increase in computational cost. Each constant represents a dimension for the constant optimizer. From our discussion we know that a high dimensionality has a serious impact on the complexity of the optimization step. 
 \subparagraph{Extending folding}
 Using the linear weights representation we could further simplify trees when applying constant folding. The following simple expression
 \[
@@ -22,7 +22,7 @@ In this work we have seen how large the impact is from invalid expression on the
 This work can be extended by several policies. The spreading policies in the topology can be extended with random sampling, new trends in archiving can be applied to the algorithm and the mutation and crossover operators can be similarly extended. 
 
 \paragraph{Topologies}
-The inverted tree topology is an interesting alternative to the original tree. Future work could evaluate other communication strategies such as random sampling. A random tree topology could offer a balance between convergence and speedup.
+The inverted tree topology is an interesting alternative to the original tree. Future work could evaluate other communication strategies such as random sampling. A random tree topology could offer a balance between convergence and speedup. Several approaches are possible, we could use a static tree topology where a process decides at runtime which child to send to. Or we could generate a random tree at each iteration. This approach would aim to combine the advantages of a stochastic approach with the speedup gains of the tree structure itself. Such a tree could lead to the introduction of synchronization at each communication cycle.
 
 \paragraph{Hyperheuristics}
 Our distributed SR algorithms has a large parameter space, most of which influence convergence. Their optimal values can be problem dependent, correlated to each other and are in general unknown. Optimizing these values requires a new optimization algorithm. Another alternative is a self optimizing variant that uses statistics collected at runtime to modify the parameters in order to find more optimal values.
