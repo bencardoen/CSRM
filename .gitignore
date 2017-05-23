@@ -6,6 +6,7 @@
 *.log
 *.blg
 *.dvi
+*.out
 *.bbl
 *.dia~
 *.synctex.gz
