@@ -152,7 +152,7 @@ We would like to observe the effect of the optimizers in a seeded configuration.
 \item optimizer : ABC, PSO, DE, None
 \item seeds : 4 best solutions from incremental 10/20/30 run
 \end{itemize}
-In order to isolate the optimizer gain we keep the total number of generations small in comparison to the 10/20/30 run (120 vs 1800).
+In order to isolate the optimizer gain we keep the total number of generations small in comparison to the 10/20/30 run (120 vs 3600).
 \paragraph{Results}
 In Figure \ref{fig:usecaseoptimizers} we see that the optimizers cannot improve the fitness value much beyond the seeded value. We see that even though fitness on the training data tends to increase, overfitting increases as well. ABC and PSO introduce overfitting. Interestingly enough DE results in a lower training fitness value compared to a run without optimizer, but has better validated fitness results. The expression with the best fitness value on training data is not necessarily the expression with the best fitness value on the validation data. Although we would like to have a strong correlation between the two, this is not always the case. This is one possible reason for the results shown. Note that the optimizers operate twice on the 4 best expressions. We again see the same behavior observed in the benchmarks, the optimizers can easily introduce overfitting. A seeded configuration such as this one is especially sensitive to this behavior.
 \begin{figure}
@@ -193,9 +193,28 @@ In Figure \ref{fig:usecasedistributed} we compare the gain in fitness on the val
 \subparagraph{Statistics}
 % show overview page with statistics of grid, rs, tree
 \subsection{Resulting Model}
+We now look at the expression with the lowest fitness value for the validation data. This is after all the aim of the tool, returning an optimal fit to the practitioner. In Figure \ref{fig:bestusecase} we see tree with depth 6. It is the result of applying distributed CSRM with 25 processes in a grid topology. The resulting fitness value is 0.001509060038016, indicating a very high correlation between the expression as a  surrogate model and the expected data. 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/bestusecase.png}
+    \caption{Fittest expression for simulator use case.}
+    \label{fig:bestusecase}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/bestusecasesimple.png}
+    \caption{Simplified fittest expression for simulator use case.}
+    \label{fig:bestusecasesimple}
+\end{figure}
+We also note that no simple constant expressions are present in this expression. If we use domain knowledge we can simplify this expression. $X_0$, $x_1$ and $x_2$ correspond with $R_0$, seeding and immunity fraction respectively. We know that neither of the 3 parameters is ever negative, so the absolute value nodes can be collapsed. Using the ranges of the parameters we can further reduce several of the min/max nodes as well. Finally the expression c * a \% a is clearly equal to c * a. This results in the expression shown in Figure \ref{fig:bestusecasesimple}. 
+\[
+f(R, S, I) = ({\cos(\min(I,0.936))}+{0.269}) ^ {\frac{0.918 R}{{\ln(\frac{S}{0.349})}\%{R}}} * {\cos(\min(I, 0.922))+{\cos(R)} ^ {\tan(I)} 
+\]
+If we split this expression into the two exponentials we can further analyse it. The first exponent will be at most 0.918 due to the modulo operator in the fraction. The second exponent is limited by [0.931, 1.398]. The bases both have the nearly identical subexpression cos(min(I, c) for some constant c. We can conclude that all three parameters influence the result with I limited in effect  once it reaches a threshold around 0.93.
 % Get the best model from all, then plot it in 3D and get feedback from Lander.
 \subsection{Conclusion}
 \paragraph{Results}
 We have seen that incremental use of symbolic regression can, when applied judiciously, increase convergence compared to a blind search with the same computational cost. In addition to obtaining improved results we can integrate it with a simulator that produces output in parallel.
-\paragraph{Alternative approach}
-Dividing the DOE generated input points into sections and using them in the regression tool can lead to issues regarding the structural properties of the design. While our results indicate that the model obtain from an incremental run has a higher quality compared to that  of a 
+% TODO
+%\paragraph{Alternative approach}
+%Dividing the DOE generated input points into sections and using them in the regression tool can lead to issues regarding the structural properties of the design. While our results indicate that the model obtain from an incremental run has a higher quality compared to that  of a 

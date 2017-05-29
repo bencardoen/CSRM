@@ -81,6 +81,15 @@ class TreeTest(unittest.TestCase):
         t = Tree.createTreeFromExpression(expr, variables=variables)
         t.printToDot(outputfolder+"best30.dot")
 
+    def testPrintUseCase(self):
+        expr = "( ( ( ( cos( ( ( min( x2, 0.9359087177559964 ) ) ) ) ) + 0.2692330739385492 ) ** ( ( (  ( 0.9185812705954355 * x0 ) )  ) / ( ( ln( ( x1 / 0.3496163920146709 ) ) ) % ( x0 ) ) ) ) * ( ( ( cos( ( ( min( x2, 0.9220179475378475 ) ) ) ) ) + ( cos( ( x0 ) ) ) ) ** ( tan( x2 ) ) ) )"
+        dcount = 2
+        vcount = 5
+        variables = generateVariables(vcount, dcount, 0)
+        t = Tree.createTreeFromExpression(expr, variables=variables)
+        t.printToDot(outputfolder+"bestusecasesimple.dot")
+
+#( ( ( ( cos( ( abs( ( min( x2, 0.9359087177559964 ) ) ) ) ) ) + 0.2692330739385492 ) ** ( ( ( abs( ( 0.9185812705954355 * x0 ) ) ) % ( max( 0.8898870280466706, ( max( x0, 0.27443469320601277 ) ) ) ) ) / ( ( ln( ( x1 / 0.3496163920146709 ) ) ) % ( max( 0.8898870280466706, ( max( x0, 0.27443469320601277 ) ) ) ) ) ) ) * ( ( ( cos( ( abs( ( min( x2, 0.9220179475378475 ) ) ) ) ) ) + ( cos( ( abs( ( min( x2, x0 ) ) ) ) ) ) ) ** ( tan( x2 ) ) ) )
 
 
     def testIsLeaf(self):
