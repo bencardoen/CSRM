@@ -22,9 +22,9 @@ min_{i \neq j} d(p_i,p_j)
 is maximal for all LHDs of size p. The maximin LHD is the most often used LHD in practice. In this work we will use the Audze-Eglais \citep{AudzeEglais, AudzeEglais2, AudzeEglais3} (AE) LHD, which uses the Euclidean distance measure but also obtains a uniform distribution of the individual points. 
 The AE LHD is based on the concept of potential energy between design points, a measure based on the inverse of the euclidean distance.
 \[
-E^(AE) = \sum_{i=0}^{p-1} {\sum_{j=i+1}^{p-1} {\frac{1}{d_{ij}}}}
+E^{AE} = \sum_{i=0}^{p-1} {\sum_{j=i+1}^{p-1} {\frac{1}{d_{ij}}}}
 \]
-
+The potential energy measure is minized in AE.
 \paragraph{Interaction with regression tool}
 We would like to obtain symbolic expressions relating parameters values to simulator output. These expressions can be used to gain insight into which parameters are correlated, which have a larger effect on output and which are irrelevant. 
 We then execute the simulator on each configuration. With the execution of a single configuraton independent of all others this is an embarrassingly parallel problem. We combine the output of all configurations and feed them into a tool where we can apply symbolic regression or another machine learning technique in order to extract a model that approximates the simulator. The problem with this approach is twofold. We have to wait until the simulator has completed all configurations and the SR tool executes on a large dataset. It has no known starting point so effectively performs a blind search in a huge search space. We can avoid both issues by using partial results from the simulator as input for the SR tool. The results from these partial samples ideally will provide a good starting point for the incrementally growing dataset. The last assumption only holds if the sequence of completed configurations is a good sample of the full dataset. We can enforce this sequence by ordering the configurations but this is non trivial. Configurations will not have the same computational load for all simulations. Consider for example the population parameter in a epidemiological simulator. An increase in runtime is expected if we increase this parameter. Even if we take this into account in our scheduling, the parallel execution of any number of tasks is never deterministic. The order of configurations is not only important to avoid a bias for the full design, which would lead to overfitting. The initialization problem \ref{subsubinvalidexpressions} reappears here. If the initial partial set of configurations is biased the probability is quite high that the resulting solutions are invalid for the complete data set. 
@@ -42,12 +42,12 @@ The following are the parameters used:
 The output parameter represents 
 \paragraph{Symbolic regression configuration}
 \begin{itemize}
-\item initial depth 3
-\item maximum depth 6
-\item p: population 20
-\item g: generations per phase 60
-\item f: phases 30
-\item archive 4 best per phase
+\item i: initial depth : 3
+\item m: maximum depth : 6
+\item p: population : 20
+\item g: generations per phase : 60
+\item f: phases : 30
+\item archiving strategy : 4 best per phase
 \item d: datapoints : 10, 20, 30
 \end{itemize}
 The total cost in fitness evaluations is then given by: 20*60*30*d.
@@ -138,20 +138,60 @@ The percentage of nodes saved is similar for all three runs. The plots show that
     \label{fig:incrementaldoubleconvergence}
 \end{figure}
 \subsubsection{Optimizers}
-% Run optimizers on the last stage of the best results of the 10/20/30 approach
-We apply each of the three optimizers in a small run on the best results of the incremental approach. From our previous discussion we known that using a configuration with 30 phases is likely to result in overfitting. We use the results of the incremental 10/20/30 run as a seed and observe the convergence characteristics of applying the optimizers.
+We apply each of the three optimizers in a small run with the best results of the incremental approach as a seed. From our previous discussion we known that using a configuration with 30 phases is likely to result in overfitting. We use the results of the incremental 10/20/30 run as a seed and observe the convergence characteristics of applying the optimizers.
+We would like to observe the effect of the optimizers in a seeded configuration. We focus on the best expression, and no longer the mean of the (sub)population. While the distribution of the fitness values as a measure is informative, it is of little worth to the practitioner who will be result oriented when applying a regression tool.
 \paragraph{Configuration}
-\item initial depth 3
-\item maximum depth 6
-\item p: population 20
-\item g: generations per phase 60
+\begin{itemize}
+\item i: initial depth : 3
+\item m: maximum depth : 6
+\item p: population : 20
+\item g: generations per phase : 60
 \item f: phases 2
-\item archive 4 best per phase
-\item d: datapoints : 10, 20, 30
+\item archiving strategy : 4 best per phase
+\item d: datapoints : 30
 \item optimizer : ABC, PSO, DE, None
+\item seeds : 4 best solutions from incremental 10/20/30 run
+\end{itemize}
+In order to isolate the optimizer gain we keep the total number of generations small in comparison to the 10/20/30 run (120 vs 1800).
+\paragraph{Results}
+In Figure \ref{fig:usecaseoptimizers} we see that the optimizers cannot improve the fitness value much beyond the seeded value. We see that even though fitness on the training data tends to increase, overfitting increases as well. ABC and PSO introduce overfitting. Interestingly enough DE results in a lower training fitness value compared to a run without optimizer, but has better validated fitness results. The expression with the best fitness value on training data is not necessarily the expression with the best fitness value on the validation data. Although we would like to have a strong correlation between the two, this is not always the case. This is one possible reason for the results shown. Note that the optimizers operate twice on the 4 best expressions. We again see the same behavior observed in the benchmarks, the optimizers can easily introduce overfitting. A seeded configuration such as this one is especially sensitive to this behavior.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/usecaseoptimizers.png}
+    \caption{Optimizers applied to use case.}
+    \label{fig:usecaseoptimizers}
+\end{figure}
 
 \subsubsection{Distributed}
-% Run Tree, Grid on the 10/20/30 approach
+\paragraph{Configuration}
+\begin{itemize}
+\item i: initial depth : 3
+\item m: maximum depth : 6
+\item p: population : 20
+\item g: generations per phase : 60
+\item f: phases 30
+\item archiving strategy : 4 best per phase
+\item d: datapoints : 30
+\item optimizer : None
+\item seeds : 4 best solutions from incremental 10/20/30 run
+\item topology : Tree, Grid, RandomStatic, Disconnected
+\end{itemize}
+\paragraph{Results}
+In Figure \ref{fig:usecasedistributed} we compare the gain in fitness on the validation data for the tree, grid and randomstatic topologies compared to the disconnected topology. We can clearly see that the diffusion in the grid topology leads to the highest gain, followed by the tree topology. Interestingly enough, the random topology scored worse than the disconnected topology. This can occur when a local optimum is communicated early to the other processes which then dominates the remainder of the process. The effect on the runtime is measured in Figure \ref{fig:usecasespeedup}. We see that the tree topology has minimal overhead and runs nearly as fast as the disconnected topology where no syncrhonization or communication overhead is present. The grid topology suffers a 2x performance penalty and the random topology is finds a middle ground between the two. During the experiment we could observe that the processes in the tree and disconnected topologies varied as much as 4 phases. This is what we expected, in this tree topology configuration the distance between two processes is at most 4 (depth of a 25-node binary tree). This is an important observation, if we increase the number of processes the tree topology will actually scale better.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/usecasedistributed.png}
+    \caption{Incremental distributed CSRM applied to use case.}
+    \label{fig:usecasedistributed}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/usecasespeedup.png}
+    \caption{Runtime impact of synchronization and communication overhead.}
+    \label{fig:usecasespeedup}
+\end{figure}
+\subparagraph{Statistics}
+% show overview page with statistics of grid, rs, tree
 \subsection{Resulting Model}
 % Get the best model from all, then plot it in 3D and get feedback from Lander.
 \subsection{Conclusion}
