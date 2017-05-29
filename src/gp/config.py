@@ -33,6 +33,7 @@ class Config:
 
 
     def concatValues(self):
+        table = {"variablepoint":"vp", "datapointcount":"dp", "archiveinputfile":"aif", "archivefile":"af", "datapointrange":"dpr"}
         q = "_"
         for k,v in sorted(self.__dict__.items()):
             if str(k) in ["display", "outputfolder"]:
@@ -40,6 +41,9 @@ class Config:
             if str(k) == "topo" or str(k) == "optimizer":
                 q += str(k) + (str(v.__name__) if v else "None")
             else:
+                if k in table:
+                    k = table[k]
                 q += str(k)+str(v)
             q+= "_"
+        q = q.replace("/", "-") # make sure we don't use path delimiters in a string representing the output directory.
         return q
