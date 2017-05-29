@@ -1,0 +1,1 @@
+python3 -m gp.paralleldriver -c 1 -t none -g 60 -p 20 -f 30 -x doe/input.csv -y doe/output.csv -m 6 -v -d 30 -q 3 -i 3 -a doe/best20

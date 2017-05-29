@@ -32,11 +32,14 @@ We then execute the simulator on each configuration. With the execution of a sin
 \subsubsection{Experiment configuration}
 We construct a DOE with 3 dimensions, 30 points in total using the tool introduced in the work of \citep{DOE}. % list stride parameters
 \paragraph{Simulator configuration}
+The simulator is configured to model a measles outbreak in a population of 5e5 in the City of Antwerp, Belgium. % check with Elise.
+The following are the parameters used:
 \begin{itemize}
-\item 
-\item 
-\item 
+\item R0 : 'basic reproduction number', the number of person a carrier will infect, [12-20]
+\item Seeding fraction : Number of persons in the population that is a carrier at the start of the simulation, [1-500]
+\item Immunity fraction : Fraction of population that is immune to the disease. [0.75, 0.95]
 \end{itemize}
+The output parameter represents 
 \paragraph{Symbolic regression configuration}
 \begin{itemize}
 \item initial depth 3
