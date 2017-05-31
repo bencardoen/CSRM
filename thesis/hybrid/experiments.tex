@@ -138,7 +138,7 @@ In Figure \ref{fig:ctfoldproblem1} we see that the savings have a high variance,
 Constant folding prevents this from occurring, but as we have discussed previously it can also hinder convergence by slowing down the search process for the 'right' constant. Even though a constant subtree can be represented by a single constant, it holds more information than that single constant alone and provides a kind of 'constant repository' that can be used by the operators to more quickly find fitter expressions. On the other hand if the constant subtrees grow so large as to dominate the tree the convergence can be compromised as the tree has no more place left for base functions using features. A delicate balance between the two is required here. In future work we could experiment with such a balance by delaying the constant folding until x generations have passed, instead of our current approach where we apply it after every generation. 
 % add to future work.
 
-\subsection{Constant optimization}
+\subsection{Constant optimization}\label{subsec:optimizers}
 We look at the effect constant optimization using different algorithms has on different configurations of the tool. The measures used in the comparison are best fitness on training and test data, mean fitness on training and test data, and optimization cost.
 
 \subsubsection{Test problem}

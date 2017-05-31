@@ -223,7 +223,7 @@ In KCV we split the data over k samples, then use k-1 of those as the training d
 
 \subsubsection{Parallelization}
 
-\paragraph{Approximating k fold cross validation}
+\paragraph{Approximating k fold cross validation}\label{KCV}
 With the distributed implementation of SR we can avoid the factor k increase required for KCV. CSRM can, as we have shown, run n instances of the algorithm in parallel. Those instances can cooperate by exchanging their current best solutions, possibly accelerating the convergence of the entire process. Instead of translating our sequential approach to the distributed approach and giving each process the same training data, we can approximate KCV without the linear increase in runtime. We do not implement full KCV, but mimic the process. For a dataset of length d, k fold will split it into k equal sized sections of size s = $\frac{d}{k}$. Each training set has $s*(k-2)$ overlapping datapoints. The value of k determines the effect of the outcome to a large extent. We would like to keep the overlap above a certain treshold, insensitive to k. If the overlap is too small the probability of highly fit expressions proving to be invalid on the validation data becomes too large. 
 
 \begin{figure}

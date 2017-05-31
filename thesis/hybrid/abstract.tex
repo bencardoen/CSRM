@@ -1,4 +1,5 @@
 % Link to simulation
+% Link to fact that we are interested in convergence over time
 Symbolic regression (SR) fits a symbolic expression to a set of expected values.
 Amongst its advantages over other techniques is the ability for a practitioner to interpret the resulting expression, determine important features by their usage in the expression, and insights into the behavior of the resulting model such as continuity, derivatives, extrema.
 SR combines a discrete combinatoric problem, combining base functions, with the continuous optimization problem of selecting and mutating real valued constants.
@@ -6,7 +7,8 @@ One of the main algorithms used in SR is Genetic Programming (GP). The convergen
 The continuous aspect of the problem has traditionally been an issue in GP based symbolic regression. This paper will study convergence of a GP-SR implementation on selected use cases known for bad convergence.
 We introduce modifications to the classical mutation and crossover operators and observe their effects on convergence. 
 The constant optimization problem is studied using a two phase approach. We apply a variation on constant folding in the GP algorithm and evaluate its effects. The hybridization of GP with 3 metaheuristics (Differential Evolution, Artificial Bee Colony, Particle Swarm Optimization) are evaluated. 
-In this work we will use a distributed GP-SR implementation to evaluate the effect of topologies on the convergence of the algorithm.
-We introduce and evaluate a topology with the aim of finding a new balance between diffusion and concentration.
+In this work we will use a distributed GP-SR implementation to evaluate the effect of topologies on the convergence characteristics of the algorithm and the difference in communication overhead and speedup.
+We introduce and evaluate a topology with the aim of finding a new balance between diffusion and communication and synchronization overhead.
 We introduce a variation of k-fold cross validation to estimate how accurate a generated solution is in predicting unknown datapoints. This validation technique is implemented in parallel in the algorithm combining both the advantages of the cross validation with the increase in covered search space for each instance.
-We combine our incremental support with a design of experiment technique applied on a simulator.
+In contrast to most, our tool offers a wide array of statistics describing the convergence characteristics of the algorithm over time, offering practitioners nuanced insights into the algorithm as it approximate the symbolic regression problem.
+We combine our incremental support with a design of experiment technique applied on a simulator and evaluate the impact on the convergence characteristics in combination with our constant optimization approach on the one hand and the distributed algorithm on the other hand.

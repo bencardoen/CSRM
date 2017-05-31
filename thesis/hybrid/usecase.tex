@@ -1,16 +1,16 @@
 In this section we apply the techniques covered in the previous sections to a real world use case.
 \subsection{Problem statement}
-We want to use symbolic regression on the output of a simulator. The simulator we use in for our experiment is a high performance tool \citep{stride} that models the spread of infectious diseases. A single simulation instance is computationally expensive. We would like to construct a surrogate model that approximates the simulator. We can use symbolic regression to obtain such a model, but in order to do so we need to obtain input and output data. Combining all possible values for all parameters is infeasible. 
-Given the huge parameter space of the simulator a Design Of Experiment is constructed where the coverage of the parameter space is maximized while minimizing the number of combinations for all parameters. 
+We want to use symbolic regression on the output of a simulator. The simulator we use for our experiment is a high performance tool \citep{stride} that models the spread of infectious diseases. A single simulation instance is computationally expensive. We would like to construct a surrogate model that approximates the simulator. We can use symbolic regression to obtain such a model, but in order to do so we need to obtain input and output data. Combining all possible values for all parameters is infeasible. 
+Given the size of the parameter space of the simulator a Design Of Experiment (DOE) is constructed where the coverage of the parameter space is maximized while minimizing the number of combinations for all parameters. 
 \paragraph{Design of experiment}
 We would like to have a space filling design that maximizes the sampling of the design space while minimizing the number of evaluation points.
 In this experiment we apply a Latin Hypercube Design (LHD). 
-Given d dimensions (parameters) and a desired output set of p points, we have that 
+Given k dimensions (parameters) and a desired output set of p points, we have that 
 \[
-p_i = (p_{i0}, ..., p_{i k-1}) \in {0, p -1}^k
+p_i = (p_{i0}, ..., p_{i k-1}) \in (0, p -1)^k
 \]
 with for each dimension j all $p_ij$ are distinct. This avoids a full factorial combination, while still covering the entire parameter space. 
-The idea behind a LHD is that it avoids collapsing. Suppose we have j parameters that have little or no effect on the output. If we construct a space filling design based on sampling alone all points $p_{ij}$ will evaluate to the same output value (minus noise) for all j. In other words, we execute j evaluations without gaining information about the underlying model. By virtue of the problem statement we do not know the effect a parameter has on the output. A LHD avoids collapsing by using the constraint that no two point share coordinate values. A side effect of this is that if we reduce a d-dimensional LHD to a d-i dimensional LHD by simply removing the i dimensions from the design, the result design forms is still a good space filling design.
+The idea behind a LHD is that it avoids collapsing. Suppose we have j parameters that have little or no effect on the output. If we construct a space filling design based on sampling alone all points $p_{ij}$ will evaluate to the same output value (minus noise) for all j. In other words, we execute j evaluations without gaining information about the underlying model. By virtue of the problem statement we do not know the effect a parameter has on the output. A LHD avoids collapsing by using the constraint that no two point share coordinate values. A side effect of this is that if we reduce a d-dimensional LHD to a d-i dimensional LHD by simply removing the i dimensions from the design, the resulting design still forms a good space filling design.
 Constructing such a LHD can be done in a variety of ways, typically using a distance measure linked to some concept of optimality. An often used measure is the euclidean distance measure :
 \[
 d(p_i, p_j) = \sqrt{\sum_{l=0}^{d-1}{p_{il}-p_{jl}}}
@@ -19,7 +19,7 @@ This distance measure is used to obtain a maximin LHD where
 \[
 min_{i \neq j} d(p_i,p_j)
 \]
-is maximal for all LHDs of size p. The maximin LHD is the most often used LHD in practice. In this work we will use the Audze-Eglais \citep{AudzeEglais, AudzeEglais2, AudzeEglais3} (AE) LHD, which uses the Euclidean distance measure but also obtains a uniform distribution of the individual points. 
+is maximal for all LHDs of size p. The maximin LHD is the most often used LHD in practice. In this work we will use the Audze-Eglais \citep{AudzeEglais, AudzeEglais2, AudzeEglais3} (AE) LHD, which uses the Euclidean distance measure but in addition obtains a uniform distribution of the individual points. 
 The AE LHD is based on the concept of potential energy between design points, a measure based on the inverse of the euclidean distance.
 \[
 E^{AE} = \sum_{i=0}^{p-1} {\sum_{j=i+1}^{p-1} {\frac{1}{d_{ij}}}}
@@ -27,19 +27,19 @@ E^{AE} = \sum_{i=0}^{p-1} {\sum_{j=i+1}^{p-1} {\frac{1}{d_{ij}}}}
 The potential energy measure is minized in AE.
 \paragraph{Interaction with regression tool}
 We would like to obtain symbolic expressions relating parameters values to simulator output. These expressions can be used to gain insight into which parameters are correlated, which have a larger effect on output and which are irrelevant. 
-We then execute the simulator on each configuration. With the execution of a single configuraton independent of all others this is an embarrassingly parallel problem. We combine the output of all configurations and feed them into a tool where we can apply symbolic regression or another machine learning technique in order to extract a model that approximates the simulator. The problem with this approach is twofold. We have to wait until the simulator has completed all configurations and the SR tool executes on a large dataset. It has no known starting point so effectively performs a blind search in a huge search space. We can avoid both issues by using partial results from the simulator as input for the SR tool. The results from these partial samples ideally will provide a good starting point for the incrementally growing dataset. The last assumption only holds if the sequence of completed configurations is a good sample of the full dataset. We can enforce this sequence by ordering the configurations but this is non trivial. Configurations will not have the same computational load for all simulations. Consider for example the population parameter in a epidemiological simulator. An increase in runtime is expected if we increase this parameter. Even if we take this into account in our scheduling, the parallel execution of any number of tasks is never deterministic. The order of configurations is not only important to avoid a bias for the full design, which would lead to overfitting. The initialization problem \ref{subsubinvalidexpressions} reappears here. If the initial partial set of configurations is biased the probability is quite high that the resulting solutions are invalid for the complete data set. 
+We then execute the simulator on each configuration. With the execution of a single configuraton independent of all others this is an embarrassingly parallel problem. We combine the output of all configurations and feed them into a tool where we can apply symbolic regression or another machine learning technique in order to extract a model that approximates the simulator. The problem with this approach is twofold. We have to wait until the simulator has completed all configurations and the SR tool executes on a large dataset. It has no known starting point so effectively performs a blind search in a huge search space. We can avoid both issues by using partial results from the simulator as input for the SR tool. The results from these partial samples ideally will provide a good starting point for the incrementally growing dataset. This last assumption only holds if the sequence of completed configurations is a good sample of the full dataset. We can enforce this sequence by ordering the configurations but this is non trivial. Configurations will not have the same computational load for all simulations. Consider for example the population parameter in a epidemiological simulator. An increase in runtime is expected if we increase this parameter. Even if we take this into account in our scheduling, the parallel execution of any number of tasks is never deterministic. The order of configurations is not only important to avoid a bias for the full design, which would lead to overfitting. The initialization problem detailed in section \ref{subsubinvalidexpressions} reappears here. If the initial partial set of configurations is biased the probability is quite high that the resulting solutions are invalid for the complete data set. 
 
 \subsubsection{Experiment configuration}
-We construct a DOE with 3 dimensions, 30 points in total using the tool introduced in the work of \citep{DOE}. % list stride parameters
+We construct a DOE with 3 dimensions, 30 points in total using the tool introduced in the work of \citep{DOE}. 
 \paragraph{Simulator configuration}
-The simulator is configured to model a measles outbreak in a population of 5e5 in the City of Antwerp, Belgium. % check with Elise.
+The simulator is configured to model a measles outbreak in a population of 5e5 in the city of Antwerp, Belgium. 
 The following are the parameters used:
 \begin{itemize}
 \item R0 : 'basic reproduction number', the number of person a carrier will infect, [12-20]
 \item Seeding fraction : Number of persons in the population that is a carrier at the start of the simulation, [1-500]
 \item Immunity fraction : Fraction of population that is immune to the disease. [0.75, 0.95]
 \end{itemize}
-The output parameter represents 
+The output parameter represents the attack rate, measured as the rate of new cases in the population at risk versus the size of the population at risk.
 \paragraph{Symbolic regression configuration}
 \begin{itemize}
 \item i: initial depth : 3
@@ -53,15 +53,15 @@ The output parameter represents
 The total cost in fitness evaluations is then given by: 20*60*30*d.
 We compare 3 approaches. First we run the CSRM tool on the entire dataset. This is the classical approach, the tool is not seeded and so starts a blind search. In a real world setting this would mean waiting until the simulator has run all 30 configurations.
 In our second approach we split the data into incremental sections. After 10 configurations have completed we start the tool on this dataset. 
-The best 4 results are saved to disk, then we run the tool with the result of 20 configurations and use the results from the previous run as a seed. The overlap between the two datasets will mitigate the initialization problem. Finally we use the results of the 20-point dataset as seed for the 30 point run. 
+The best 4 results are saved to disk, then we run the tool with the result of 20 configurations and use the results from the previous run as a seed. The overlap between the two datasets will influence the effects of the initialization problem. Finally we use the results of the 20-point dataset as a seed for the 30 point run. 
 The cost of running the 10 and 20 point runs to use as seed for the 30 point run is equal to the cost of the 30 point run. 
 To ground the comparison our last approach runs the tool on the data from 30 configurations with double the amount of phases. This means that it has the same number of fitness evaluations as the 10-20-30 combination. We compare all three to see which gains are made and at what cost.
-Finally we first compare the incremental technique without constant optimization algorithms or distributed in order to isolate the effect of reseeding the tool.
-Then we apply the optimizers and run the experiment distributed to observe the effect.
+We then compare the incremental technique without constant optimization or algorithms in order to isolate the effect of reseeding the tool.
+Then we apply the optimizers and run the experiment distributed to observe the change in convergence characteristics.
 \subsection{Results}
 \subsubsection{Fitness improvement}
-In Figure \ref{fig:incrementalgain} we see that the fitness is improved by using the best results of the previous run on a partial data set. We have deliberately split our data set to expose a risk here. If we run the tool with 20 datapoints seeded by a run of 10 datapoints, we see that the validated fitness actually decreases compared to a non seeded run. The ratio between new and known data is too large, leading to overfitting. If we seed the best results from the 20-point run into a 30 point configuration we see that both the training and validated fitness values significantly improve. 
-The 30 point run with 60 phases has the same computational cost as the 10-20-30 runs combined, but has lower convergence. We see that convergence is slowing, with training fitness improving by a factor of 1.1, but validation fitness worsens. This is a typical example of overfitting. The combined 10-20-30 run increases validation fitness with a factor of 1.13. Note the clustering patterns in the incremental runs. When seeded with solutions of previous runs we introduce information that the algorithm otherwise would have to discover. These seeds have fitness values somewhere between the randomly generated and optimal samples. Applying operators on them leads to a niching effect visualized in the fitness distribution. Seeding will not guarantee this effect, it is a possibility depending on how the seeds fit in the trajectory in the search space that the algorithm generates during its execution.
+We compare both seeded runs and the extended run with the normal 30-point run. In Figure \ref{fig:incrementalgain} we see that the fitness is improved by using the best results of the previous run on a partial data set. We have deliberately split our data set to expose a risk here. If we run the tool with 20 datapoints seeded by a run of 10 datapoints, we see that the validated fitness actually decreases compared to a non seeded run. The ratio between new and known data is too large, leading to overfitting. If we seed the best results from the 20-point run into a 30 point configuration we see that both the training and validated fitness values significantly improve. 
+The 30 point run with 60 phases has the same computational cost as the 10-20-30 runs combined, but gains little to nothing in convergence. We see that convergence is slowing, with training fitness improving by a factor of 1.1, but validation fitness worsens. This is a typical example of overfitting. The combined 10-20-30 run increases validation fitness with a factor of 1.13. we seewe
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/incrementalgain.png}
@@ -70,9 +70,11 @@ The 30 point run with 60 phases has the same computational cost as the 10-20-30 
 \end{figure}
 \subsubsection{Convergence behavior}
 \paragraph{Fitness distribution}
-In Figures \ref{fig:incrementalseededconvergence}\ref{fig:incrementalconvergence}\ref{fig:incrementaldoubleconvergence} we see how the convergence process evolves over time. If we compare the fitness plot we clearly see that the seeded process has a different distribution compared with the unseeded runs. Around generation 1000 the convergence rate slows. Doubling the phases has little effect on the fitness distribution. 
+In Figures \ref{fig:incrementalseededconvergence}\ref{fig:incrementalconvergence}\ref{fig:incrementaldoubleconvergence} we see how the convergence process evolves over time. 
+Note the clustering patterns in the incremental runs. When seeded with solutions of previous runs we introduce information that the algorithm otherwise would have to discover. These seeds have fitness values somewhere between the randomly generated and optimal samples. Applying operators on them leads to a niching effect visualized in the fitness distribution. Seeding will not guarantee this effect, it is a possibility depending on how the seeds fit in the trajectory in the search space that the algorithm generates during its execution.
+If we compare the fitness plot we clearly see that the seeded process has a different distribution compared with the unseeded runs. Around generation 1000 the convergence rate slows. Doubling the phases has little effect on the fitness distribution. 
 \paragraph{Operator effectiveness}
-In the plots we see operator success rate and operator gains visualized. The first is the ratio between applications of an operator that leads to improvement in fitness versus the total number of applications. The trendline is obtained by a cubic fit.This gives us an indication whether an operator is still effective, in particular it gives us the fraction of the population that is improved each generation by the operator. The second plot is the mean gain of an operator, it reflects how much the fitness of each generation is improved by an operator. The distinction is important, if fitness is improved by very small amounts the success rate will be high but the gain low. These statistics offer an insight into the convergence characteristics over generations. Instead of relying only on the end result we can directly observe the effects of the operators. For our comparison we see that there is little difference in gain or success rate between the three runs.
+In the plots we see the operator success rate and operator gains visualized. The first is the ratio between the number of applications of an operator that lead to improvement in fitness versus the total number of applications. The trendline is obtained by a cubic fit. This gives us an indication whether an operator is still effective, in particular it gives us the fraction of the population that is improved each generation by the operator. The second plot is the mean gain of an operator, it reflects how much the fitness of each generation is improved by an operator. The distinction is important, if fitness is improved by very small amounts the success rate will be high but the gain low. These statistics offer an insight into the convergence characteristics over generations. Instead of relying only on the end result we can directly observe the effects of the operators. For our comparison we see that there is little difference in gain or success rate between the three runs.
 \paragraph{Constant folding}
 The percentage of nodes saved is similar for all three runs. The plots show that constant subtrees are introduced at a constant rate and folded at the end of each generation. The savings plotted also give an indication of the potential increase in nodes that could take place if folding was not implemented. 
  \begin{figure}
@@ -154,7 +156,7 @@ We would like to observe the effect of the optimizers in a seeded configuration.
 \end{itemize}
 In order to isolate the optimizer gain we keep the total number of generations small in comparison to the 10/20/30 run (120 vs 3600).
 \paragraph{Results}
-In Figure \ref{fig:usecaseoptimizers} we see that the optimizers cannot improve the fitness value much beyond the seeded value. We see that even though fitness on the training data tends to increase, overfitting increases as well. ABC and PSO introduce overfitting. Interestingly enough DE results in a lower training fitness value compared to a run without optimizer, but has better validated fitness results. The expression with the best fitness value on training data is not necessarily the expression with the best fitness value on the validation data. Although we would like to have a strong correlation between the two, this is not always the case. This is one possible reason for the results shown. Note that the optimizers operate twice on the 4 best expressions. We again see the same behavior observed in the benchmarks, the optimizers can easily introduce overfitting. A seeded configuration such as this one is especially sensitive to this behavior.
+In Figure \ref{fig:usecaseoptimizers} we see that the optimizers cannot improve the fitness value much beyond the seeded value. We see that even though fitness on the training data tends to increase, overfitting increases as well. ABC and PSO introduce overfitting. Interestingly enough DE results in a lower training fitness value compared to a run without optimizer, but has better validated fitness results. The expression with the best fitness value on training data is not necessarily the expression with the best fitness value on the validation data. Although we would like to have a strong correlation between the two, this is not always the case. This is one possible reason for the results shown. Note that the optimizers operate twice on the 4 best expressions. We see the same behavior observed in the benchmarks, the optimizers can easily introduce overfitting. A seeded configuration is especially sensitive to this behavior.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/usecaseoptimizers.png}
@@ -175,6 +177,7 @@ In Figure \ref{fig:usecaseoptimizers} we see that the optimizers cannot improve 
 \item optimizer : None
 \item seeds : 4 best solutions from incremental 10/20/30 run
 \item topology : Tree, Grid, RandomStatic, Disconnected
+\item number of processes : 25
 \end{itemize}
 \paragraph{Results}
 In Figure \ref{fig:usecasedistributed} we compare the gain in fitness on the validation data for the tree, grid and randomstatic topologies compared to the disconnected topology. We can clearly see that the diffusion in the grid topology leads to the highest gain, followed by the tree topology. Interestingly enough, the random topology scored worse than the disconnected topology. This can occur when a local optimum is communicated early to the other processes which then dominates the remainder of the process. The effect on the runtime is measured in Figure \ref{fig:usecasespeedup}. We see that the tree topology has minimal overhead and runs nearly as fast as the disconnected topology where no syncrhonization or communication overhead is present. The grid topology suffers a 2x performance penalty and the random topology is finds a middle ground between the two. During the experiment we could observe that the processes in the tree and disconnected topologies varied as much as 4 phases. This is what we expected, in this tree topology configuration the distance between two processes is at most 4 (depth of a 25-node binary tree). This is an important observation, if we increase the number of processes the tree topology will actually scale better.
@@ -190,10 +193,40 @@ In Figure \ref{fig:usecasedistributed} we compare the gain in fitness on the val
     \caption{Runtime impact of synchronization and communication overhead.}
     \label{fig:usecasespeedup}
 \end{figure}
+
 \subparagraph{Statistics}
-% show overview page with statistics of grid, rs, tree
+So far we have focussed on the end results only of the symbolic regression process. Our tool measures several statistics on the convergence characteristics of the process which we will discuss now.
+We are interested in the convergence characteristics of the different processes and how the evolution of the fitness values calculated on the training data correlate with those of the validation data.
+We use the pearson r correlation coefficient (for populations) as we do for the fitness calculation itself:
+\[
+d(f_{training}, f_{validation}) = 1 - \vert r(f_{training}, f_{validation}) \vert
+\]
+The measure is 0 for perfect correlation, 1 for no correlation. A value of 1 in this setting indicates overfitting, a value of 0 indicates that the predictive value of the generated models is perfect. In other words, the validation data are fit perfectly by the generated expressions even though the expressions have been evolved without those data points.
+\begin{figure}
+    \begin{subfigure}{0.5\textwidth}
+        \includegraphics[width=0.8\linewidth]{figures/usecasecorrdisconnected.png}
+        \caption{Correlation behavior without communication.}
+    \end{subfigure}
+    \begin{subfigure}{0.5\textwidth}
+        \includegraphics[width=0.8\linewidth]{figures/usecasecorrtree.png}
+        \caption{Correlation behavior with tree topology.}
+    \end{subfigure}
+        \begin{subfigure}{0.5\textwidth}
+        \includegraphics[width=0.8\linewidth]{figures/usecasecorrgrid.png}
+        \caption{Correlation behavior with grid topology.}
+    \end{subfigure}
+    \begin{subfigure}{0.5\textwidth}
+        \includegraphics[width=0.8\linewidth]{figures/usecasecorrrandom.png}
+        \caption{Correlation behavior with random topology.}
+    \end{subfigure}
+    \caption{Use case : Effect of topology on fitness correlation of distributed processes.}
+    \label{fig:usecasecorrelation}
+\end{figure}
+In Figure \ref{fig:usecasecorrelation} we can clearly see how the topology affects the correlation between fitness values on training and validation data. Our validation configuration introduced in section \ref{KCV} promotes this behavior, the group of processes approximates k-fold cross validation. In a fully connected topology with minimal distance such as grid the correlation behavior will tend to the same value. We see a similar effect for the random topology. Note that this random topology consisted of disconnected cycles as seen in Figure \ref{fig:topologies}. The disconnected topology has  a near uniformly distributed correlation, there is no communication between the processes so they cannot train on the validation data. This is a parallel execution of 25 sequential processes with differing seeds and data. The tree topology finds the middle ground, as we descend toward the leaves the amount of shared information increases and with it the coverage of the validation data.
+We can also see from the plots how the process evolves over time. The grid and random topology quickly stabilize without significant gain. The tree topology has a subset of processes that starts to converge to a lower correlation value. 
+
 \subsection{Resulting Model}
-We now look at the expression with the lowest fitness value for the validation data. This is after all the aim of the tool, returning an optimal fit to the practitioner. In Figure \ref{fig:bestusecase} we see tree with depth 6. It is the result of applying distributed CSRM with 25 processes in a grid topology. The resulting fitness value is 0.001509060038016, indicating a very high correlation between the expression as a  surrogate model and the expected data. 
+We now look at the expression with the lowest fitness value for the validation data. This is after all the aim of the tool, returning to the practitioner a surrogate model with an optimal fit. In Figure \ref{fig:bestusecase} we see the resulting tree with depth 6. It is the result of applying distributed CSRM with 25 processes in a grid topology. The resulting fitness value is ~ 0.00151, indicating a very high correlation between the expression as a  surrogate model and the expected data. 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/bestusecase.png}
@@ -206,15 +239,14 @@ We now look at the expression with the lowest fitness value for the validation d
     \caption{Simplified fittest expression for simulator use case.}
     \label{fig:bestusecasesimple}
 \end{figure}
-We also note that no simple constant expressions are present in this expression. If we use domain knowledge we can simplify this expression. $X_0$, $x_1$ and $x_2$ correspond with $R_0$, seeding and immunity fraction respectively. We know that neither of the 3 parameters is ever negative, so the absolute value nodes can be collapsed. Using the ranges of the parameters we can further reduce several of the min/max nodes as well. Finally the expression c * a \% a is clearly equal to c * a. This results in the expression shown in Figure \ref{fig:bestusecasesimple}. 
+We also note that no constant subtrees are present in this tree. If we use domain knowledge we can simplify this expression. $X_0$, $x_1$ and $x_2$ correspond with $R_0$, seeding and immunity fraction respectively. We know that neither of the 3 parameters is ever negative, so the absolute value nodes can be collapsed. Using the ranges of the parameters we can further reduce several of the min/max nodes as well. Finally the expression (c * a) \% a is clearly equal to c * a. This results in the expression shown in Figure \ref{fig:bestusecasesimple}. 
 \[
-f(R, S, I) = ({\cos(\min(I,0.936))}+{0.269}) ^ {\frac{0.918 R}{{\ln(\frac{S}{0.349})}\%{R}}} * {\cos(\min(I, 0.922))+{\cos(R)} ^ {\tan(I)} 
+f(R, S, I) = ({\cos(\min(I,0.936))}+{0.269}) ^ {\frac{0.918 R}{{\ln(\frac{S}{0.349})}\%{R}}} * {\cos(\min(I, 0.922))+{\cos(R)} ^ {\tan(I)} }
 \]
-If we split this expression into the two exponentials we can further analyse it. The first exponent will be at most 0.918 due to the modulo operator in the fraction. The second exponent is limited by [0.931, 1.398]. The bases both have the nearly identical subexpression cos(min(I, c) for some constant c. We can conclude that all three parameters influence the result with I limited in effect  once it reaches a threshold around 0.93.
-% Get the best model from all, then plot it in 3D and get feedback from Lander.
+If we split this expression into the two exponentials we can further analyse it. The first exponent will be at most 0.918 due to the modulo operator in the fraction. The second exponent is limited by [0.931, 1.398]. The bases both have the nearly identical subexpression cos(min(I, c)) for some constant c. We can conclude that all three parameters influence the result with I limited in effect  once it reaches a threshold around 0.93.
 \subsection{Conclusion}
 \paragraph{Results}
-We have seen that incremental use of symbolic regression can, when applied judiciously, increase convergence compared to a blind search with the same computational cost. In addition to obtaining improved results we can integrate it with a simulator that produces output in parallel.
-% TODO
-%\paragraph{Alternative approach}
-%Dividing the DOE generated input points into sections and using them in the regression tool can lead to issues regarding the structural properties of the design. While our results indicate that the model obtain from an incremental run has a higher quality compared to that  of a 
+We have seen that incremental use of symbolic regression can, when applied judiciously, increase convergence compared to a blind search with the same computational cost. In addition to obtaining improved results we can integrate it with a simulator that produces output in parallel. 
+Applying the constant optimizers on seeded expressions demonstrated that overfitting is a real risk. This confirms our conclusion from section \ref{subsec:optimizers}.
+The grid topology offered the best fitness gains, at a severe cost in performance. The tree topology found the middle ground between performance and fitness improvement. The tree topology exploited the delay mechanism in order to obtain the best possible speedup.
+
