@@ -3,7 +3,8 @@ In this section we will detail the design of our tool, the algorithm and its par
 \subsubsection{Input and output}
 The algorithm accepts a matrix X = n x k of input data, and a vector Y = 1 x k of expected data. It will evolve expressions that result, when evaluated on X, in an 1 x k vector Y' that approximates Y. N is the number of features, or parameters, the expression can use. K is the number of datapoints. The algorithm makes no assumptions on the domain or range of the expressions or data set. While domain specific knowledge can be of great value, in real world situations such data is not always known. We aim to make a tool that operates under this uncertainty.
 \subsubsection{Control flow}
-\begin{figure}\label{fig:controlflow}
+Figure \ref{fig:controlflow} gives a high level overview of the tool's control flow.
+\begin{figure}
 \begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\footnotesize}]
 \node (start) [startstop] {Start};
 \node (phase) [decision, below of=start, yshift=-0.5cm] {Phase $<$ Phases};
@@ -13,7 +14,7 @@ The algorithm accepts a matrix X = n x k of input data, and a vector Y = 1 x k o
 \node (eval) [process, below of=while, yshift=-1.5cm] {2. Evaluate Population};
 \node (select) [process, below of=eval] {3. Select};
 \node (evolve) [process, below of=select] {4. Evolve};
-\node (mutate) [process, right of=evolve, xshift=4cm, yshift = + 1 cm] {4.1 Mutate};
+\node (mutate) [process, right of=evolve, xshift=4cm, yshift = + 0.75 cm] {4.1 Mutate};
 \node (crossover) [process, below of=mutate ] {4.2 Crossover};
 \node (update) [process, below of=evolve] {5. Update Population};
 \node (archive) [process, right of=while, xshift=4cm] {0.2 Archive};
@@ -44,13 +45,15 @@ The algorithm accepts a matrix X = n x k of input data, and a vector Y = 1 x k o
 \draw [arrow] (update)-- +(-2,0) |- (while) node[near start,sloped,above] {};
 \end{tikzpicture}
 \caption{CSRM control flow.}
+\label{fig:controlflow}
 \end{figure}
+In the following sections we will discuss each of the stages and discuss the trade-offs made in our design. 
 \subsubsection{Entities}
 We will describe briefly the important entities in our design. In Figure \ref{fig:uml} the architecture of our tool is shown. Functionality such as IO, statistics and plotting is left out here for clarity. The interested reader is referred to the source code documentation.
 \paragraph{Algorithm}
 The algorithm hierarchy extends each instance with new behavior, only overriding those functions needed. Code reuse is maximized here by the usage of hook functions, which in the superclasses result in a noop operation. An example of this is the evolve function, by and large the most complex function of the algorithm. By using hooks such as \textit{requireMutation()} this function can remain in the superclass, and the subclass need only implement the hook.
 \paragraph{Tree}
-The Tree and Node classes represent the main data structure of CSRM's population. The Tree is comprised of Node objects, each of which holds an optional constant weight. Leaves are either features (VariableNode) or constants. 
+The Tree and Node classes represent the main data structures of CSRM's population. The Tree is comprised of Node objects, each of which holds an optional constant weight. Leaves are either features (VariableNode) or constants. 
 In \ref{subsectree} we go in depth into the design choices made for this representation.
 The Tree class holds a few utility functions, for example to create trees from an expression using a parser in the tool module.
 Functionality needed by the mutation and crossover operators is present here as well. Of note are both construction functions, which allow for efficient generation of random trees. In section \ref{subsubinvalidexpressions} we will cover the problem these functions solve.
