@@ -103,7 +103,7 @@ Our tool uses a simple measure that approximates the more advanced techniques st
 There are disadvantages to this approach, if the fitness function has a zero gradient surface allowing replacement based on equal fitness value can help the optimizer to traverse such an area. 
 
 \subsubsection{Predictive behavior}
-The algorithm evaluates expressions based on training data $X_t \subset X$. $X_t$ is an n x (rk) matrix sampled from the original input matrix X, with $r \in \right[ 0,1 \left[$.
+The algorithm evaluates expressions based on training data $X_t \subset X$. $X_t$ is an n x (rk) matrix sampled from the original input matrix X, with $r \in ] 0,1 [$.
 R is the sampling ratio, the ratio between training and validation data. 
 After completion of the algorithm the population is ordered based on minimized fitness values calculated on the training data. 
 In real world applications practitioners are also interested in the predictive qualities of the generated expression. In other words, how well do the expressions score on unknown data? In the final evaluation we score each expression on the full data to obtain this measure. 
