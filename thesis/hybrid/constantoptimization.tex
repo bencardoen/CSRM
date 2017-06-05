@@ -1,10 +1,10 @@
 In this section we will cover the constant optimization problem. A constant value can appear as a linear weight for a base function, or as a leaf. The following two functions clarify the difference.
-%\[
-%f(x) = \sin(\log(2, x))
-%\]
-%\[
-%g(x) = 3.14 sin(x) + 4.25 cos(x)
-%\]
+\[
+f(x) = \sin(\log(2, x))
+\]
+\[
+g(x) = 3.14 sin(x) + 4.25 cos(x)
+\]
 In f the value of 2 is a constant value but not a linear weight to a base function. In g, 3.14 and 4.25 are both linear weights to sine and cosine respectively. In this work we focus on constant values that appear not as linear weights but as free constant arguments to base functions. Our tree encoding has a hidden linear weight for each node which could be optimized. When we refer to constant optimization, we are referring to the process of finding the optimal values of free constant arguments in the expression.
 
 \subsection{Constant Optimization} \label{subconstantoptimization}
@@ -25,26 +25,26 @@ It is still possible to create constant expressions by applying mutation and cro
 
 \paragraph{Constant aliasing}
 When we run the SR tool we do not know in advance which of our features influences the expected output. It is possible that some features have little or no effect whatsoever. If we have a feature z that has no effect on Y it is possible that, when the number of datapoints is low, the SR tool will start to use the values of z as a library of constant values. This unintended usage of z as a constant should be avoided at all costs as it will lead to a misleading surrogate model. In order to prevent this from occurring the values for any feature should be distinct and sampled so that they have sufficient distance between each other. Suppose we want to find a surrogate model for the function f:
-%\[
-%f(x, y, z) =\frac{sin(x) * cos(y)}{\ln(0.95)}
-%\]
-If the range of x, y, and z is [0.9, 1] it is not difficult to see that the algorithm is likely to pick z to alias the desired constant value 0.95, instead of generating it. A resulting surrogate model could be :
-%\[
-%f'(x, y, z) =\frac{\sin(x) * \cos(y)}{\ln(z)}
-%\]
-and have a reasonable fitness value but mislead a practitioner into assuming that z is a relevant feature. Since we have no information regarding f, not even if all features are needed, it is very hard to predict such behavior. The only way to mitigate this issue to increase the number of datapoints and ensure that their distance is maximal. Increasing the range may help, but is often problem dependent and not under our control.
+\[
+f(x, y, z) =\frac{sin(x) * cos(y)}{\ln(0.95)}
+\]
+If the range of x, y, and z is [0.9, 1] it is not difficult to see that the algorithm is likely to pick z to alias the desired constant value 0.95, instead of generating it. A resulting surrogate model could then be
+\[
+f'(x, y, z) =\frac{\sin(x) * \cos(y)}{\ln(z)}
+\]
+and have a reasonable fitness value but mislead a practitioner into assuming that z is a relevant feature. Since we have no information regarding f, not even if all features are needed, it is very hard to predict such behavior. The only way to mitigate this issue is to increase the number of datapoints and ensure that their distance is maximal. Increasing the range may help, but is often problem dependent and not under our control.
 
 \subsubsection{Folding}\label{secconstfolding}
 
 \paragraph{Constant subtree problem}
 A tree can contain subtrees that represent constant expressions. This is an immediate effect of the GP algorithm trying to evolve the correct constant. This can lead to large subtrees that can be represented by a single node. Nodes used in such a constant subtree are not available for base functions. They waste memory and evaluation cost, without their presence the tree could become a fitter instance. 
-There is a counterargument to be made here: parts of a constant subtree can help evolve constants faster than a pure random selection. It is possible that folding such subtrees leads to slightly lower fitness values.
+There is a counterargument to be made here: parts of a constant subtree can help evolve constants faster than a pure random selection. It is therefore possible that folding such subtrees can lead to lower fitness values.
 
 \paragraph{Constant subtree folding}
 We can use a depth sensitive objective function to try to mitigate this effect, but a more direct approach is replacing the subtrees.
 Using the previous constant expression detection technique we can collect all constant subtrees from a tree. We evaluate each subtree, and replace it with the constant value it represents. 
 Constant folding requires an O(n) detection check, since the entire tree needs to be traversed. The folding operation itself is at worst O(n), if the entire tree is constant.
-% TODO subfigure
+
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/prefold.png}
@@ -58,9 +58,8 @@ Constant folding requires an O(n) detection check, since the entire tree needs t
     \label{fig:postfold}
 \end{figure}
 \subparagraph{Analysis}
-This leads to savings in nodes and possibly a reduction in depth. These savings can have an effect on the convergence as well. Mutation and crossover will no longer operate on constant subtrees, and the iterations and place in the tree that becomes available can be used to improve the fitness of the tree. These two advantages are intuitive and expected. There is also a counterintuitive disadvantage to constant folding. A constant subtree is the algorithm's attempt at evolving a single constant. In constant folding we assume that the subtree only holds the information needed to represent this single constant, and therefore is more efficiently represented by that single constant. This is not true. A constant subtree with depth d represents between d and $2^{d+1}-1$ constants. Each leaf is per definition a constant. Each internal node is the root of a constant subtree. Each of those represents a new constant, which is eventually combined to the root of the largest constant subtree. Removing the entire subtree by folding it into a single constant can actually lead to worse fitness. To see this we need to look at constant subtrees as a set of discovered constants. The GP algorithm has 2 ways to generate a constant : crossover and mutation. Mutation will generate a subtree and replace it in an existing tree. In order to generate a constant a constant subtree will need to be generated. This process is unaffected by folding. What is affected is when the mutation target node is a node in a constant subtree. Mutation is able to generate far more complex expressions than a single selection of a constant leaf node is able to do, it is evolving the existing subtree. If we apply constant folding mutation can only replace the existing constant with a new one. The probability of this new value having better fitness is lower compared to mutation the subtree that represents the constant. 
-In crossover the effect is even stronger. The constant subtrees of a tree form a library of constants from which crossover can select and combine to form a new one. Given the exponential number of constants represented by such a subtree it is clear that expressive power of crossover without constant folding is greater than with constant folding applied. 
-% Figure
+Constant folding leads to savings in nodes and possibly a reduction in depth. These savings can have an effect on the convergence as well. Mutation and crossover will no longer operate on constant subtrees, and the iterations and space in the tree that becomes available can be used to improve the fitness of the tree. These two advantages are intuitive and expected. There is also a counterintuitive disadvantage to constant folding. A constant subtree is the algorithm's attempt at evolving a single constant. In constant folding we assume that the subtree only holds the information needed to represent this single constant, and therefore is more efficiently represented by that single constant. This is not true. A constant subtree with depth d represents between d and $2^{d+1}-1$ constants. Each leaf is per definition a constant. Each internal node is the root of a constant subtree. Each of those represents a new constant, which is eventually combined to form the root of the largest constant subtree. Removing the entire subtree by folding it into a single constant can actually lead to worse fitness. To see this we need to look at constant subtrees as a set of discovered constants. The GP algorithm has 2 ways to generate a constant : crossover and mutation. Mutation will generate a subtree and replace an existing subtree in a tree. In order to generate a constant a constant subtree will need to be generated. This process is unaffected by folding. What is affected is when the mutation target node is a node in a constant subtree. Mutation is able to generate far more complex expressions than a single selection of a constant leaf node is able to do. If we apply constant folding mutation can only replace the existing constant with a new one. The probability of this new value having better fitness is lower compared to mutation the subtree that represents the constant. 
+In crossover the effect is even stronger. The constant subtrees of a tree form a library of constants from which crossover can select and combine to form new values. Given the exponential number of constants represented by such a subtree it is clear that expressive power of crossover without constant folding is greater than with constant folding applied. Constant folding is a trade-off between this expressive power and complexity. More importantly, constant folding is a necessity in order to optimize the constant values with a continuous optimizer. It reduces the dimensions of the optimization problem significantly.
 
 \paragraph{Edge cases}
 In Figure \ref{fig:postfold} we see the effect of applying the constant subtree folding. 
@@ -68,16 +67,14 @@ There are subtle edge cases that cannot be detected using the above method. Cons
 \[
 f(x) = \max(x, 4 + \sin(0.3)) 
 \]
-% Link to image
 The subexpression 4 + sin(0.3) is detected and folded into the constant 4.26. 
 We should not stop there, since f can still be a constant expression if $\forall i :  x_i < 4.26$. To verify this we need to evaluate f on all i datapoints. In contrast, the constant subtree detection code needs only 1 evaluation. In Figure \ref{fig:postfold} we see a similar case in the right subtree where the first value of $x_0$ the right subtree is indeed constant. 
-Even if we should evaluate f for all i, this will not guarantee us that f is indeed a constant expression. All this check then proves is that for all i in the training data, f is constant. The testing data holds new values, for which f may or may not be constant. We conclude that this edge case cannot be prevented from occurring.
+Even if we should evaluate f for all i, this does not guarantee that f is indeed a constant expression. All this check proves is that for all i in the training data, f is constant. The testing data holds new values, for which f may or may not be constant. We conclude that this edge case cannot be prevented from occurring.
 Another case occurs in expressions of the form 
 \[
 f(x, y) = \tan(y) * \sqrt{x/x}
 \]
-In this reduced example the node $\sqrt{x/x}$ is simply $\sqrt{1}$. Outside of this example, detecting such cases is non trivial. There is a clear benefit to do so, despite their low occurrence: if the domain of x includes 0 this tree is never generated because it leads to division by zero in a single datapoint. Discarding this expression is however not needed, since $\sqrt{1}$ is a valid subexpression. One way to solve this is to use mathematical software to simplify the expressions, and then convert them back to tree representations. Deciding to apply this step should be based on the cost versus benefit and the frequency of such occurrences. 
-% link future work
+In this reduced example the node $\sqrt{x/x}$ is simply $\sqrt{1}$. Outside of this example, detecting such cases is non trivial. There is a clear benefit to do so, despite their low occurrence: if the domain of x includes 0 this tree is never generated because it leads to division by zero in a single datapoint. Discarding this expression is not needed, since $\sqrt{1}$ is a valid subexpression. One way to solve this is to use mathematical software to simplify the expressions and then convert them back to tree representations. Deciding to apply this step should be based on the cost versus benefit and the frequency of such occurrences. 
 
 \paragraph{Conclusion}
 Constant detection and folding mitigate some of the side effects of the constant optimization problem. We have discussed the advantages and the risks of applying constant folding. In general it is still advised to apply constant folding in order to constrain the excessive growth of trees in the population. In section \ref{subsecfoldingresults}
@@ -89,7 +86,7 @@ For this we need a continuous optimizer, an algorithm designed specifically to o
 
 \paragraph{Hybridizing GP}
 Using a real valued optimizer in combination with GP is a known solution \cite{GEDE, GPConst}.
-Which algorithm to combine is a difficult question. To our knowledge there is no comparison made between optimizaton algorithms to find out which is a better fit to combine with GP. 
+Selecting an algorithm to combine with GP is a difficult question. To our knowledge there is no comparison made between optimizaton algorithms to find out which is a better fit to combine with GP. 
 
 \paragraph{Problem statement}
 Given a tree with k constant leaves, with all constant subtrees folded, we would like to find the most optimal values for those constants resulting in a better fitness. 
