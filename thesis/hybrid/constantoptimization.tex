@@ -1,3 +1,12 @@
+In this section we will cover the constant optimization problem. A constant value can appear as a linear weight for a base function, or as a leaf. The following two functions clarify the difference.
+%\[
+%f(x) = \sin(\log(2, x))
+%\]
+%\[
+%g(x) = 3.14 sin(x) + 4.25 cos(x)
+%\]
+In f the value of 2 is a constant value but not a linear weight to a base function. In g, 3.14 and 4.25 are both linear weights to sine and cosine respectively. In this work we focus on constant values that appear not as linear weights but as free constant arguments to base functions. Our tree encoding has a hidden linear weight for each node which could be optimized. When we refer to constant optimization, we are referring to the process of finding the optimal values of free constant arguments in the expression.
+
 \subsection{Constant Optimization} \label{subconstantoptimization}
 Selecting base functions is a combinatoric, discrete problem. Selecting the right constants to use is a continuous problem, that GP tries to solve with a combinatoric approach. There are several aspects to this issue, we will go over each individually and show our approach. 
 
@@ -5,7 +14,7 @@ Selecting base functions is a combinatoric, discrete problem. Selecting the righ
 From section \ref{searchspace} we know that the size of the constant set dominates the size of the search space. We intentionally restrict this set to [0,1]. This reduces the size of c from $2^{64}$ to $2^{23}$. This restriction in range does not prevent larger constants from being evolved. The algorithm will evolve subtrees combining base functions with constants in order to approximate the desired values. Selection [0,1] as the reduced range is a logical choice given that floating point numbers have the highest density in this range. Despite the significant reduction in size of c, it still dominates the search space size.
 
 \subsubsection{Initialization revisited}
-During initialization it is possible that a generated tree represents a constant expression. Such an expression is only a valid approximation if no feature has an influence on Y, which is an unlikely edge case. A constant expression is of no use to the algorithm, but without measures to prevent or remove these they will still be formed. Ideally such an expression will have a worse fitness value than non constant expressions, and will be eventually filtered out. Since detecting a constant expression is feasible in worst case O(n) with n the number of nodes in the tree, a more efficient approach is preventing constant expressions from being generated. 
+During initialization it is possible that a generated tree represents a constant expression. Such an expression is only a valid approximation if no feature influences Y, which is an unlikely edge case. A constant expression is of no use to the algorithm, but without measures to prevent or remove these they will still be formed. Ideally such an expression will have a worse fitness value than non constant expressions, and will be eventually filtered out. Since detecting a constant expression is feasible in worst case O(n) with n the number of nodes in the tree, a more efficient approach is preventing constant expressions from being generated. 
 
 \paragraph{Constant expression detection}
 An expression is a constant expression if all its children are constant expressions. As a base case, a leaf node is a constant expression if it is not a feature. This problem statement allows us to define a recursive algorithm to detect constant expressions. It should be noted that its complexity is O(n) only in the worst case, when the tree is a constant expression. Upon detecting a non constant subtree, the algorithm returns early without a full traversal. 
@@ -13,6 +22,17 @@ An expression is a constant expression if all its children are constant expressi
 \paragraph{Preventing constant expressions}
 Using the checking procedure in the initialization, a tree marked as a constant expression is not allowed in the initialization procedure.
 It is still possible to create constant expressions by applying mutation and crossover. If the left subtree of a node is a constant expression, and the right is not, and this right is replaced by either mutation or crossover with a constant expression then the tree becomes a constant expression. The mutation operator will not generate constant subtrees, so this leaves only crossover. Our tool does not prevent constant expressions from forming in this way, the evaluation following crossover will filter out the constant expressions using evolutionary pressure.
+
+\paragraph{Constant aliasing}
+When we run the SR tool we do not know in advance which of our features influences the expected output. It is possible that some features have little or no effect whatsoever. If we have a feature z that has no effect on Y it is possible that, when the number of datapoints is low, the SR tool will start to use the values of z as a library of constant values. This unintended usage of z as a constant should be avoided at all costs as it will lead to a misleading surrogate model. In order to prevent this from occurring the values for any feature should be distinct and sampled so that they have sufficient distance between each other. Suppose we want to find a surrogate model for the function f:
+%\[
+%f(x, y, z) =\frac{sin(x) * cos(y)}{\ln(0.95)}
+%\]
+If the range of x, y, and z is [0.9, 1] it is not difficult to see that the algorithm is likely to pick z to alias the desired constant value 0.95, instead of generating it. A resulting surrogate model could be :
+%\[
+%f'(x, y, z) =\frac{\sin(x) * \cos(y)}{\ln(z)}
+%\]
+and have a reasonable fitness value but mislead a practitioner into assuming that z is a relevant feature. Since we have no information regarding f, not even if all features are needed, it is very hard to predict such behavior. The only way to mitigate this issue to increase the number of datapoints and ensure that their distance is maximal. Increasing the range may help, but is often problem dependent and not under our control.
 
 \subsubsection{Folding}\label{secconstfolding}
 
