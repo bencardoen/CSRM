@@ -17,6 +17,7 @@ We can replace GP with several other combinatorial optimization algorithms and c
 
 \paragraph{Base functions}
 In this work we have seen how great the impact is from invalid expression on the runtime of the algorithm. If we use a set of base functions where the domain is identical for each, for example the Chebyshev polynomials, and rescale our input set then we could largely avoid the initialization issue.
+A domain expert should be able to give hints to the tool specifying which base functions are expected to be used. If this is uncertain a weighted set of functons could be introduced. If a sinoid is expected, but other base functions cannot be excluded, we could bias the functionset by introducing weights steering the selection of base functions. This functionality is partially present in the current state of the tool.
 
 \paragraph{Policies}
 This work can be extended by several policies. The spreading policies in the topology can be extended with random sampling, new trends in archiving can be applied to the algorithm and the mutation and crossover operators can be similarly extended. 
