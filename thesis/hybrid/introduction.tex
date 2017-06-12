@@ -1,10 +1,7 @@
 \subsection{Overview}
 In this work we will study the convergence behavior of Symbolic Regression. The convergence characteristics of symbolic regression is still an open problem \cite{SRBaseline, SRAccur, SRAccuracy, FFX}. We will investigate the causes of this and suggest approaches. In particular we tackle the constant optimization problem. We evaluate our approach on a previously introduced \cite{SRBaseline} set of benchmark problems. We parallelize our approach and evaluate the effect on convergence. Finally we test our implementation on a real world use case and study its convergence.
 In the remainder of this section will give a problem statement, describe the challenges faced and why they are relevant.
-% List sections?
-% What we will discuss and where
-% Not focussed on what works, but on what doesn't
-% No black box, want to see how fitness evolves.
+
 
 \subsection{Symbolic Regression}
 Symbolic regression generates an expression that, when evaluated on a set of input points X, approximates an expected output set. This is a minimization problem where we can use as fitness a distance function. The expression is comprised of base functions, constants and features. 
@@ -60,7 +57,7 @@ We can use symbolic regression to gain insight into the correlation between thes
 \paragraph{Quality}
 We define the quality of a solution as its fitness value. If we use only the distance function as the fitness value, we can ask the SR tool to return solutions that are at least as fit as a given threshold. This threshold value is hard to set as each problem statement will have different convergence characteristics. In order to use this approach the fitness function should have a finite range with a defined scale. 
 \paragraph{Convergence rate}
-A practitioner would like to know how long it would take for an SR algorithm to find solutions of a given quality. It is equally important to know how convergence behaves over time. Suppose we have a fitness function with range [0,1] with 0 optimal. The SR tool evolves g generations and finds a solution with fitness 1e-12. A practitioner would like to know how an increase in generations would influence the decrease in fitness. We would like to be able to answer the question : "How many generations are needed to improve fitness by an order of magnitude?". Current implementations in SR are unable to answer these questions. It is possible to track convergence over time and based on this extrapolate future behavior. CSRM offers the user such insights by visualizing the convergence rate amongst other statistics.
+A practitioner would like to know how long it would take for an SR algorithm to find solutions of a given quality. It is equally important to know how convergence behaves over time. Suppose we have a fitness function with range [0,1] with 0 optimal. The SR tool evolves g generations and finds a solution with fitness 1e-12. A practitioner would like to know how an increase in generations would influence the decrease in fitness. We would like to be able to answer the question : "How many generations are needed to improve fitness by an order of magnitude?". Current implementations in SR are unable to answer these questions. It is possible to track convergence over time and based on this extrapolate future behavior. Our tool, convergence of symbolic regression using metaheuristics (CSRM), offers the user such insights by visualizing the convergence rate amongst other statistics.
 
 \paragraph{Accuracy}
 If we know that there exists a single global optimal solution, we can define accuracy as a distance measure. We score each solution the algorithm evolves based on the distance to the known optimal solution. Accuracy measures the algorithm's capability to approximate a known solution. 
