@@ -98,7 +98,7 @@ The function reflects the aim of the algorithm. We not only want to assign a goo
 
 \subsubsection{Diversity}\label{subsubdiversity}
 Diversity, the concept of maintaining semantically different specimens, is an important aspect in metaheuristics. Concepts such as niching and partitioning are often used to promote this behavior, amongst other reasons to prevent premature convergence or even to enable multimodality.
-Our tool uses a simple measure that approximates the more advanced techniques stated above. It should be clear that for any combination of input and output data, there are a huge set of expressions with an identical fitness value. Such expressions can lead to premature convergence where a subset of the fittest expressions all have the same fitness value without introducing new information. Those expressions approximate the same local optimum. Our tool will aim to prevent retaining expressions that have identical fitness values.
+Our tool uses a simple measure that approximates the more advanced techniques stated above. It should be clear that for any combination of input and output data, there are is huge set of expressions with identical fitness values. Such expressions can lead to premature convergence where a subset of the fittest expressions all have the same fitness value without introducing new information. Those expressions approximate the same local optimum. Our tool will aim to prevent retaining expressions that have identical fitness values.
 %Some metaheuristics \cite{DE} allow replacement of solutions with identical fitness values as it can help avoid local minima.
 There are disadvantages to this approach, if the fitness function has a zero gradient surface allowing replacement based on equal fitness value can help the optimizer to traverse such an area.
 
@@ -185,9 +185,9 @@ We trace the application of the operators during the execution using an effectiv
 Mutation works by replacing a randomly chosen subexpression with a newly generated expression. In our implementation this means selecting a node in the tree and replacing it with a new subtree. Our mutation operator can be configured to replace the subtree with one of equal depth or a randomly chosen depth. The insertion point can be made depth-sensitive. A shallow node, a node with a low depth, is the root of a subtree with significant depth. Replacing such a subtree is therefore more likely to have a significant effect on the fitness value. Replacing a deep node will have on average a smaller effect.
 The mutation operator is applied either selectively using a cooling schedule, or on the entire population.
 The cooling schedule uses the current fitness and the current generation of a tree to decide if the tree is likely to benefit from mutation. This is similar to the approach in simulated annealing \citep{SA}.
-Mutation introduces new information into the optimization process (a new subtree). This process can be constructive (lowering fitness) or destructive (increasing fitness). The idea behind the cooling schedule is that for fitter trees the mutation operation will not be able to improve fitness (decrease it), while for less fit trees it has a higher probability.
-This probability is estimated using the current generation and fitness value (relative to the population), and using this information a random choice is made whether or not to apply mutation. In the experiments section \ref{secexperiments} we will investigate if this assumption holds, and if it leads to gains in fitness and or effectiveness.
-The mutation operates has to generate new subtrees, and therefore the same issues seen in the initialization process which we discussed in section \ref{subsubinvalidexpressions} apply here as well. The mutation operator will generate subtrees until a valid one is found. If the depth sensitive operation proves to generate equal or better fitness values, this could significantly reduce the computation cost of the operator.
+Mutation introduces new information into the optimization process (a new subtree). This process can be constructive (lowering fitness) or destructive (increasing fitness). The idea behind the cooling schedule is that for fitter trees the mutation operation will not be able to improve fitness (decrease it), while for less fit trees it has a higher probability to do so.
+This probability is estimated using the current generation and fitness value (relative to the population), and using this information a biased random choice is made whether or not to apply mutation. In the experiments in section \ref{secexperiments} we will investigate if this assumption holds, and if it leads to gains in fitness and or effectiveness.
+The mutation operator has to generate new subtrees, and therefore the same issues seen in the initialization process which we discussed in section \ref{subsubinvalidexpressions} apply here as well. The mutation operator will generate subtrees until a valid one is found. If the depth sensitive operation proves to generate equal or better fitness values, this could significantly reduce the computation cost of the operator.
 
 \subsubsection{Crossover}
 Crossover operates on 2 trees in the population. It selects subtrees from both, and swaps them between each other. The resulting set of 4 trees is scored and the 2 fittest replace the original trees. As with mutation crossover can be configured to operate on a set depth, or select a random depth. It can also work symmetric, picking an equal depth insertion point in both trees.
@@ -199,7 +199,7 @@ Crossover is based on the idea that 2 expressions can improve by combining parts
 If the expression represented by a tree is a set of separable functions we could use crossover and mutation only on those subexpressions. Unfortunately the search space is composed of both separable and non separable functions, and we do not know in advance if we gain from focussing only on separable solutions. Both crossover and mutation lack this information when dealing with subtrees and are forced to operate as random selectors.
 
 \subsection{Selection}
-After evolution a decision has to be made on which expressions will be retained in the population. In our tool the population is fixed, so a replacement is in order. We use an elitist approach. If an expression has a lower (better) fitness value after mutation, it is replaced.
+After evolution a decision has to be made on which expressions to retain in the population. In our tool the population size is fixed, so a replacement is in order. We use an elitist approach. If an expression has a lower (better) fitness value after mutation, it is replaced.
 In crossover we combine two expressions r, and t, resulting in two offspring s, u.
 From these four expressions the two with minimal fitness survive to the next generation.
 
@@ -220,7 +220,7 @@ The algorithm has the choice which mode of access to use depending on the usage 
 \paragraph{Base functions}
 The set of base functions is determined by the problem domain. For symbolic regression we use the following set:\\
 +, -, \%, /, max, min, abs, tanh, sin, cos, tan, log, exp, power\\
-A problem with this set is the varying domain of each, why may or may not correspond with the domain of the features. A possible extension is to use orthogonal base functions such as Chebyshev polynomials. In our solution the functions listed correspond with their mathematical equivalent, e.g. division by zero is undefined. Other constraints are based on floating point representation (e.g overflow).
+A problem with this set is the varying domain of each, which may or may not correspond with the domain of the features. A possible extension is to use orthogonal base functions such as Chebyshev polynomials. In our solution the functions listed correspond with their mathematical equivalent, e.g. division by zero is undefined. Other constraints are based on floating point representation (e.g overflow).
 
 \paragraph{Constants}
 Constants are fixed values in leaves in the tree. The representation also allows for multiplicative weights for each node, which can be used to further optimize an evolved expression. In contrast to the base functions with a limited set to choose from, constants have the entire floating point range at their disposal. The probability of selecting a 'right' value is extremely small, and domain information is lacking for these constants, it depends on the entire subtree holding the constant. We select a constant from a small range and allow the algorithm to recombine these constants later to larger values. This limiting of the search space can lead to the algorithm converging faster to a suboptimal solution.
@@ -231,23 +231,23 @@ Features are represented as an object holding a reference to a set of input valu
 
 \subsubsection{Population}
 The population of trees is kept in a sorted set, where the key is the fitness value and the value is a reference to the tree representing the expression.  Sorted datastructures are notably lacking from Python, we use the sortedcontainers \cite{sortedcontainers} module which provides sorted datastructures that are designed with performance in mind.
-This representation allows for fast access in selecting a (sub)set of fittest trees. It also allows for an O(1) check if we already have an equivalent solution, a tree with a fitness score which we already have in the population. This allows our diversity approach mentioned in \ref{subsubdiversity}.
+This representation allows for fast access in selecting a (sub)set of fittest trees. It also allows for an O(1) check to see if we already have an equivalent solution, a tree with a fitness score which we already have in the population. This allows our diversity approach mentioned in \ref{subsubdiversity}.
 In Figure \ref{fig:uml} we see that the actual data structure used as population is interchangeable. If duplicate fitness values are allowed, and membership testing is no longer needed, a sorted list could be used instead.
 
 \subsection{Parameters}
 In this section we briefly list the main parameters of the algorithm and their effects on convergence, runtime and complexity.
 \subsubsection{Depth}
-The depth of trees can vary between an initial and maximum value. If we know in advance an optimal solution uses 13 features, the tree should have at least 13 leaves in order to use each feature at least once. This requires a depth of at least 4. In practice the depth will need to be greater due to the use of unary functions, and bloat. Bloat is a known issue in GP \cite{GPBloat}
+The depth of trees can vary between an initial and maximum value. If we know in advance that an optimal solution uses 13 features, the tree should have at least 13 leaves in order to use each feature at least once. This requires a depth of at least 4. In practice the depth will need to be greater due to the use of unary functions, and bloat. Bloat is a known issue in GP \cite{GPBloat}
 where the algorithm, unless constrained by limits or an objective function that penalizes depth, will tend to evolve deep trees without gaining much in fitness. In the worst case entire subtrees can be evolved that do not contribute to the fitness value, similar to introns in genetics. These can still have a valid purpose, for example serving as genetic memory. Their disadvantage is clear: a computational overhead without clear effect on the fitness value.
 A similar problem arises with the generation of constants. Suppose we would like to generate the constant 3.14, the probability of generating this by a single random call is extremely small. The algorithm will try to build an expression fitting 3.14, for example "1+(3*1) + 28/200". The problem with this is that this process is highly inefficient. It uses iterations that, if a more efficient approach exists, could be used to optimize the fitness value of the tree further. The constant expression wastes nodes that could be used to improve the tree. One approach is folding such expressions into a single constant, which mitigates some of the effects mentioned but does not prevent such subtrees from forming.
 Without a solution for this issue, the user would have to take this into account and increase the depth parameter.
-From \ref{subsubinvalidexpressions} we know that the initialization process and the mutation operator will become more costly exponentially with the increase in depth.
+From \ref{subsubinvalidexpressions} we know that the initialization process and the mutation operator will become more costly exponential with the increase in depth.
 The complexity of our tool is defined by the number of evaluations and the depth of the tree, with the depth having an exponential cost in time and memory.
 
 % complexity
 \subsubsection{Population size}
 The population size is directly related to convergence rate and the quality of the solution. A very small population will lead to premature convergence, the population is lacking in diversity (or information viewed from a different perspective).
-A large population on the other leads to a large increase in runtime, unless the operators only work on a subset of the population. The optimal value is problem specific, but values in the range of 20-50 give a good balance for our implementation.
+A large population on the other leads to a large increase in runtime, unless the operators only work on a subset of the population. The optimal value is problem specific, but values in the range of [20,50] give a good balance for our implementation.
 
 \subsubsection{Phases and generations}
 The execution of the algorithms comprises of g generations and r phases, resulting in a maximum of g x r iterations.
@@ -279,9 +279,9 @@ Possible disadvantages are :
 \item The SR tool is not guaranteed to return the optimal solution, it is possible the process is misguided by suboptimal solutions. This risk exist as well in the full approach.
 \item Interpretation of the results is needed in order to make the decision to prune features or datapoints.
 \end{itemize}
-We will investigate this approach in our use case in  section \ref{secexperiments}.
-The following diagram illustrates a DOE hypercube design using our tool and a simulator. \\
-\begin{figure}\label{fig:incremental}
+We will investigate this approach in our use case in  section \ref{secusecase}.
+The diagram \ref{fig:incremental} illustrates a DOE hypercube design using our tool and a simulator. \\
+\begin{figure}
 \begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\footnotesize}]
 \node (start) [startstop] {Start};
 \node (featureset) [process, below of=start] {Features};
@@ -311,6 +311,7 @@ The following diagram illustrates a DOE hypercube design using our tool and a si
 
 \end{tikzpicture}
 \caption{Incremental DOE using CSRM and a simulator.}
+\label{fig:incremental}
 \end{figure}
 
 \subsection{Statistics and visualization}
