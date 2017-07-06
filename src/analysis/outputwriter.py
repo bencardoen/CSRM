@@ -7,6 +7,7 @@
 #      Author: Ben Cardoen
 from itertools import chain
 import logging
+import numpy
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('global')
@@ -70,15 +71,37 @@ class OutputWriter:
         self._body += "<table>\n"
         # add headers
         self._body += "<tr>\n"
+        values = []
         #logger.info("Headers is {}".format(self._headers))
         for h in self._headers:
             self._body += ''.join(["<th>", str(h) ,"</th>"])
         self._body += "</tr>\n"
         for expression in self._exprs:
             self._body += "<tr>\n"
+            values.append(expression[0])
             for entry in expression:
                 self._body += ''.join(["<td>", str(entry) ,"</td>"])
             self._body += "</tr>\n"
+        self._body += "</table>\n"
+        self._body += "<h3>Distribution</h3>"
+        self._body += "<table>\n"
+        # add headers
+        self._body += "<tr>\n"
+
+        #logger.info("Headers is {}".format(self._headers))
+        results = []
+        results.append(min(values))
+        results.append(numpy.mean(values))
+        results.append(numpy.std(values))
+        results.append(numpy.var(values))
+        for h in ["Minimum", "Mean", "Standard Deviation", "Variation"]:
+            self._body += ''.join(["<th>", str(h) ,"</th>"])
+        self._body += "</tr>\n"
+
+        self._body += "<tr>\n"
+        for entry in results:
+            self._body += ''.join(["<td>", str(entry) ,"</td>"])
+        self._body += "</tr>\n"
         self._body += "</table>\n"
 
 
@@ -97,11 +120,3 @@ class OutputWriter:
 
     def writeFooter(self):
         self._body += """</html>\n"""
-
-
-if __name__ == "__main__":
-    logger.setLevel(logging.INFO)
-    e = [("sin(x1) * cos(x2)", 0.1)]
-    o = OutputWriter(e, filename = "test.html", headers = ["Expression", "Fitness"])
-    o.constructPage()
-    o.writePage()
