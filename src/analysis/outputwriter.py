@@ -58,7 +58,9 @@ class OutputWriter:
             self._body += "</tr>\n"
             for key, value in sorted(self._config.__dict__.items()):
                 self._body += "<tr>\n"
-
+                if key == "topo":
+                    value = str(value)
+                    value = value[value.rfind('.')+1:-2]
                 self._body += ''.join(["<td>", str(key) ,"</td>","<td>", str(value) ,"</td>"])
                 self._body += "</tr>\n"
             self._body += "</table>\n"
