@@ -54,7 +54,7 @@ class Topology():
 
 class NoneTopology(Topology):
     """
-    Stub class for a sequential sinle instances process.
+    Stub class for a sequential single instances process.
     """
 
     def __init__(self, size):
@@ -69,6 +69,7 @@ class NoneTopology(Topology):
 
 class RandomStaticTopology(Topology):
     def __init__(self, size:int, rng=None, seed=None, links=None):
+        assert(size > 1)
         super().__init__(size)
         if rng is None:
             self._rng = getRandom()
@@ -148,6 +149,7 @@ class TreeTopology(Topology):
         """
         :param int size: Number of nodes. Size+1 should be a power of 2
         """
+        assert(size > 1)
         super().__init__(size)
         self.spreadpolicy = DistributeSpreadPolicy
 
@@ -184,6 +186,7 @@ class RandomDynamicTopology(RandomStaticTopology):
 
     # TODO modify lookup code in pgp to handle time invariant.
     def __init__(self, size:int, rng=None, seed=None):
+        assert(size > 1)
         super().__init__(size, rng=rng, seed=seed)
 
     def recalculate(self):
@@ -199,6 +202,7 @@ class RingTopology(Topology):
     """
 
     def __init__(self, size:int):
+        assert(size>1)
         super().__init__(size)
 
     def getSource(self, target:int):

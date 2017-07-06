@@ -11,9 +11,12 @@ from expression.tools import rmtocm
 import logging
 import json
 import numpy
+import os
+import webbrowser
 from functools import reduce
 from itertools import chain
 from expression.tools import copyObject
+from analysis.outputwriter import OutputWriter
 logger = logging.getLogger('global')
 
 
@@ -170,12 +173,15 @@ class Convergence(Plotter):
 
 
 class SummarizedResults(Plotter):
-    def __init__(self, results):
+    def __init__(self, results, config=None):
         super().__init__()
         self._results = results
+        self._bestpath = None
+        self._config = config
         self.plotAll()
 
     def saveBest(self, filename):
+
         if filename is None:
             logger.warning("Filename is still None!!")
             assert(False)
@@ -187,8 +193,19 @@ class SummarizedResults(Plotter):
         pl = int(len(sscored) / rl)
         sscored = sscored[0:pl]
         with open(filename, 'w') as f:
-            for _, s in sscored:
-                f.write(s+"\n")
+            for v, s in sscored:
+                f.write(str(v) + "\t" + s+"\n")
+        mname = filename[:-4] + ".html"
+        o = OutputWriter(sscored, mname, headers= ["Fitness", "Expression"], config = self._config)
+        self._bestpath = os.path.abspath(mname)
+        o.writePage()
+
+    def displayBest(self):
+        if self._bestpath:
+            webbrowser.open_new_tab(self._bestpath)
+        else:
+            logger.warning("Results weren't saved, path has not been set !")
+
 
     def plotFitness(self):
         fitness = rmtocm([r['fitness'] for r in self._results])

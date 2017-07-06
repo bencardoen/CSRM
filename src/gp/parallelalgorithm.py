@@ -204,7 +204,7 @@ class ParallelGP():
         self.algorithm.archiveExternal(buffer)
 
 
-    def reportOutput(self, save=False, display=False, outputfolder=None):
+    def reportOutput(self, save=False, display=False, outputfolder=None, config=None):
         """
         Report output either to file or browser.
 
@@ -213,7 +213,7 @@ class ParallelGP():
         :param str outputfolder: modify output directory
         """
         #logger.info("RPO P with save {}".format(save))
-        reportOutput([self], X=self._X, Y=self._Y, save=save, display=display, outputfolder=outputfolder, pid=self.pid)
+        reportOutput([self], X=self._X, Y=self._Y, save=save, display=display, outputfolder=outputfolder, pid=self.pid, config=config)
 
     def summarizeResults(self, X, Y):
         """
@@ -275,7 +275,7 @@ class SequentialPGP():
                 for index, target in enumerate(targets):
                     self._processes[target].receive(buf[index], i)
 
-    def reportOutput(self, save=False, display=False, outputfolder=None):
+    def reportOutput(self, save=False, display=False, outputfolder=None, config=None):
         """
         Report output of all processes.
 
@@ -283,7 +283,7 @@ class SequentialPGP():
         :param bool display: Display results in browser (WARNING : CPU intensive for large sets)
         :param str outputfolder: modify output directory
         """
-        reportOutput(self._processes, X=self._X, Y=self._Y, save=save, display=display, outputfolder=outputfolder, pid=None)
+        reportOutput(self._processes, X=self._X, Y=self._Y, save=save, display=display, outputfolder=outputfolder, pid=None, config=config)
 
 
     def collectSummaries(self):
@@ -295,7 +295,7 @@ class SequentialPGP():
 # Factored out function, used by both SQ and Parallel.
 
 
-def reportOutput(processes, X, Y, save=False, display=False, outputfolder=None, pid=None,):
+def reportOutput(processes, X, Y, save=False, display=False, outputfolder=None, pid=None,config=None):
     """
     Report output of all processes.
 
@@ -322,7 +322,7 @@ def reportOutput(processes, X, Y, save=False, display=False, outputfolder=None, 
         sums = processes[0].collectSummaries()
     # in MPI mode, sums will be None for any except root
     if sums:
-        s = SummarizedResults(sums)
+        s = SummarizedResults(sums, config=config)
         title = "Collected results for all processes"
         if save:
             # refactor
@@ -331,3 +331,4 @@ def reportOutput(processes, X, Y, save=False, display=False, outputfolder=None, 
             s.saveBest(outputfolder + "bestresults.txt")
         if display:
             s.displayPlots("summary", title=title)
+            s.displayBest()

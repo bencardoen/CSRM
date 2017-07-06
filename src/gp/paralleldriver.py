@@ -12,7 +12,7 @@ import random
 from expression.tree import Tree
 from expression.tools import generateVariables
 import argparse
-from gp.topology import RandomStaticTopology, topologies
+from gp.topology import RandomStaticTopology, NoneTopology, topologies
 from gp.config import Config
 from gp.parallelalgorithm import ParallelGP, SequentialPGP, isMPI
 from gp.algorithm import BruteCoolingElitist
@@ -69,8 +69,8 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
 
     assert(len(Y) ==config.datapointcount)
     if topo is None:
-        logger.info("Topology is None, using RStatic")
-        topo = RandomStaticTopology
+        logger.info("Topology is None, using None Topology")
+        topo = NoneTopology
     algo = None
     t = None
     if topo == RandomStaticTopology:
@@ -91,7 +91,7 @@ def runBenchmark(config, topo=None, processcount = None, outfolder = None, X=Non
     tstart = time.time()
     algo.executeAlgorithm()
 
-    algo.reportOutput(save=True, outputfolder = outfolder, display=display)
+    algo.reportOutput(save=True, outputfolder = outfolder, display=display, config=config)
     logger.info("Benchmark complete for {}".format(pid))
 
     # if MPI, merge all results and print
