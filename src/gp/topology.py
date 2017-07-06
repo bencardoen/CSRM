@@ -151,7 +151,6 @@ class TreeTopology(Topology):
         """
         assert(size > 1)
         super().__init__(size)
-        self.spreadpolicy = DistributeSpreadPolicy
 
     def getSource(self, target:int):
         assert(target < self.size)
@@ -177,6 +176,24 @@ class TreeTopology(Topology):
 
     def __str__(self):
         return "TreeTopology " + super().__str__()
+
+
+class InvertedTreeTopology(TreeTopology):
+    """
+    Inverted Tree where all children send to parents, focussing into the root.
+    """
+
+    def __init__(self, size:int):
+        super().__init__(size)
+
+    def getSource(self, target:int):
+        return super(InvertedTreeTopology, self).getTarget(target)
+
+    def getTarget(self, source:int):
+        return super(InvertedTreeTopology, self).getSource(source)
+
+    def __str__(self):
+        return "InvertedTreeTopology " + super().__str__()
 
 
 class RandomDynamicTopology(RandomStaticTopology):
@@ -277,4 +294,4 @@ class VonNeumannTopology(Topology):
         return "VonNeumannTopology" + super().__str__()
 
 
-topologies = {"grid":VonNeumannTopology, "randomstatic":RandomStaticTopology, "randomdynamic":RandomDynamicTopology, "tree":TreeTopology, "none":NoneTopology}
+topologies = {"grid":VonNeumannTopology, "randomstatic":RandomStaticTopology, "randomdynamic":RandomDynamicTopology, "tree":TreeTopology,"invertedtree":InvertedTreeTopology, "none":NoneTopology}
