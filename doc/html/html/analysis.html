@@ -52,7 +52,7 @@
 <dl class="class">
 <dt id="analysis.convergence.Convergence">
 <em class="property">class </em><code class="descclassname">analysis.convergence.</code><code class="descname">Convergence</code><span class="sig-paren">(</span><em>convergencestats</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#analysis.convergence.Plotter" title="analysis.convergence.Plotter"><code class="xref py py-class docutils literal"><span class="pre">analysis.convergence.Plotter</span></code></a></p>
 <p>Utility class to parse and convert convergence statistics.</p>
 <dl class="method">
 <dt id="analysis.convergence.Convergence.__init__">
@@ -60,10 +60,19 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="analysis.convergence.Convergence.displayPlots">
-<code class="descname">displayPlots</code><span class="sig-paren">(</span><em>filename</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.displayPlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.displayPlots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Collect all plots and write them out to a displayed html file.</p>
-</dd></dl>
+<dt id="analysis.convergence.Convergence.plotAlgorithmCost">
+<code class="descname">plotAlgorithmCost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotAlgorithmCost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotAlgorithmCost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotAlgorithmCostTrend">
+<code class="descname">plotAlgorithmCostTrend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotAlgorithmCostTrend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotAlgorithmCostTrend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotAll">
+<code class="descname">plotAll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotAll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="analysis.convergence.Convergence.plotComplexity">
@@ -72,21 +81,49 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="analysis.convergence.Convergence.plotDataPoints">
-<code class="descname">plotDataPoints</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotDataPoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotDataPoints" title="Permalink to this definition">¶</a></dt>
+<dt id="analysis.convergence.Convergence.plotDepth">
+<code class="descname">plotDepth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotDepth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotDepth" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="analysis.convergence.Convergence.plotFitness">
 <code class="descname">plotFitness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotFitness" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot fitness values over the generations</p>
-</dd></dl>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotFoldingGains">
+<code class="descname">plotFoldingGains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotFoldingGains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotFoldingGains" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotFoldingGainsTrend">
+<code class="descname">plotFoldingGainsTrend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotFoldingGainsTrend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotFoldingGainsTrend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotOperatorImpactTrend">
+<code class="descname">plotOperatorImpactTrend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotOperatorImpactTrend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotOperatorImpactTrend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotOperatorSuccessTrend">
+<code class="descname">plotOperatorSuccessTrend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotOperatorSuccessTrend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotOperatorSuccessTrend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="analysis.convergence.Convergence.plotOperators">
 <code class="descname">plotOperators</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotOperators"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotOperators" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot effective (i.e. rendering a fitter individual) modifications made by mutations and crossover</p>
-</dd></dl>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotOperatorsImpact">
+<code class="descname">plotOperatorsImpact</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotOperatorsImpact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotOperatorsImpact" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotOptimizerGains">
+<code class="descname">plotOptimizerGains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotOptimizerGains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotOptimizerGains" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="analysis.convergence.Convergence.plotPareto">
@@ -95,13 +132,130 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="analysis.convergence.Convergence.plotPopulationOverGenerations">
+<code class="descname">plotPopulationOverGenerations</code><span class="sig-paren">(</span><em>keyword='fitness'</em>, <em>cool=False</em>, <em>xcategorical=False</em>, <em>ycategorical=False</em>, <em>groupsimilar=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotPopulationOverGenerations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotPopulationOverGenerations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotSeries">
+<code class="descname">plotSeries</code><span class="sig-paren">(</span><em>keys</em>, <em>labels</em>, <em>title</em>, <em>legend</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotSeries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Convergence.plotTrend">
+<code class="descname">plotTrend</code><span class="sig-paren">(</span><em>keyvalues</em>, <em>axislabels</em>, <em>legend</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.plotTrend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.plotTrend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="analysis.convergence.Convergence.saveData">
 <code class="descname">saveData</code><span class="sig-paren">(</span><em>filename</em>, <em>outputfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.saveData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.saveData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="class">
+<dt id="analysis.convergence.Plotter">
+<em class="property">class </em><code class="descclassname">analysis.convergence.</code><code class="descname">Plotter</code><a class="reference internal" href="_modules/analysis/convergence.html#Plotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Plotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <dl class="method">
-<dt id="analysis.convergence.Convergence.savePlots">
-<code class="descname">savePlots</code><span class="sig-paren">(</span><em>filename</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Convergence.savePlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Convergence.savePlots" title="Permalink to this definition">¶</a></dt>
+<dt id="analysis.convergence.Plotter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Plotter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Plotter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Plotter.addPlot">
+<code class="descname">addPlot</code><span class="sig-paren">(</span><em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Plotter.addPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Plotter.addPlot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Plotter.displayPlots">
+<code class="descname">displayPlots</code><span class="sig-paren">(</span><em>filename</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Plotter.displayPlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Plotter.displayPlots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Plotter.getPlots">
+<code class="descname">getPlots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Plotter.getPlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Plotter.getPlots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Plotter.plotDataPoints">
+<code class="descname">plotDataPoints</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Plotter.plotDataPoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Plotter.plotDataPoints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.Plotter.savePlots">
+<code class="descname">savePlots</code><span class="sig-paren">(</span><em>filename</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#Plotter.savePlots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.Plotter.savePlots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="analysis.convergence.SummarizedResults">
+<em class="property">class </em><code class="descclassname">analysis.convergence.</code><code class="descname">SummarizedResults</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#analysis.convergence.Plotter" title="analysis.convergence.Plotter"><code class="xref py py-class docutils literal"><span class="pre">analysis.convergence.Plotter</span></code></a></p>
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotAll">
+<code class="descname">plotAll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotAll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotComplexity">
+<code class="descname">plotComplexity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotComplexity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotComplexity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotDepth">
+<code class="descname">plotDepth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotDepth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotDepth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotDifference">
+<code class="descname">plotDifference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotDifference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotDifference" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotFeatures">
+<code class="descname">plotFeatures</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotFeatures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotFitness">
+<code class="descname">plotFitness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotFitness" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotPrediction">
+<code class="descname">plotPrediction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotPrediction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotPrediction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotPredictionTrend">
+<code class="descname">plotPredictionTrend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotPredictionTrend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotPredictionTrend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotTrainedFitness">
+<code class="descname">plotTrainedFitness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotTrainedFitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotTrainedFitness" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.plotVariance">
+<code class="descname">plotVariance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.plotVariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.plotVariance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.saveBest">
+<code class="descname">saveBest</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.saveBest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.saveBest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.saveData">
+<code class="descname">saveData</code><span class="sig-paren">(</span><em>filename</em>, <em>outputfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.saveData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.saveData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -111,12 +265,20 @@
 <span id="analysis-plot-module"></span><h2>analysis.plot module<a class="headerlink" href="#module-analysis.plot" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="analysis.plot.displayPlot">
-<code class="descclassname">analysis.plot.</code><code class="descname">displayPlot</code><span class="sig-paren">(</span><em>plots</em>, <em>filename</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/plot.html#displayPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.plot.displayPlot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">analysis.plot.</code><code class="descname">displayPlot</code><span class="sig-paren">(</span><em>plots</em>, <em>filename</em>, <em>title</em>, <em>square=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/plot.html#displayPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.plot.displayPlot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="analysis.plot.groupData">
+<code class="descclassname">analysis.plot.</code><code class="descname">groupData</code><span class="sig-paren">(</span><em>data</em>, <em>scale=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/plot.html#groupData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.plot.groupData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a linear array of data values, sort them by value, count each instance.</p>
+<p>Return a dictionary where each value points to the relative frequency multiplied by scale.
+E.g. [1,2,2], scale=2 -&gt; {1:2/3, 2:4/3}</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="analysis.plot.plotDotData">
-<code class="descclassname">analysis.plot.</code><code class="descname">plotDotData</code><span class="sig-paren">(</span><em>data</em>, <em>mean=None</em>, <em>std=None</em>, <em>var=None</em>, <em>generationstep=1</em>, <em>labelx=None</em>, <em>labely=None</em>, <em>title=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/plot.html#plotDotData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.plot.plotDotData" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">analysis.plot.</code><code class="descname">plotDotData</code><span class="sig-paren">(</span><em>data</em>, <em>mean=None</em>, <em>std=None</em>, <em>var=None</em>, <em>generationstep=1</em>, <em>labelx=None</em>, <em>labely=None</em>, <em>title=None</em>, <em>cool=False</em>, <em>xcategorical=False</em>, <em>ycategorical=False</em>, <em>groupsimilar=False</em>, <em>scalesimilar=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/plot.html#plotDotData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.plot.plotDotData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot data values over generations.</p>
 </dd></dl>
 
@@ -127,13 +289,13 @@
 
 <dl class="function">
 <dt id="analysis.plot.plotLineData">
-<code class="descclassname">analysis.plot.</code><code class="descname">plotLineData</code><span class="sig-paren">(</span><em>data</em>, <em>mean=None</em>, <em>std=None</em>, <em>var=None</em>, <em>generationstep=1</em>, <em>labelx=None</em>, <em>labely=None</em>, <em>title=None</em>, <em>legend=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/plot.html#plotLineData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.plot.plotLineData" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">analysis.plot.</code><code class="descname">plotLineData</code><span class="sig-paren">(</span><em>data</em>, <em>mean=None</em>, <em>std=None</em>, <em>var=None</em>, <em>generationstep=1</em>, <em>labelx=None</em>, <em>labely=None</em>, <em>title=None</em>, <em>legend=None</em>, <em>xcategorical=False</em>, <em>ycategorical=False</em>, <em>dot=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/plot.html#plotLineData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.plot.plotLineData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot data values over generations.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="analysis.plot.savePlot">
-<code class="descclassname">analysis.plot.</code><code class="descname">savePlot</code><span class="sig-paren">(</span><em>plots</em>, <em>filename</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/plot.html#savePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.plot.savePlot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">analysis.plot.</code><code class="descname">savePlot</code><span class="sig-paren">(</span><em>plots</em>, <em>filename</em>, <em>title</em>, <em>square=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/plot.html#savePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.plot.savePlot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

@@ -28,6 +28,15 @@ gp.topology module
     :undoc-members:
     :show-inheritance:
 
+gp.paralleldriver module
+---------------------------
+
+.. automodule:: gp.paralleldriver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 
 gp.population module
 --------------------

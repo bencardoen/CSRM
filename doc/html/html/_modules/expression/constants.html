@@ -44,19 +44,33 @@
           <div class="body" role="main">
             
   <h1>Source code for expression.constants</h1><div class="highlight"><pre>
-<span></span>
+<span></span><span class="c1">#This file is part of the CSRM project.</span>
+<span class="c1">#Copyright 2016 - 2017 University of Antwerp</span>
+<span class="c1">#https://www.uantwerpen.be/en/</span>
+<span class="c1">#Licensed under the EUPL V.1.1</span>
+<span class="c1">#A full copy of the license is in COPYING.txt, or can be found at</span>
+<span class="c1">#https://joinup.ec.europa.eu/community/eupl/og_page/eupl</span>
+<span class="c1">#      Author: Ben Cardoen</span>
+
 
 <div class="viewcode-block" id="Constants"><a class="viewcode-back" href="../../expression.html#expression.constants.Constants">[docs]</a><span class="k">class</span> <span class="nc">Constants</span><span class="p">():</span>
 <div class="viewcode-block" id="Constants.__init__"><a class="viewcode-back" href="../../expression.html#expression.constants.Constants.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Minimum fitness value, lower is better, minimum in this sense means the worst possible value.</span>
+<span class="sd">    Note that the range of fitness values depends on the fitness function. A fitness value</span>
+<span class="sd">    of MINFITNESS indicates an invalid specimen (e.g y = x/0)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">MINFITNESS</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Worst value of fitness in the scaled pearson r fitness function&quot;&quot;&quot;</span>
+    <span class="n">PEARSONMINFITNESS</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">MAXFITNESS</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># Size limit for exponents</span>
-    <span class="n">SIZE_LIMIT</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">EXPONENT_LIMIT</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="n">BASE_LIMIT</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e10</span>
+    <span class="c1"># ensure that a value isn&#39;t too small, it won&#39;t be representable in IEEE754, leading</span>
+    <span class="c1"># to overflow error</span>
+    <span class="n">LOWER_LIMIT</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span>
     <span class="c1"># Legal range for constants</span>
     <span class="c1"># Setting this to high values leads to explosion in fitness values</span>
     <span class="n">CONSTANTS_LOWER</span><span class="o">=</span><span class="mi">0</span>
@@ -86,15 +100,18 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">HISTORY</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Influences size of archive</span>
+<span class="sd">    Determines what ratio of a data set is used for training.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">POP_TO_ARCHIVERATIO</span> <span class="o">=</span> <span class="mi">4</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Ratio of archive to selection in reseeding/archiving values.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ARCHIVE_SELECTION_RATIO</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">SAMPLING_RATIO</span><span class="o">=</span><span class="mf">0.8</span>
 
-    <span class="n">SAMPLING_RATIO</span><span class="o">=</span><span class="mf">0.8</span></div>
+    <span class="n">PLOT_SIZE_DEFAULT</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">PLOT_SIZE_COOL</span><span class="o">=</span><span class="mi">4</span>
+    <span class="n">PLOT_SIZE_DEPTH</span><span class="o">=</span><span class="mi">8</span>
+    <span class="n">PLOT_ALPHA_DEFAULT</span><span class="o">=</span><span class="mf">0.5</span>
+    <span class="n">PLOT_ALPHA_DEPTH</span><span class="o">=</span><span class="mf">0.15</span>
+
+    <span class="c1"># Defines normal distribution in ABC</span>
+    <span class="n">NORMAL_SCALE</span> <span class="o">=</span> <span class="mi">20</span></div>
 </pre></div>
 
           </div>
