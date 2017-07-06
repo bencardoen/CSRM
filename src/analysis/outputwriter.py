@@ -79,8 +79,7 @@ class OutputWriter:
         for expression in self._exprs:
             self._body += "<tr>\n"
             values.append(expression[0])
-            for entry in expression:
-                self._body += ''.join(["<td>", str(entry) ,"</td>"])
+            self._body += ''.join(["<td>", "{0:.2e}".format(expression[0]) ,"</td>", "<td>", "{}".format(expression[1]) ,"</td>"])
             self._body += "</tr>\n"
         self._body += "</table>\n"
         self._body += "<h3>Distribution</h3>"
@@ -100,7 +99,7 @@ class OutputWriter:
 
         self._body += "<tr>\n"
         for entry in results:
-            self._body += ''.join(["<td>", str(entry) ,"</td>"])
+            self._body += ''.join(["<td>", "{0:.2e}".format(entry) ,"</td>"])
         self._body += "</tr>\n"
         self._body += "</table>\n"
 
