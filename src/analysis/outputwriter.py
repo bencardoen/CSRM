@@ -48,9 +48,7 @@ class OutputWriter:
     def writeConfig(self):
         if self._config:
             self._body += "<h3>Configuration</h3>"
-            self._body += "<p>This is the configuration used to obtain the expressions.</p>"
             self._body += "<table>\n"
-            # add headers
             self._body += "<tr>\n"
 
             for h in ["Parameter", "Value"]:
@@ -69,7 +67,6 @@ class OutputWriter:
 
     def writeTable(self):
         self._body += "<h3>Expressions</h3>"
-        self._body += "<p> The following table lists the resulting expressions ranked by their fitness based on the full data set. </p>"
         self._body += "<table>\n"
         # add headers
         self._body += "<tr>\n"
@@ -90,11 +87,7 @@ class OutputWriter:
         self._body += "<tr>\n"
 
         #logger.info("Headers is {}".format(self._headers))
-        results = []
-        results.append(min(values))
-        results.append(numpy.mean(values))
-        results.append(numpy.std(values))
-        results.append(numpy.var(values))
+        results = [min(values),numpy.mean(values), numpy.std(values), numpy.var(values) ]
         for h in ["Minimum", "Mean", "Standard Deviation", "Variation"]:
             self._body += ''.join(["<th>", str(h) ,"</th>"])
         self._body += "</tr>\n"
