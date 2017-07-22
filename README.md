@@ -1,6 +1,12 @@
 # README #
 
-This document gets you up and running in the shortest
+This document gets you up and running in the shortest amount of time.
+
+### Getting the code
+
+```
+$git clone https://bitbucket.org/bcardoen/csrm
+```
 
 ### Dependencies ###
 * Python3
