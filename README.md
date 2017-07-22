@@ -16,13 +16,34 @@ This document gets you up and running in the shortest
     $pip3 install numpy
     ```
 
+* Scipy :
+
+    ```
+    $pip3 install scipy
+    ```
+
 * Bokeh :
 
     ```
     $pip3 install bokeh
     ```
 * MPI and mpi4py:
-    MPI is the C/C++ framework, mpi4py are the required python bindings. The following link will get you started:
+    MPI is the C/C++ framework, mpi4py are the required python bindings. The following links will get you started:
+
+    www.mpich.org/downloads
+    Packages are available for Fedora/Debian/MacOS and Windows
+    Make sure you install the development version as well as the main version.
+
+    Fedora
+    ```
+    $sudo dnf install mpich-devel mpich python3-mpi4py-mpich
+    ```
+
+    If mpiexec isn't found, add it to your path like so:
+    ```
+    export PATH=/usr/lib64/mpich/bin/:$PATH
+    ```
+    The MPICH path can obviously be different on your system.
 
     https://pypi.python.org/pypi/mpi4py
 
