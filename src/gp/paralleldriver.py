@@ -257,7 +257,7 @@ if __name__ == "__main__":
         c.ranges = ranges
 
     # Finalize
-    logger.info("Config is {} ".format(c.__dict__.items()))
+    #logger.info("Config is {} ".format(c.__dict__.items()))
 
     outputfolder += c.concatValues() + "/"
     logger.info("Creating outputfolder {} if it doesn't exist.".format(outputfolder))
