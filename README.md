@@ -7,7 +7,7 @@ This document gets you up and running in the shortest amount of time.
 ```
 $git clone https://bitbucket.org/bcardoen/csrm
 ```
-
+l
 ### Dependencies ###
 * Python3
 * Sortedcontainers :
@@ -33,6 +33,7 @@ $git clone https://bitbucket.org/bcardoen/csrm
     ```
     $pip3 install bokeh
     ```
+
 * MPI and mpi4py:
     MPI is the C/C++ framework, mpi4py are the required python bindings. The following links will get you started:
 
