@@ -5,7 +5,8 @@ The experiments use a fixed seed in order to guarantee determinism. Where releva
 An open source \href{https://bitbucket.org/bcardoen/csrm}{repository} holds the project's source code, benchmark scripts, analysis code and plots. The project dependencies are minimal making the project portable across any system that has a working Python3 implementation and pip as an installation manager. In order to run distributed the project requires an MPI implementation, which is available for most platforms.
 \subsection{Benchmark problems}
 Recent work on the convergence of GP-based SR \cite{SRAccur, SRBaseline} featured a set of benchmark problems that pose convergence problems for SR implementations. 
-These 15 problems use at most five features. CSRM does not know which features are used, making the problem harder. In other words it assumes each problem is a function of 5 features which may or may not influence the expected outcome. This is an extra test in robustness for the algorithm, while also testing the algorithm's capability as a classifier. 
+These 15 problems use at most five features, and are non linear arithmetic expressions using the standard set of base functions : (sin, cos, tan(h), log,$a^x$, /, *, modulo, abs, min, max, +, -).
+ CSRM does not know which features are used, making the problem harder. In other words it assumes each problem is a function of 5 features which may or may not influence the expected outcome. This is an extra test in robustness for the algorithm, while also testing the algorithm's capability as a classifier. 
 %\[
 %1.57 + (24.3*x_3)\]
 %\[0.23+14.2*\frac{x_3+x_1}{3.0*x_4}
@@ -29,39 +30,8 @@ These 15 problems use at most five features. CSRM does not know which features a
 
 
 \subsection{Experiment setup}
-\begin{itemize}
-\item population : 20
-\item minimum depth : 4
-\item maximum depth : 8
-\item phases : 20
-\item generations per phase : 20
-\item datapoints : 20
-\item range : [1,5]
-\item features : 5
-\item archivesize : 20
-\item expressions to archive per phase : 4
-\item optimization strategy : none
-\item communication size m : 2, 4
-\item topology : Tree, Random, Grid
-\item spreadpolicy : distribute
-\item processes n : 25
-\end{itemize}
-\paragraph{Discussion}
-From section \ref{subsec:commstrategies}
-we know that simply using m for all topologies will lead to unintended communication patterns. We test Tree and Random with m = 2, and Grid with m = 4. This results in the following number of messages per link :
-\begin{itemize}
-\item Grid : 1
-\item Tree : 1
-\item Random : 2
-\end{itemize}
-The total number of messages sent per phase is then :
-\begin{itemize}
-\item Grid : 4 * n = 200
-\item Tree : 1 * n = 25
-\item Random : 2 * n = 50
-\end{itemize}
-The value of m = 2 for Tree and m = 4 for Grid follows from our discussion in \ref{subsec:commstrategies}. The Random topology in this configuration has a single outgoing link per process, resulting in 2 messages per link. This configuration forms a balance between the different strategies.
-For 25 processes the grid topology is a simple square of 5x5. The tree topology with 25 processes is a non full binary tree with depth 4. The random topology is highly dependent on the seed. In this instance the topology has become a disconnected graph of 2 cycles. This highlights the risk of using a random topology, without extra constraints the characteristics of the communication pattern are unknown and can be undesirable.
+Each process has a population of 20, initial depth of 4, max depth of 8, executes 20 phases of 20 generations each, with an archivesize of 20. Per phase the 4 best expressions are archived, the spreading policy distributes the best expressions over the communication links. The benchmark functions have at most 5 features, each with 20 sample points in the range [1,5]. The Grid and Tree topology will have single expression per link, the Random topology will have 2 per link. 25 processes are used, resulting in respectively 400, 15 ,50 being sent per phase. The random topology in this case contains 2 cliques of cycles.
+
 %\begin{figure}
 %    \centering
 %    \begin{subfigure}{0.5\textwidth}
@@ -83,9 +53,9 @@ When the experiment ends the best 20 expressions from all processes are collecte
 Finally we record the mean fitness values of the best 5 expressions, both on the training and validation data. The mean is restricted to the upper quarter of the population specifically to measure how the best expressions are distributed. This measure records the convergence more accurately as the fittest expressions drive the convergence rate. 
 \paragraph{Calculation}
 The fitness values fluctuate strongly between the test problems and even between topologies. We apply a negative logarithmic scale :
-\[
+$
 f_t = -\log_{10}(f)
-\]
+$
 where f is either the best fitness value or the mean. Then we scale the results relative to the values obtained for the tree topology in order to measure relative gain or loss in orders of magnitude.
 \subsubsection{Results}
 \paragraph{Convergence}
@@ -120,8 +90,8 @@ Next we look at the mean fitness values on training and validation data. Interes
 
 
 
-\subparagraph{Synchronization overhead}
-From our discussion in \ref{subasync} we know that cycles in the topology will lead to excessive synchronization and even serialization.
+\subparagraph{Measuring Overhead}
+Cycles in the topology will lead to excessive synchronization and even serialization.
 We measure the mean execution time for testproblem 6. The convergence characteristics using the three topologies differed significantly making this a good testcase. The processes will communicate 25 times. If the runtime of a single phase is too long, the overhead of communication will become hard to measure. If it is too short the overhead dominates the entire runtime. This second case is one we should try to avoid, it will unfairly penalize topologies with cycles forcing them to serialize. The runtime of a phase is dependent on the generations, population and depth ranges of the expressions. Ideally we would like for a practitioner to choose these parameters based on the problem at hand and not be constrained by synchronization considerations.
 We compare the three topologies and use the disconnected or 'none' topology as a reference point, which has zero synchronization overhead.
 This last topology has an ideal speedup of n, where n is the processcount, compared to a sequential process. From the synchronization overhead we can then derive the speedup each of the topologies is able to offer. In practice even the 'none' topology will have some synchronization overhead, as the root process has to collect all results from the other processes.
@@ -141,17 +111,3 @@ This last topology has an ideal speedup of n, where n is the processcount, compa
     \label{fig:distributeddelayresults}
     \end{figure}
 In Figure \ref{fig:distributeddelayresults} we see that the tree topology has a near zero delay introduced by the synchronization. This is due to the delay tolerance we have built in in our implementation. The random topology has a mean delay factor of 1.3, the grid topology scores worst with a mean delay factor of nearly 2. This is easily translated in terms of speedup. A tree topology will have near linear speedup, a grid will have a speedup roughly half of that value and a random topology will have a speedup bracketed between those two. The standard deviation for the tree topology is significantly smaller indicating that a tree topology will have a far more predictable speedup.
-
-\subparagraph{Memory overhead}
-Memory overhead is hard to measure in a language with a garbage collector. We can estimate the overhead by calculating the needed memory in function of depth and topology used.
-Let the depth be constrained by [$d_i, d_x$], with n processes, m communicationsize and a distribution spreading policy. $D_i$ is the minimum depth and $d_x$ the maximum depth. If we let $d_a = \frac{d_i + d_x}{2}$ be the average depth, then the memory requirements on average for each topology are then given by
-\begin{itemize}
-\item Tree : $d_a \frac{m}{2} (n-1)$
-\item Random : $d_a \frac{m} n$
-\item Grid : $d_a \frac{m}{4} 4 n$
-\end{itemize}
-Note that $d_i$ is not necessarily equal to the initial depth. While rare, it is possible that CSRM evolves trees with a depth lower than the initial depth. Unless we constrain the operators from doing so trees will start with a depth of $d_i$ but then vary between 1 and $d_x$.
-Here m $>=$ 4 for a grid if we use distributing spreading policy. This leads us to an important observation. The Tree topology can communicate expressions with an average depth that is 2 times greater than the one used by the grid with the same memory usage. This factor is important, an increase in depth has an exponential effect on the complexity of the entire algorithm but also allows for more complex solutions. In addition an increased depth tolerates more bloat without losing accuracy. 
-%\subsection{Conclusion}
-%We have seen that a tree topology is able to offer a near linear speedup at the cost of a lower convergence rate. As the depth increases, the synchronization between processes decreases allowing for a better speedup. The distance in phases between processes will be at most the depth of the tree.
-%The random and grid topologies on the other hand can offer better convergence rates but require a longer runtime in order to achieve those values. A tree topology is able to communicate expressions with average depth twice that of the grid topology making it an attractive choice for practitioners. The random topology finds a balance between the characteristics of the tree and grid, but is non deterministic in its communication patterns. The resulting convergence and runtime will be influenced by each new random communication pattern, leading to uncertainty for the practitioner.
