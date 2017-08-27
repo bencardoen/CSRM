@@ -6,18 +6,11 @@
 \BOOKMARK [2][-]{subsection.2.3}{Approximated k-fold cross validation}{section.2}% 6
 \BOOKMARK [2][-]{subsection.2.4}{Topologies}{section.2}% 7
 \BOOKMARK [1][-]{section.3}{Experiments}{}% 8
-\BOOKMARK [2][-]{subsection.3.1}{Reproducability}{section.3}% 9
-\BOOKMARK [2][-]{subsection.3.2}{Benchmark problems}{section.3}% 10
-\BOOKMARK [2][-]{subsection.3.3}{Experiment setup}{section.3}% 11
-\BOOKMARK [3][-]{subsubsection.3.3.1}{Measures}{subsection.3.3}% 12
-\BOOKMARK [3][-]{subsubsection.3.3.2}{Results}{subsection.3.3}% 13
-\BOOKMARK [1][-]{section.4}{Use Case}{}% 14
-\BOOKMARK [2][-]{subsection.4.1}{Problem statement}{section.4}% 15
-\BOOKMARK [3][-]{subsubsection.4.1.1}{Experiment}{subsection.4.1}% 16
-\BOOKMARK [2][-]{subsection.4.2}{Results}{section.4}% 17
-\BOOKMARK [3][-]{subsubsection.4.2.1}{Fitness improvement}{subsection.4.2}% 18
-\BOOKMARK [3][-]{subsubsection.4.2.2}{Distributed}{subsection.4.2}% 19
-\BOOKMARK [2][-]{subsection.4.3}{Resulting Model}{section.4}% 20
-\BOOKMARK [1][-]{section.5}{Related Work}{}% 21
-\BOOKMARK [1][-]{section.6}{Conclusion}{}% 22
-\BOOKMARK [1][-]{section.7}{Future work}{}% 23
+\BOOKMARK [2][-]{subsubsection.3.0.1}{Results}{section.3}% 9
+\BOOKMARK [1][-]{section.4}{Use Case}{}% 10
+\BOOKMARK [2][-]{subsection.4.1}{Problem statement}{section.4}% 11
+\BOOKMARK [2][-]{subsection.4.2}{Results}{section.4}% 12
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Fitness improvement}{subsection.4.2}% 13
+\BOOKMARK [3][-]{subsubsection.4.2.2}{Distributed}{subsection.4.2}% 14
+\BOOKMARK [1][-]{section.5}{Related Work}{}% 15
+\BOOKMARK [1][-]{section.6}{Conclusion}{}% 16

@@ -3,7 +3,9 @@
 \usepackage{times}			
 \usepackage{url}
 \usepackage{pdflscape}
-\usepackage{adjustbox}			
+\usepackage{adjustbox}		
+\usepackage{cleveref}	
+\usepackage{subcaption}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows}
 \usepackage[pdftex]{hyperref}
@@ -22,15 +24,16 @@
 
 
 
-\title{Convergence of distributed symbolic regression.
+\title{Convergence of incremental distributed symbolic regression.
     }
 \author{
     %	\begin{tabular}{cccc}
     Ben Cardoen  \\
-    ben.cardoen@student.uantwerpen.be
+    {ben.cardoen@student.uantwerpen.be|bcardoen@sfu.ca}
     %		\multicolumn{3}{c}{\{firstname.lastname\}%@student.uantwerpen.be}
     %	\end{tabular}
 }
+\date{}
 \begin{document}
     
     \maketitle
@@ -48,8 +51,8 @@
     \input{relatedwork.tex}
     \section{Conclusion}
     \input{conclusion.tex}
-    \section{Future work}
-    \input{future.tex}
+%    \section{Future work}
+%    \input{future.tex}
     \bibliographystyle{acm}
     \bibliography{papers}
     
