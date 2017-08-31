@@ -1,11 +1,10 @@
-The experiments were performed on an Intel Xeon E5 2697 processor with 64GB Ram, with Ubuntu 16.04 LTS, kernel 4.4.0.
+The experiments were performed on an Intel Xeon E5 2697 processor with 64GB RAM, with Ubuntu 16.04 LTS, kernel 4.4.0.
 CSRM is implemented using Python3, the test system uses Python 3.5. 
 The experiments use a fixed seed in order to guarantee determinism. Where relevant the configuration is given. 
 An open source \href{https://bitbucket.org/bcardoen/csrm}{repository} holds the project's source code, benchmark scripts, analysis code and plots. The project dependencies are minimal making the project portable across any system that has a working Python3 implementation and pip as an installation manager. In order to run distributed the project requires an MPI implementation, which is available for most platforms.
 \paragraph{Benchmark problems}
 Recent work on the convergence of GP-based SR \cite{SRAccur, SRBaseline} featured a set of benchmark problems that pose convergence problems for SR implementations. 
-These 15 problems use at most five features, and are non linear arithmetic expressions using the standard set of base functions : (sin, cos, tan(h), log,$a^x$, /, *, modulo, abs, min, max, +, -).
- CSRM does not know which features are used, making the problem harder. In other words it assumes each problem is a function of 5 features which may or may not influence the expected outcome,  testing the robustness of the algorithm.
+These 15 problems use at most five features, and are non linear arithmetic expressions using the standard set of base functions : (sin, cos, tan(h), log,$a^x$, /, *, modulo, abs, min, max, +, -). CSRM does not know which features are used, making the problem harder. In other words it assumes each problem is a function of 5 features which may or may not influence the expected outcome, testing the robustness of the algorithm.
 \paragraph{Experiment setup}
 Each process has a population of 20, initial depth of 4, max depth of 8, executes 20 phases of 20 generations each, with an archivesize of 20. Per phase the 4 best expressions are archived, the spreading policy distributes the best expressions over the communication links. The benchmark functions have at most 5 features, each with 20 sample points in the range [1,5]. The Grid and Tree topology will have single expression per link, the Random topology will have 2 per link. 25 processes are used, resulting in respectively 400, 15 ,50 being sent per phase. The random topology in this case contains 2 cliques of cycles.
 When the experiment ends the best 20 expressions from all processes are collected and scored. We measure best fitness on the training data, and best fitness on the validated data. 
