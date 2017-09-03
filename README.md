@@ -1,6 +1,15 @@
 # README #
 
-This document gets you up and running in the shortest amount of time.
+### About
+CSRM (Convergence of Symbolic Regression using Metaheuristics) is an incremental distributed Symbolic Regression tool written in Python. Unlike most optimization tools it will provide you with an extensive amount of data (visual and logged) of how it evolved its solution.
+
+The remainder of this document gets you up and running in the shortest amount of time.
+
+This project fulfilled the requirement for my Master Thesis in Computer Science at the University of Antwerp, Belgium, under the guidance of Prof. Dr. Jan Broeckhove.
+
+For the thesis text please see :
+
+    ./thesis/thesis/MsCThesisBenCardoen.pdf
 
 ### Getting the code
 
