@@ -17,7 +17,8 @@
         VERSION:     '0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
@@ -26,8 +27,6 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="CSRM 0.0 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -67,10 +66,10 @@
     <span class="n">MAXFITNESS</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># Size limit for exponents</span>
     <span class="n">EXPONENT_LIMIT</span> <span class="o">=</span> <span class="mi">20</span>
-    <span class="n">BASE_LIMIT</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e10</span>
+    <span class="n">BASE_LIMIT</span> <span class="o">=</span> <span class="mf">1e10</span>
     <span class="c1"># ensure that a value isn&#39;t too small, it won&#39;t be representable in IEEE754, leading</span>
     <span class="c1"># to overflow error</span>
-    <span class="n">LOWER_LIMIT</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span>
+    <span class="n">LOWER_LIMIT</span> <span class="o">=</span> <span class="mf">1e-12</span>
     <span class="c1"># Legal range for constants</span>
     <span class="c1"># Setting this to high values leads to explosion in fitness values</span>
     <span class="n">CONSTANTS_LOWER</span><span class="o">=</span><span class="mi">0</span>
@@ -145,8 +144,8 @@
       &copy;2016, Ben Cardoen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>
 

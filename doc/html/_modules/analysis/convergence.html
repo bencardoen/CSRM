@@ -17,7 +17,8 @@
         VERSION:     '0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
@@ -26,8 +27,6 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="CSRM 0.0 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -57,9 +56,12 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">webbrowser</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">reduce</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">expression.tools</span> <span class="k">import</span> <span class="n">copyObject</span>
+<span class="kn">from</span> <span class="nn">analysis.outputwriter</span> <span class="k">import</span> <span class="n">OutputWriter</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;global&#39;</span><span class="p">)</span>
 
 
@@ -90,7 +92,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Convergence.__init__"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.Convergence.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">convergencestats</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convergencestats</span> <span class="o">=</span> <span class="n">convergencestats</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_convergencestats</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plotAll</span><span class="p">()</span></div>
@@ -216,12 +218,15 @@
 
 
 <div class="viewcode-block" id="SummarizedResults"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.SummarizedResults">[docs]</a><span class="k">class</span> <span class="nc">SummarizedResults</span><span class="p">(</span><span class="n">Plotter</span><span class="p">):</span>
-<div class="viewcode-block" id="SummarizedResults.__init__"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.SummarizedResults.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+<div class="viewcode-block" id="SummarizedResults.__init__"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.SummarizedResults.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bestpath</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plotAll</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SummarizedResults.saveBest"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.SummarizedResults.saveBest">[docs]</a>    <span class="k">def</span> <span class="nf">saveBest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+
         <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Filename is still None!!&quot;</span><span class="p">)</span>
             <span class="k">assert</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
@@ -233,8 +238,19 @@
         <span class="n">pl</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sscored</span><span class="p">)</span> <span class="o">/</span> <span class="n">rl</span><span class="p">)</span>
         <span class="n">sscored</span> <span class="o">=</span> <span class="n">sscored</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">pl</span><span class="p">]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sscored</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sscored</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">s</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">mname</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">OutputWriter</span><span class="p">(</span><span class="n">sscored</span><span class="p">,</span> <span class="n">mname</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Fitness&quot;</span><span class="p">,</span> <span class="s2">&quot;Expression&quot;</span><span class="p">],</span> <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bestpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">mname</span><span class="p">)</span>
+        <span class="n">o</span><span class="o">.</span><span class="n">writePage</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SummarizedResults.displayBest"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.SummarizedResults.displayBest">[docs]</a>    <span class="k">def</span> <span class="nf">displayBest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bestpath</span><span class="p">:</span>
+            <span class="n">webbrowser</span><span class="o">.</span><span class="n">open_new_tab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bestpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Results weren&#39;t saved, path has not been set !&quot;</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="SummarizedResults.plotFitness"><a class="viewcode-back" href="../../analysis.html#analysis.convergence.SummarizedResults.plotFitness">[docs]</a>    <span class="k">def</span> <span class="nf">plotFitness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">fitness</span> <span class="o">=</span> <span class="n">rmtocm</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;fitness&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">])</span>
@@ -352,8 +368,8 @@
       &copy;2016, Ben Cardoen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>
 

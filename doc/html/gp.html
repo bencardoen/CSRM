@@ -17,7 +17,8 @@
         VERSION:     '0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -26,7 +27,6 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="CSRM 0.0 documentation" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -106,7 +106,7 @@
 
 <dl class="method">
 <dt id="gp.algorithm.BruteCoolingElitist.requireMutation">
-<code class="descname">requireMutation</code><span class="sig-paren">(</span><em>popindex: int</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/gp/algorithm.html#BruteCoolingElitist.requireMutation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteCoolingElitist.requireMutation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">requireMutation</code><span class="sig-paren">(</span><em>popindex: int</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/gp/algorithm.html#BruteCoolingElitist.requireMutation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.BruteCoolingElitist.requireMutation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -165,8 +165,8 @@ a single fitter sample, then obviously fitness will not improve any further.
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>X</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; a list of feature values, per feature an equal length sublist</li>
-<li><strong>Y</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; a list of response values</li>
+<li><strong>X</strong> (<em>list</em>) &#8211; a list of feature values, per feature an equal length sublist</li>
+<li><strong>Y</strong> (<em>list</em>) &#8211; a list of response values</li>
 <li><strong>popsize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; maximum population size</li>
 <li><strong>maxdepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; the maximum depth a tree is initialized to</li>
 <li><strong>generations</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; generations to iterate</li>
@@ -231,10 +231,10 @@ The generation process will skip constant expressions.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>selection</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; a subset of the population selected</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>selection</strong> (<em>list</em>) &#8211; a subset of the population selected</td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Return tuple modified:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body">a tuple of modified samples based on selection, and changes made</td>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">a tuple of modified samples based on selection, and changes made</td>
 </tr>
 </tbody>
 </table>
@@ -337,7 +337,7 @@ Each sublist is indiced by generation and holds a dict:&#8221;fitness&#8221;, &#
 
 <dl class="method">
 <dt id="gp.algorithm.GPAlgorithm.requireMutation">
-<code class="descname">requireMutation</code><span class="sig-paren">(</span><em>popindex: int</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.requireMutation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.requireMutation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">requireMutation</code><span class="sig-paren">(</span><em>popindex: int</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/gp/algorithm.html#GPAlgorithm.requireMutation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.GPAlgorithm.requireMutation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decide if mutation is desirable</p>
 </dd></dl>
 
@@ -437,7 +437,7 @@ called methods to alter behavior</p>
 
 <dl class="function">
 <dt id="gp.algorithm.probabilityMutate">
-<code class="descclassname">gp.algorithm.</code><code class="descname">probabilityMutate</code><span class="sig-paren">(</span><em>generation: int</em>, <em>generations: int</em>, <em>ranking: int</em>, <em>population: int</em>, <em>rng: random.Random = None</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/gp/algorithm.html#probabilityMutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.probabilityMutate" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">gp.algorithm.</code><code class="descname">probabilityMutate</code><span class="sig-paren">(</span><em>generation: int</em>, <em>generations: int</em>, <em>ranking: int</em>, <em>population: int</em>, <em>rng: random.Random = None</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/gp/algorithm.html#probabilityMutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.algorithm.probabilityMutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a probability to mutate based on 2 parameters : the current generation and the the ranking of the sample.</p>
 <p>A fitter sample (either by age (generation) or rank) is less likely to gain from mutation, and will even lose fitness.
 The probability that random information introduced by mutation leads to a better result compared with evolved information decreases.
@@ -463,231 +463,38 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 </dd></dl>
 
 </div>
-<div class="section" id="module-gp.parallelalgorithm">
-<span id="gp-parallelalgorithm-module"></span><h2>gp.parallelalgorithm module<a class="headerlink" href="#module-gp.parallelalgorithm" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="gp.parallelalgorithm.ParallelGP">
-<em class="property">class </em><code class="descclassname">gp.parallelalgorithm.</code><code class="descname">ParallelGP</code><span class="sig-paren">(</span><em>algo: gp.algorithm.GPAlgorithm</em>, <em>X</em>, <em>Y</em>, <em>communicationsize: int = None</em>, <em>topo: gp.topology.Topology = None</em>, <em>pid=None</em>, <em>Communicator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Parallel GP Algorithm.</p>
-<p>Executes a composite GP algorithm in parallel, adding communication and synchronization to the algorithm.</p>
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>algo: gp.algorithm.GPAlgorithm</em>, <em>X</em>, <em>Y</em>, <em>communicationsize: int = None</em>, <em>topo: gp.topology.Topology = None</em>, <em>pid=None</em>, <em>Communicator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a PGP instance using an existing GP algo.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>algo</strong> &#8211; Enclosed algorithm</li>
-<li><strong>communicationsize</strong> &#8211; Nr of samples to request from the algorithm for distribution</li>
-<li><strong>topo</strong> &#8211; topology to use in communications</li>
-<li><strong>pid</strong> &#8211; Process id. Either MPI rank or manually set. This value determines the process&#8217; location in the topology. (e.g. pid=0 is root in a tree)</li>
-<li><strong>Communicator</strong> &#8211; MPI Comm object</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="gp.parallelalgorithm.ParallelGP.algorithm">
-<code class="descname">algorithm</code><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.algorithm" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.collectSummaries">
-<code class="descname">collectSummaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.collectSummaries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.collectSummaries" title="Permalink to this definition">¶</a></dt>
-<dd><p>If root process, get all summarized results from the other processes.</p>
-<p>If not root, send to root all results.
-:returns : None if not pid==0, else all collectResults</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="gp.parallelalgorithm.ParallelGP.communicator">
-<code class="descname">communicator</code><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.communicator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.executeAlgorithm">
-<code class="descname">executeAlgorithm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.executeAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.executeAlgorithm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main driver method</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.executePhase">
-<code class="descname">executePhase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.executePhase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.executePhase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run a single phase of the algorithm.</p>
-<p>This step executes a limited number of generations (depending on the algorithm)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="gp.parallelalgorithm.ParallelGP.phases">
-<code class="descname">phases</code><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.phases" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="gp.parallelalgorithm.ParallelGP.pid">
-<code class="descname">pid</code><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.pid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.receive">
-<code class="descname">receive</code><span class="sig-paren">(</span><em>buffer</em>, <em>source: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.receive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.receive" title="Permalink to this definition">¶</a></dt>
-<dd><p>Receive from process <em>source</em> buffer</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.receiveCommunications">
-<code class="descname">receiveCommunications</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.receiveCommunications"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.receiveCommunications" title="Permalink to this definition">¶</a></dt>
-<dd><p>Receive incoming samples (blocking) and update the algorithm</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.reportOutput">
-<code class="descname">reportOutput</code><span class="sig-paren">(</span><em>save=False</em>, <em>display=False</em>, <em>outputfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.reportOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.reportOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Report output either to file or browser.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>save</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Save results to file</li>
-<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Display results in browser (WARNING : CPU intensive for large sets)</li>
-<li><strong>outputfolder</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; modify output directory</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.send">
-<code class="descname">send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.send" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve samples from the algorithm, lookup targets in the topology and send them.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="gp.parallelalgorithm.ParallelGP.spreadpolicy">
-<code class="descname">spreadpolicy</code><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.spreadpolicy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.summarizeResults">
-<code class="descname">summarizeResults</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.summarizeResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.summarizeResults" title="Permalink to this definition">¶</a></dt>
-<dd><p>After the algorithm has completed, collect results on the entire data set (ict samples)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="gp.parallelalgorithm.ParallelGP.topo">
-<code class="descname">topo</code><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.topo" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.ParallelGP.waitForSendRequests">
-<code class="descname">waitForSendRequests</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#ParallelGP.waitForSendRequests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.ParallelGP.waitForSendRequests" title="Permalink to this definition">¶</a></dt>
-<dd><p>Before initiation a new send operation, ensure our last transmission was completed by checking the stored requests.</p>
-<p>After this method completes all sent buffers and requests are purged.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="gp.parallelalgorithm.SequentialPGP">
-<em class="property">class </em><code class="descclassname">gp.parallelalgorithm.</code><code class="descname">SequentialPGP</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>archivesize=None</em>, <em>communicationsize=None</em>, <em>initialdepth=None</em>, <em>archivefile=None</em>, <em>optimizer=None</em>, <em>optimizestrategy=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Executes Parallel GP in sequential mode, controlling a set of processes.</p>
-<p>This is a driver class for the ParallelGP class, to be used when MPI is not active.</p>
-<dl class="method">
-<dt id="gp.parallelalgorithm.SequentialPGP.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>processcount: int</em>, <em>popsize: int</em>, <em>maxdepth: int</em>, <em>fitnessfunction</em>, <em>seed: int</em>, <em>generations: int</em>, <em>phases: int</em>, <em>topo: gp.topology.Topology = None</em>, <em>archivesize=None</em>, <em>communicationsize=None</em>, <em>initialdepth=None</em>, <em>archivefile=None</em>, <em>optimizer=None</em>, <em>optimizestrategy=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a SeqPGP instance, driving a set of GP instances.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>X</strong> &#8211; Input data set, a set of points per feature.</li>
-<li><strong>Y</strong> &#8211; Output data set to approximate</li>
-<li><strong>processcount</strong> &#8211; Number of active processes</li>
-<li><strong>popsize</strong> &#8211; Population (per process instance)</li>
-<li><strong>maxdepth</strong> &#8211; Maximum depth of a tree</li>
-<li><strong>communicationsize</strong> &#8211; Nr of samples sent per process</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.SequentialPGP.collectSummaries">
-<code class="descname">collectSummaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.collectSummaries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.collectSummaries" title="Permalink to this definition">¶</a></dt>
-<dd><p>From all processes, get summarized results.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.SequentialPGP.executeAlgorithm">
-<code class="descname">executeAlgorithm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.executeAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.executeAlgorithm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main driver for the algorithm.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="gp.parallelalgorithm.SequentialPGP.reportOutput">
-<code class="descname">reportOutput</code><span class="sig-paren">(</span><em>save=False</em>, <em>display=False</em>, <em>outputfolder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#SequentialPGP.reportOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.SequentialPGP.reportOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Report output of all processes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>save</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Save results to file</li>
-<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Display results in browser (WARNING : CPU intensive for large sets)</li>
-<li><strong>outputfolder</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; modify output directory</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="gp.parallelalgorithm.isMPI">
-<code class="descclassname">gp.parallelalgorithm.</code><code class="descname">isMPI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#isMPI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.isMPI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="gp.parallelalgorithm.reportOutput">
-<code class="descclassname">gp.parallelalgorithm.</code><code class="descname">reportOutput</code><span class="sig-paren">(</span><em>processes</em>, <em>X</em>, <em>Y</em>, <em>save=False</em>, <em>display=False</em>, <em>outputfolder=None</em>, <em>pid=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/parallelalgorithm.html#reportOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.parallelalgorithm.reportOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Report output of all processes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>save</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Save results to file</li>
-<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Display results in browser (WARNING : CPU intensive for large sets)</li>
-<li><strong>outputfolder</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; modify output directory</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<div class="section" id="gp-parallelalgorithm-module">
+<h2>gp.parallelalgorithm module<a class="headerlink" href="#gp-parallelalgorithm-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-gp.topology">
 <span id="gp-topology-module"></span><h2>gp.topology module<a class="headerlink" href="#module-gp.topology" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="gp.topology.InvertedTreeTopology">
+<em class="property">class </em><code class="descclassname">gp.topology.</code><code class="descname">InvertedTreeTopology</code><span class="sig-paren">(</span><em>size: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#InvertedTreeTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.InvertedTreeTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gp.topology.TreeTopology" title="gp.topology.TreeTopology"><code class="xref py py-class docutils literal"><span class="pre">gp.topology.TreeTopology</span></code></a></p>
+<p>Inverted Tree where all children send to parents, focussing into the root.</p>
+<dl class="method">
+<dt id="gp.topology.InvertedTreeTopology.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>size: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#InvertedTreeTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.InvertedTreeTopology.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.topology.InvertedTreeTopology.getSource">
+<code class="descname">getSource</code><span class="sig-paren">(</span><em>target: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#InvertedTreeTopology.getSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.InvertedTreeTopology.getSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.topology.InvertedTreeTopology.getTarget">
+<code class="descname">getTarget</code><span class="sig-paren">(</span><em>source: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#InvertedTreeTopology.getTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.InvertedTreeTopology.getTarget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="gp.topology.NoneTopology">
 <em class="property">class </em><code class="descclassname">gp.topology.</code><code class="descname">NoneTopology</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#NoneTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gp.topology.Topology" title="gp.topology.Topology"><code class="xref py py-class docutils literal"><span class="pre">gp.topology.Topology</span></code></a></p>
-<p>Stub class for a sequential sinle instances process.</p>
+<p>Stub class for a sequential single instances process.</p>
 <dl class="method">
 <dt id="gp.topology.NoneTopology.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/topology.html#NoneTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology.__init__" title="Permalink to this definition">¶</a></dt>
@@ -695,12 +502,12 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 
 <dl class="method">
 <dt id="gp.topology.NoneTopology.getSource">
-<code class="descname">getSource</code><span class="sig-paren">(</span><em>target: int</em><span class="sig-paren">)</span> &rarr; list<a class="reference internal" href="_modules/gp/topology.html#NoneTopology.getSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology.getSource" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getSource</code><span class="sig-paren">(</span><em>target: int</em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/gp/topology.html#NoneTopology.getSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology.getSource" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="gp.topology.NoneTopology.getTarget">
-<code class="descname">getTarget</code><span class="sig-paren">(</span><em>source: int</em><span class="sig-paren">)</span> &rarr; list<a class="reference internal" href="_modules/gp/topology.html#NoneTopology.getTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology.getTarget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getTarget</code><span class="sig-paren">(</span><em>source: int</em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/gp/topology.html#NoneTopology.getTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.NoneTopology.getTarget" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -733,12 +540,12 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 
 <dl class="method">
 <dt id="gp.topology.RandomStaticTopology.getSource">
-<code class="descname">getSource</code><span class="sig-paren">(</span><em>target: int</em><span class="sig-paren">)</span> &rarr; list<a class="reference internal" href="_modules/gp/topology.html#RandomStaticTopology.getSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.RandomStaticTopology.getSource" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getSource</code><span class="sig-paren">(</span><em>target: int</em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/gp/topology.html#RandomStaticTopology.getSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.RandomStaticTopology.getSource" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="gp.topology.RandomStaticTopology.getTarget">
-<code class="descname">getTarget</code><span class="sig-paren">(</span><em>source: int</em><span class="sig-paren">)</span> &rarr; list<a class="reference internal" href="_modules/gp/topology.html#RandomStaticTopology.getTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.RandomStaticTopology.getTarget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getTarget</code><span class="sig-paren">(</span><em>source: int</em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/gp/topology.html#RandomStaticTopology.getTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.RandomStaticTopology.getTarget" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -793,12 +600,12 @@ This function estimates this probability, thereby avoiding unnecessary mutations
 
 <dl class="method">
 <dt id="gp.topology.Topology.getSource">
-<code class="descname">getSource</code><span class="sig-paren">(</span><em>target: int</em><span class="sig-paren">)</span> &rarr; list<a class="reference internal" href="_modules/gp/topology.html#Topology.getSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.Topology.getSource" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getSource</code><span class="sig-paren">(</span><em>target: int</em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/gp/topology.html#Topology.getSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.Topology.getSource" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="gp.topology.Topology.getTarget">
-<code class="descname">getTarget</code><span class="sig-paren">(</span><em>source: int</em><span class="sig-paren">)</span> &rarr; list<a class="reference internal" href="_modules/gp/topology.html#Topology.getTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.Topology.getTarget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getTarget</code><span class="sig-paren">(</span><em>source: int</em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/gp/topology.html#Topology.getTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.Topology.getTarget" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -853,7 +660,7 @@ With each node generating independently, the pipeline effect is largely avoided.
 
 <dl class="method">
 <dt id="gp.topology.TreeTopology.isLeaf">
-<code class="descname">isLeaf</code><span class="sig-paren">(</span><em>node: int</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/gp/topology.html#TreeTopology.isLeaf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.TreeTopology.isLeaf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">isLeaf</code><span class="sig-paren">(</span><em>node: int</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/gp/topology.html#TreeTopology.isLeaf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.topology.TreeTopology.isLeaf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return true if node is a leaf.</p>
 </dd></dl>
 
@@ -902,18 +709,8 @@ node 0 is connected to [8,1,6,3]</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-gp.paralleldriver">
-<span id="gp-paralleldriver-module"></span><h2>gp.paralleldriver module<a class="headerlink" href="#module-gp.paralleldriver" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="gp.paralleldriver.runBenchmark">
-<code class="descclassname">gp.paralleldriver.</code><code class="descname">runBenchmark</code><span class="sig-paren">(</span><em>config</em>, <em>topo=None</em>, <em>processcount=None</em>, <em>outfolder=None</em>, <em>X=None</em>, <em>Y=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/paralleldriver.html#runBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.paralleldriver.runBenchmark" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="gp.paralleldriver.updateConfig">
-<code class="descclassname">gp.paralleldriver.</code><code class="descname">updateConfig</code><span class="sig-paren">(</span><em>configobj</em>, <em>attributes</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/paralleldriver.html#updateConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.paralleldriver.updateConfig" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="gp-paralleldriver-module">
+<h2>gp.paralleldriver module<a class="headerlink" href="#gp-paralleldriver-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-gp.population">
 <span id="gp-population-module"></span><h2>gp.population module<a class="headerlink" href="#module-gp.population" title="Permalink to this headline">¶</a></h2>
@@ -1113,132 +910,8 @@ node 0 is connected to [8,1,6,3]</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-gp.testalgorithm">
-<span id="gp-testalgorithm-module"></span><h2>gp.testalgorithm module<a class="headerlink" href="#module-gp.testalgorithm" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="gp.testalgorithm.GPTest">
-<em class="property">class </em><code class="descclassname">gp.testalgorithm.</code><code class="descname">GPTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testBmark">
-<code class="descname">testBmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testBmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testBmark" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testBruteElitistExtended">
-<code class="descname">testBruteElitistExtended</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testBruteElitistExtended"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testBruteElitistExtended" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testConvergence">
-<code class="descname">testConvergence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testConvergence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testConvergence" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testCooling">
-<code class="descname">testCooling</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testCooling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testCooling" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testDeterminism">
-<code class="descname">testDeterminism</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testDeterminism"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testDeterminism" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ensure that the algorithm runs deterministic if a seed is set.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testFolding">
-<code class="descname">testFolding</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testFolding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testFolding" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testIncremental">
-<code class="descname">testIncremental</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testIncremental"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testIncremental" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testInitialization">
-<code class="descname">testInitialization</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testInitialization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testInitialization" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testPopulation">
-<code class="descname">testPopulation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testPopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testPopulation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testTournament">
-<code class="descname">testTournament</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testTournament"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testTournament" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.GPTest.testVariableDepth">
-<code class="descname">testVariableDepth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#GPTest.testVariableDepth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.GPTest.testVariableDepth" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="gp.testalgorithm.PGPTest">
-<em class="property">class </em><code class="descclassname">gp.testalgorithm.</code><code class="descname">PGPTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#PGPTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.PGPTest" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
-<dl class="method">
-<dt id="gp.testalgorithm.PGPTest.testAllTopologies">
-<code class="descname">testAllTopologies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#PGPTest.testAllTopologies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.PGPTest.testAllTopologies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.PGPTest.testConstruct">
-<code class="descname">testConstruct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#PGPTest.testConstruct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.PGPTest.testConstruct" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.PGPTest.testParallelWrite">
-<code class="descname">testParallelWrite</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#PGPTest.testParallelWrite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.PGPTest.testParallelWrite" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="gp.testalgorithm.TopologyTest">
-<em class="property">class </em><code class="descclassname">gp.testalgorithm.</code><code class="descname">TopologyTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#TopologyTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.TopologyTest" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
-<dl class="method">
-<dt id="gp.testalgorithm.TopologyTest.testCycle">
-<code class="descname">testCycle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#TopologyTest.testCycle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.TopologyTest.testCycle" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.TopologyTest.testInverse">
-<code class="descname">testInverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#TopologyTest.testInverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.TopologyTest.testInverse" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.TopologyTest.testMultiLink">
-<code class="descname">testMultiLink</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#TopologyTest.testMultiLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.TopologyTest.testMultiLink" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.TopologyTest.testSpreadPolicy">
-<code class="descname">testSpreadPolicy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#TopologyTest.testSpreadPolicy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.TopologyTest.testSpreadPolicy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.TopologyTest.testTreeTopology">
-<code class="descname">testTreeTopology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#TopologyTest.testTreeTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.TopologyTest.testTreeTopology" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="gp.testalgorithm.TopologyTest.testVNTopology">
-<code class="descname">testVNTopology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#TopologyTest.testVNTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.TopologyTest.testVNTopology" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="gp.testalgorithm.generateForest">
-<code class="descclassname">gp.testalgorithm.</code><code class="descname">generateForest</code><span class="sig-paren">(</span><em>fsize=10</em>, <em>depth=4</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gp/testalgorithm.html#generateForest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.testalgorithm.generateForest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="gp-testalgorithm-module">
+<h2>gp.testalgorithm module<a class="headerlink" href="#gp-testalgorithm-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-gp">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-gp" title="Permalink to this headline">¶</a></h2>
@@ -1256,11 +929,11 @@ node 0 is connected to [8,1,6,3]</p>
 <li><a class="reference internal" href="#">gp package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-gp.algorithm">gp.algorithm module</a></li>
-<li><a class="reference internal" href="#module-gp.parallelalgorithm">gp.parallelalgorithm module</a></li>
+<li><a class="reference internal" href="#gp-parallelalgorithm-module">gp.parallelalgorithm module</a></li>
 <li><a class="reference internal" href="#module-gp.topology">gp.topology module</a></li>
-<li><a class="reference internal" href="#module-gp.paralleldriver">gp.paralleldriver module</a></li>
+<li><a class="reference internal" href="#gp-paralleldriver-module">gp.paralleldriver module</a></li>
 <li><a class="reference internal" href="#module-gp.population">gp.population module</a></li>
-<li><a class="reference internal" href="#module-gp.testalgorithm">gp.testalgorithm module</a></li>
+<li><a class="reference internal" href="#gp-testalgorithm-module">gp.testalgorithm module</a></li>
 <li><a class="reference internal" href="#module-gp">Module contents</a></li>
 </ul>
 </li>
@@ -1275,7 +948,7 @@ node 0 is connected to [8,1,6,3]</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/gp.txt"
+      <li><a href="_sources/gp.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -1297,11 +970,11 @@ node 0 is connected to [8,1,6,3]</p>
       &copy;2016, Ben Cardoen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/gp.txt"
+      <a href="_sources/gp.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

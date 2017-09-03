@@ -17,7 +17,8 @@
         VERSION:     '0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -26,7 +27,6 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="CSRM 0.0 documentation" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -191,11 +191,16 @@
 
 <dl class="class">
 <dt id="analysis.convergence.SummarizedResults">
-<em class="property">class </em><code class="descclassname">analysis.convergence.</code><code class="descname">SummarizedResults</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">analysis.convergence.</code><code class="descname">SummarizedResults</code><span class="sig-paren">(</span><em>results</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#analysis.convergence.Plotter" title="analysis.convergence.Plotter"><code class="xref py py-class docutils literal"><span class="pre">analysis.convergence.Plotter</span></code></a></p>
 <dl class="method">
 <dt id="analysis.convergence.SummarizedResults.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>results</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="analysis.convergence.SummarizedResults.displayBest">
+<code class="descname">displayBest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/analysis/convergence.html#SummarizedResults.displayBest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analysis.convergence.SummarizedResults.displayBest" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -330,7 +335,7 @@ E.g. [1,2,2], scale=2 -&gt; {1:2/3, 2:4/3}</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/analysis.txt"
+      <li><a href="_sources/analysis.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -352,11 +357,11 @@ E.g. [1,2,2], scale=2 -&gt; {1:2/3, 2:4/3}</p>
       &copy;2016, Ben Cardoen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/analysis.txt"
+      <a href="_sources/analysis.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

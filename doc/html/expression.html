@@ -17,7 +17,8 @@
         VERSION:     '0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -26,7 +27,6 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="CSRM 0.0 documentation" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -205,8 +205,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>actual</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; Y&#8217;, actual approximated valus</li>
-<li><strong>expected</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; Y, expected values</li>
+<li><strong>actual</strong> (<em>list</em>) &#8211; Y&#8217;, actual approximated valus</li>
+<li><strong>expected</strong> (<em>list</em>) &#8211; Y, expected values</li>
 <li><strong>tree</strong> (<a class="reference internal" href="#expression.tree.Tree" title="expression.tree.Tree"><em>Tree</em></a>) &#8211; the instance to operate on</li>
 <li><strong>distancefunction</strong> (<em>function</em>) &#8211; function object that accepts actual, expected as parameters and returns a numerical distance. If None, rootmeansquare is used.</li>
 </ul>
@@ -1083,6 +1083,16 @@ With mindepthratio set, the</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="expression.testtree.TreeTest.testPrint30">
+<code class="descname">testPrint30</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testPrint30"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testPrint30" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="expression.testtree.TreeTest.testPrintUseCase">
+<code class="descname">testPrintUseCase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testPrintUseCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testPrintUseCase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="expression.testtree.TreeTest.testRandom">
 <code class="descname">testRandom</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/expression/testtree.html#TreeTest.testRandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.testtree.TreeTest.testRandom" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1345,7 +1355,7 @@ The returned value is in the range [0, 1] with 0 optimal distance.</p>
 
 <dl class="function">
 <dt id="expression.tools.powerOf2">
-<code class="descclassname">expression.tools.</code><code class="descname">powerOf2</code><span class="sig-paren">(</span><em>a: int</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/expression/tools.html#powerOf2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.powerOf2" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">expression.tools.</code><code class="descname">powerOf2</code><span class="sig-paren">(</span><em>a: int</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/expression/tools.html#powerOf2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#expression.tools.powerOf2" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1364,7 +1374,7 @@ The returned value is in the range [0, 1] with 0 optimal distance.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lst</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; modified in place, at the last call the list is empty.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lst</strong> (<em>list</em>) &#8211; modified in place, at the last call the list is empty.</td>
 </tr>
 </tbody>
 </table>
@@ -1685,7 +1695,7 @@ Bottom up construction allows for far faster detection of invalid (sub) trees.</
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Returns expression.tree.Tree:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">A randomized tree.</p>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first last">A randomized tree.</p>
 </td>
 </tr>
 </tbody>
@@ -1832,7 +1842,7 @@ Bottom up construction allows for far faster detection of invalid (sub) trees.</
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/expression.txt"
+      <li><a href="_sources/expression.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -1854,11 +1864,11 @@ Bottom up construction allows for far faster detection of invalid (sub) trees.</
       &copy;2016, Ben Cardoen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.9</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/expression.txt"
+      <a href="_sources/expression.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
