@@ -7,7 +7,7 @@ This document gets you up and running in the shortest amount of time.
 ```
 $git clone https://bitbucket.org/bcardoen/csrm
 ```
-l
+
 ### Dependencies ###
 * Python3
 * Sortedcontainers :
@@ -37,7 +37,10 @@ l
 * MPI and mpi4py:
     MPI is the C/C++ framework, mpi4py are the required python bindings. The following links will get you started:
 
-    www.mpich.org/downloads
+    https://www.mpich.org/downloads
+
+    https://pypi.python.org/pypi/mpi4py
+
     Packages are available for Fedora/Debian/MacOS and Windows
     Make sure you install the development version as well as the main version.
 
@@ -51,8 +54,6 @@ l
     export PATH=/usr/lib64/mpich/bin/:$PATH
     ```
     The MPICH path can obviously be different on your system.
-
-    https://pypi.python.org/pypi/mpi4py
 
     On Ubuntu a typical install would be
     ```
@@ -72,7 +73,7 @@ You can execute the tests from the 'src' folder by executing:
 ```
 
 
-For most of the tests tree are generated, these are written in dot format in the 'output' folder.
+For most of the tests trees are generated in dot format in the 'output' folder.
 A small script is present in this folder that call graphviz to render the trees in svg format, run from within the output folder:
 
 ```Shell
@@ -113,7 +114,6 @@ CSRM writes a JSON and HTML file per process. In addition a summarized file (in 
 I will give you two copy-pasteable commands that 'just work'. The first is a sequential run, the second a distributed run.
 
 * Sequential
-
 ```Python
 $python3 -m gp.paralleldriver -x doe/input.csv10 -q 3 -y doe/output.csv10 -d 10 -c 1 -f 20 -p 20 -g 20 -v
 ```
@@ -145,7 +145,8 @@ $mpiexec -n 3 python3 -m gp.paralleldriver -x doe/input.csv10 -q 3 -y doe/output
 ```
 Note that we use MPI now to prefix the command string, and specify both the number of processes and the topology
 
--n <processcount> Has to match -c <>
+-n <processcount> Has to match -c
+
 -t <topology> The topology to use. Use either tree, grid, none or random.
 
 The results are again written to file and displayed in a browser of your choice.
