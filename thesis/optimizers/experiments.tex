@@ -1,0 +1,100 @@
+All benchmarks were performed on an Intel Xeon E5 2697 processor with 64GB Ram, with Ubuntu 16.04 LTS, kernel 4.4.0 as operating system. CSRM is implemented using Python3, the test system uses Python 3.5.  The experiments use a fixed seed in order to guarantee determinism. Where relevant the configuration is given. An open source \href{https://bitbucket.org/bcardoen/csrm}{repository} holds the project's source code, benchmark scripts, analysis code and plots and extra material. 
+Recent work on the convergence of GP-based SR \cite{SRAccur, SRBaseline} featured a set of benchmark problems that pose convergence problems for SR implementations, using at most five features. CSRM does not know which features are used, making the problem harder. 
+\subsubsection{Optimizer experiments setup}
+We test the 15 expressions with the following configuration:
+\begin{itemize}
+\item population : 20
+\item minimum depth : 4
+\item maximum depth : 10
+\item phases : (2, 5, 10)
+\item generations per phase : 20
+\item datapoints : 20
+\item range : [1,5]
+\item features : 5
+\item archivesize : 20
+\item expressions to archive per phase : 4
+\item optimization strategy : optimize expressions archived at end of phase
+\end{itemize}
+\subsubsection{Measures}
+We compare the relative gain in fitness compared to not using an optimizer for all expressions. 
+In other words, if $m_n$ is a measure obtained by the algorithm without the optimizer, and $m_a$ the same measure with the optimizer, we then define the relative gain as $ g_{ma} = \frac{m_n}{m_a} $ If $m_a$ is zero, we use $-log_{10}(m_n)$ to represent the gain. If both are zero, the gain is obviously 1. A value of g $>$ 1 indicates the ratio with which the optimizer improves the result. A g value $<$ 1 indicates a regression. These 15 functions have wildly varying convergence behavior. In order to make sense of the data, we then apply a log scale $ g_{lma} = - \log_{10}(g_{ma}) $.
+As measures we use the best fitness value on the training data, and the best on the full data set. We take the mean of the fitness of the 5 best expressions on training and the full data as well. This last measure gives us an indication on how the optimization process acts on the 'best' set of the population. Note that in our configuration, the 4 best expressions are always optimized.
+\subsubsection{2 Phases}
+In Figure \ref{fig:2phase} we see the performance of the algorithms on training data. 
+We see that for the training fitness data the improvements are significant, with ABC scoring an increase of 2.5 orders of magnitude for problem 6. For the other problems the increase is still large, especially given that our fitness function has a range of [0,1].
+We also observe the significant regression for problem 6. This is likely caused due to overfitting. The algorithm in question (DE) optimizes the 4 best candidates of the last phase, but it is possible that these optimized expressions actually form a local optimum for the training data which has poor fitness values for the validation data. By archiving these the convergence of the algorithm is hindered in the next phase. Note that DE allows equality updates, where expressions with the same fitness values are accepted as better. The same behavior occurs in a far less significant effect for expressions 7 and 9. A second explanation is our implementation of the population. The algorithm enforces distinct fitness values for all expressions. In an edge case it is possible that these optimized samples form a barrier, preventing other expressions from evolving past them. The optimized expressions in effect trap the rest of the population, which given our low generation count can explain this behavior. The mean fitness of the 5 best expressions shows significant improvements. Important to observe is the similarity between the two plots, the correlation between fitness values on training and full data is strong. This was a concern in the setup of the experiments. The optimizers could introduce overfitting on the training data. This risk is mitigated by the relatively low number of iterations each optimizer has been allocated. For the minimum fitness on the full data ABC outperforms the others. For the mean evaluation PSO is a good candidate. In this stage of the experiments, there is no single algorithm that is ideal for all problems. This once again confirms the NFL theorem \cite{NFL}.
+\paragraph{5 Phases}
+With 5 phases we see in Figure\ref{fig:5phase} a more diverse effect. While ABC scores exceptionally good on problem 6, in sharp contrast with the 2 phase experiment, we see that PSO scores overall better for the training data. These results are logarithmic scaled, an improvement in fitness of factor 10 results in a value of 1 in the plots. When it comes to improving the mean of the best 5 expressions, PSO is a stable choice if we disregard the outlier values for problem 5. The correlation between training and full fitness scores is good for both measures. This demonstrates that the optimizer is not in this experiment introducing overfitting on the training data. The adverse effect of the optimizer on some test problems is still present. For the best fitness values on the full data DE is the better candidate. While ABC scores exceptionally high on problem 6, DE scores better overall. When we look at the mean there is no clear winner. 
+\begin{figure*}
+    \centering
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+    \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases2_mintrainfitness.png}
+    \caption{Relative gain in best fitness of training data - 2 phases}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+     \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases2_minfullfitness.png}
+    \caption{Relative gain in best fitness of full data - 2 phases}
+    \end{subfigure}
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+    \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases2_meantrainfitness.png}
+    \caption{Relative gain in mean fitness of 5 best on training data - 2 phases}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+    \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases2_meanfullfitness.png}
+    \caption{Relative gain in mean fitness of 5 best on full data - 2 phases}
+    \label{fig:2phase}
+    \end{subfigure}
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases5_mintrainfitness.png}
+        \caption{Relative gain in best fitness of training data - 5 phases}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases5_minfullfitness.png}
+        \caption{Relative gain in best fitness of full data - 5 phases}
+    \end{subfigure}
+        \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases5_meantrainfitness.png}
+        \caption{Relative gain in mean fitness of 5 best on training data - 5 phases}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases5_meanfullfitness.png}
+        \caption{Relative gain in mean fitness of 5 best on full data - 5 phases}
+        \label{fig:5phase}
+    \end{subfigure}
+        \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_mintrainfitness.png}
+        \caption{Relative gain in best fitness of training data - 10 phases}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_minfullfitness.png}
+        \caption{Relative gain in best fitness of full data - 10 phases}
+    \end{subfigure}
+        \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_meantrainfitness.png}
+        \caption{Relative gain in mean fitness of 5 best on training data - 10 phases}
+    \end{subfigure}%
+    \begin{subfigure}{0.6\textwidth}
+    \centering
+        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_meanfullfitness.png}
+        \caption{Relative gain in mean fitness of 5 best on full data - 10 phases}
+            \label{fig:10phase}
+    \end{subfigure}
+
+    \caption{Relative gain of optimizer after 2,5,10 phases.}
+%    \label{fig:5phase}
+\end{figure*}
+\paragraph{10 Phases}
+If we observe the convergence after 10 phases we see a more pronounced effect. In Figure \ref{fig:10phase} we see that for several problems the optimizers are no longer improving w.r.t the unoptimized algorithm. This only holds for the best values, for the mean values the improvements are still significant. It becomes clear that the optimizer can force the algorithm into a local optimum from which it becomes hard to escape. The correlation between fitness results on the training data and full data is starting to weaken as well, in comparison to the experiments with 2 and 5 phases. 
+If we look at the fitness values for the full data DE is the more stable of the three algorithms. When it regresses its losses are smaller than the others, while its gains are strongest on the most problems. For the mean fitness of the full data a similar argument can be made, with the exception of problem 2 where DE fails severely.
+Another aspect is that after 100 generations the fitness values are extremely small, in the order of 1e-15. We measure the relative gain with respect to the algorithm without an optimizer, but as the fitness values decrease rounding errors start to influence the calculations more and more. The fitness values are approaching the floating point epsilon values. For our implementation epsilon is set at 2.22 e-16. For problem 0, a minimum fitness value of 0 is found after 2 phases. For others far more iterations are needed. We need to make a trade-off in order to be able to compare all 15 problems. Giving each problem an equal budget in iterations is the more fair approach. Another approach is implementing a stop condition that halts within a certain distance of a desired fitness threshold, but this approach is fraught with issues. There is no guarantee exactly how many iterations are needed. This approach requires knowing the problem 'hardness' \cite{GPHardness} in advance, but by the very definition of our problem statement we do not know how hard our problem is. 

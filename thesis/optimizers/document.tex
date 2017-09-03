@@ -1,0 +1,60 @@
+\documentclass[twocolumn]{article}
+
+\usepackage{times}			
+\usepackage{url}
+\usepackage{pdflscape}
+\usepackage{adjustbox}		
+\usepackage{cleveref}	
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\usepackage[pdftex]{hyperref}
+\usepackage[numbers]{natbib}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{graphicx}
+
+%Tikz flowchart
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, text width=3cm, draw=black]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
+
+\title{Convergence of symbolic regression using metaheuristics.
+    }
+\author{
+    %	\begin{tabular}{cccc}
+    Ben Cardoen  \\
+    {ben.cardoen@student.uantwerpen.be|bcardoen@sfu.ca}
+    % TODO fill out with names of collaborators (e.g. Jan, Lander, Elise)
+    %		\multicolumn{3}{c}{\{firstname.lastname\}%@student.uantwerpen.be}
+    %	\end{tabular}
+}
+\date{}
+\begin{document}
+    
+    \maketitle
+    \section{Abstract}
+    \input{abstract.tex}
+    \section{Introduction and design}
+%    \input{introduction.tex}
+%    \section{Design}\label{secdesign}
+    \input{design.tex}
+    \section{Constant optimization}\label{secconstopt}
+    \input{constantoptimization.tex}
+    \section{Experiments}\label{secexperiments}
+    \input{experiments.tex}
+    \section{Related Work}
+    \input{relatedwork.tex}
+%	\section{Future work}
+%    \input{future.tex}
+    \section{Conclusion}
+    \input{conclusion.tex}
+    \bibliographystyle{acm}
+    \bibliography{papers}
+    
+\end{document}
