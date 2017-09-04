@@ -5,11 +5,13 @@ The algorithm accepts a matrix X = n x k of input data, and a vector Y = 1 x k o
 The goal of the algorithm is to find f' such that $ d(f(X), f'(X))=\epsilon$ results in $\epsilon$ minimal. F is the process we wish to approximate with f'. Not all distance functions are equally well suited for this purpose. A simple root mean squared error (RMSE) function has the issue of scale, the range of this function is [0, +$\infty$), which makes comparison problematic, especially if we want to combine it with other objective functions. A simple linear weighted sum requires that all terms use the same scale.
 Normalization of RMSE is an option, however there is no single recommended approach to obtain this NRMSE.
 In this work we use a distance function based on the Pearson Correlation Coefficient r. Specifically, we define
-\[
-d(Y, Y') = 1 - 
-\lvert \frac{\sum_{i=0}^{n}{(y_i-E[Y])*(y'_i-E[Y'])}}{\sqrt{\sum_{j=0}^{n}{(y_j-E[Y])^2}*\sum_{k=0}^{n}{(y'_k-E[Y'])^2}}}
+\begin{equation}
+\begin{aligned}
+d(Y, Y') = & \\ 1 - 
+ \lvert \frac{\sum_{i=0}^{n}{(y_i-E[Y])*(y'_i-E[Y'])}}{\sqrt{\sum_{j=0}^{n}{(y_j-E[Y])^2}*\sum_{k=0}^{n}{(y'_k-E[Y'])^2}}}
 \lvert 
-\]
+\end{aligned}
+\end{equation}
 R has a range of [-1, 1] indicating negative linear and linear correlation between Y and Y' respectively, and 0 indicates no correlation. The distance function d has a range [0,1] which facilitates comparison across domains and allows combining it with other objective functions. The function reflects the aim of the algorithm. We not only want to assign a good (i.e. minimal) fitness value to a model that has a minimal distance, we also want to consider linearity between Y an Y'. The use of the Pearson correlation coefficient as a fitness measure is not new, a variant of this approach is used in \citep{pearson}.
 \paragraph{Genetic Programming Implementation}
 We use Genetic Programming (GP) \cite{GP} to find a solution to the problem statement. The GP algorithm controls a population of expressions, represented as trees, that are initialized, evolved using operators and selected to simulate evolution.
