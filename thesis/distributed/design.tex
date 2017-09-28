@@ -1,5 +1,5 @@
-Our tool is implemented in Python. The language offers portability, access to rich libraries and fast development cycles. The disadvantages are speed and memory usage compared with compiled languages (e.g. C++) or newer scripting languages (e.g Julia).
-Furthermore, Python's usage of a global interpreter lock makes shared memory parallelism not feasible. Distributed programming is possible using MPI.
+Our tool is implemented in Python. It offers portability, rich libraries and fast development cycles. The disadvantages compared with compiled languages (e.g. C++) or newer scripting languages (e.g Julia) are speed and memory footprint.
+Furthermore, Python's use of a global interpreter lock makes shared memory parallelism infeasible. Distributed programming is possible using MPI.
 \subsection{Algorithm}
 The algorithm accepts a matrix X = n x k of input data, and a vector Y = 1 x k of expected data. It will evolve expressions that result, when evaluated on X, in an 1 x k vector Y' that approximates Y. N is the number of features, or parameters, the expression can use. We do not know in advance if all features are needed, which makes the problem statement even harder.
 The goal of the algorithm is to find f' such that
