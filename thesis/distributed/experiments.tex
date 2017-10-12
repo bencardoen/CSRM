@@ -1,20 +1,26 @@
-An open source \href{https://bitbucket.org/bcardoen/csrm}{repository} holds the project's source code, benchmark scripts, analysis code and plots. Additional results, left out here due to space constraints are covered in \href{https://bitbucket.org/bcardoen/csrm/src/9de4b990ce27bbaeb885203f82a76635d8d92473/thesis/thesis/MsCThesisBenCardoen.pdf?at=master&fileviewer=file-view-default}{work}. The project dependencies are minimal making the project portable across any system with Python3, pip as an installation manager and MPI.
+%%!TEX root = document.tex
 
-The experiments were performed on an Intel Xeon E5 2697 processor with 64GB RAM, with Ubuntu 16.04 LTS.  The experiments use a fixed seed in order to guarantee reproducibility. Where relevant we specify the parameter configuration.
+The project's source code, benchmark scripts, analysis code and plots are provided in an open source  \href{https://bitbucket.org/bcardoen/csrm}{repository}. Additional results, left out here due to space constraints are covered in \href{https://bitbucket.org/bcardoen/csrm/src/9de4b990ce27bbaeb885203f82a76635d8d92473/thesis/thesis/MsCThesisBenCardoen.pdf?at=master&fileviewer=file-view-default}{work}.
+The experiments were performed on an Intel Xeon E5 2697 processor with 64GB RAM, with Ubuntu 16.04 LTS.  The experiments use a fixed seed in order to guarantee reproducibility. 
+%Where relevant we specify the parameter configuration.
  
 \paragraph{Benchmark problems}
 Recent work on the convergence of GP-based SR \cite{SRAccur, SRBaseline} featured a set of benchmarks that pose convergence problems for SR implementations. 
-These 15 benchmarks use at most five features and are non linear arithmetic expressions using standard base functions : (sin, cos, tan(h), log,$a^x$, /, *, modulo, abs, min, max, +, -). CSRM does not know which features are used, making the problem even harder. In other words it only assumes each problem is a function of 5 features which may or may not influence the expected outcome, testing the robustness of the algorithm.
+These 15 benchmarks use at most five features and are non-linear arithmetic expressions using standard base functions : (sin, cos, tan(h), log,$a^x$, /, *, modulo, abs, min, max, +, -). CSRM does not know in advance which features are used. It only assumes that each problem is a function of maximum 5 features, testing the robustness of the algorithm.
 
 \paragraph{Experiment setup}
-Each process has a population of 20, initial depth of 4, max depth of 8, executes 20 phases of 20 generations each, with an archivesize of 20. Per phase the 4 best expressions are archived, the spreading policy distributes the best expressions over the communication links. The benchmark functions have at most 5 features, each with 20 sample points in the range [1,5]. The Grid and Tree topology will have single expression per link, the Random topology will have 2 per link. 25 processes are used, resulting in respectively 400, 15 ,50 being sent per phase. The random topology in this case contains 2 cliques of cycles.
+Each process has a population of 20 expression trees with an initial depth of 4, max depth of 8, executes 20 phases of 20 runs or generations with an archive size of 20 expressions. Per phase, the 4 best expressions are archived. The benchmark functions have at most 5 features with 20 sample points in the range [1,5]. The Grid and Tree topology share their best expression per link, the Random topology shares 2 expressions per link. We used 25 processes, resulting in respectively 400, 15, 50 expressions being sent per phase. The random topology in this case contains 2 cliques of cycles.
 
-When the experiment ends the best 20 expressions from all processes are collected and scored. We measure best fitness on the training data, and best fitness on the validated data. 
-Finally we record the mean fitness values of the best 5 expressions, both on the training and validation data. The mean is restricted to the upper quarter of the population specifically to measure how the best expressions are distributed. This measure records the convergence more accurately as the fittest expressions drive the convergence rate. 
+At the end of an experiment, the best 20 expressions from all processes are collected and scored. We measure the fitness on the training data, and the fitness on the validation data. 
+Finally, we record the mean fitness values of the best 5 expressions, both on the training and validation data, as convergence rate.
+The mean is restricted to the upper quarter of the population specifically to measure how the best expressions are distributed. %LW: dit begrijp ik net...
+%This measure records the convergence more accurately as the fittest expressions drive the convergence rate. 
+Fitness values fluctuate strongly across test problems and topologies. The results are presented in relative to the Tree topology to measure a relative gain or loss in orders of magnitude.
+% on a negative logarithmic scale : $f_t = -\log_{10}(f)$ where f is the ratio of the best fitness values. 
+%LW: the scale is not relevant is you present a ratio. It is used for both measures...
 
-Fitness values fluctuate strongly between across test problems and topologies. We apply a negative logarithmic scale : $f_t = -\log_{10}(f)$ where f is either the best fitness value or the mean. Then we scale the results relative to the values obtained for the tree topology in order to measure relative gain or loss in orders of magnitude.
 
-\subsubsection{Results}
+%\subsubsection{Results}
 \paragraph{Convergence}
 \begin{figure*}
     \centering
@@ -41,6 +47,7 @@ Fitness values fluctuate strongly between across test problems and topologies. W
     \caption{Convergence differences between topologies.}
     \label{fig:distributedresults}
 \end{figure*}
+
 \begin{figure}
 	\begin{subfigure}{0.5\textwidth}\label{fig:csrmkfold}
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/validationcsrm.png}
@@ -57,10 +64,16 @@ Fitness values fluctuate strongly between across test problems and topologies. W
     \label{fig:ckfold}
  \end{figure}
 
-In Figure \ref{fig:distributedresults} we see how the topology affects convergence. The first observation we make is that the first 5 benchmarks, with exception of the second, all have identical values for best fitness on training and validation data. The processes converged to zero fitness values for these problems, hence the identical results. The training fitness results in Figure \ref{fig:distributedresults}a indicate that the grid and random topology have superior convergence characteristics compared to the tree topology, with grid outperforming random on several benchmarks. When we look at the fitness values on the validation data in Figure \ref{fig:distributedresults}b we see a more nuanced result. Overall the grid topology is the best choice, the random topology has worse results for problems 11 and 12. Next we look at the mean fitness values on training and validation data. Interestingly enough for problem 0 both random and grid score far worse than the tree topology. Overall the grid topology is still better for most problems, with the exception of problem 7. Note the similarity in pattern in the results here between training and validation data indicating that the predictive capability of the results is still good. If overfitting would have taken place we would see a reverse pattern in the results for the validation data.
+%Figure \ref{fig:distributedresults} shows large differences in the fitness based on the topology. 
+%For the best fitness, the first 5 benchmarks, with exception of the second, all have identical values on training and validation data. The processes converged to zero fitness values for these problems, hence the identical results. 
+The fitness results on the training data, presented in Figure \ref{fig:distributedresults}a, indicate that the Grid and Random topology have superior convergence characteristics compared to the Tree topology, with Grid outperforming Random on several benchmarks. When we look at the fitness values on the validation data in Figure \ref{fig:distributedresults}b, we observe more nuanced results. Overall, the Grid topology is the best choice regarding best fitness values and the Random topology sometimes performs inferior compared to the Tree topology (e.g. benchmark 11 and 12). If we look at the mean fitness values on training and validation data, the Tree topology outperforms the Grid and Random topology on 2 benchmarks. However, the Grid topology performs still the best for most problems, with the exception of benchmark 7 where the Random topology dominates. The similarity between the results of the training and validation data, both for the best and mean fitness, indicates a good predictive capability since overfitting would result in a reverse patterns for the training and validation data.
 
 \paragraph{Measuring Overhead}
-Cycles in the topology lead to excessive synchronization and even serialization. We measure the mean execution time for benchmark 6. The convergence characteristics using the three topologies differ significantly making this a good testcase. The processes will communicate 25 times. If the runtime of a single phase is too long, communication overhead becomes hard to measure. If it is too short, overhead dominates the entire runtime. This second case is one we should try to avoid, it will unfairly penalize topologies with cycles forcing them to serialize. The runtime of a phase is dependent on the generations, population and depth ranges of the expressions. Ideally we would like for a practitioner to choose these parameters based on the problem at hand and not be constrained by synchronization considerations. To compare the three topologies, we use the disconnected or 'none' topology as a reference point, as it has zero synchronization overhead and has an ideal speedup of n, where n is the processcount. From the synchronization overhead we can then derive the speedup each of the topologies is able to offer. In practice even the 'none' topology will have some synchronization overhead, as the root process has to collect all results.
+Cycles in the topology lead to excessive synchronization and serialization. We measure the mean execution time for benchmark 6, which leads to different convergence characteristics based on the topology, making this a good testcase. The processes will communicate 25 times. 
+The runtime of one phase depends on the number of generations, population size and depth ranges of the expressions. 
+Ideally, we would like for a user to choose these parameters based on the problem at hand and not be constrained by synchronization considerations. To compare the three topologies, we use the disconnected or 'none' topology as a reference point, as it has zero synchronization overhead and has an ideal speed-up of n, where n is the processcount. From the synchronization overhead we can then derive the speed-up each of the topologies is able to offer. In practice even the 'none' topology will have some synchronization overhead, as the root process has to collect all results.
+Measuring communication overhead becomes hard if the runtime of a single phase is very long. If they are is too short, overhead dominates the entire runtime and it will unfairly penalize topologies with cycles forcing them to serialize. 
+
 \begin{figure*}
     \centering
     \begin{subfigure}{0.5\textwidth}
@@ -76,4 +89,8 @@ Cycles in the topology lead to excessive synchronization and even serialization.
     \caption{Synchronization overhead introduced by topologies.}
     \label{fig:distributeddelayresults}
     \end{figure*}
-In Figure \ref{fig:distributeddelayresults} we see that the tree topology has near zero delay caused by the synchronization. This is due to the delay tolerance we have built in in our implementation. The random topology has a mean delay factor of 1.3, the grid topology  has a mean delay factor of nearly 2. This is easily translated in terms of speedup. A tree topology will have near linear speedup, a grid will have a speedup roughly half of that value and a random topology will have a speedup bracketed between those two. The standard deviation for the tree topology is significantly smaller indicating that a tree topology will have a far more predictable speedup.
+    
+Figure \ref{fig:distributeddelayresults} shows that the Tree topology has almost no delay caused by synchronization. This is due to the delay tolerance we have built in in our implementation. The Random topology has an average delay factor of 1.3 and the Grid topology has an average delay factor of nearly 2. This is easily translated in terms of speed-up. As such, the Tree topology will have near linear speedup, a Grid topology roughly half of that and a Random topology will have an intermediate speed-up. The standard deviation on the speed-up for the Tree topology is significantly smaller indicating a predictable speed-up.
+
+%LW: do the performance results of the other benchmarks show the same message? If so, please mention this, and refer to the thesis. If not, please explain why...
+
