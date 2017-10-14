@@ -13,11 +13,12 @@ Each process has a population of 20 expression trees with an initial depth of 4,
 
 At the end of an experiment, the best 20 expressions from all processes are collected and scored. We measure the fitness on the training data, and the fitness on the validation data. 
 Finally, we record the mean fitness values of the best 5 expressions, both on the training and validation data, as convergence rate.
-The mean is restricted to the upper quarter of the population specifically to measure how the best expressions are distributed. %LW: dit begrijp ik net...
-%This measure records the convergence more accurately as the fittest expressions drive the convergence rate. 
+The mean is restricted to the upper quarter of the population specifically to measure how the best expressions are distributed. %LW: dit begrijp ik net... 
+% BC : De population mean is gevoelig aan outliers, e.g. 0.01, 0.02, 0.9,1,1,1 in edge cases (0.01 best, 1 worst), dus ik neem de mean van de best x om naar de 'effective subpopulation' te kijken.
+This measure records the convergence more accurately as the fittest expressions drive the convergence rate, or put differently, it ignores the effect outliers would otherwise have on the mean.
 Fitness values fluctuate strongly across test problems and topologies. The results are presented in relative to the Tree topology to measure a relative gain or loss in orders of magnitude.
 % on a negative logarithmic scale : $f_t = -\log_{10}(f)$ where f is the ratio of the best fitness values. 
-%LW: the scale is not relevant is you present a ratio. It is used for both measures...
+%LW: the scale is not relevant is you present a ratio. It is used for both measures... // agreed
 
 
 %\subsubsection{Results}
@@ -90,7 +91,9 @@ Measuring communication overhead becomes hard if the runtime of a single phase i
     \label{fig:distributeddelayresults}
     \end{figure*}
     
-Figure \ref{fig:distributeddelayresults} shows that the Tree topology has almost no delay caused by synchronization. This is due to the delay tolerance we have built in in our implementation. The Random topology has an average delay factor of 1.3 and the Grid topology has an average delay factor of nearly 2. This is easily translated in terms of speed-up. As such, the Tree topology will have near linear speedup, a Grid topology roughly half of that and a Random topology will have an intermediate speed-up. The standard deviation on the speed-up for the Tree topology is significantly smaller indicating a predictable speed-up.
+Figure \ref{fig:distributeddelayresults} shows that the Tree topology has almost no delay caused by synchronization. This is due to the delay tolerance we have built in in our implementation. The Random topology has an average delay factor of 1.3 and the Grid topology has an average delay factor of nearly 2. This is easily translated in terms of speed-up. As such, the Tree topology will have near linear speedup, a Grid topology roughly half of that and a Random topology will have an intermediate speed-up. The standard deviation on the speed-up for the Tree topology is significantly smaller indicating a predictable speed-up. 
+It should be noted that selecting a different benchmark will lead to differing convergence characteristics, which in turn can mask synchronization effects. However, covering all benchmarks with all possible configurations is outside the computation scope of this work. 
 
 %LW: do the performance results of the other benchmarks show the same message? If so, please mention this, and refer to the thesis. If not, please explain why...
+%BC : You're right, but it's impossible to test all cases. So I have the implication (Topology -> Speedup) but this depends on the problem instance, which depends on the configuration. So all I can say is that our assumption is not disproved by this sample problem. E.g. more difficult or easier problems would actually mask or underline the synchronization effects.
 

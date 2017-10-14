@@ -1,7 +1,7 @@
 %%!TEX root = document.tex
 
 The reference work of E. Alba \cite{parallelmetaheuristics} provides a broad overview of the challenges and advantages of parallel metaheuristics. 
-In a random island model for a parallel GP-SR implementation \citep{DGPSR}, processes are allowed to ignore messages. The authors argue that this promotes niching, where `contamination' of locally (per process) fit expressions could introduce premature convergence. The advantage of such a system is speed-up, since no process has to waits on other processes. %Another difference with our approach is the message exchange protocol. 
+In a random island model for a parallel GP-SR implementation \citep{DGPSR}, processes are allowed to ignore messages. The authors argue that this promotes niching, where `contamination' of locally (per process) fit expressions could introduce premature convergence. The advantage of such a system is speed-up, since no process has to wait on other processes. Another difference with our approach is the message exchange protocol. 
 This approach interleaves message exchange with computation during a phase, which allows for a heterogeneous set of processes. 
 
 Another approach is a master slave topology in combination with a load balancing algorithm between the slaves \citep{DFGPSR}. The slaves are not separate algorithms: they are assigned a subset of the population and only compute the fitness function. Selection and evolution are performed by the master process. This fine grained approach offers a speed-up compared to a sequential GP-SR, but it does not increase the coverage of the search space. 
