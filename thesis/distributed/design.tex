@@ -11,8 +11,11 @@ Not all distance functions are equally well suited for this purpose. A simple ro
 Normalization of RMSE is an option, however there is no single recommended approach to obtain this NRMSE.
 In this work we use a distance function based on the Pearson Correlation Coefficient r. Specifically, we define
 \[
+r(Y, Y') = \frac{\sum_{i=0}^{n}{(y_i-E[Y])*(y'_i-E[Y'])}}{\sqrt{\sum_{j=0}^{n}{(y_j-E[Y])^2}*\sum_{k=0}^{n}{(y'_k-E[Y'])^2}}}
+\]
+\[
 d(Y, Y') = 1 - 
-\lvert \frac{\sum_{i=0}^{n}{(y_i-E[Y])*(y'_i-E[Y'])}}{\sqrt{\sum_{j=0}^{n}{(y_j-E[Y])^2}*\sum_{k=0}^{n}{(y'_k-E[Y'])^2}}}
+\lvert r
  \lvert 
  \]
 The correlation coefficient ranges from -1 to 1, indicating negative linear and linear correlation between Y and Y', respectively, and 0 indicates no correlation. The distance function d has a range [0,1], which facilitates comparison across domains and allow us to make combinations with other objective functions. We not only want to assign a good (i.e. minimal) fitness value to a model that has a minimal distance, we also want to consider linearity between Y an Y'. The use of the Pearson Correlation Coefficient as a fitness measure has been used in \citep{pearson}.
