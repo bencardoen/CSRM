@@ -1,4 +1,5 @@
 %%!TEX root = document.tex
+Symbolic regression (SR) is a supervised learning algorithm that fits variable length mathematical expression on a set of input features within a certain error distance to an expected output. SR evolves form and weights of the expression in tandem, unlike other forms of regression that only focus on the parameters. Its goal is to find a symbolic expression that best explains the observed data while at the same time being interpretable by the user.
 
 \subsection{Algorithm}
 The algorithm requires input data in a matrix X = n x k, and a vector Y = 1 x k of expected data, with n is the number of features, or parameters. It will generate and evolve expressions to obtain an 1 x k vector Y' that approximates Y when evaluated on X. We do not know in advance if all features are equally important to predict the response, which increases the complexity.
