@@ -50,6 +50,7 @@ Fitness values fluctuate strongly across test problems and topologies. The resul
 \end{figure*}
 
 \begin{figure}
+    \label{fig:ckfold}
 	\begin{subfigure}{0.5\textwidth}\label{fig:csrmkfold}
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/validationcsrm.png}
     \caption{Approximation of k fold cross validation \\with parallel processes, k = 4,  r = $\frac{3}{4}$.}
@@ -60,7 +61,7 @@ Fitness values fluctuate strongly across test problems and topologies. The resul
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/kfold.png}
     \caption{Visualization of k fold cross validation with k = 4.}
     \end{subfigure}%
-    \label{fig:ckfold}
+    \caption{K fold cross validation approximation in CSRM.}
  \end{figure}
 
 %Figure \ref{fig:distributedresults} shows large differences in the fitness based on the topology. 
