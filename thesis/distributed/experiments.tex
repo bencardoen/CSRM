@@ -27,22 +27,22 @@ Fitness values fluctuate strongly across test problems and topologies. The resul
     \centering
     \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\linewidth]{figures/distributedbesttraining.png}
+        \includegraphics[width=0.6\linewidth]{figures/distributedbesttraining.png}
         \caption{Relative gain in best fitness of training data}
     \end{subfigure}%
     \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\linewidth]{figures/distributedbestvalidated.png}
+        \includegraphics[width=0.6\linewidth]{figures/distributedbestvalidated.png}
         \caption{Relative gain in best fitness on full data.}
     \end{subfigure}
         \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\linewidth]{figures/distributedmeantraining.png}
+        \includegraphics[width=0.6\linewidth]{figures/distributedmeantraining.png}
         \caption{Relative gain in mean fitness on training data.}
     \end{subfigure}%
     \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\linewidth]{figures/distributedmeanvalidated.png}
+        \includegraphics[width=0.6\linewidth]{figures/distributedmeanvalidated.png}
         \caption{Relative gain in mean fitness on full data.}
     \end{subfigure}
     \caption{Convergence differences between topologies.}
@@ -52,16 +52,14 @@ Fitness values fluctuate strongly across test problems and topologies. The resul
 \begin{figure}
 	\begin{subfigure}{0.5\textwidth}\label{fig:csrmkfold}
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/validationcsrm.png}
-    \caption{Approximation of k fold cross validation with parallel processes, k = 4,  r = $\frac{3}{4}$.}
+    \caption{Approximation of k fold cross validation \\with parallel processes, k = 4,  r = $\frac{3}{4}$.}
     \end{subfigure}
 	\begin{subfigure}{0.5\textwidth}    \label{fig:kfold}
 
     \centering
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/kfold.png}
     \caption{Visualization of k fold cross validation with k = 4.}
-%    \label{fig:kfold}
     \end{subfigure}%
-%    \caption{Topologies in CSRM.}
     \label{fig:ckfold}
  \end{figure}
 
@@ -79,13 +77,13 @@ Measuring communication overhead becomes hard if the runtime of a single phase i
     \centering
     \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\linewidth]{figures/distributeddelaymean.png}
+        \includegraphics[width=0.7\linewidth]{figures/distributeddelaymean.png}
         \caption{Mean synchronization delay factor.}
     \end{subfigure}%
     \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\linewidth]{figures/distributeddelaysd.png}
-        \caption{Standard deviation of synchronization delay factor.}
+        \includegraphics[width=0.7\linewidth]{figures/distributeddelaysd.png}
+        \caption{Standard deviation of \\synchronization delay factor.}
     \end{subfigure}
     \caption{Synchronization overhead introduced by topologies.}
     \label{fig:distributeddelayresults}

@@ -50,31 +50,33 @@ This is a typical example of overfitting. The combined 10-20-30 run increases va
 We performed the 10-20-30 analysis also in the distributed setting and compared the topologies in terms of fitness improvement and speed-up. We used 25 processes in a Tree, Grid and Random and   Disconnected topology. Figure \ref{fig:usecasedistributed} presents the gain in fitness on the validation data for the Tree, Grid and Random topologies compared to the Disconnected topology. We observed that the diffusion in the Grid topology leads to the highest gain, followed by the Tree topology. Interestingly, the Random topology scored less than the Disconnected topology. This can occur when an early local optimum dominates the remainder of the process. The effect on runtime is showed in Figure \ref{fig:usecasespeedup}, with the Tree topology encountering minimal overhead. The Grid topology has a performance penalty of factor 2 and the Random topology performed intermediate. During the experiments, we observed that the progress of the processes in the Tree and Disconnected topologies could vary up to 4 phases. This can be explained by the distance between two processes in the Tree topology, which is at most 4 (depth of a 25-node binary tree). As such, if we increase the number of processes in the Tree topology, it will scale better. %The delay tolerance allows the tree topology this scaling effect.
 
 \begin{figure}
-    \begin{subfigure}{0.5\textwidth}
-        \includegraphics[width=0.8\linewidth]{figures/usecasedistributed.png}
+    \begin{subfigure}{0.7\textwidth}
+        \includegraphics[width=0.7\linewidth]{figures/usecasedistributed.png}
 		\caption{Incremental distributed CSRM applied to use case.}
 		\label{fig:usecasedistributed}
     \end{subfigure}
-    \begin{subfigure}{0.5\textwidth}
-        \includegraphics[width=0.8\linewidth]{figures/usecasespeedup.png}
-		\caption{Runtime impact of synchronization and communication overhead.}
+    \begin{subfigure}{0.7\textwidth}
+        \includegraphics[width=0.7\linewidth]{figures/usecasespeedup.png}
+		\caption{Runtime impact of synchronization\\ and communication overhead.}
 		\label{fig:usecasespeedup}
     \end{subfigure}
-        \begin{subfigure}{0.5\textwidth}
-        \includegraphics[width=0.8\linewidth]{figures/incrementalgain.png}
+        \begin{subfigure}{0.7\textwidth}
+        \includegraphics[width=0.7\linewidth]{figures/incrementalgain.png}
         \caption{Incremental fitness gain in CSRM.}
         \label{fig:incrementalgain}
     \end{subfigure}
-        \begin{subfigure}{0.5\textwidth}
-        \includegraphics[width=0.5\linewidth]{figures/responseR.png}
+\end{figure}
+\begin{figure}
+    \begin{subfigure}{0.7\textwidth}
+        \includegraphics[width=0.7\linewidth]{figures/responseR.png}
         \caption{Response of attack rate to R.}
     \end{subfigure}
-    \begin{subfigure}{0.5\textwidth}
-        \includegraphics[width=0.5\linewidth]{figures/responseS.png}
+    \begin{subfigure}{0.7\textwidth}
+        \includegraphics[width=0.7\linewidth]{figures/responseS.png}
         \caption{Response of attack rate to S.}
     \end{subfigure}
-        \begin{subfigure}{0.5\textwidth}
-        \includegraphics[width=0.5\linewidth]{figures/responseI.png}
+        \begin{subfigure}{0.7\textwidth}
+        \includegraphics[width=0.7\linewidth]{figures/responseI.png}
         \caption{Response of attack rate to I.}
         \label{fig:usecaseresponseplots}
     \end{subfigure}
@@ -83,5 +85,5 @@ We performed the 10-20-30 analysis also in the distributed setting and compared 
 \end{figure}
 
 Based on runtime and scaling, we obtained the best results with the distributed application of CSRM with a Tree topology. This resulted in an algebraic expression with a fitness value of 0.039 on the full data set. However, it is still 10 orders of magnitude removed from the optimal prediction of the response, which is an indication of the value that partial results can offer. 
-The effect of each parameter on the response can be explored using response plots. As such, we vary each of the parameters while keeping the others fixed to the midpoint of the range, and calculate an estimate of the attack rate. We observed that our surrogate model predicts an attack rate outside of the valid range of [0,1]. This might be explained by the scaling factor of 10 between the prediction and the actual output from the simulator. The surrogate models from the CSRM tool are trained with 30 data points and not the full factorial design. Nonetheless, the response plots can be used to evaluate points that were not available in our training set. The trends in the response plots are in line with the literature [REF 13].  R$_0$ increases logarithmic with the attack rate, which is in line with theoretical and empirical results. An increasing trend is also observed with the initial number of infected persons. An in crease in the immunization fraction shows a decease in the predicted attack rate. While the exact values of the predicted attack rate from our suboptimal surrogate model are not yet correctly, the expected trends are. This justifies our incremental approach since surrogate models will  match the trend first, rather than fitting individual points. This can be partly explained by our usage of the Pearson R correlation coefficient as basis for the fitness function. 
+The effect of each parameter on the response can be explored using response plots. As such, we vary each of the parameters while keeping the others fixed to the midpoint of the range, and calculate an estimate of the attack rate. We observed that our surrogate model predicts an attack rate outside of the valid range of [0,1]. This might be explained by the scaling factor of 10 between the prediction and the actual output from the simulator. The surrogate models from the CSRM tool are trained with 30 data points and not the full factorial design. Nonetheless, the response plots can be used to evaluate points that were not available in our training set. The trends in the response plots are in line with the literature \cite{FRED}.  R$_0$ increases logarithmic with the attack rate, which is in line with theoretical and empirical results. An increasing trend is also observed with the initial number of infected persons. An in crease in the immunization fraction shows a decease in the predicted attack rate. While the exact values of the predicted attack rate from our suboptimal surrogate model are not yet correctly, the expected trends are. This justifies our incremental approach since surrogate models will  match the trend first, rather than fitting individual points. This can be partly explained by our usage of the Pearson R correlation coefficient as basis for the fitness function. 
 

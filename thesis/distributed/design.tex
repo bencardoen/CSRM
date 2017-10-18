@@ -45,7 +45,7 @@ After each phase, a process sends its best k expressions to each target based on
 For hierarchical, non-cyclic topologies this can lead to a perfect scaling, where synchronization decreases as the number of processes increases.
 
 \subsection{Approximated k-fold Cross Validation}
-We divide the data over k processes, each using a random sample of 4/5 of the full input-output data. Subsequently, each process divides its data by 4/5 between training and validation. As such, the distributed process approximates a k-fold cross validation. Irrespectively of the topology, each pair of communicating processes has the same probability of overlapping data. When this probability is too low, overfitting occurs and expressions from one process are likely to be invalid for other process' training data. When the overlap is too extensive, both processes will be searching the same subspace of the search space.
+We divide the data over k processes, each using a random sample of 4/5 of the full input-output data. Subsequently, each process divides its data by 4/5 between training and validation. As such, the distributed process approximates a k-fold cross validation. Irrespectively of the topology, each pair of communicating processes has the same probability of overlapping data. When this probability is too low, overfitting occurs and expressions from one process are likely to be invalid for other process' training data. When the overlap is too extensive, both processes will be searching the same subspace of the search space. The process is detailed in Figure \ref{fig:kfold}.
 
 \subsection{Communication Topology}
 The process communication topology affects the convergence characteristics algorithm, which can be expressed as concentration and diffusion.
