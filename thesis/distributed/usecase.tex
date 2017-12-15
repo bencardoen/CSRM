@@ -1,7 +1,7 @@
 %%!TEX root = document.tex
 
 Infectious diseases have substantial impact on health care, economics and society. 
-Observational data might not be fully predictive for future outbreaks in adapted populations or settings and experiments in the real world process can have practical, budgetary or ethical constraints. Therefore, simulations and surrogate modeling can be very useful to mimic real world process and to inform policy makers on the prevention of infectious diseases and to obtain insights in transmission dynamics.
+Observational data might not be fully predictive for future outbreaks in adapted populations or settings and experiments in the real world process can have practical, budgetary or ethical constraints. Therefore, simulation and surrogate modeling can be very useful to mimic real world process and to inform policy makers on the prevention of infectious diseases and to obtain insights in transmission dynamics.
 
 Our aim is to apply our CSRM tool to the input-output data of a computationally intensive high-performance simulator, STRIDE \citep{stride}, which models the transmission of infectious diseases.
 The simulator is calibrated for measles outbreaks in Antwerp, a city in Belgium, with a population size of 500000 individuals. Of vital importance here is the population immunity aspect and as such our research question is: how does the immunization fraction influence the outbreak of measles?
@@ -26,7 +26,7 @@ We constructed an experimental design with 3 dimensions and 30 points, using the
 \item Starting set of infected persons (S) : Number of persons in the population that is an infected person at the start of the simulation, [1-500]
 \item Immunity fraction (I) : Fraction of the population that is immune to the disease at the start of the simulation. [0.75, 0.95]
 \end{itemize}
-For each parameter we used 30 points uniformly chosen in their range and each configuration is used to run the disease simulator once. 
+For each parameter we used 30 points uniformly chosen in their domain and each configuration is used to run the disease simulator once. 
 We used the the attack rate as output parameter, which is the rate of the total number of cases in the population versus the size of the population. 
 
 
@@ -52,7 +52,7 @@ We performed the 10-20-30 analysis also in the distributed setting and compared 
 \begin{figure}
     \begin{subfigure}{0.7\textwidth}
         \includegraphics[width=0.7\linewidth]{figures/usecasedistributed.png}
-		\caption{Incremental distributed CSRM applied to use case.}
+		\caption{Incremental distributed\\ CSRM applied to use case.}
 		\label{fig:usecasedistributed}
     \end{subfigure}
     \begin{subfigure}{0.7\textwidth}
@@ -65,6 +65,7 @@ We performed the 10-20-30 analysis also in the distributed setting and compared 
         \caption{Incremental fitness gain in CSRM.}
         \label{fig:incrementalgain}
     \end{subfigure}
+	\caption{Use case : Effect of topology when applied to use case.}
 \end{figure}
 \begin{figure}
     \begin{subfigure}{0.7\textwidth}
@@ -80,7 +81,7 @@ We performed the 10-20-30 analysis also in the distributed setting and compared 
         \caption{Response of attack rate to I.}
         \label{fig:usecaseresponseplots}
     \end{subfigure}
-    %\caption{Use case : Effect of topology on fitness correlation of distributed processes.}
+    \caption{Use case : Response of attack rate to R, S, I.}
     %\label{fig:usecasecorrelation}
 \end{figure}
 

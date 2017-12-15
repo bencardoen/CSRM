@@ -1,7 +1,7 @@
 %%!TEX root = document.tex
 
 The project's source code, benchmark scripts, analysis code and plots are provided in an open source  \href{https://bitbucket.org/bcardoen/csrm}{repository}. Additional results, left out here due to space constraints are covered in \href{https://bitbucket.org/bcardoen/csrm/src/9de4b990ce27bbaeb885203f82a76635d8d92473/thesis/thesis/MsCThesisBenCardoen.pdf?at=master&fileviewer=file-view-default}{work}.
-The experiments were performed on an Intel Xeon E5 2697 processor with 64GB RAM, with Ubuntu 16.04 LTS.  The experiments use a fixed seed in order to guarantee reproducibility. 
+The experiments were performed on an Intel Xeon E5 2697 processor with 64GB RAM, with Ubuntu 16.04 LTS.  The experiments use a fixed seed in order to guarantee reproducibility. For the parallel experiments we use 25 processes.
 %Where relevant we specify the parameter configuration.
  
 \paragraph{Benchmark problems}
@@ -9,13 +9,13 @@ Recent work on the convergence of GP-based SR \cite{SRAccur, SRBaseline} feature
 These 15 benchmarks use at most five features and are non-linear arithmetic expressions using standard base functions : (sin, cos, tan(h), log,$a^x$, /, *, modulo, abs, min, max, +, -). CSRM does not know in advance which features are used. It only assumes that each problem is a function of maximum 5 features, testing the robustness of the algorithm.
 
 \paragraph{Experiment setup}
-Each process has a population of 20 expression trees with an initial depth of 4, max depth of 8, executes 20 phases of 20 runs or generations with an archive size of 20 expressions. Per phase, the 4 best expressions are archived. The benchmark functions have at most 5 features with 20 sample points in the range [1,5]. The Grid and Tree topology share their best expression per link, the Random topology shares 2 expressions per link. We used 25 processes, resulting in respectively 400, 15, 50 expressions being sent per phase. The random topology in this case contains 2 cliques of cycles.
+Each process has a population of 20 expression trees with an initial depth of 4, max depth of 8, executes 20 phases of 20 runs or generations with an archive size of 20 expressions. Per phase, the 4 best expressions are archived. The benchmark functions have at most 5 features with 20 sample points in the range [1,5]. The Grid and Tree topology share their best expression per link, the Random topology shares 2 expressions per link. We used 25 processes, resulting in respectively 400, 15, 50 expressions being sent per phase. The random topology in this case contains is a disconnected set of 2 cycles.
 
 At the end of an experiment, the best 20 expressions from all processes are collected and scored. We measure the fitness on the training data, and the fitness on the validation data. 
 Finally, we record the mean fitness values of the best 5 expressions, both on the training and validation data, as convergence rate.
 The mean is restricted to the upper quarter of the population specifically to measure how the best expressions are distributed. %LW: dit begrijp ik net... 
 % BC : De population mean is gevoelig aan outliers, e.g. 0.01, 0.02, 0.9,1,1,1 in edge cases (0.01 best, 1 worst), dus ik neem de mean van de best x om naar de 'effective subpopulation' te kijken.
-This measure records the convergence more accurately as the fittest expressions drive the convergence rate, or put differently, it ignores the effect outliers would otherwise have on the mean.
+This measure records the convergence more accurately as the fittest expressions drive the convergence rate, or put differently, it ignores the effect outliers would otherwise have on the mean. 
 Fitness values fluctuate strongly across test problems and topologies. The results are presented in relative to the Tree topology to measure a relative gain or loss in orders of magnitude.
 % on a negative logarithmic scale : $f_t = -\log_{10}(f)$ where f is the ratio of the best fitness values. 
 %LW: the scale is not relevant is you present a ratio. It is used for both measures... // agreed
@@ -23,7 +23,24 @@ Fitness values fluctuate strongly across test problems and topologies. The resul
 
 %\subsubsection{Results}
 \paragraph{Convergence}
-\begin{figure*}
+
+
+\begin{figure}
+    \label{fig:ckfold}
+	\begin{subfigure}{0.5\textwidth}\label{fig:csrmkfold}
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/validationcsrm.png}
+    \caption{Approximation of k fold cross validation \\with parallel processes, k = 4,  r = $\frac{3}{4}$.}
+    \end{subfigure}
+	\begin{subfigure}{0.5\textwidth}    \label{fig:kfold}
+
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/kfold.png}
+    \caption{Visualization of k fold cross validation with k = 4.}
+    \end{subfigure}%
+    \caption{K fold cross validation approximation in CSRM.}
+ \end{figure}
+ 
+ \begin{figure*}
     \centering
     \begin{subfigure}{0.5\textwidth}
     \centering
@@ -49,24 +66,9 @@ Fitness values fluctuate strongly across test problems and topologies. The resul
     \label{fig:distributedresults}
 \end{figure*}
 
-\begin{figure}
-    \label{fig:ckfold}
-	\begin{subfigure}{0.5\textwidth}\label{fig:csrmkfold}
-    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/validationcsrm.png}
-    \caption{Approximation of k fold cross validation \\with parallel processes, k = 4,  r = $\frac{3}{4}$.}
-    \end{subfigure}
-	\begin{subfigure}{0.5\textwidth}    \label{fig:kfold}
-
-    \centering
-    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{figures/kfold.png}
-    \caption{Visualization of k fold cross validation with k = 4.}
-    \end{subfigure}%
-    \caption{K fold cross validation approximation in CSRM.}
- \end{figure}
-
 %Figure \ref{fig:distributedresults} shows large differences in the fitness based on the topology. 
-%For the best fitness, the first 5 benchmarks, with exception of the second, all have identical values on training and validation data. The processes converged to zero fitness values for these problems, hence the identical results. 
-The fitness results on the training data, presented in Figure \ref{fig:distributedresults}a, indicate that the Grid and Random topology have superior convergence characteristics compared to the Tree topology, with Grid outperforming Random on several benchmarks. When we look at the fitness values on the validation data in Figure \ref{fig:distributedresults}b, we observe more nuanced results. Overall, the Grid topology is the best choice regarding best fitness values and the Random topology sometimes performs inferior compared to the Tree topology (e.g. benchmark 11 and 12). If we look at the mean fitness values on training and validation data, the Tree topology outperforms the Grid and Random topology on 2 benchmarks. However, the Grid topology performs still the best for most problems, with the exception of benchmark 7 where the Random topology dominates. The similarity between the results of the training and validation data, both for the best and mean fitness, indicates a good predictive capability since overfitting would result in a reverse patterns for the training and validation data.
+For the best fitness, the first 5 benchmarks, with exception of the second, all have identical values on training and validation data. The processes converged to zero fitness values for these problems, hence the identical results. 
+The fitness results on the training data, presented in Figure \ref{fig:distributedresults}a, indicate that the Grid and Random topology have superior convergence characteristics compared to the Tree topology, with Grid outperforming Random on more than half of the benchmarks. When we look at the fitness values on the validation data in Figure \ref{fig:distributedresults}b, we observe more nuanced results. Overall, the Grid topology is the best choice regarding best fitness values and the Random topology sometimes performs inferior compared to the Tree topology (e.g. benchmark 11 and 12). If we look at the mean fitness values on training and validation data, the Tree topology outperforms the Grid and Random topology on 2 benchmarks. However, the Grid topology performs still the best for most problems, with the exception of benchmark 7 where the Random topology dominates. The similarity between the results of the training and validation data, both for the best and mean fitness, indicates a good predictive capability since overfitting would result in a reverse patterns for the training and validation data. 
 
 \paragraph{Measuring Overhead}
 Cycles in the topology lead to excessive synchronization and serialization. We measure the mean execution time for benchmark 6, which leads to different convergence characteristics based on the topology, making this a good testcase. The processes will communicate 25 times. 
