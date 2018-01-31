@@ -2,15 +2,17 @@ An open source \href{https://bitbucket.org/bcardoen/csrm}{repository} holds the 
 All benchmarks were performed on an Intel Xeon E5 2697 processor with 64GB Ram, with Ubuntu 16.04 LTS operating system. The experiments use a fixed seed in order to guarantee determinism. 
 Recent work on the convergence of GP-based SR \cite{SRAccur, SRBaseline} featured a set of benchmark problems, using at most five features. CSRM does not know which features are used, making the problem harder. 
 \paragraph{Setup}
-We test 15 functions with the configuration: \\
-- population : 20\\
-- minimum depth : 4; maximum depth : 10\\
-- phases : (2, 5, 10); generations per phase : 20\\
-- features 5; datapoints : 20\\
-- range : [1,5]\\
-- size of archive : 20\\
-- expressions to archive per phase : 4\\
-- optimization : optimize at end of phase
+We test 15 functions with the configuration:
+\begin{itemize}
+\item population : 20
+\item minimum depth : 4; maximum depth : 10
+\item phases : (2, 5, 10); generations per phase : 20
+\item features 5; datapoints : 20
+\item range : [1,5]
+\item size of archive : 20
+\item expressions to archive per phase : 4
+\item optimization : optimize at end of phase
+\end{itemize}
 \paragraph{Measures}
 For all functions, we compare the gain in fitness with and without using an optimizer. 
 If $m_n$ is a measures the gain without the optimizer, and $m_a$ with the optimizer, we define the relative gain as $ g_{ma} = \frac{m_n}{m_a}$. If $m_a$ is zero, we use $-log_{10}(m_n)$ to represent the gain. If both are zero, the gain is 1. A value of g $>$ 1 indicates the ratio with which the optimizer improves the result. A g value $<$ 1 indicates a regression. The 15 functions have wildly varying convergence behavior. In order to make sense of the data, we then apply a log scale $ g_{lma} = - \log_{10}(g_{ma}) $.
@@ -22,69 +24,71 @@ We also observe the significant regression for problem 6. This is likely due to 
 \paragraph{5 Phases}
 With 5 phases we see in Figure\ref{fig:5phase} a more diverse effect. ABC scores exceptionally well on problem 6, in sharp contrast with the 2 phase experiment. PSO scores better overall for the training data. When it comes to improving the mean of the best 5 expressions, PSO is a stable choice if we disregard the outlier values for problem 5. The correlation between training and full fitness scores is good for both measures. This demonstrates that the optimizer is not (in this experiment) introducing overfitting on the training data. The adverse effect of the optimizer on some test problems is still present. For the best fitness values on the full data DE is the better candidate. While ABC scores exceptionally high on problem 6, DE scores better overall. When we look at the mean there is no clear winner. 
 \begin{figure*}
+\captionsetup[subfigure]{justification=centering}
+
     \centering
-    \begin{subfigure}{0.6\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
     \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases2_mintrainfitness.png}
-    \caption{Relative gain in best fitness of training data - 2 phases}
+    \caption{Relative gain in best fitness\\ on training data - 2 phases}
     \end{subfigure}%
-    \begin{subfigure}{0.6\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
      \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases2_minfullfitness.png}
-    \caption{Relative gain in best fitness of full data - 2 phases}
+    \caption{Relative gain in best fitness\\ on full data - 2 phases}
     \end{subfigure}
-    \begin{subfigure}{0.6\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
     \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases2_meantrainfitness.png}
-    \caption{Relative gain in mean fitness of 5 best on training data - 2 phases}
+    \caption{Relative gain in mean fitness of 5 best\\ on training data - 2 phases}
     \end{subfigure}%
-    \begin{subfigure}{0.6\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
     \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases2_meanfullfitness.png}
-    \caption{Relative gain in mean fitness of 5 best on full data - 2 phases}
+    \caption{Relative gain in mean fitness of 5 best\\ on full data - 2 phases}
     \label{fig:2phase}
     \end{subfigure}
-    \begin{subfigure}{0.6\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
         \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases5_mintrainfitness.png}
-        \caption{Relative gain in best fitness of training data - 5 phases}
+        \caption{Relative gain in best fitness\\ on training data - 5 phases}
     \end{subfigure}%
-    \begin{subfigure}{0.6\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
         \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases5_minfullfitness.png}
-        \caption{Relative gain in best fitness of full data - 5 phases}
+        \caption{Relative gain in best fitness\\ on full data - 5 phases}
     \end{subfigure}
-        \begin{subfigure}{0.6\textwidth}
+        \begin{subfigure}{0.5\textwidth}
     \centering
         \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases5_meantrainfitness.png}
-        \caption{Relative gain in mean fitness of 5 best on training data - 5 phases}
+        \caption{Relative gain in mean fitness of 5 best\\ on training data - 5 phases}
     \end{subfigure}%
-    \begin{subfigure}{0.6\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
         \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases5_meanfullfitness.png}
-        \caption{Relative gain in mean fitness of 5 best on full data - 5 phases}
+        \caption{Relative gain in mean fitness of 5 best\\ on full data - 5 phases}
         \label{fig:5phase}
     \end{subfigure}
-        \begin{subfigure}{0.6\textwidth}
+        \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_mintrainfitness.png}
-        \caption{Relative gain in best fitness of training data - 10 phases}
+    \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_mintrainfitness.png}
+    \caption{Relative gain in best fitness\\ of training data - 10 phases}
     \end{subfigure}%
-    \begin{subfigure}{0.6\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_minfullfitness.png}
-        \caption{Relative gain in best fitness of full data - 10 phases}
+    \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_minfullfitness.png}
+    \caption{Relative gain in best fitness\\ of full data - 10 phases}
     \end{subfigure}
-        \begin{subfigure}{0.6\textwidth}
+        \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_meantrainfitness.png}
-        \caption{Relative gain in mean fitness of 5 best on training data - 10 phases}
+    \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_meantrainfitness.png}
+    \caption{Relative gain in mean fitness of 5 best\\ on training data - 10 phases}
     \end{subfigure}%
-    \begin{subfigure}{0.6\textwidth}
+    \begin{subfigure}{0.5\textwidth}
     \centering
-        \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_meanfullfitness.png}
-        \caption{Relative gain in mean fitness of 5 best on full data - 10 phases}
-            \label{fig:10phase}
+    \includegraphics[width=0.5\columnwidth]{figures/hybrid_phases10_meanfullfitness.png}
+    \caption{Relative gain in mean fitness of 5 best\\ on full data - 10 phases}
+    \label{fig:10phase}
     \end{subfigure}
 
     \caption{Relative gain of optimizer after 2,5,10 phases.}

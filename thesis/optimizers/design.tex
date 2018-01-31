@@ -4,10 +4,9 @@ Furthermore, Python's use of a global interpreter lock makes shared memory paral
 The algorithm accepts a matrix X = n x k of input data, and a vector Y = 1 x k of expected data. It will evolve expressions that result, when evaluated on X, in an 1 x k vector Y' that approximates Y. N is the number of features, or parameters, the expression can use. We do not know in advance whether all features are needed to build the expression.
 The goal of the algorithm is to find f' such that $ d(f(X), f'(X))=\epsilon$ results in $\epsilon$ minimal. F is the process we wish to approximate with f'. Not all distance functions are equally suitable for this purpose. A simple root mean squared error (RMSE) has an issue of scale: the range of this function is [0, +$\infty$), which makes comparisons problematic, particularly if we want to combine it with other objective functions. A simple linear weighted sum requires that all terms use the same scale.
 Normalization of RMSE is an option, but there is no single recommended way to do so.
-In this work we use a distance function based on the Pearson Correlation Coefficient r. Specifically, we define
+In this work we use a distance function based on the Pearson Correlation Coefficient R. Specifically, we define $d(Y,Y') = 1 - R$ and R as
 \begin{equation}
 \begin{aligned}
-d(Y, Y') = & \\ 1 - 
  \lvert \frac{\sum_{i=0}^{n}{(y_i-E[Y])*(y'_i-E[Y'])}}{\sqrt{\sum_{j=0}^{n}{(y_j-E[Y])^2}*\sum_{k=0}^{n}{(y'_k-E[Y'])^2}}}
 \lvert 
 \end{aligned}
